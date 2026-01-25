@@ -1,0 +1,107 @@
+services:
+  backend:
+    build: 
+      context: ./backend
+    container_name: euleresg-backend-dev
+    working_dir: /workspace/backend
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - ./backend/config/.env
+
+    environment:
+      # 报告并发
+      EXCEL_METRICS_REPORT_WORKERS: "2"
+
+      # LLM 并发
+      EXCEL_METRICS_LLM_CONCURRENCY: "11"
+
+      # 单 GPU 
+      EXCEL_METRICS_GPU_LOCK: "1"
+
+      # 并发下防漏数：LLM 失败重试
+      EXCEL_METRICS_LLM_RETRY: "4"
+      EXCEL_METRICS_LLM_RETRY_SLEEP: "0.8"
+    
+
+      PYTHONPATH: /workspace/backend/src
+      PYTHONUNBUFFERED: "1"
+
+      # 让 HippoRAG 走本地 embeddings endpoint（注意是 /v1）
+      HIPPO_EMBEDDING_BASE_URL: "http://embedder:8001/v1"
+      HIPPO_EMBEDDING_MODEL_NAME: "bge-m3"
+
+      # 指向你要用的本地 bge-m3 snapshot（容器内路径）
+      LOCAL_EMBEDDINGS_MODEL_PATH: /root/.cache/huggingface/hub/models--BAAI--bge-m3/snapshots/5617a9f61b028005a4858fdac845db406aefb181
+      LOCAL_EMBEDDINGS_DEVICE: cuda
+      LOCAL_EMBEDDINGS_BATCH: 16
+      LOCAL_EMBEDDINGS_MAX_LENGTH: 8192
+
+      # 热更新需要轮询
+      WATCHFILES_FORCE_POLLING: "true"
+      WATCHFILES_POLL_INTERVAL: "8.0"
+
+      # 国内镜像
+      # HF_ENDPOINT: "https://hf-mirror.com"
+      # HF_HUB_DISABLE_XET: "1"
+      # HF_HUB_ENABLE_HF_TRANSFER: "0"
+      # HF_HUB_DOWNLOAD_TIMEOUT: "1200"
+      # HF_HUB_ETAG_TIMEOUT: "120"
+
+    volumes:
+      - ./backend:/workspace/backend
+      - ./uploads:/workspace/uploads
+      - hf_cache:/root/.cache/huggingface
+      
+
+
+    command: >
+      python -m uvicorn esg_encoding.api:app
+      --host 0.0.0.0
+      --port 8000
+      --reload
+      --reload-dir src
+      --reload-exclude outputs/*
+      --reload-exclude logs/*
+
+    gpus: all
+    shm_size: "16gb"
+
+  frontend:
+    build:
+      context: ./ESG-demo-main/frontend
+      dockerfile: Dockerfile.dev
+    container_name: euleresg-frontend-dev
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend
+
+    volumes:
+      - ./ESG-demo-main/frontend:/app
+      - frontend_node:/app/node_modules
+      - frontend_next:/app/.next
+      - ./uploads:/app/uploads:ro
+
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+
+      # Frontend should proxy /api and /auth through Next rewrites to this backend URL
+      BACKEND_URL: "http://backend:8000"
+
+      # 热更新需要轮询
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      WATCHPACK_POLLING_INTERVAL: "4000"
+      CHOKIDAR_INTERVAL: "4000"
+
+      CROSS_ALL_RECORDS_PATH: /app/uploads/outputs/cross_analysis/output/all_records.json
+      
+
+volumes:
+  hf_cache:
+    name: hf_cache
+  frontend_node:
+  frontend_next:
+
