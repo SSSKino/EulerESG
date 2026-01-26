@@ -60,6 +60,69 @@ const isEmptyValue = (value: unknown) => {
   return s.length === 0;
 };
 
+// Extract readable context text from various backend schemas.
+// The backend may return:
+// - a plain string
+// - an object (evidence blob)
+// - an array of evidence segments
+const extractContextText = (raw: any): string => {
+  if (raw === null || raw === undefined) return "";
+  if (typeof raw === "string") return raw.trim();
+
+  const pickTextFromObj = (o: any): string => {
+    if (!o || typeof o !== "object") return "";
+    const cand =
+      o.context ??
+      o.Context ??
+      o.text ??
+      o.Text ??
+      o.excerpt ??
+      o.Excerpt ??
+      o.evidence_text ??
+      o.evidenceText ??
+      o.evidence ??
+      o.snippet ??
+      o.Snippet;
+
+    if (typeof cand === "string") return cand.trim();
+    if (cand && typeof cand === "object") {
+      // Sometimes evidence itself is nested.
+      const nested = pickTextFromObj(cand);
+      if (nested) return nested;
+    }
+
+    // As a last resort, stringify a small subset.
+    try {
+      const shallow = {
+        context: o.context ?? o.Context,
+        text: o.text ?? o.Text,
+        excerpt: o.excerpt ?? o.Excerpt,
+        page: o.page ?? o.page_number ?? o.pageNumber,
+      };
+      const s = JSON.stringify(shallow);
+      return s === "{}" ? "" : s;
+    } catch {
+      return "";
+    }
+  };
+
+  if (Array.isArray(raw)) {
+    const parts = raw
+      .map((seg) => {
+        if (typeof seg === "string") return seg.trim();
+        return pickTextFromObj(seg);
+      })
+      .filter((s) => !!s);
+    return parts.join("\n\n");
+  }
+
+  if (typeof raw === "object") {
+    return pickTextFromObj(raw);
+  }
+
+  return String(raw).trim();
+};
+
 const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   fileId,
   onPageNavigate,
@@ -183,7 +246,7 @@ const convertedData: AnalysisDataItem[] = (assessment.metric_analyses || [])
     );
 
     // context/evidence excerpt for hover
-    const context = pick(
+    const contextRaw = pick(
       item?.context,
       item?.Context,
       item?.evidence,
@@ -202,7 +265,8 @@ const convertedData: AnalysisDataItem[] = (assessment.metric_analyses || [])
       type,
       value: value ?? null,
       page: page ?? null,
-      context: (context ?? null) as any,
+      // Normalize evidence/context to readable text (avoid rendering [object Object]).
+      context: extractContextText(contextRaw) || null,
     };
   });
 setAnalysisData(convertedData);
@@ -262,6 +326,26 @@ setAnalysisData(convertedData);
       .sort((a, b) => a.localeCompare(b))
       .map((c) => ({ text: c, value: c }));
 
+    const unitOptions = Array.from(
+      new Set(
+        (data || [])
+          .map((d) => (d.unit || "").trim())
+          .filter((u) => u.length > 0)
+      )
+    )
+      .sort((a, b) => a.localeCompare(b))
+      .map((u) => ({ text: u, value: u }));
+
+    const typeOptions = Array.from(
+      new Set(
+        (data || [])
+          .map((d) => (d.type || "").trim())
+          .filter((t) => t.length > 0)
+      )
+    )
+      .sort((a, b) => a.localeCompare(b))
+      .map((t) => ({ text: t, value: t }));
+
     return [
       {
         title: "Metric",
@@ -315,12 +399,16 @@ setAnalysisData(convertedData);
         dataIndex: "unit",
         key: "unit",
         width: 90,
+        filters: unitOptions,
+        onFilter: (value, record) => (record.unit || "") === value,
       },
       {
         title: "Type",
         dataIndex: "type",
         key: "type",
         width: 120,
+        filters: typeOptions,
+        onFilter: (value, record) => (record.type || "") === value,
       },
       {
         title: "Value",
@@ -343,6 +431,8 @@ setAnalysisData(convertedData);
               ? formatNumber(record.value)
               : String(record.value);
 
+          const evidenceText = record.context ? String(record.context).trim() : "";
+
           const evidenceContent = (
             <div className="max-w-md p-2">
               <div className="text-sm">
@@ -355,22 +445,33 @@ setAnalysisData(convertedData);
                   </div>
                 )}
               </div>
-              {record.context ? (
-                <div className="mt-2 text-sm whitespace-pre-wrap">{record.context}</div>
+              {evidenceText ? (
+                <div className="mt-2 text-sm whitespace-pre-wrap">{evidenceText}</div>
               ) : (
                 <div className="mt-2 text-xs text-gray-500">No evidence excerpt available.</div>
               )}
             </div>
           );
 
+          // Hover content for the "!" icon. Requirements:
+          // - Do not use "LLM Analysis" as a title.
+          // - Include original context from the raw JSON when available.
           const llmContent = (
             <div className="max-w-md p-2">
-              <h4 className="font-semibold mb-2">LLM Analysis</h4>
-              {record.reasoning ? (
-                <p className="text-sm whitespace-pre-wrap">{record.reasoning}</p>
-              ) : (
-                <p className="text-sm text-gray-500">No analysis text available.</p>
+              {evidenceText && (
+                <div className="mb-3">
+                  <div className="text-xs font-semibold text-gray-700">Context</div>
+                  <div className="mt-1 text-sm whitespace-pre-wrap">{evidenceText}</div>
+                </div>
               )}
+              <div>
+                <div className="text-xs font-semibold text-gray-700">Analysis</div>
+                {record.reasoning ? (
+                  <p className="mt-1 text-sm whitespace-pre-wrap">{record.reasoning}</p>
+                ) : (
+                  <p className="mt-1 text-sm text-gray-500">No analysis text available.</p>
+                )}
+              </div>
             </div>
           );
 
@@ -381,13 +482,13 @@ setAnalysisData(convertedData);
 
           return (
             <div className="flex items-center gap-2 w-full">
-              {/* Left: value (takes remaining width) */}
-              <div className="flex-1 min-w-0">
-                <Popover content={evidenceContent} title="Evidence" trigger="hover" mouseEnterDelay={0.2}>
+              {/* Left: value */}
+              <div className="min-w-0">
+                <Popover content={evidenceContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
                   <span
                     className={
                       record.context || !empty
-                        ? "cursor-help underline decoration-dotted"
+                        ? "cursor-pointer underline decoration-dotted"
                         : "text-gray-400"
                     }
                   >
@@ -396,12 +497,12 @@ setAnalysisData(convertedData);
                 </Popover>
               </div>
 
-              {/* Right: hover (LLM) + page, right-aligned */}
-              <div className="ml-auto flex items-center gap-2 shrink-0">
+              {/* Right: hover (LLM) + page. Reserve space and avoid pushing too far right. */}
+              <div className="flex items-center gap-2 shrink-0 min-w-[56px] pr-3">
                 {(record.reasoning || record.reasoning === "") && (
-                  <Popover content={llmContent} title="LLM Analysis" trigger="hover" mouseEnterDelay={0.2}>
+                  <Popover content={llmContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
                     <span
-                      className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-help select-none"
+                      className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
                       aria-label="LLM analysis"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -585,8 +686,8 @@ setAnalysisData(convertedData);
         </div>
       </div>
       {showTable && (
-        <div className="bg-white rounded-lg shadow-sm p-4 hover:scale-[1.01] hover:shadow-lg transition-transform duration-300">
-          <h3 className="text-lg font-semibold mb-3 text-gray-800">
+        <div className="bg-white rounded-lg shadow-sm p-6 hover:scale-[1.01] hover:shadow-lg transition-transform duration-300">
+          <h3 className="text-xl font-semibold mb-6 text-gray-800">
             Results
           </h3>
           <Table

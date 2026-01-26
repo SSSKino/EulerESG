@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Table, Button, Space, Tag, Popconfirm, Badge } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { DeleteOutlined, CommentOutlined, FileSearchOutlined, SyncOutlined } from "@ant-design/icons";
+import { DeleteOutlined, CommentOutlined, SyncOutlined } from "@ant-design/icons";
 import { useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 
@@ -12,7 +12,7 @@ interface FileTableProps {
   onSelectionChange: (rows: File[]) => void;
 }
 
-const FileTable: React.FC<FileTableProps> = ({ onChatClick, onAnalysisClick, selectedRows, onSelectionChange }) => {
+const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSelectionChange }) => {
   const files = useFileStore((state) => state.files);
   const loading = useFileStore((state) => state.loading);
   const lastRefresh = useFileStore((state) => state.lastRefresh);
@@ -78,14 +78,6 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, onAnalysisClick, sel
             onClick={() => onChatClick(file)}
             disabled={file.status !== "ready"}>
             Chat
-          </Button>
-          <Button
-            type="default"
-            size="small"
-            icon={<FileSearchOutlined />}
-            onClick={() => onAnalysisClick && onAnalysisClick(file)}
-            disabled={file.status !== "ready"}>
-            Compliance Analysis
           </Button>
           <Popconfirm
             title="Delete the file"

@@ -17,6 +17,33 @@ import numpy as np
 
 from .models import ReportContent, TextSegment
 
+
+def _safe_pdf_page_count_from_bytes(pdf_bytes: bytes) -> Optional[int]:
+    """Best-effort PDF page count from bytes.
+
+    Returns None if the payload is not a valid PDF or PyMuPDF is unavailable.
+    """
+    try:
+        import fitz  # PyMuPDF
+
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        return int(doc.page_count)
+    except Exception:
+        return None
+
+
+def _safe_pdf_page_count_from_path(pdf_path: Path) -> Optional[int]:
+    """Best-effort PDF page count from a file path."""
+    try:
+        if not pdf_path.exists():
+            return None
+        import fitz  # PyMuPDF
+
+        doc = fitz.open(str(pdf_path))
+        return int(doc.page_count)
+    except Exception:
+        return None
+
 class FileManager:
     """ESG系统文件管理器"""
 
@@ -137,6 +164,12 @@ class FileManager:
         try:
             with open(target_path, 'wb') as f:
                 f.write(file_content)
+
+            # Best-effort: compute PDF page count early so the dashboard can
+            # display "No. of Pages" without relying on downstream processing.
+            page_count: Optional[int] = None
+            if file_type == "report" and file_extension.lower() == ".pdf":
+                page_count = _safe_pdf_page_count_from_bytes(file_content)
             
             # 生成文件哈希
             file_hash = self._generate_file_hash(target_path)
@@ -149,6 +182,7 @@ class FileManager:
                 "file_path": str(target_path),
                 "file_type": file_type,
                 "file_size": len(file_content),
+                "page_count": page_count,
                 "file_hash": file_hash,
                 "upload_time": datetime.now().isoformat(),
                 "status": "pending" if file_type == "report" else "uploaded",
@@ -402,6 +436,7 @@ class FileManager:
             文件信息列表
         """
         files = []
+        updated_any = False
         for file_id, file_info in self.metadata["files"].items():
             # 检查文件类型
             if file_info["file_type"] != file_type:
@@ -422,9 +457,27 @@ class FileManager:
                     continue
             
             files.append(file_info)
+
+            # Backfill page_count for legacy uploads (dashboard "No. of Pages").
+            try:
+                if (
+                    file_type == "report"
+                    and (file_info.get("page_count") is None)
+                    and str(file_info.get("file_path", "")).lower().endswith(".pdf")
+                ):
+                    pc = _safe_pdf_page_count_from_path(Path(file_info["file_path"]))
+                    if pc is not None:
+                        file_info["page_count"] = pc
+                        updated_any = True
+            except Exception:
+                # Never block listing due to a best-effort enrichment.
+                pass
         
         # 按上传时间排序
         files.sort(key=lambda x: x["upload_time"], reverse=True)
+
+        if updated_any:
+            self._save_metadata()
         return files
     
     def list_user_files(self, user_id: int, file_type: Optional[str] = None, 
@@ -441,6 +494,7 @@ class FileManager:
             文件信息列表
         """
         files = []
+        updated_any = False
         for file_id, file_info in self.metadata["files"].items():
             # 检查用户ID
             file_user_id = file_info.get("user_id")
@@ -458,9 +512,27 @@ class FileManager:
                 continue
             
             files.append(file_info)
+
+            # Backfill page_count for legacy uploads.
+            try:
+                if (
+                    (file_type is None or file_type == "report")
+                    and (file_info.get("file_type") == "report")
+                    and (file_info.get("page_count") is None)
+                    and str(file_info.get("file_path", "")).lower().endswith(".pdf")
+                ):
+                    pc = _safe_pdf_page_count_from_path(Path(file_info["file_path"]))
+                    if pc is not None:
+                        file_info["page_count"] = pc
+                        updated_any = True
+            except Exception:
+                pass
         
         # 按上传时间排序
         files.sort(key=lambda x: x["upload_time"], reverse=True)
+
+        if updated_any:
+            self._save_metadata()
         return files
     
     def cleanup_old_files(self, days: int = 30) -> int:

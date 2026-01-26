@@ -1,13 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Breadcrumb, Modal, Button, message } from "antd";
+import { Breadcrumb, Button, message } from "antd";
 import { useRouter } from "next/navigation";
 import { useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import MainContent from "../maincontent/MainContent";
 import FileTable from "./FileTable";
 import LoadingModal from "./LoadingModal";
-import ComplianceAnalysis from "./ComplianceAnalysis";
 
 export default function PDFViewer() {
   const router = useRouter();
@@ -82,8 +81,7 @@ export default function PDFViewer() {
         />
 
         <MainContent />
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-800">Your Files</h1>
+        <div className="flex items-center justify-end mb-4">
           <Button
             type="primary"
             disabled={selectedRows.length < 2}
