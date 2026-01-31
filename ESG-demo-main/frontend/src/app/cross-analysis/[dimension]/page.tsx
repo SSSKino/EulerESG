@@ -9,10 +9,9 @@ import type { ColumnsType } from "antd/es/table";
 import { getStoredAuth } from "@/lib/auth";
 import type { CrossExtractedRecord, CrossReportSummary } from "@/features/crossAnalysis/types";
 import { normalizeCrossRecords } from "@/features/crossAnalysis/recordAdapter";
-import IssueComparisonCharts, { getComparableUnitCharts } from "@/components/cross-analysis/IssueComparisonCharts";
 import { NewSidebar } from "@/components/cross-analysis/NewSidebar";
 import { NewHeader } from "@/components/cross-analysis/NewHeader";
-import { NewComparisonChart } from "@/components/cross-analysis/NewComparisonChart";
+import { MetricChartsGrid, type MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
 import { NewDataTable } from "@/components/cross-analysis/NewDataTable";
 import DisclosureCompletenessComparison from "@/components/cross-analysis/DisclosureCompletenessComparison";
 
@@ -34,6 +33,18 @@ function stripFileExt(name: string): string {
   if (!s) return "";
   // Remove the last extension only (e.g., ".pdf"), keep internal dots.
   return s.replace(/\.[^/.]+$/, "");
+}
+
+
+function isUuid(v: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v || "").trim());
+}
+
+function normalizeReportKey(v: any): string {
+  if (!v) return "";
+  const s = String(v).trim().toLowerCase();
+  const noExt = s.replace(/\.(pdf|json|txt)$/i, "");
+  return noExt.replace(/[^a-z0-9]+/g, "");
 }
 
 
@@ -134,7 +145,23 @@ export default function CrossAnalysisDimensionPage() {
   const isMobile = !screens.md;
 
   const dimensionSlug = safeTrim((params as any)?.dimension || "");
-  const ids = useMemo(() => parseIds(searchParams.get("ids")), [searchParams]);
+
+  // IMPORTANT:
+  // Next.js `useSearchParams()` may return a new object identity across renders.
+  // If we depend on that object in useMemo/useCallback, we can accidentally retrigger
+  // data loading (runExtract) on every render, which causes chart flicker.
+  // Therefore we only depend on the *string values* we actually use.
+  const idsParam = searchParams.get("ids") || "";
+  const frameworkParam = searchParams.get("framework") || "";
+
+  // Cache commonly used query params as strings so hooks don't depend on the
+  // `useSearchParams()` object identity.
+  const searchParamsStr = searchParams.toString();
+  const primaryQ = safeTrim(searchParams.get("primary"));
+  const secondaryQ = safeTrim(searchParams.get("secondary"));
+
+  const ids = useMemo(() => parseIds(idsParam), [idsParam]);
+  const selectedFramework = useMemo(() => safeTrim(frameworkParam), [frameworkParam]);
 
   const [reports, setReports] = useState<CrossReportSummary[]>([]);
   const [reportsLoading, setReportsLoading] = useState(false);
@@ -184,7 +211,7 @@ export default function CrossAnalysisDimensionPage() {
   useEffect(() => {
     if (!primaryOptions.length) return;
 
-    const primaryFromQuery = safeTrim(searchParams.get("primary"));
+    const primaryFromQuery = primaryQ;
     let desiredPrimary = "";
     if (primaryFromQuery && primaryOptions.includes(primaryFromQuery)) {
       desiredPrimary = primaryFromQuery;
@@ -194,7 +221,7 @@ export default function CrossAnalysisDimensionPage() {
     if (!desiredPrimary) desiredPrimary = primaryOptions[0];
 
     const secondaryOptions = secondaryByPrimary.get(desiredPrimary) || [];
-    const secondaryRaw = safeTrim(searchParams.get("secondary"));
+    const secondaryRaw = secondaryQ;
     let desiredSecondaries = secondaryRaw
       ? secondaryRaw
           .split(",")
@@ -204,11 +231,12 @@ export default function CrossAnalysisDimensionPage() {
     desiredSecondaries = desiredSecondaries.filter((s) => secondaryOptions.includes(s));
     if (!desiredSecondaries.length && secondaryOptions.length) desiredSecondaries = [secondaryOptions[0]];
 
-    setExpandedPrimaries((prev) => ({ ...prev, [desiredPrimary]: true }));
+    // Avoid pointless state updates that can cause continuous rerenders.
+    setExpandedPrimaries((prev) => (prev?.[desiredPrimary] ? prev : { ...prev, [desiredPrimary]: true }));
 
     setSelectedPrimary((prev) => (prev === desiredPrimary ? prev : desiredPrimary));
     setSelectedSecondaries((prev) => (arraysEqual(prev, desiredSecondaries) ? prev : desiredSecondaries));
-  }, [primaryOptions.join("|"), secondaryByPrimary, searchParams, dimensionSlug]);
+  }, [primaryOptions.join("|"), secondaryByPrimary, dimensionSlug, primaryQ, secondaryQ]);
 
   const records = useMemo(() => {
     const p = selectedPrimary;
@@ -302,23 +330,40 @@ export default function CrossAnalysisDimensionPage() {
     return m;
   }, [reports]);
 
+  // Map: (filename stem / display name / short name) -> true uuid file_id
+  const reportKeyToFileId = useMemo(() => {
+    const m = new Map<string, string>();
+    (reports || []).forEach((r) => {
+      const fid = safeTrim((r as any)?.file_id);
+      if (!fid) return;
+      const fname = stripFileExt(safeTrim((r as any)?.filename));
+      const dname = stripFileExt(safeTrim((r as any)?.display_name));
+      const sname = stripFileExt(safeTrim((r as any)?.short_name));
+      [fid, fname, dname, sname].forEach((k) => {
+        const nk = normalizeReportKey(k);
+        if (nk) m.set(nk, fid);
+      });
+    });
+    return m;
+  }, [reports]);
+
+
   const runExtract = useCallback(async () => {
     setRecordsLoading(true);
     setRecordsError(null);
     try {
-      // Prefer reading the persisted output JSON directly (static file).
-      // This avoids re-triggering expensive extraction and works even if embedding/LLM is unavailable.
-      const staticRows = await loadAllRecordsFromStatic();
-
-      // Second choice: local frontend route that reads the file from a mounted volume.
+      // Prefer local route first to avoid repeated 404s and UI flicker during dev.
+      // Local route reads from the mounted volume and is typically the fastest path.
       let localRows: any[] | null = null;
-      if (!staticRows) {
-        const local = await tryFetchPublicJson<any>(`/local/cross-analysis/excel-metrics/direct?ts=${Date.now()}`);
-        if (local && Array.isArray(local.records)) localRows = local.records;
-      }
+      const local = await tryFetchPublicJson<any>(`/local/cross-analysis/excel-metrics/direct?ts=${Date.now()}`);
+      if (local && Array.isArray(local.records)) localRows = local.records;
 
-      // Fallback: if static output is not available, use backend API (may trigger extraction).
-      let rows: any[] | null = staticRows || localRows;
+      // Second choice: read the persisted output JSON directly (static file).
+      // This avoids re-triggering expensive extraction and works even if embedding/LLM is unavailable.
+      const staticRows = localRows ? null : await loadAllRecordsFromStatic();
+
+      // Fallback: if neither local nor static output is available, use backend API (may trigger extraction).
+      let rows: any[] | null = localRows || staticRows;
       if (!rows) {
         try {
           const resp = await fetchJson<ExcelMetricsResponse>(`/api/cross-analysis/excel-metrics`, {
@@ -526,7 +571,12 @@ export default function CrossAnalysisDimensionPage() {
         key: "evidence",
         width: 110,
         render: (_: any, record: any) => {
-          const fileId = safeTrim(record?.id);
+          const rawId = safeTrim(record?.id) || safeTrim((record as any)?.file_id) || safeTrim(record?.name);
+          const fileId = rawId
+            ? (isUuid(rawId)
+                ? rawId
+                : reportKeyToFileId.get(normalizeReportKey(rawId)) || reportKeyToFileId.get(normalizeReportKey(record?.name)) || rawId)
+            : "";
           const page = record?.page ? String(record.page) : "1";
           const title = `${safeTrim(record?.name) || "Report"} · ${safeTrim(record?.topic) || "Evidence"}`;
           const qs = new URLSearchParams({
@@ -547,7 +597,7 @@ export default function CrossAnalysisDimensionPage() {
         },
       },
     ];
-  }, [companyOptions, topicOptions, subTopicOptions, yearOptions, filterCompanies, filterTopics, filterSubTopics, filterYears, isMobile]);
+  }, [companyOptions, topicOptions, subTopicOptions, yearOptions, filterCompanies, filterTopics, filterSubTopics, filterYears, isMobile, reportKeyToFileId]);
 
   const handleTableChange = useCallback((_: any, filters: any) => {
     setFilterCompanies((filters?.name as string[]) || []);
@@ -587,7 +637,7 @@ export default function CrossAnalysisDimensionPage() {
 
   const onSelectPrimary = useCallback(
     (primary: string, secondaryOverride?: string) => {
-      const sp = new URLSearchParams(searchParams.toString());
+      const sp = new URLSearchParams(searchParamsStr);
       sp.set("primary", primary);
 
       const secs = secondaryByPrimary.get(primary) || [];
@@ -607,13 +657,13 @@ export default function CrossAnalysisDimensionPage() {
       setSelectedSecondaries(nextSecs);
       if (nextSecs.length) setActiveSecondary(nextSecs[0]);
     },
-    [searchParams, router, secondaryByPrimary, clearTableFilters]
+    [searchParamsStr, router, secondaryByPrimary, clearTableFilters]
   );
 
   const onToggleSecondary = useCallback(
     (secondary: string, toggleMode: boolean) => {
       if (!selectedPrimary) return;
-      const sp = new URLSearchParams(searchParams.toString());
+      const sp = new URLSearchParams(searchParamsStr);
 
       const secOptions = secondaryByPrimary.get(selectedPrimary) || [];
       let next: string[] = [];
@@ -640,212 +690,84 @@ export default function CrossAnalysisDimensionPage() {
       setSelectedSecondaries(next);
       setActiveSecondary(secondary);
     },
-    [selectedPrimary, selectedSecondaries, searchParams, router, secondaryByPrimary, clearTableFilters]
+    [selectedPrimary, selectedSecondaries, searchParamsStr, router, secondaryByPrimary, clearTableFilters]
   );
 
   // 允许在没有 ids 的情况下也显示数据（从直接 JSON 文件加载）
   const isReady = true;
 
-  // 映射 dimension 和 issue 到数据字段
-  const dimensionMap: Record<string, string> = {
-    environment: "Environment",
-    social: "Social",
-    governance: "Governance",
-    "supply-chain": "Supply Chain",
-    community: "Community",
-  };
+// Cross Analysis navigation is fully data-driven:
+// Primary Navigation -> Secondary Navigation are extracted from all_records.json (and therefore reflect the real dataset).
+const [viewMode, setViewMode] = useState<"issue" | "disclosure">("issue");
 
-  const issueMap: Record<string, string[]> = {
-    emissions: ["greenhouse gas emissions", "ghg emissions", "emissions", "ghg"],
-    energy: ["energy", "energy management", "energy consumption", "renewable"],
-    water: ["water", "wastewater", "water consumption", "water use"],
-    waste: ["waste", "waste management", "waste generation"],
-    labor: ["labor", "workforce", "employee", "workforce", "labor practices"],
-    diversity: ["diversity", "inclusion", "diversity", "inclusion", "gender", "global female representation", "female representation", "female"],
-    health: ["health", "safety", "health", "safety", "occupational"],
-    ethics: ["ethics", "business ethics", "ethics", "ethical", "corruption", "contributions"],
-    compliance: ["compliance", "regulatory", "compliance", "regulatory", "legal"],
-    risk: ["risk", "risk management", "risk", "risk management"],
-    sourcing: ["sourcing", "responsible sourcing", "sourcing", "supply chain"],
-    suppliers: ["supplier", "suppliers", "supplier", "suppliers", "vendor"],
-    engagement: ["engagement", "community engagement", "engagement", "community"],
-    impact: ["impact", "social impact", "impact", "social impact"],
-  };
+const buildNavUrl = useCallback(
+  (primary: string, secondaries: string[]) => {
+    const next = new URLSearchParams(searchParamsStr);
+    if (primary) next.set("primary", primary);
+    else next.delete("primary");
 
-  // 根据选中的 dimension 和 issue 过滤数据（用于新样式）
-  const [selectedDimension, setSelectedDimension] = useState("environment");
-  const [selectedIssue, setSelectedIssue] = useState("emissions");
-  const [viewMode, setViewMode] = useState<"issue" | "disclosure">("issue");
+    if (secondaries && secondaries.length) next.set("secondary", secondaries.join(","));
+    else next.delete("secondary");
 
-  // 初始化时，根据 URL 参数或数据设置默认 dimension
-  useEffect(() => {
-    if (dimensionSlug) {
-      // 从 URL 参数获取 dimension
-      const dimensionFromSlug = Object.keys(dimensionMap).find(
-        (key) => slugify(dimensionMap[key]) === dimensionSlug
-      );
-      if (dimensionFromSlug) {
-        setSelectedDimension(dimensionFromSlug);
-      }
-    } else if (primaryOptions.length > 0) {
-      // 根据数据设置默认 dimension
-      const firstPrimary = primaryOptions[0];
-      const dimensionFromPrimary = Object.keys(dimensionMap).find(
-        (key) => dimensionMap[key].toLowerCase() === firstPrimary.toLowerCase()
-      );
-      if (dimensionFromPrimary) {
-        setSelectedDimension(dimensionFromPrimary);
-      }
-    }
-  }, [dimensionSlug, primaryOptions]);
+    const slug = slugify(primary || "nav");
+    const qs = next.toString();
+    return qs ? `/cross-analysis/${slug}?${qs}` : `/cross-analysis/${slug}`;
+  },
+  [searchParamsStr]
+);
 
-  const handleSelectIssue = useCallback((dimensionId: string, issueId: string) => {
+const handleTogglePrimary = useCallback(
+  (primary: string) => {
     setViewMode("issue");
-    setSelectedDimension(dimensionId);
-    setSelectedIssue(issueId);
-    
-    // 同步到现有的选择逻辑
-    const primaryNav = dimensionMap[dimensionId];
-    const issueKeywords = issueMap[issueId] || [];
-    
-    // 找到匹配的 primary
-    const matchedPrimary = primaryOptions.find(p => 
-      p.toLowerCase() === primaryNav?.toLowerCase()
-    );
-    
-    if (matchedPrimary) {
-      setSelectedPrimary(matchedPrimary);
-      
-      // 找到匹配的 secondary
-      const secs = secondaryByPrimary.get(matchedPrimary) || [];
-      const matchedSecondary = secs.find(s => {
-        const sLower = s.toLowerCase();
-        return issueKeywords.some(kw => sLower.includes(kw.toLowerCase()));
-      });
-      
-      if (matchedSecondary) {
-        setSelectedSecondaries([matchedSecondary]);
-      }
+    setExpandedPrimaries((prev) => ({ ...prev, [primary]: safeTrim(selectedPrimary) === primary ? !prev?.[primary] : true }));
+
+    // If user clicks a different primary, switch to it and select its first secondary by default.
+    if (safeTrim(selectedPrimary) !== primary) {
+      const secs = secondaryByPrimary.get(primary) || [];
+      const nextSecondaries = secs.length ? [secs[0]] : [];
+      setSelectedPrimary(primary);
+      setSelectedSecondaries(nextSecondaries);
+      router.replace(buildNavUrl(primary, nextSecondaries));
     }
-  }, [primaryOptions, secondaryByPrimary]);
+  },
+  [router, buildNavUrl, selectedPrimary, secondaryByPrimary]
+);
 
-  const handleSelectDisclosure = useCallback(() => {
-    setViewMode("disclosure");
-  }, []);
+const handleSelectSecondary = useCallback(
+  (primary: string, secondary: string) => {
+    setViewMode("issue");
+    setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
+    setSelectedPrimary(primary);
+    setSelectedSecondaries([secondary]);
+    router.replace(buildNavUrl(primary, [secondary]));
+  },
+  [router, buildNavUrl]
+);
 
+const handleSelectDisclosure = useCallback(() => {
+  setViewMode("disclosure");
+}, []);
 
-  // 根据新样式选择的 dimension 和 issue 过滤记录
-  const filteredRecordsForNewStyle = useMemo(() => {
-    if (!allRecords.length) {
-      console.log(`[CrossAnalysis] No records to filter, allRecords.length = ${allRecords.length}`);
-      return [];
-    }
+// Normalize URL (slug + query) once selection is resolved from data/URL,
+// so navigation state remains stable even when users land on /cross-analysis/<dimension>?ids=...
+useEffect(() => {
+  if (!selectedPrimary) return;
 
-    const primaryNav = dimensionMap[selectedDimension];
-    const issueKeywords = issueMap[selectedIssue] || [];
+  const pQ = primaryQ;
+  const sQ = secondaryQ;
+  const desiredSlug = slugify(selectedPrimary);
+  const curSlug = safeTrim((params as any)?.dimension || "");
+  const desiredSecondaryStr = (selectedSecondaries || []).join(",");
 
-    console.log(`[CrossAnalysis] Filtering records: dimension=${selectedDimension} (${primaryNav}), issue=${selectedIssue} (${issueKeywords.join(', ')})`);
+  const needsUpdate =
+    pQ !== selectedPrimary ||
+    (desiredSecondaryStr ? sQ !== desiredSecondaryStr : !!sQ) ||
+    (curSlug && curSlug !== desiredSlug);
 
-    const filtered = allRecords.filter((record) => {
-      // 匹配 Primary Navigation（不区分大小写）
-      const recordPrimaryNav = safeTrim((record as any).primary_navigation)?.toLowerCase() || "";
-      const matchesDimension = primaryNav
-        ? recordPrimaryNav === primaryNav.toLowerCase()
-        : false;
-
-      if (!matchesDimension) {
-        return false;
-      }
-
-      // 匹配 Secondary Navigation（不区分大小写，使用包含匹配）
-      const secondaryNav = safeTrim((record as any).secondary_navigation)?.toLowerCase() || "";
-      const matchesIssue =
-        issueKeywords.length === 0 ||
-        issueKeywords.some((keyword) => {
-          const kwLower = keyword.toLowerCase();
-          return secondaryNav.includes(kwLower) || kwLower.includes(secondaryNav);
-        });
-
-      return matchesIssue;
-    });
-
-    console.log(`[CrossAnalysis] Filtered to ${filtered.length} records`);
-    return filtered;
-  }, [allRecords, selectedDimension, selectedIssue]);
-
-  // 生成新样式需要的图表数据
-  const newChartData = useMemo(() => {
-    if (!filteredRecordsForNewStyle.length) return [];
-
-    // 获取所有唯一的报告名称
-    const allReportNames = new Set<string>();
-    filteredRecordsForNewStyle.forEach((record) => {
-      const fid = safeTrim((record as any).id || (record as any).file_id);
-      const fallback = safeTrim((record as any).name);
-      const name = fid ? fileIdToReportLabel.get(fid) || fallback || fid : fallback;
-      if (name) allReportNames.add(name);
-    });
-    const reportNamesList = Array.from(allReportNames);
-
-    // 按 Sub-topic 分组
-    const topicGroups: Record<string, Record<string, number>> = {};
-    const unitByCategory: Record<string, Set<string>> = {};
-
-    filteredRecordsForNewStyle.forEach((record) => {
-      const category = safeTrim((record as any).sub_topic) || safeTrim((record as any).topic) || "Other";
-      const fid = safeTrim((record as any).id || (record as any).file_id);
-      const fallback = safeTrim((record as any).name) || "Unknown";
-      const recordName = fid ? fileIdToReportLabel.get(fid) || fallback || fid : fallback;
-
-      // 记录每个 category 的单位（用于 yAxis 标题 & tooltip）
-      const unit = safeTrim((record as any).unit);
-      if (unit) {
-        if (!unitByCategory[category]) unitByCategory[category] = new Set<string>();
-        unitByCategory[category].add(unit);
-      }
-
-      const rawValue = safeTrim((record as any).data)?.replace(/,/g, "") || "0";
-      const value = parseFloat(rawValue) || 0;
-
-      if (isNaN(value) || value === 0) return;
-
-      if (!topicGroups[category]) {
-        topicGroups[category] = {};
-      }
-
-      if (topicGroups[category][recordName]) {
-        topicGroups[category][recordName] += value;
-      } else {
-        topicGroups[category][recordName] = value;
-      }
-    });
-
-    return Object.entries(topicGroups)
-      .map(([category, reportValues]) => {
-        const chartItem: any = { category };
-
-        // 单位：如果同一 category 出现多个单位，则标记为 Multiple units
-        const units = unitByCategory[category];
-        const unit =
-          units && units.size > 0
-            ? units.size === 1
-              ? Array.from(units)[0]
-              : "Multiple units"
-            : null;
-
-        chartItem.unit = unit;
-
-        reportNamesList.forEach((reportName) => {
-          chartItem[reportName] = reportValues[reportName] || 0;
-        });
-        return chartItem;
-      })
-      .filter((item) => reportNamesList.some((reportName) => item[reportName] > 0))
-      .sort((a, b) => {
-        const firstReport = reportNamesList[0] || "";
-        return (b[firstReport] || 0) - (a[firstReport] || 0);
-      });
-  }, [filteredRecordsForNewStyle, fileIdToReportLabel]);
+  if (needsUpdate) {
+    router.replace(buildNavUrl(selectedPrimary, selectedSecondaries || []));
+  }
+}, [selectedPrimary, (selectedSecondaries || []).join("|"), primaryQ, secondaryQ, router, buildNavUrl, params]);
 
   // 生成新样式需要的表格数据
   const newTableData = useMemo(() => {
@@ -864,16 +786,20 @@ export default function CrossAnalysisDimensionPage() {
       keys.forEach((k) => nameToFileIdMap.set(k, fid));
     });
 
-    return filteredRecordsForNewStyle.map((record, index) => {
+    return records.map((record, index) => {
       const numericValue = parseFloat(safeTrim((record as any).data)?.replace(/,/g, "") || "0");
       const formattedValue = isNaN(numericValue)
         ? safeTrim((record as any).data) || "N/A"
         : numericValue.toLocaleString();
-
-      // 提取 file_id 和 page
-      // 优先使用记录的 id，如果不存在则通过报告名称查找
+      // Extract file_id + page. Rows may come from old JSON where `id` is a company alias (e.g., Google2025).
+      // Prefer true uuid file_id; otherwise resolve alias/name to uuid using report meta.
       const recordName = safeTrim((record as any).name) || "";
-      const recordId = (record as any).id || (record as any).file_id || nameToFileIdMap.get(recordName) || "";
+      const rawFileId = safeTrim((record as any).id) || safeTrim((record as any).file_id) || nameToFileIdMap.get(recordName) || "";
+      const recordId = rawFileId
+        ? (isUuid(rawFileId)
+            ? rawFileId
+            : reportKeyToFileId.get(normalizeReportKey(rawFileId)) || reportKeyToFileId.get(normalizeReportKey(recordName)) || rawFileId)
+        : "";
       const recordPage = (record as any).page;
       const pageNumber = recordPage !== null && recordPage !== undefined 
         ? (typeof recordPage === 'number' ? recordPage : parseInt(String(recordPage))) 
@@ -886,8 +812,12 @@ export default function CrossAnalysisDimensionPage() {
       return {
         id: index + 1,
         report: reportLabel,
-        metric: safeTrim((record as any).sub_topic) || safeTrim((record as any).topic) || "N/A",
-        detail: safeTrim((record as any).detail) || "",
+        // Use Topic as the metric (requested)
+        metric: safeTrim((record as any).topic) || "N/A",
+        // Put sub-topic / detail into the detail column (wrappable)
+        detail: [safeTrim((record as any).sub_topic), safeTrim((record as any).detail)]
+          .filter(Boolean)
+          .join(" — "),
         year: parseInt(safeTrim((record as any).year) || "0") || new Date().getFullYear(),
         value: formattedValue,
         unit: safeTrim((record as any).unit) || "",
@@ -895,7 +825,7 @@ export default function CrossAnalysisDimensionPage() {
         page: pageNumber, // 保存原始记录的 page
       };
     });
-  }, [filteredRecordsForNewStyle, reports, fileIdToReportLabel]);
+  }, [records, reports, fileIdToReportLabel, reportKeyToFileId]);
 
   // 获取报告名称列表（从 records 中提取唯一的报告名称）
   const reportNames = useMemo(() => {
@@ -923,6 +853,111 @@ export default function CrossAnalysisDimensionPage() {
     return Array.from(uniqueNames);
   }, [reports, allRecords, ids]);
 
+  // Assign a stable color per company/report (used by all charts)
+  const companyColors = useMemo(() => {
+    const palette = [
+      "#1677ff",
+      "#52c41a",
+      "#faad14",
+      "#f5222d",
+      "#722ed1",
+      "#13c2c2",
+      "#eb2f96",
+      "#a0d911",
+    ];
+    const map: Record<string, string> = {};
+    reportNames.forEach((name, idx) => {
+      map[name] = palette[idx % palette.length];
+    });
+    return map;
+  }, [reportNames]);
+
+  // Build charts that compare the same indicator (Topic) across different companies that have data.
+  // If different indicators are disclosed, they become separate charts in a grid (max 4 per row).
+  const metricCharts = useMemo<MetricChartSpec[]>(() => {
+    if (!records.length) return [];
+
+    const yearNum = (y: string | null | undefined) => {
+      const n = Number(safeTrim(y));
+      return Number.isFinite(n) ? n : -Infinity;
+    };
+
+    const byKey = new Map<
+      string,
+      {
+        topic: string;
+        unit: string | null;
+        perCompany: Map<string, { value: number; year: string | null }>;
+      }
+    >();
+
+    records.forEach((record) => {
+      const topic = safeTrim((record as any).topic) || "Metric";
+      const unit = safeTrim((record as any).unit) || null;
+
+      const fid = safeTrim((record as any).id || (record as any).file_id);
+      const fallback = safeTrim((record as any).name);
+      const company = fid ? fileIdToReportLabel.get(fid) || fallback || fid : fallback || "Unknown";
+
+      // Parse the first numeric value from `data`.
+      const raw = safeTrim((record as any).data).replace(/,/g, "");
+      const match = raw.match(/-?\d+(?:\.\d+)?/);
+      if (!match) return;
+      const value = Number(match[0]);
+      if (!Number.isFinite(value)) return;
+
+      const year = safeTrim((record as any).year) || null;
+
+      const key = `${topic}||${unit || ""}`;
+      if (!byKey.has(key)) {
+        byKey.set(key, { topic, unit, perCompany: new Map() });
+      }
+      const bucket = byKey.get(key)!;
+      const prev = bucket.perCompany.get(company);
+
+      // Keep the most recent year per company for this Topic+Unit.
+      if (!prev || yearNum(year) > yearNum(prev.year)) {
+        bucket.perCompany.set(company, { value, year });
+      }
+    });
+
+    const charts: MetricChartSpec[] = [];
+    byKey.forEach((bucket, key) => {
+      const points = Array.from(bucket.perCompany.entries()).map(([company, v]) => ({
+        company,
+        value: v.value,
+        year: v.year,
+      }));
+
+      // Compare only metrics that have data for >=2 companies.
+      if (points.length < 2) return;
+
+      // Keep company order consistent with the header list when possible.
+      points.sort((a, b) => {
+        const ai = reportNames.indexOf(a.company);
+        const bi = reportNames.indexOf(b.company);
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+        return a.company.localeCompare(b.company);
+      });
+
+      const years = Array.from(new Set(points.map((p) => safeTrim(p.year)))).filter(Boolean) as string[];
+      const yearInfo = years.length === 1 ? `Year: ${years[0]}` : years.length > 1 ? "Years vary" : undefined;
+
+      charts.push({
+        key,
+        topic: bucket.topic,
+        unit: bucket.unit,
+        yearInfo,
+        points,
+      });
+    });
+
+    charts.sort((a, b) => b.points.length - a.points.length || a.topic.localeCompare(b.topic));
+    return charts;
+  }, [records, fileIdToReportLabel, reportNames]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#FFFFFF] p-6 w-full">
       <div className="w-full flex gap-6">
@@ -934,10 +969,14 @@ export default function CrossAnalysisDimensionPage() {
         ) : (
           <div className="w-[320px] flex-shrink-0">
             <NewSidebar
-              selectedDimension={selectedDimension}
-              selectedIssue={selectedIssue}
+              primaryOptions={primaryOptions}
+              secondaryByPrimary={secondaryByPrimary}
+              selectedPrimary={selectedPrimary}
+              selectedSecondaries={selectedSecondaries}
+              expandedPrimaries={expandedPrimaries}
               viewMode={viewMode}
-              onSelectIssue={handleSelectIssue}
+              onTogglePrimary={handleTogglePrimary}
+              onSelectSecondary={handleSelectSecondary}
               onSelectDisclosure={handleSelectDisclosure}
             />
           </div>
@@ -947,24 +986,24 @@ export default function CrossAnalysisDimensionPage() {
         <div className="flex-1 min-w-0 space-y-4">
           {/* Header Card */}
           <NewHeader
-            dimension={viewMode === "disclosure" ? "Disclosure completeness" : selectedDimension}
+            dimension={viewMode === "disclosure" ? "Disclosure completeness" : `${selectedPrimary}${selectedSecondaries?.[0] ? " / " + selectedSecondaries[0] : ""}`}
             reports={reportNames}
             onRefresh={() => runExtract()}
           />
 
           {viewMode === "disclosure" ? (
-            <DisclosureCompletenessComparison fileIds={ids} reports={reports} />
+              <DisclosureCompletenessComparison
+                fileIds={ids}
+                reports={reports}
+                framework={selectedFramework}
+              />
           ) : (
             <>
               {/* Comparison Chart Card */}
               {recordsLoading ? (
                 <Skeleton active paragraph={{ rows: 8 }} />
-              ) : newChartData.length > 0 ? (
-                <NewComparisonChart data={newChartData} />
               ) : (
-                <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-[#64748B]">
-                  No chart data available
-                </div>
+                <MetricChartsGrid charts={metricCharts} companyColors={companyColors} />
               )}
 
               {/* Data Table Card */}

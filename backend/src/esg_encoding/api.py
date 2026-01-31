@@ -2,10 +2,10 @@
 ESG System API Endpoints
 """
 
-from textwrap import indent
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from typing import Optional
 import os
 import json
@@ -83,6 +83,20 @@ FRONTEND_ORIGINS = [origin.strip() for origin in FRONTEND_ORIGINS_STR.split(",")
 
 # Log CORS configuration for debugging
 logger.info(f"CORS allowed origins: {FRONTEND_ORIGINS}")
+
+
+
+# Expose ./uploads over HTTP so the frontend can load persisted JSON outputs and other static artifacts.
+# In docker-compose, ./uploads is mounted to /workspace/uploads in backend.
+try:
+    _uploads_dir = str(file_manager.base_dir.resolve())
+    if os.path.isdir(_uploads_dir):
+        app.mount("/uploads", StaticFiles(directory=_uploads_dir), name="uploads")
+        logger.info(f"Mounted /uploads -> {_uploads_dir}")
+    else:
+        logger.warning(f"Uploads dir not found: {_uploads_dir} (skip mount)")
+except Exception as _e:
+    logger.warning(f"Failed to mount /uploads: {_e}")
 
 # Add CORS middleware
 app.add_middleware(
@@ -428,7 +442,7 @@ async def upload_report(
                     semi_industry=semiIndustry
                 )
                 t_end = time.time()
-                print(f"Disclosure inference as taken {t_end - t_start} seconds")
+                logger.info(f"Disclosure inference took {t_end - t_start} seconds")
                 
                 # Store assessment results
                 system_components["current_assessment"] = assessment
@@ -447,16 +461,14 @@ async def upload_report(
                 except Exception as e:
                     logger.warning(f"HippoRAG pre-index failed for {file_info['file_id']}: {e}")
                 
-                # Generate and save compliance report
+                # Generate and save compliance report (canonical location: uploads/outputs/markdown/)
                 compliance_report = disclosure_engine.generate_compliance_report(assessment)
-                report_path = Path("outputs") / f"compliance_report_{assessment.report_id}.md"
-                report_path.parent.mkdir(exist_ok=True)
-                with open(report_path, "w", encoding="utf-8") as f:
-                    f.write(compliance_report)
-                
-                # Save JSON assessment data for frontend use
-                backend_dir = Path(__file__).parent.parent.parent
-                json_report_dir = backend_dir / "outputs"
+                report_path = Path(file_manager.markdown_outputs) / f"compliance_report_{assessment.report_id}.md"
+                report_path.parent.mkdir(parents=True, exist_ok=True)
+                report_path.write_text(compliance_report, encoding="utf-8")
+
+                # Save JSON / XLSX assessment data for frontend use (canonical: uploads/outputs/compliance_reports/)
+                json_report_dir = Path(file_manager.compliance_outputs)
                 json_report_dir.mkdir(parents=True, exist_ok=True)
 
                 json_report_path = json_report_dir / f"{file_info['file_id']}_compliance.json"
@@ -497,6 +509,20 @@ async def upload_report(
                         for analysis in assessment.metric_analyses
                     ]
                 }
+
+                # Enforce UI/Output rules in the persisted JSON as well:
+                # - not_disclosed -> remove page/value
+                # - partially_disclosed -> replace value with a textual reason (no concrete numbers)
+                for m in assessment_json.get("metric_analyses", []) or []:
+                    s = str(m.get("disclosure_status", "") or "").strip().lower()
+                    if "partial" in s:
+                        m["value"] = (
+                            "Partially disclosed: referenced in the report, but the disclosure is not clear enough to extract a specific value "
+                            "(e.g., missing a precise figure, unit, or reporting period)."
+                        )
+                    elif "not" in s:
+                        m["page"] = None
+                        m["value"] = None
                 
                 with open(json_report_path, "w", encoding="utf-8") as f:
                     json.dump(assessment_json, f, indent=2, ensure_ascii=False)
@@ -553,7 +579,7 @@ async def upload_report(
                 df_final = df_renamed.reindex(columns=final_columns)
                 df_final.to_excel(xlsx_report_path, index=False, sheet_name="Benchmark")
 
-                print(f"Successfully converted JSON to Excel at: {xlsx_report_path}")
+                logger.info(f"Successfully converted JSON to Excel at: {xlsx_report_path}")
                 
                 file_manager.move_report_file(file_info["file_id"], "processed")
                 logger.info(f"Complete processing chain finished. Score: {assessment.overall_compliance_score:.2%}")
@@ -755,23 +781,27 @@ async def analyze_compliance():
         # 生成合规报告
         compliance_report = disclosure_engine.generate_compliance_report(assessment)
         
-        # 保存报告
-        report_path = Path("outputs") / f"compliance_report_{assessment.report_id}.md"
-        report_path.parent.mkdir(exist_ok=True)
-        with open(report_path, "w", encoding="utf-8") as f:
-            f.write(compliance_report)
+        # 保存报告（canonical location: uploads/outputs/markdown/）
+        report_path = Path(file_manager.markdown_outputs) / f"compliance_report_{assessment.report_id}.md"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(compliance_report, encoding="utf-8")
         
-        # 保存JSON评估数据供前端使用
-        backend_dir = Path(__file__).parent.parent.parent
-        json_report_dir = backend_dir / "outputs"
+        # 保存JSON评估数据供前端使用（canonical: uploads/outputs/compliance_reports/）
+        json_report_dir = Path(file_manager.compliance_outputs)
         json_report_dir.mkdir(parents=True, exist_ok=True)
 
-        # 从报告ID提取文件ID（格式类似：doc_20250826_042708_ffd688f6-e1aa-49d3-be2d-2eefdc6ccfd2_9b591e1c）
-        report_id_parts = assessment.report_id.split('_')
-        if len(report_id_parts) >= 4:
-            file_id = '_'.join(report_id_parts[3:4])  # 提取文件ID部分
-        else:
-            file_id = assessment.report_id
+        # Best-effort resolve file_id from current report path
+        file_id = None
+        try:
+            current_path = str(system_components["current_report"].document_content.file_path)
+            for fid, info in file_manager.metadata.get("files", {}).items():
+                if info.get("file_path") == current_path:
+                    file_id = fid
+                    break
+        except Exception:
+            file_id = None
+        if not file_id:
+            file_id = str(getattr(assessment, "report_id", "unknown"))
 
         json_report_path = json_report_dir / f"{file_id}_compliance.json"
         
@@ -926,20 +956,33 @@ def _load_specific_report_context(file_id: str):
     report_content_obj = None
     assessment_obj = None
 
-    # Fast path: reuse in-memory report if it matches this file_id.
-    # This saves repeated disk IO + large embedding loads on every chat turn.
+    # Resolve file metadata early (needed for robust path resolution)
+    file_info = None
+    try:
+        file_info = file_manager.get_file_info(file_id)
+    except Exception:
+        file_info = None
+
+    safe_filename = str((file_info or {}).get("safe_filename") or "")
+    stem = Path(safe_filename).stem if safe_filename else ""
+
+    # Fast path: reuse in-memory report if it appears to belong to this file.
+    # NOTE: ReportContent.document_id is not guaranteed to equal file_id (it can be doc_<stem>_<hash>),
+    # so we also match by stem.
     try:
         cr = system_components.get("current_report")
-        if cr is not None and getattr(cr, "document_id", None) == file_id:
-            # assessment is still loaded from disk below (cheap) but report can be reused
-            report_content_obj = cr
+        if cr is not None:
+            docid = str(getattr(cr, "document_id", "") or "")
+            if docid == file_id or (stem and stem in docid):
+                report_content_obj = cr
     except Exception:
         pass
 
-    backend_root = Path(__file__).resolve().parents[2]          # /workspace/backend
-    workspace_root = backend_root.parent                       # /workspace
-    outputs_dir = backend_root / "outputs"
-    uploads_reports_dir = workspace_root / "uploads" / "reports"
+    # Canonical output roots (consistent with FileManager)
+    reports_root = Path(file_manager.reports_dir)
+    assessment_dir = Path(file_manager.compliance_outputs)
+    markdown_outputs_dir = Path(file_manager.markdown_outputs)
+    legacy_outputs_dir = Path(__file__).resolve().parents[2] / "outputs"
 
     def _parse_status(v) -> DisclosureStatus:
         if v is None:
@@ -966,14 +1009,19 @@ def _load_specific_report_context(file_id: str):
         return summary
 
     # 1) Load compliance assessment JSON for this file_id
-    assessment_json_path = outputs_dir / f"{file_id}_compliance.json"
-    file_info = None
-    try:
-        file_info = file_manager.get_file_info(file_id)
-    except Exception:
-        file_info = None
+    assessment_candidates = [
+        assessment_dir / f"{file_id}_compliance.json",
+    ]
+    if stem:
+        assessment_candidates.append(assessment_dir / f"{stem}_compliance.json")
+    if legacy_outputs_dir.exists():
+        assessment_candidates.append(legacy_outputs_dir / f"{file_id}_compliance.json")
+        if stem:
+            assessment_candidates.append(legacy_outputs_dir / f"{stem}_compliance.json")
 
-    if assessment_json_path.exists():
+    assessment_json_path = next((p for p in assessment_candidates if p.exists()), None)
+
+    if assessment_json_path is not None and assessment_json_path.exists():
         try:
             assessment_data = json.loads(assessment_json_path.read_text(encoding="utf-8"))
 
@@ -1081,10 +1129,12 @@ def _load_specific_report_context(file_id: str):
                 stem = pdf_path.stem
                 candidates.append(pdf_path.parent / f"{stem}_extracted.md")
                 candidates.append(pdf_path.parent / f"{stem}.md")
-                candidates.append(uploads_reports_dir / "pending" / f"{stem}_extracted.md")
-                candidates.append(uploads_reports_dir / "processed" / f"{stem}_extracted.md")
-                candidates.append(uploads_reports_dir / "failed" / f"{stem}_extracted.md")
-            candidates.append(outputs_dir / "markdown" / f"{file_id}.md")
+                candidates.append(reports_root / "pending" / f"{stem}_extracted.md")
+                candidates.append(reports_root / "processed" / f"{stem}_extracted.md")
+                candidates.append(reports_root / "failed" / f"{stem}_extracted.md")
+            candidates.append(markdown_outputs_dir / f"{file_id}.md")
+            if legacy_outputs_dir.exists():
+                candidates.append(legacy_outputs_dir / "markdown" / f"{file_id}.md")
 
             markdown_text = None
             for p in candidates:
@@ -1230,10 +1280,12 @@ def _load_latest_assessment_for_chat():
     为聊天机器人加载最新的评估数据（从JSON文件）
     """
     try:
-        # 获取最新的JSON评估数据
-        backend_dir = Path(__file__).parent.parent.parent
-        outputs_dir = backend_dir / "outputs"
-        json_files = list(outputs_dir.glob("*_compliance.json"))
+        # 获取最新的JSON评估数据（优先使用 uploads/outputs/compliance_reports/）
+        canonical_dir = Path(file_manager.compliance_outputs)
+        legacy_dir = Path(__file__).resolve().parents[2] / "outputs"  # legacy backend/outputs
+        json_files = list(canonical_dir.glob("*_compliance.json"))
+        if legacy_dir.exists():
+            json_files.extend(list(legacy_dir.glob("*_compliance.json")))
 
         if not json_files:
             logger.warning("No assessment JSON files found")
@@ -1300,9 +1352,9 @@ def _load_report_content_for_chat():
     try:
         from .models import ReportContent, ReportSegment
         
-        # 查找提取的markdown文件
-        uploads_dir = Path(__file__).parent.parent.parent.parent / "uploads"
-        markdown_files = list(uploads_dir.glob("*_extracted.md"))
+        # 查找提取的markdown文件（通常随 PDF 一起存放在 uploads/reports/**）
+        reports_dir = Path(file_manager.reports_dir)
+        markdown_files = list(reports_dir.glob("**/*_extracted.md"))
         
         if not markdown_files:
             logger.warning("No extracted markdown files found for chat")
@@ -1609,6 +1661,29 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         a.setdefault("context", a.get("specific_data_found") or a.get("evidence") or "")
         a.setdefault("evidence_segments", [])
         a.setdefault("improvement_suggestions", [])
+
+        # --- UI/Output rules for disclosure statuses ---
+        # 1) not_disclosed -> do not output any page/value
+        # 2) partially_disclosed -> value should be a textual reason (no concrete numbers)
+        status_raw = str(a.get("disclosure_status", "") or "").strip().lower()
+        # Normalize common legacy variants
+        if "partial" in status_raw:
+            status_norm = "partially_disclosed"
+        elif "not" in status_raw:
+            status_norm = "not_disclosed"
+        elif "full" in status_raw:
+            status_norm = "fully_disclosed"
+        else:
+            status_norm = status_raw
+
+        if status_norm == "not_disclosed":
+            a["page"] = None
+            a["value"] = None
+        elif status_norm == "partially_disclosed":
+            a["value"] = (
+                "Partially disclosed: referenced in the report, but the disclosure is not clear enough to extract a specific value "
+                "(e.g., missing a precise figure, unit, or reporting period)."
+            )
         norm.append(a)
 
     payload["metric_analyses"] = norm
@@ -1656,23 +1731,6 @@ async def get_assessment(limit: int = 0):
     return _normalize_assessment_payload(payload)
 
 
-@app.get("/api/test-path")
-async def test_path():
-    """测试路径配置"""
-    try:
-        backend_dir = Path(__file__).parent.parent.parent
-        outputs_dir = backend_dir / "outputs"
-        return {
-            "current_file": str(Path(__file__)),
-            "backend_dir": str(backend_dir), 
-            "outputs_dir": str(outputs_dir),
-            "outputs_exists": outputs_dir.exists(),
-            "files": [f.name for f in outputs_dir.glob("*.md")] if outputs_dir.exists() else []
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
-
 @app.get("/api/assessment/latest")
 async def get_latest_assessment(user_id: int = Depends(get_current_user)):
     """
@@ -1682,8 +1740,8 @@ async def get_latest_assessment(user_id: int = Depends(get_current_user)):
         最新的评估结果
     """
     try:
-        backend_dir = Path(__file__).parent.parent.parent
-        outputs_dir = backend_dir / "outputs"
+        canonical_dir = Path(file_manager.compliance_outputs)
+        legacy_dir = Path(__file__).resolve().parents[2] / "outputs"  # legacy backend/outputs
 
         # 从元数据中过滤当前用户的报告
         user_files = file_manager.list_user_files(user_id, file_type="report")
@@ -1701,11 +1759,12 @@ async def get_latest_assessment(user_id: int = Depends(get_current_user)):
 
         # 按上传时间倒序，找到第一个存在合规 JSON 的文件
         for f in sorted(user_files, key=lambda x: x["upload_time"], reverse=True):
-            json_file = outputs_dir / f"{f['file_id']}_compliance.json"
-            if json_file.exists():
-                logger.info(f"Loading latest assessment for user {user_id} from: {json_file}")
-                with open(json_file, 'r', encoding='utf-8') as fp:
-                    return _normalize_assessment_payload(json.load(fp))
+            for d in (canonical_dir, legacy_dir):
+                json_file = d / f"{f['file_id']}_compliance.json"
+                if json_file.exists():
+                    logger.info(f"Loading latest assessment for user {user_id} from: {json_file}")
+                    with open(json_file, 'r', encoding='utf-8') as fp:
+                        return _normalize_assessment_payload(json.load(fp))
 
         # 若用户有文件但尚未生成合规结果
         return {
@@ -1772,29 +1831,66 @@ async def get_assessment_by_file(file_id: str, user_id: int = Depends(get_curren
         file_info = file_manager.get_file_info(file_id, user_id=user_id)
         if not file_info:
             raise HTTPException(status_code=404, detail="File not found or access denied")
-        # Use backend/outputs directory for JSON files
-        backend_dir = Path(__file__).parent.parent.parent
-        json_report_dir = backend_dir / "outputs"
+        # --- Locate assessment JSON ---
+        # Canonical location:
+        #   uploads/outputs/compliance_reports/{file_id}_compliance.json
+        # Legacy location (older builds):
+        #   backend/outputs/*.json
+        safe_filename = str(file_info.get("safe_filename") or "")
+        base_name = Path(safe_filename).stem if safe_filename else ""
 
-        # 查找对应的JSON评估文件
-        json_file = json_report_dir / f"{file_id}_compliance.json"
+        canonical_dir = Path(file_manager.compliance_outputs)
+        legacy_dir = Path(__file__).resolve().parents[2] / "outputs"  # backend/outputs
+        search_dirs = [canonical_dir]
+        if legacy_dir.exists():
+            search_dirs.append(legacy_dir)
 
-        if not json_file.exists():
-            # 尝试模糊匹配
-            json_files = list(json_report_dir.glob(f"*{file_id}*.json"))
-            if not json_files:
-                logger.warning(f"No JSON assessment found for file_id: {file_id}")
-                return {
-                    "report_id": file_id,
-                    "assessment_date": datetime.now().isoformat(),
-                    "total_metrics": 0,
-                    "overall_score": 0,
-                    "disclosure_summary": {},
-                    "metric_analyses": [],
-                    "status": "not_analyzed",
-                    "message": f"No analysis available for this file yet"
-                }
-            json_file = json_files[0]
+        candidate_names = [f"{file_id}_compliance.json"]
+        if base_name:
+            candidate_names.append(f"{base_name}_compliance.json")
+
+        json_file = None
+        for d in search_dirs:
+            for name in candidate_names:
+                p = d / name
+                if p.exists():
+                    json_file = p
+                    break
+            if json_file is not None:
+                break
+
+        if json_file is None:
+            # Best-effort fuzzy match (keep strict to compliance-like names to avoid false positives)
+            fuzzy_patterns = [
+                f"*{file_id}*compliance*.json",
+                f"*{file_id}*_compliance.json",
+            ]
+            if base_name:
+                fuzzy_patterns.extend([
+                    f"*{base_name}*compliance*.json",
+                    f"*{base_name}*_compliance.json",
+                ])
+            matches = []
+            for d in search_dirs:
+                for pat in fuzzy_patterns:
+                    matches.extend(list(d.glob(pat)))
+            matches = [m for m in matches if m.is_file()]
+            if matches:
+                matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+                json_file = matches[0]
+
+        if json_file is None:
+            logger.warning(f"No JSON assessment found for file_id: {file_id}")
+            return {
+                "report_id": file_id,
+                "assessment_date": datetime.now().isoformat(),
+                "total_metrics": 0,
+                "overall_score": 0,
+                "disclosure_summary": {},
+                "metric_analyses": [],
+                "status": "not_analyzed",
+                "message": "No analysis available for this file yet"
+            }
 
         logger.info(f"Loading assessment from: {json_file}")
 
@@ -2440,30 +2536,50 @@ async def cleanup_orphaned_reports():
     清理孤儿报告文件（没有对应元数据的报告）
     """
     try:
-        # 获取所有活跃文件ID
-        active_file_ids = set(file_manager.metadata["files"].keys())
-        
-        # 扫描backend/outputs目录
-        backend_dir = Path(__file__).parent.parent.parent
-        outputs_dir = backend_dir / "outputs"
-        
+        # Active IDs / base names derived from metadata
+        active_files = list((file_manager.metadata or {}).get("files", {}).values())
+        active_file_ids = {str(x.get("file_id") or "").strip() for x in active_files if str(x.get("file_id") or "").strip()}
+        active_base_names = {
+            Path(str(x.get("safe_filename") or "")).stem
+            for x in active_files
+            if str(x.get("safe_filename") or "").strip()
+        }
+
+        def _is_orphan(name: str) -> bool:
+            return (not any(fid and fid in name for fid in active_file_ids)) and (not any(bn and bn in name for bn in active_base_names))
+
         deleted_items = []
-        if outputs_dir.exists():
-            for report_file in outputs_dir.glob("*.md"):
-                # 检查文件名中是否包含任何活跃的file_id
-                is_orphaned = True
-                for file_id in active_file_ids:
-                    if file_id in report_file.name:
-                        is_orphaned = False
-                        break
-                
-                if is_orphaned:
-                    report_file.unlink()
-                    deleted_items.append(report_file.name)
+
+        # Canonical output locations under uploads/
+        scan_specs = [
+            (Path(file_manager.markdown_outputs), "*.md"),
+            (Path(file_manager.compliance_outputs), "*.json"),
+            (Path(file_manager.embeddings_outputs), "*.*"),
+        ]
+
+        # Legacy output location (older builds): backend/outputs
+        legacy_outputs_dir = Path(__file__).resolve().parents[2] / "outputs"
+        if legacy_outputs_dir.exists():
+            scan_specs.append((legacy_outputs_dir, "*.md"))
+            scan_specs.append((legacy_outputs_dir, "*compliance*.json"))
+
+        for d, pat in scan_specs:
+            if not d.exists():
+                continue
+            for p in d.glob(pat):
+                if not p.is_file():
+                    continue
+                if _is_orphan(p.name):
+                    try:
+                        p.unlink()
+                        deleted_items.append(str(p))
+                    except Exception:
+                        # Best-effort cleanup: ignore individual failures
+                        pass
         
         return {
             "status": "success",
-            "message": f"Cleaned up {len(deleted_items)} orphaned report files",
+            "message": f"Cleaned up {len(deleted_items)} orphaned output files",
             "deleted_files": deleted_items
         }
     
@@ -2498,76 +2614,83 @@ async def delete_file(file_id: str, user_id: int = Depends(get_current_user)):
             deleted_items.append(f"PDF文件: {file_path.name}")
         
         # 2. 删除提取的Markdown文件
-        safe_filename = file_info.get("safe_filename", "")
-        base_name = ""
-        if safe_filename:
-            # 构造markdown文件路径
-            base_name = safe_filename.replace(".pdf", "")
-            markdown_paths = [
-                file_path.parent / f"{base_name}_extracted.md",
-                Path("uploads/outputs/markdown") / f"{base_name}_extracted.md",
-            ]
-            
-            for md_path in markdown_paths:
-                if md_path.exists():
-                    md_path.unlink()
-                    deleted_items.append(f"Markdown文件: {md_path.name}")
-        else:
-            # 如果没有safe_filename，从file_id构造base_name
-            base_name = file_id
-        
-        # 3. 删除嵌入向量文件
-        embeddings_paths = [
-            Path("uploads/outputs/embeddings") / f"{base_name}_embeddings.json",
-            Path("uploads/outputs/embeddings") / f"{base_name}_embeddings.npy",
+        safe_filename = str(file_info.get("safe_filename") or "")
+        stem = Path(safe_filename).stem if safe_filename else file_path.stem
+        markdown_paths = [
+            # Most common: saved next to the PDF (pending/processed/failed)
+            file_path.parent / f"{stem}_extracted.md",
+            # Optional: centralized markdown outputs
+            Path(file_manager.markdown_outputs) / f"{stem}_extracted.md",
         ]
-        
+
+        for md_path in markdown_paths:
+            if md_path.exists():
+                md_path.unlink()
+                deleted_items.append(f"Markdown文件: {md_path.name}")
+
+        # 3. 删除嵌入向量文件（以 FileManager 的落盘规则为准）
+        embeddings_paths = [
+            Path(file_manager.embeddings_outputs) / f"{file_id}_segments.json",
+            Path(file_manager.embeddings_outputs) / f"{file_id}_embeddings.npz",
+            Path(file_manager.embeddings_outputs) / f"{file_id}_embeddings_meta.json",
+            # Legacy variants (best-effort)
+            Path(file_manager.embeddings_outputs) / f"{stem}_embeddings.json",
+            Path(file_manager.embeddings_outputs) / f"{stem}_embeddings.npy",
+        ]
+
         for emb_path in embeddings_paths:
             if emb_path.exists():
                 emb_path.unlink()
                 deleted_items.append(f"嵌入文件: {emb_path.name}")
-        
+
         # 4. 删除合规分析报告
         compliance_paths = [
-            # JSON格式的合规报告
-            Path("uploads/outputs/compliance_reports") / f"{base_name}_compliance.json",
-            Path("uploads/outputs/compliance_reports") / f"{file_id}_compliance.json",
+            Path(file_manager.compliance_outputs) / f"{file_id}_compliance.json",
         ]
-        
-        # 添加backend/outputs目录下的Markdown合规报告
-        backend_dir = Path(__file__).parent.parent.parent  # 从src/esg_encoding到backend根目录
-        outputs_dir = backend_dir / "outputs"
-        
-        # 查找所有包含file_id的合规报告文件
-        if outputs_dir.exists():
-            for report_file in outputs_dir.glob(f"*{file_id}*.md"):
-                compliance_paths.append(report_file)
-        
+        if stem:
+            compliance_paths.append(Path(file_manager.compliance_outputs) / f"{stem}_compliance.json")
+
+        # Legacy location (older builds): backend/outputs
+        legacy_outputs_dir = Path(__file__).resolve().parents[2] / "outputs"
+        if legacy_outputs_dir.exists():
+            compliance_paths.extend(list(legacy_outputs_dir.glob(f"*{file_id}*.md")))
+            compliance_paths.extend(list(legacy_outputs_dir.glob(f"*{file_id}*compliance*.json")))
+
         for comp_path in compliance_paths:
             if comp_path.exists():
                 comp_path.unlink()
                 deleted_items.append(f"合规报告: {comp_path.name}")
-        
+
         # 5. 清理系统组件中的相关数据
-        # 如果这是当前加载的报告，清理内存中的数据
-        if system_components.get("current_report_content"):
-            current_report = system_components["current_report_content"]
-            if hasattr(current_report, 'document_id') and file_id in current_report.document_id:
-                system_components["current_report_content"] = None
-                deleted_items.append("内存中的报告内容")
+        # NOTE: ReportContent.document_id = doc_<stem>_<hash> (not the file_id)
+        cleared_current = False
+        current_report = system_components.get("current_report")
+        if current_report and stem and hasattr(current_report, "document_id") and stem in str(getattr(current_report, "document_id", "")):
+            system_components["current_report"] = None
+            cleared_current = True
+            deleted_items.append("内存中的报告内容")
         
-        if system_components.get("current_assessment"):
-            current_assessment = system_components["current_assessment"]
-            if hasattr(current_assessment, 'report_id') and file_id in current_assessment.report_id:
-                system_components["current_assessment"] = None
-                deleted_items.append("内存中的评估结果")
+        current_assessment = system_components.get("current_assessment")
+        if current_assessment and hasattr(current_assessment, "report_id") and str(getattr(current_assessment, "report_id", "")) == str(file_id):
+            system_components["current_assessment"] = None
+            cleared_current = True
+            deleted_items.append("内存中的评估结果")
+
+        # Clear derived caches only when they are tied to the cleared current context
+        if cleared_current:
+            system_components["current_metrics"] = None
+            system_components["current_framework"] = None
+            system_components["current_industry"] = None
+            system_components["current_semi_industry"] = None
+            system_components["current_company"] = None
         
         # 6. 清理聊天机器人上下文
         if system_components.get("chatbot"):
             chatbot = system_components["chatbot"]
             # 清理与该文件相关的聊天上下文
-            if hasattr(chatbot, 'report_content') and chatbot.report_content:
-                if hasattr(chatbot.report_content, 'document_id') and file_id in chatbot.report_content.document_id:
+            if getattr(chatbot, "report_content", None) is not None:
+                rc = chatbot.report_content
+                if stem and hasattr(rc, "document_id") and stem in str(getattr(rc, "document_id", "")):
                     chatbot.report_content = None
                     chatbot.compliance_assessment = None
                     deleted_items.append("聊天机器人上下文")
@@ -2623,27 +2746,46 @@ async def get_latest_report(user_id: int = Depends(get_current_user)):
         最新报告内容
     """
     try:
-        outputs_dir = Path("outputs")
-        if not outputs_dir.exists():
-            raise HTTPException(status_code=404, detail="No reports directory found")
-        
+        json_dirs = [
+            Path(file_manager.compliance_outputs),
+            Path(__file__).resolve().parents[2] / "outputs",  # legacy backend/outputs
+        ]
+        md_dirs = [
+            Path(file_manager.markdown_outputs),
+            Path(file_manager.compliance_outputs),  # some legacy runs wrote markdown alongside JSON
+            Path(__file__).resolve().parents[2] / "outputs",
+        ]
+
         # 获取用户自己的报告文件列表，按上传时间倒序
         user_files = file_manager.list_user_files(user_id, file_type="report")
         for f in sorted(user_files, key=lambda x: x["upload_time"], reverse=True):
-            # 先查 JSON 拿 report_id，再用 report_id 找 markdown
-            json_file = outputs_dir / f"{f['file_id']}_compliance.json"
-            if not json_file.exists():
+            # 先查 JSON 拿 report_id
+            json_file = None
+            for d in json_dirs:
+                p = d / f"{f['file_id']}_compliance.json"
+                if p.exists():
+                    json_file = p
+                    break
+            if not json_file:
                 continue
-            with open(json_file, 'r', encoding='utf-8') as jf:
+
+            with open(json_file, "r", encoding="utf-8") as jf:
                 assessment_data = json.load(jf)
             report_id = assessment_data.get("report_id")
             if not report_id:
                 continue
-            md_file = outputs_dir / f"compliance_report_{report_id}.md"
-            if not md_file.exists():
+
+            # 再用 report_id 找 markdown
+            md_file = None
+            for d in md_dirs:
+                p = d / f"compliance_report_{report_id}.md"
+                if p.exists():
+                    md_file = p
+                    break
+            if not md_file:
                 continue
-            with open(md_file, 'r', encoding='utf-8') as mf:
-                content = mf.read()
+
+            content = md_file.read_text(encoding="utf-8")
             return {
                 "status": "success",
                 "report_file": md_file.name,
@@ -2675,44 +2817,43 @@ async def get_report_by_file_id(file_id: str, user_id: int = Depends(get_current
         file_info = file_manager.get_file_info(file_id, user_id=user_id)
         if not file_info:
             raise HTTPException(status_code=404, detail="File not found or access denied")
-        backend_dir = Path(__file__).parent.parent.parent
-        backend_outputs_dir = backend_dir / "outputs"
-        uploads_outputs_dir = UPLOADS_DIR / "outputs"
+        legacy_outputs_dir = Path(__file__).resolve().parents[2] / "outputs"
+        json_dirs = [Path(file_manager.compliance_outputs), legacy_outputs_dir]
 
-        # Where previous runs might have stored compliance artifacts
-        candidate_json_paths = [
-            backend_outputs_dir / f"{file_id}_compliance.json",
-            uploads_outputs_dir / "compliance_reports" / f"{file_id}_compliance.json",
-            uploads_outputs_dir / f"{file_id}_compliance.json",
-        ]
-
-        json_file = next((p for p in candidate_json_paths if p.exists()), None)
+        json_file = None
+        for d in json_dirs:
+            p = d / f"{file_id}_compliance.json"
+            if p.exists():
+                json_file = p
+                break
         if not json_file:
             raise HTTPException(status_code=404, detail=f"No assessment found for file {file_id}")
 
         # Read JSON to get report_id
-        import json
         with open(json_file, 'r', encoding='utf-8') as f:
             assessment_data = json.load(f)
 
         report_id = assessment_data.get('report_id')
         if not report_id:
-            print(f"Report ID: {report_id} not found in assessment data")
+            logger.warning(f"Report ID not found in assessment data for file_id={file_id}")
             raise HTTPException(status_code=404, detail="Report ID not found in assessment data")
 
         # Now load the markdown report using the report_id
-        candidate_md_paths = [
-            backend_outputs_dir / f"compliance_report_{report_id}.md",
-            uploads_outputs_dir / "markdown" / f"compliance_report_{report_id}.md",
-            uploads_outputs_dir / "compliance_reports" / f"compliance_report_{report_id}.md",
-            uploads_outputs_dir / f"compliance_report_{report_id}.md",
+        md_dirs = [
+            Path(file_manager.markdown_outputs),
+            Path(file_manager.compliance_outputs),
+            legacy_outputs_dir,
         ]
-        report_file = next((p for p in candidate_md_paths if p.exists()), None)
+        report_file = None
+        for d in md_dirs:
+            p = d / f"compliance_report_{report_id}.md"
+            if p.exists():
+                report_file = p
+                break
 
         # Fallback: try to find any markdown report containing the report_id
         if not report_file:
-            search_dirs = [d for d in [backend_outputs_dir, uploads_outputs_dir / "markdown", uploads_outputs_dir / "compliance_reports"] if d.exists()]
-            for d in search_dirs:
+            for d in [x for x in md_dirs if x.exists()]:
                 matches = list(d.glob(f"*{report_id}*.md"))
                 if matches:
                     report_file = matches[0]

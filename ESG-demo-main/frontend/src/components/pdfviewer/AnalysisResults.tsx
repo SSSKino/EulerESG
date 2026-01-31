@@ -128,6 +128,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   onPageNavigate,
   showTable = true,
 }) => {
+
+  // UI rule:
+  // - not_disclosed: show no value and no page
+  // - partially_disclosed: value should be a textual reason (no concrete numbers)
+  const PARTIAL_VALUE_TEXT =
+    "Partially disclosed: referenced in the report, but the disclosure is not clear enough to extract a specific value (e.g., missing a precise figure, unit, or reporting period).";
   const files = useFileStore((state) => state.files);
   const currentFile = files.find((file) => file.file_id === fileId);
   const industry = currentFile?.industry;
@@ -418,20 +424,24 @@ setAnalysisData(convertedData);
         width: 420,
         render: (_value: string | number | null, record: AnalysisDataItem) => {
           const isNotDisclosed = record.disclosure_status === "not_disclosed";
+          const isPartiallyDisclosed = record.disclosure_status === "partially_disclosed";
 
           // If not disclosed, keep value empty and hide evidence/page/LLM hover indicators.
           if (isNotDisclosed) {
             return <span className="text-gray-400"></span>;
           }
 
-          const empty = isEmptyValue(record.value);
-          const displayValue = empty
-            ? "Not specified"
-            : typeof record.value === "number"
-              ? formatNumber(record.value)
-              : String(record.value);
-
           const evidenceText = record.context ? String(record.context).trim() : "";
+          const hasEvidence = !!evidenceText;
+
+          const empty = isEmptyValue(record.value);
+          const displayValue = isPartiallyDisclosed
+            ? PARTIAL_VALUE_TEXT
+            : empty
+              ? "Not specified"
+              : typeof record.value === "number"
+                ? formatNumber(record.value)
+                : String(record.value);
 
           const evidenceContent = (
             <div className="max-w-md p-2">
@@ -487,9 +497,7 @@ setAnalysisData(convertedData);
                 <Popover content={evidenceContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
                   <span
                     className={
-                      record.context || !empty
-                        ? "cursor-pointer underline decoration-dotted"
-                        : "text-gray-400"
+                      hasEvidence ? "cursor-pointer underline decoration-dotted" : ""
                     }
                   >
                     {displayValue}
@@ -693,8 +701,8 @@ setAnalysisData(convertedData);
           <Table
             columns={columns}
             dataSource={data}
-            className="w-full"
-            scroll={{ x: "max-content", y: 300 }}
+            className="w-full analysis-results-table"
+            scroll={{ y: 300 }}
             tableLayout="fixed"
             pagination={false}
             rowKey="key"

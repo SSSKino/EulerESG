@@ -228,6 +228,18 @@ export default function RecordsComparisonChart({
                   : undefined,
               } as any}
               interactions={[{ type: "active-region", enable: false }, { type: "element-active" }, { type: "element-highlight" }] as any}
+              state={{
+                active: {
+                  style: {
+                    lineWidth: 2,
+                    stroke: "#111827",
+                    shadowBlur: 14,
+                    shadowColor: "rgba(0,0,0,0.25)",
+                  },
+                },
+                inactive: { style: { opacity: 0.35 } },
+              } as any}
+              columnStyle={{ radius: [6, 6, 0, 0] } as any}
               tooltip={{
                 shared: false,
                 showMarkers: false,

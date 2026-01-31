@@ -268,11 +268,11 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 w-full">
-      <div className="overflow-x-auto w-full">
-        <table className="w-full min-w-full">
+      <div className="w-full">
+        <table className="w-full table-fixed">
           <thead>
             <tr className="border-b border-[#E2E8F0]">
-              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[210px]">
+              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[18%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   Report
                   <MultiSelectFilter
@@ -284,7 +284,7 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                 </div>
               </th>
 
-              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[260px]">
+              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[20%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   Metric
                   <MultiSelectFilter
@@ -296,14 +296,14 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                 </div>
               </th>
 
-              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[240px]">
+              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[26%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   Detail
                   <TextFilter ariaLabel="Filter detail" value={detailQuery} onChange={setDetailQuery} />
                 </div>
               </th>
 
-              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[90px]">
+              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[8%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   Year
                   <MultiSelectFilter
@@ -315,14 +315,14 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                 </div>
               </th>
 
-              <th className="text-right py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[140px]">
+              <th className="text-right py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[12%] whitespace-nowrap">
                 <div className="flex items-center justify-end gap-2">
                   Value
                   <TextFilter ariaLabel="Filter value" value={valueQuery} onChange={setValueQuery} />
                 </div>
               </th>
 
-              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[120px]">
+              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[10%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   Unit
                   <MultiSelectFilter
@@ -334,7 +334,7 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                 </div>
               </th>
 
-              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[120px]">
+              <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[6%] whitespace-nowrap">
                 Evidence
               </th>
             </tr>
@@ -353,12 +353,12 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                   key={row.id}
                   className={`border-b border-[#E2E8F0] ${index % 2 === 0 ? "bg-white" : "bg-[#F8FAFC]"} hover:bg-[#F1F5F9] transition-colors`}
                 >
-                  <td className="py-3 px-3 text-sm text-[#0F172A]">{row.report}</td>
-                  <td className="py-3 px-3 text-sm text-[#0F172A]">{row.metric}</td>
-                  <td className="py-3 px-3 text-sm text-[#64748B]">{row.detail}</td>
+                  <td className="py-3 px-3 text-sm text-[#0F172A] break-words whitespace-normal">{row.report}</td>
+                  <td className="py-3 px-3 text-sm text-[#0F172A] break-words whitespace-normal">{row.metric}</td>
+                  <td className="py-3 px-3 text-sm text-[#64748B] break-words whitespace-normal">{row.detail}</td>
                   <td className="py-3 px-3 text-sm text-[#0F172A]">{row.year}</td>
-                  <td className="py-3 px-3 text-sm font-bold text-[#0F172A] text-right">{row.value}</td>
-                  <td className="py-3 px-3 text-sm text-[#64748B]">{row.unit}</td>
+                  <td className="py-3 px-3 text-sm font-bold text-[#0F172A] text-right break-words whitespace-normal">{row.value}</td>
+                  <td className="py-3 px-3 text-sm text-[#64748B] break-words whitespace-normal">{row.unit}</td>
                   <td className="py-3 px-3">
                     <button
                       className="text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium"

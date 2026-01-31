@@ -7,7 +7,6 @@ import type { File } from "@/store/useFileStore";
 
 interface FileTableProps {
   onChatClick: (file: File) => void;
-  onAnalysisClick?: (file: File) => void;
   selectedRows: File[];
   onSelectionChange: (rows: File[]) => void;
 }
@@ -19,11 +18,8 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
   const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
 
   useEffect(() => {
-    console.log('FileTable loading files from backend...');
-    loadFilesFromBackend().then(() => {
-      console.log('Files loaded:', useFileStore.getState().files);
-    });
-  }, []);
+    loadFilesFromBackend();
+  }, [loadFilesFromBackend]);
 
   const columns: ColumnsType<File> = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -83,13 +79,7 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
             title="Delete the file"
             description="Are you sure you want to delete this file?"
             onConfirm={async () => {
-              console.log('Delete button clicked for file:', file.file_id);
-              try {
-                await useFileStore.getState().deleteFile(file.file_id!);
-                console.log('File deleted successfully');
-              } catch (error) {
-                console.error('Error deleting file:', error);
-              }
+              await useFileStore.getState().deleteFile(file.file_id!);
             }}
             okText="Yes"
             cancelText="No">

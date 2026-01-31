@@ -381,11 +381,11 @@ _SPEC_DISK_CACHE_LOCK = threading.Lock()
 
 
 def _outputs_root_dir() -> Path:
-    """Return the backend outputs root directory.
+    """Return the canonical *uploads* outputs root directory.
 
     We intentionally derive this from CROSS_CACHE_DIR to avoid hard-coding paths.
-    In this codebase CROSS_CACHE_DIR is typically:
-      <repo>/outputs/cross_analysis
+    In this codebase CROSS_CACHE_DIR is:
+      <uploads>/outputs/cross_analysis
     """
     try:
         return Path(CROSS_CACHE_DIR).parent

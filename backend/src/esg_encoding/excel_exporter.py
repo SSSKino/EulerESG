@@ -12,6 +12,8 @@ from typing import Dict, List, Optional, Any
 from loguru import logger
 import json
 
+from .file_manager import file_manager
+
 
 class ExcelExporter:
     """Export ESG analysis results to Excel format"""
@@ -24,8 +26,8 @@ class ExcelExporter:
             output_dir: Directory to save Excel files. Defaults to 'outputs/excel'
         """
         if output_dir is None:
-            # Default to backend/outputs/excel directory
-            self.output_dir = Path(__file__).parent.parent.parent / "outputs" / "excel"
+            # Canonical location: uploads/outputs/excel
+            self.output_dir = Path(file_manager.outputs_dir) / "excel"
         else:
             self.output_dir = Path(output_dir)
         

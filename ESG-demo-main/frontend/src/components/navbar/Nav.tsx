@@ -75,7 +75,7 @@ const applyLang = (v: "zh" | "en") => {
           className="w-8 sm:w-10 h-auto"
         />
         <h1 className="!text-base sm:!text-xl font-semibold text-[#2274BC]">
-          Euler ESG
+          EulerESG
         </h1>
       </button>
       <div className="flex items-center gap-3">

@@ -382,7 +382,20 @@ export default function IssueComparisonCharts({
         seriesField: "companyKey",
         colorField: "companyKey",
         isGroup: true,
-        appendPadding: [8, 8, 0, 8],
+        interactions: [{ type: "element-active" }],
+        state: {
+          active: {
+            style: {
+              lineWidth: 2,
+              stroke: "#111827",
+              shadowBlur: 14,
+              shadowColor: "rgba(0,0,0,0.25)",
+            },
+          },
+          inactive: { style: { opacity: 0.35 } },
+        },
+        columnStyle: { radius: [6, 6, 0, 0] },
+appendPadding: [8, 8, 0, 8],
         legend: {
           position: "top",
           layout: "horizontal",

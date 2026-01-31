@@ -123,6 +123,14 @@
   body {
     overflow-x: hidden;
   }
+
+  /* Evidence reader (Cross Analysis) can temporarily allow horizontal scroll when the user zooms in.
+     This avoids clipping while keeping the rest of the app strictly no-horizontal-scroll. */
+  html.evidence-x-scroll,
+  body.evidence-x-scroll {
+    overflow-x: auto !important;
+  }
+
   body {
     @apply bg-background text-foreground;
     min-height: 100vh;
@@ -141,6 +149,29 @@
 
 .ca-table-wrap .ant-table-thead > tr > th {
   white-space: nowrap;
+}
+
+/* Single report Analysis Results table: wrap content and prevent horizontal scrollbars */
+.analysis-results-table .ant-table-cell {
+  white-space: normal !important;
+  word-break: break-word;
+}
+
+.analysis-results-table .ant-table-content {
+  overflow-x: hidden !important;
+}
+
+/* Metric chart grid row: dynamic columns, but stack on small screens */
+.metric-grid-row {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+}
+
+@media (max-width: 768px) {
+  .metric-grid-row {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 #root-layout {

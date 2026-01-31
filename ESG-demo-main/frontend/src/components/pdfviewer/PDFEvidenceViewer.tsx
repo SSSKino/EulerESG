@@ -29,6 +29,12 @@ export type PDFEvidenceViewerProps = {
    * - "page": fit whole page into the viewport (no scrolling by default)
    */
   fitTo?: "width" | "page";
+  /**
+   * Scrolling mode:
+   * - "container": the PDF sits in an internal scroll container (legacy)
+   * - "page": use the browser/page scroll only (no nested scroll frame)
+   */
+  scrollMode?: "container" | "page";
 };
 
 type PageSize = { w: number; h: number } | null;
@@ -37,8 +43,9 @@ export default function PDFEvidenceViewer({
   fileUrl,
   initialPage = 1,
   height = "72vh",
-  defaultZoom = 1.0,
+  defaultZoom = 1.15,
   fitTo = "width",
+  scrollMode = "container",
 }: PDFEvidenceViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [page, setPage] = useState<number>(Math.max(1, initialPage));
@@ -46,6 +53,7 @@ export default function PDFEvidenceViewer({
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const [containerHeight, setContainerHeight] = useState<number>(0);
   const [pageSize, setPageSize] = useState<PageSize>(null);
+  const [hovered, setHovered] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +82,73 @@ export default function PDFEvidenceViewer({
     return () => ro.disconnect();
   }, []);
 
+  // Ctrl/Cmd + wheel zoom (avoid browser zoom while cursor is over viewer)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      // Prevent browser zoom.
+      e.preventDefault();
+      const dir = e.deltaY > 0 ? -1 : 1;
+      setZoom((s) => {
+        const next = Math.round((s + dir * 0.1) * 10) / 10;
+        return Math.min(2.6, Math.max(0.6, next));
+      });
+    };
+
+    // Must be non-passive to preventDefault.
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel as any);
+  }, []);
+
+  // Robust Ctrl/Cmd + wheel zoom: also capture at window level so the browser doesn't zoom
+  // when the PDF canvas/text layers swallow the wheel event.
+  useEffect(() => {
+    const onWheelCapture = (e: WheelEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      const el = containerRef.current;
+      if (!el) return;
+      // Only intercept when the pointer is over the viewer.
+      if (!el.contains(e.target as Node)) return;
+      e.preventDefault();
+      const dir = e.deltaY > 0 ? -1 : 1;
+      setZoom((s) => {
+        const next = Math.round((s + dir * 0.1) * 10) / 10;
+        return Math.min(2.6, Math.max(0.6, next));
+      });
+    };
+    window.addEventListener("wheel", onWheelCapture, { passive: false, capture: true });
+    return () => window.removeEventListener("wheel", onWheelCapture as any, true);
+  }, []);
+
+  // Ctrl/Cmd + / - / 0 zoom shortcuts
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      // Only apply viewer zoom shortcuts when the discourser is over the viewer,
+      // so we don't hijack global shortcuts elsewhere in the app.
+      if (!hovered) return;
+      if (!(e.ctrlKey || e.metaKey)) return;
+      if (e.key === "+" || e.key === "=") {
+        e.preventDefault();
+        setZoom((s) => Math.min(2.6, Math.round((s + 0.1) * 10) / 10));
+        return;
+      }
+      if (e.key === "-" || e.key === "_") {
+        e.preventDefault();
+        setZoom((s) => Math.max(0.6, Math.round((s - 0.1) * 10) / 10));
+        return;
+      }
+      if (e.key === "0") {
+        e.preventDefault();
+        setZoom(Math.min(2.6, Math.max(0.6, defaultZoom)));
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [defaultZoom, hovered]);
+
   const clampPage = (p: number) => {
     if (!numPages) return Math.max(1, p);
     return Math.min(Math.max(1, p), numPages);
@@ -93,25 +168,41 @@ export default function PDFEvidenceViewer({
   }, []);
 
   const pageScale = useMemo(() => {
-    if (!containerWidth || !containerHeight || !pageSize) return undefined;
+    if (!containerWidth || !pageSize) return undefined;
 
-    // Gutter keeps page from touching card edges.
-    const gutter = 20;
+    // Gutter keeps page from touching the edges.
+    const gutter = scrollMode === "page" ? 56 : 20;
     const wScale = Math.max(0.1, (containerWidth - gutter) / pageSize.w);
-    const hScale = Math.max(0.1, (containerHeight - gutter) / pageSize.h);
 
-    const base = fitTo === "page" ? Math.min(wScale, hScale) : wScale;
+    // In container mode we can optionally fit to the viewport height as well.
+    if (scrollMode === "container") {
+      if (!containerHeight) return undefined;
+      const hScale = Math.max(0.1, (containerHeight - gutter) / pageSize.h);
+      const base = fitTo === "page" ? Math.min(wScale, hScale) : wScale;
+      return Math.max(0.1, base) * zoom;
+    }
+
+    // In page mode, fit-to-width only; let the document flow naturally.
+    const base = wScale;
     return Math.max(0.1, base) * zoom;
-  }, [containerWidth, containerHeight, pageSize, fitTo, zoom]);
+  }, [containerWidth, containerHeight, pageSize, fitTo, zoom, scrollMode]);
 
   const overflowMode = useMemo(() => {
+    if (scrollMode === "page") return "visible";
     // Fit-to-page aims for "no scroll" at zoom=1; allow scroll once user zooms in.
     if (fitTo === "page") return zoom <= 1.001 ? "hidden" : "auto";
     return "auto";
-  }, [fitTo, zoom]);
+  }, [fitTo, zoom, scrollMode]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        // In page mode, avoid forcing a fixed height so the browser scroll is used.
+        height: scrollMode === "container" ? "100%" : "auto",
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -156,16 +247,21 @@ export default function PDFEvidenceViewer({
 
       <div
         ref={containerRef}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         style={{
-          flex: 1,
-          overflow: overflowMode,
-          height,
+          flex: scrollMode === "container" ? 1 : "unset",
+          overflow: overflowMode as any,
+          height: scrollMode === "container" ? height : "auto",
           padding: 8,
           background: "rgba(255,255,255,0.7)",
           borderRadius: 12,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          display: scrollMode === "container" ? "flex" : "block",
+          ...(scrollMode === "container"
+            ? { alignItems: "center", justifyContent: "center" }
+            : {}),
+          // Ensure large zoom doesn't get clipped.
+          width: "100%",
         }}
       >
         <Document
@@ -175,13 +271,15 @@ export default function PDFEvidenceViewer({
           loading={<div style={{ padding: 16, opacity: 0.7 }}>Loading…</div>}
           error={<div style={{ padding: 16 }}>Failed to load PDF.</div>}
         >
-          <Page
-            pageNumber={clampPage(page)}
-            scale={pageScale}
-            onLoadSuccess={onPageLoadSuccess}
-            renderTextLayer
-            renderAnnotationLayer
-          />
+          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+            <Page
+              pageNumber={clampPage(page)}
+              scale={pageScale}
+              onLoadSuccess={onPageLoadSuccess}
+              renderTextLayer
+              renderAnnotationLayer
+            />
+          </div>
         </Document>
       </div>
     </div>

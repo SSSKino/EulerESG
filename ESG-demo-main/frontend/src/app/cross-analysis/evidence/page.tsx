@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button, Card, Typography } from "antd";
 import { ArrowLeft } from "lucide-react";
 import PDFEvidenceViewer from "@/components/pdfviewer/PDFEvidenceViewer";
 import { crossTokens } from "@/features/crossAnalysis/tokens";
+import { getStoredAuth } from "@/lib/auth";
 
 const { Title, Text } = Typography;
 
@@ -27,42 +28,132 @@ function safeDecode(v: string) {
   }
 }
 
+
+function isUuid(v: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v.trim());
+}
+
+function normalizeKey(v: any): string {
+  if (!v) return "";
+  const s = String(v).trim().toLowerCase();
+  // drop extension
+  const noExt = s.replace(/\.(pdf|json|txt)$/i, "");
+  // keep only alnum
+  return noExt.replace(/[^a-z0-9]+/g, "");
+}
+
+async function resolveReportId(aliasOrId: string): Promise<string | null> {
+  const wanted = normalizeKey(aliasOrId);
+  if (!wanted) return null;
+  const auth = getStoredAuth();
+  const headers: Record<string, string> = {};
+  if (auth?.token) headers["Authorization"] = `Bearer ${auth.token}`;
+
+  const res = await fetch(`${API_BASE_URL}/api/files?file_type=report`, { headers, cache: "no-store" });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(t || `HTTP ${res.status}`);
+  }
+  const payload: any = await res.json();
+  const files: any[] = Array.isArray(payload?.files) ? payload.files : [];
+
+  let best: any = null;
+  for (const f of files) {
+    const fid = String(f?.file_id || "");
+    const cands = [fid, f?.original_name, f?.safe_filename, f?.file_path];
+    if (cands.some((c) => normalizeKey(c) === wanted)) {
+      best = f;
+      break;
+    }
+  }
+
+  return best?.file_id ? String(best.file_id) : null;
+}
+
 export default function CrossEvidencePage() {
   const sp = useSearchParams();
   const router = useRouter();
+
+  // Evidence view must not clip zoomed content; allow horizontal scroll only on this page.
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    html.classList.add("evidence-x-scroll");
+    body.classList.add("evidence-x-scroll");
+    return () => {
+      html.classList.remove("evidence-x-scroll");
+      body.classList.remove("evidence-x-scroll");
+    };
+  }, []);
 
   // NOTE: upstream may encode query params; decode once here to avoid double-encoding.
   const fileId = safeDecode(sp.get("file_id") || "");
   const page = asInt(sp.get("page"), 1);
   const name = safeDecode(sp.get("name") || "Evidence");
 
-  const fileUrl = useMemo(() => `${API_BASE_URL}/api/files/${encodeURIComponent(fileId)}/pdf`, [fileId]);
+  const [resolvedFileId, setResolvedFileId] = useState<string>(fileId);
+  const [resolving, setResolving] = useState<boolean>(false);
+  const [resolveError, setResolveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setResolvedFileId(fileId);
+      setResolveError(null);
+      if (!fileId) return;
+      if (isUuid(fileId)) return;
+      setResolving(true);
+      try {
+        const resolved = await resolveReportId(fileId);
+        if (alive && resolved) setResolvedFileId(resolved);
+      } catch (e: any) {
+        if (alive) setResolveError(e?.message || "Failed to resolve report id");
+      } finally {
+        if (alive) setResolving(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [fileId]);
+
+  const fileUrl = useMemo(() => `${API_BASE_URL}/api/files/${encodeURIComponent(resolvedFileId)}/pdf`, [resolvedFileId]);
 
   if (!fileId) {
     return (
-      <div style={{ flex: 1, background: crossTokens.color.bg, padding: crossTokens.spacing.xl }}>
+      <div style={{ minHeight: "100vh", width: "100%", background: crossTokens.color.bg, padding: crossTokens.spacing.xl }}>
         <Card style={{ borderRadius: crossTokens.radius.card, border: `1px solid ${crossTokens.color.border}` }}>
           <Title level={4} style={{ marginTop: 0 }}>Missing file_id</Title>
-          <Text style={{ color: crossTokens.color.subtext }}>请从 Cross Analysis 的 Evidence 按钮进入。</Text>
+          <Text style={{ color: crossTokens.color.subtext }}>
+            Please open this page from the Cross Analysis evidence link.
+          </Text>
           <div style={{ height: 12 }} />
-          <Button onClick={() => router.back()}>返回</Button>
+          <Button onClick={() => router.back()}>Back</Button>
         </Card>
       </div>
     );
   }
 
   return (
-    <div style={{ flex: 1, background: crossTokens.color.bg, padding: 12 }}>
+    <div style={{ minHeight: "100vh", width: "100%", background: crossTokens.color.bg, padding: 12 }}>
       <div style={{ maxWidth: "100%", margin: "0 auto", width: "100%" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
           <div>
             <Title level={3} style={{ margin: 0, color: crossTokens.color.text }}>{name}</Title>
-            <Text style={{ color: crossTokens.color.subtext }}>大屏直读（默认适配宽度） · 可缩放 · 可跳页</Text>
+            <Text style={{ color: crossTokens.color.subtext }}>
+              Large-screen PDF view (fit to width by default) · Zoom · Page jump
+            </Text>
+            {resolving ? (
+              <div><Text style={{ color: crossTokens.color.subtext }}>Resolving report id…</Text></div>
+            ) : resolveError ? (
+              <div><Text style={{ color: "#c0362c" }}>Failed to load PDF: {resolveError}</Text></div>
+            ) : null}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <Button icon={<ArrowLeft size={16} />} onClick={() => router.back()} style={{ borderRadius: 12 }}>
-              返回
-            </Button>          </div>
+              Back
+            </Button>
+          </div>
         </div>
 
         <div style={{ height: 12 }} />
@@ -73,10 +164,20 @@ export default function CrossEvidencePage() {
             border: `1px solid ${crossTokens.color.border}`,
             boxShadow: crossTokens.shadow.card,
             background: crossTokens.color.card,
+            overflow: "visible",
           }}
-          bodyStyle={{ padding: 10, height: "calc(100vh - 92px)" }}
+          styles={{ body: { padding: 10, overflow: "visible" } }}
         >
-          <PDFEvidenceViewer fileUrl={fileUrl} initialPage={page} height="calc(100vh - 124px)" defaultZoom={1.0} fitTo="page" />
+          <PDFEvidenceViewer
+            fileUrl={fileUrl}
+            initialPage={page}
+            // Use page scroll only (no nested scroll frame).
+            scrollMode="page"
+            // Fit to width; zoom changes scale without clipping.
+            fitTo="width"
+            // Start slightly zoomed-in for readability.
+            defaultZoom={1.05}
+          />
         </Card>
       </div>
     </div>

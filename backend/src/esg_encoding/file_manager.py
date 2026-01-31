@@ -4,6 +4,7 @@
 """
 
 import os
+import re
 import shutil
 import uuid
 from datetime import datetime, timedelta
@@ -44,6 +45,26 @@ def _safe_pdf_page_count_from_path(pdf_path: Path) -> Optional[int]:
     except Exception:
         return None
 
+
+
+def _normalize_report_key(value: str) -> str:
+    """Normalize a report identifier (uuid/filename/stem) into a comparable key."""
+    if value is None:
+        return ""
+    s = str(value).strip().lower()
+    if not s:
+        return ""
+    # Remove URL encoding artifacts
+    try:
+        from urllib.parse import unquote
+        s = unquote(s)
+    except Exception:
+        pass
+    # Remove common extensions
+    s = Path(s).stem
+    # Collapse to alnum only for fuzzy matching (Google2025 == Google 2025 == google_2025)
+    s = re.sub(r"[^a-z0-9]+", "", s)
+    return s
 class FileManager:
     """ESG系统文件管理器"""
 
@@ -283,28 +304,130 @@ class FileManager:
         except Exception as e:
             logger.error(f"移动文件失败: {e}")
             return False
+
+    def resolve_file_id(self, alias: str, user_id: Optional[int] = None) -> Optional[str]:
+        """Resolve non-UUID aliases (e.g., 'Google2025') to the real internal file_id.
+
+        This is needed because some cached cross-analysis JSON uses report short names as `id`,
+        while backend endpoints expect the UUID-like file_id.
+
+        Matching strategy:
+        1) Exact key match in metadata
+        2) Normalize and compare against original_name/safe_filename/file_id
+        """
+        if not alias:
+            return None
+
+        # Exact hit
+        if alias in self.metadata.get("files", {}):
+            return alias
+
+        needle = _normalize_report_key(alias)
+        if not needle:
+            return None
+
+        best_id: Optional[str] = None
+        best_ts: str = ""
+
+        for fid, info in (self.metadata.get("files", {}) or {}).items():
+            if not isinstance(info, dict):
+                continue
+
+            # optional ownership constraint
+            if user_id is not None:
+                file_user_id = info.get("user_id")
+                if file_user_id is not None and file_user_id != user_id:
+                    continue
+
+            # Only consider report PDFs for alias resolution
+            if info.get("file_type") and str(info.get("file_type")) != "report":
+                continue
+
+            cands = [
+                fid,
+                info.get("file_id"),
+                info.get("safe_filename"),
+                info.get("original_name"),
+            ]
+            hit = False
+            for c in cands:
+                if not c:
+                    continue
+                if _normalize_report_key(str(c)) == needle:
+                    hit = True
+                    break
+
+            if not hit:
+                continue
+
+            # Prefer latest upload_time if multiple match
+            ts = str(info.get("upload_time") or "")
+            if ts >= best_ts:
+                best_ts = ts
+                best_id = fid
+
+        return best_id
+
     
     def get_file_info(self, file_id: str, user_id: Optional[int] = None) -> Optional[Dict]:
         """
         获取文件信息
-        
+
         Args:
-            file_id: 文件ID
+            file_id: 文件ID（优先 uuid；也允许传入文件名/公司简称用于兼容旧前端）
             user_id: 用户ID (如果提供,会检查文件是否属于该用户)
-            
+
         Returns:
             文件信息字典,如果文件不存在或不属于该用户则返回None
         """
+        if not file_id:
+            return None
+
+        # 1) Exact match (uuid)
         file_info = self.metadata["files"].get(file_id)
+
+        # 2) Backward compatible: allow passing filename stem / display name.
+        #    Example: Google2025 -> resolve to its uuid.
+        if not file_info:
+            wanted = _normalize_report_key(file_id)
+            if wanted:
+                best = None
+                best_time = ""
+                for fid, info in (self.metadata.get("files") or {}).items():
+                    if not isinstance(info, dict):
+                        continue
+                    # Only reports have PDFs
+                    if info.get("file_type") != "report":
+                        continue
+                    if user_id is not None:
+                        file_user_id = info.get("user_id")
+                        if file_user_id is not None and file_user_id != user_id:
+                            continue
+
+                    candidates = [
+                        info.get("file_id"),
+                        info.get("original_name"),
+                        info.get("safe_filename"),
+                        info.get("file_path"),
+                    ]
+                    if any(_normalize_report_key(c) == wanted for c in candidates if c):
+                        # Prefer latest upload_time if multiple matches
+                        ut = str(info.get("upload_time") or "")
+                        if not best or ut > best_time:
+                            best = info
+                            best_time = ut
+                if best:
+                    file_info = best
+
         if not file_info:
             return None
-        
-        # 如果提供了user_id,检查文件是否属于该用户
+
+        # If provided, check ownership
         if user_id is not None:
             file_user_id = file_info.get("user_id")
             if file_user_id is not None and file_user_id != user_id:
                 return None
-        
+
         return file_info
 
     # =============================

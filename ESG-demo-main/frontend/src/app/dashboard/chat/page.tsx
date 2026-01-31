@@ -1,8 +1,8 @@
 // app/dashboard/chat/page.tsx
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Breadcrumb, message } from "antd";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ChatView from "@/components/pdfviewer/ChatView";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService, type ChatResponse } from "@/lib/api";
@@ -14,6 +14,7 @@ interface Message {
 
 export default function ChatPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([
     {
       text: "Welcome to EulerESG. I can help to answer any questions you have about ESG topics, disclosures, or metrics. How can I assist you today?",
@@ -23,14 +24,36 @@ export default function ChatPage() {
 
   const files = useFileStore((state) => state.files);
   const selectedFileId = useFileStore((state) => state.selectedFileId);
+  const setSelectedFileId = useFileStore((state) => state.setSelectedFileId);
+  const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
 
-  const currentFile = files.find((file) => file.file_id === selectedFileId) || null;
+  const queryFileId = searchParams.get("file_id");
+
+  // Ensure report context exists even after refresh or direct navigation.
+  useEffect(() => {
+    if (queryFileId && queryFileId !== selectedFileId) {
+      setSelectedFileId(queryFileId);
+    }
+  }, [queryFileId, selectedFileId, setSelectedFileId]);
+
+  useEffect(() => {
+    // If store does not have files yet (e.g., hard refresh), fetch from backend.
+    if (!files || files.length === 0) {
+      loadFilesFromBackend();
+    }
+  }, [files?.length, loadFilesFromBackend]);
+
+  const currentFile = useMemo(
+    () => files.find((file) => file.file_id === (queryFileId || selectedFileId)) || null,
+    [files, queryFileId, selectedFileId]
+  );
 
   const handleBackToList = () => {
     router.push("/dashboard");
   };
 
   const handleSendMessage = async (userMessage: string) => {
+    const effectiveFileId = queryFileId || selectedFileId;
     // 添加用户消息
     setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
 
@@ -40,11 +63,11 @@ export default function ChatPage() {
     try {
       // 调用后端API：如果选中了文件，则使用 /api/chat/{file_id}（带报告/评估上下文）；
       // 否则回落到全局 /api/chat。
-      const response: ChatResponse = selectedFileId
-        ? await apiService.sendMessageForFile(selectedFileId, {
+      const response: ChatResponse = effectiveFileId
+        ? await apiService.sendMessageForFile(effectiveFileId, {
             message: userMessage,
             include_context: true,
-            session_id: `file:${selectedFileId}`
+            session_id: `file:${effectiveFileId}`
           })
         : await apiService.sendMessage({
             message: userMessage,

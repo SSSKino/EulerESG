@@ -13,8 +13,6 @@ export default function PDFViewer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
-  const [analysisFile, setAnalysisFile] = useState<File | null>(null);
   const [selectedRows, setSelectedRows] = useState<File[]>([]);
   const updateFileStatus = useFileStore((state) => state.updateFileStatus);
   const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
@@ -28,7 +26,7 @@ export default function PDFViewer() {
   useEffect(() => {
     if (progress === 100 && selectedFile && selectedFile.file_id) {
       updateFileStatus(selectedFile.file_id, "ready");
-      router.push("/dashboard/chat");
+      router.push(`/dashboard/chat?file_id=${encodeURIComponent(selectedFile.file_id)}`);
     }
   }, [progress, selectedFile, updateFileStatus, router]);
 
@@ -51,11 +49,6 @@ export default function PDFViewer() {
     }, 200);
   };
 
-  const handleAnalysisClick = (file: File) => {
-    setAnalysisFile(file);
-    setShowAnalysisModal(true);
-  };
-
   const handleCrossAnalyze = () => {
     if (selectedRows.length < 2) {
       message.info("Please select at least two reports to compare");
@@ -68,7 +61,9 @@ export default function PDFViewer() {
       message.info("Please select at least two reports to compare");
       return;
     }
-    router.push(`/cross-analysis/environment?ids=${encodeURIComponent(ids.join(","))}`);
+    // UX requirement: framework must be selected BEFORE entering the Cross Analysis pages.
+    // We launch the framework selection modal on the dashboard, so the dashboard is the background.
+    router.push(`/dashboard?launch=cross-analysis&ids=${encodeURIComponent(ids.join(","))}`);
   };
 
   return (
@@ -92,7 +87,6 @@ export default function PDFViewer() {
         </div>
         <FileTable
           onChatClick={handleChatClick}
-          onAnalysisClick={handleAnalysisClick}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
         />
