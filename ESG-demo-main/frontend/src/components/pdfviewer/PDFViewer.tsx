@@ -7,8 +7,10 @@ import type { File } from "@/store/useFileStore";
 import MainContent from "../maincontent/MainContent";
 import FileTable from "./FileTable";
 import LoadingModal from "./LoadingModal";
+import { useT } from "@/i18n/useT";
 
 export default function PDFViewer() {
+  const { t } = useT();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -51,19 +53,18 @@ export default function PDFViewer() {
 
   const handleCrossAnalyze = () => {
     if (selectedRows.length < 2) {
-      message.info("Please select at least two reports to compare");
+      message.info(t("files.selectAtLeastTwoReports"));
       return;
     }
     const ids = selectedRows
       .map((f) => f.file_id || f.key)
       .filter(Boolean);
     if (ids.length < 2) {
-      message.info("Please select at least two reports to compare");
+      message.info(t("files.selectAtLeastTwoReports"));
       return;
     }
-    // UX requirement: framework must be selected BEFORE entering the Cross Analysis pages.
-    // We launch the framework selection modal on the dashboard, so the dashboard is the background.
-    router.push(`/dashboard?launch=cross-analysis&ids=${encodeURIComponent(ids.join(","))}`);
+    // Directly enter Cross Analysis using the already-generated per-report assessment outputs.
+    router.push(`/cross-analysis?ids=${encodeURIComponent(ids.join(","))}`);
   };
 
   return (
@@ -71,7 +72,7 @@ export default function PDFViewer() {
       <div className="w-[95%]">
         <Breadcrumb
           style={{ margin: 20 }}
-          items={[{ title: "Files" }, { title: "All Files" }]}
+          items={[{ title: t("files.breadcrumbFiles") }, { title: t("files.breadcrumbAllFiles") }]}
           className="mb-2 !text-lg"
         />
 
@@ -82,7 +83,7 @@ export default function PDFViewer() {
             disabled={selectedRows.length < 2}
             onClick={handleCrossAnalyze}
           >
-            Cross Analysis (beta)
+            {t("files.crossAnalysisBeta")}
           </Button>
         </div>
         <FileTable

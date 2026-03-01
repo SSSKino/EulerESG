@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, Empty, Select, Tabs } from "antd";
+import { useT } from "@/i18n/useT";
 import { Column } from "@ant-design/plots";
 import type { AllRecord } from "@/features/crossAnalysis/types";
 
@@ -59,6 +60,7 @@ export default function RecordsComparisonChart({
   records: AllRecord[];
   selectedReportIds: string[];
 }) {
+  const { t } = useT();
   const reportMeta = useMemo<ReportMeta[]>(() => {
     const seen = new Map<string, string>();
     for (const r of records) {
@@ -141,8 +143,8 @@ export default function RecordsComparisonChart({
   }, [units.join("||"), activeUnit]);
 
   const unitTabs = useMemo(() => {
-    return units.map((u) => ({ key: u, label: u === "—" ? "No unit" : u }));
-  }, [units]);
+    return units.map((u) => ({ key: u, label: u === "—" ? t("crossAnalysis.noUnit") : u }));
+  }, [units, t]);
 
   const chartData = useMemo(() => {
     const uKey = activeUnit || units[0] || "—";
@@ -167,7 +169,7 @@ export default function RecordsComparisonChart({
   if (selectedReportIds.length < 2) {
     return (
       <Card className="rounded-2xl" bodyStyle={{ padding: 14 }}>
-        <Empty description="Select at least two reports to compare." />
+        <Empty description={t("files.selectAtLeastTwoReports")} />
       </Card>
     );
   }
@@ -175,23 +177,23 @@ export default function RecordsComparisonChart({
   return (
     <Card className="rounded-2xl" bodyStyle={{ padding: 14 }}>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="text-sm font-semibold text-slate-900">Comparison chart</div>
+        <div className="text-sm font-semibold text-slate-900">{t("crossAnalysis.comparisonChartTitle")}</div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="text-xs text-slate-500">Year</div>
+          <div className="text-xs text-slate-500">{t("crossAnalysis.table.year")}</div>
           <Select
             size="small"
             value={year}
             onChange={(v) => setYear(v)}
             style={{ minWidth: 120 }}
             options={years.map((y) => ({ value: y, label: y }))}
-            placeholder="Year"
+            placeholder={t("crossAnalysis.table.year")}
           />
         </div>
       </div>
 
       {!metricGroups.length ? (
         <div className="mt-4">
-          <Empty description="No comparable numeric metrics for the selected year." />
+          <Empty description={t("crossAnalysis.noComparableNumericForYear")} />
         </div>
       ) : (
         <div className="mt-3">
@@ -202,7 +204,7 @@ export default function RecordsComparisonChart({
             onChange={(k) => setActiveUnit(k)}
           />
           {!chartData.length ? (
-            <Empty description="No comparable metrics for this unit." />
+            <Empty description={t("crossAnalysis.noComparableForUnit")} />
           ) : (
             <Column
               data={chartData}

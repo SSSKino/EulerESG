@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useT } from "@/i18n/useT";
 
 const ColumnPlot = dynamic(async () => {
   const mod: any = await import("@ant-design/plots");
@@ -55,6 +56,8 @@ function ClientOnly({ children }: { children: React.ReactNode }) {
 }
 
 export function NewComparisonChart({ data }: NewComparisonChartProps) {
+  const { t } = useT();
+  const UNIT_VARIES_TOOLTIP = t("analysis.unitVariesTooltip");
 
   // 从数据中提取所有报告名称（排除 category），并排序以确保顺序一致
   const reportNames = useMemo(() => {
@@ -147,7 +150,7 @@ export function NewComparisonChart({ data }: NewComparisonChartProps) {
 
     // y-axis unit (show a single unit if consistent; otherwise indicate mixed units)
     const uniqUnits = Array.from(new Set(plotData.map((d: any) => d.unit).filter((u: any) => u)));
-    const yUnit = uniqUnits.length === 1 ? String(uniqUnits[0]) : (uniqUnits.length > 1 ? "Unit varies (see tooltip)" : "");
+    const yUnit = uniqUnits.length === 1 ? String(uniqUnits[0]) : (uniqUnits.length > 1 ? UNIT_VARIES_TOOLTIP : "");
 
 
     return {
@@ -308,7 +311,7 @@ export function NewComparisonChart({ data }: NewComparisonChartProps) {
               .replace(/'/g, "&#039;");
 
           const unitSuffix =
-            unit && unit !== "null" && unit !== "Multiple units" && unit !== "Unit varies (see tooltip)"
+            unit && unit !== "null" && unit !== "Multiple units" && unit !== UNIT_VARIES_TOOLTIP
               ? ` ${escapeHtml(unit)}`
               : "";
 
@@ -316,10 +319,10 @@ export function NewComparisonChart({ data }: NewComparisonChartProps) {
             <div style="font-size:12px; color:#0F172A;">
               <div style="font-weight:600; margin-bottom:6px;">${escapeHtml(category)}</div>
               <div style="margin-bottom:4px;">
-                <span style="color:#64748B;">Report:</span> ${escapeHtml(report)}
+                <span style="color:#64748B;">${escapeHtml(t("crossAnalysis.table.report"))}:</span> ${escapeHtml(report)}
               </div>
               <div>
-                <span style="color:#64748B;">Value:</span> ${escapeHtml(valueText)}${unitSuffix}
+                <span style="color:#64748B;">${escapeHtml(t("analysis.columns.value"))}:</span> ${escapeHtml(valueText)}${unitSuffix}
               </div>
             </div>
           `;
@@ -349,7 +352,7 @@ export function NewComparisonChart({ data }: NewComparisonChartProps) {
   if (!data || data.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-[#64748B]">
-        No chart data available
+        {t("crossAnalysis.noComparableChartData")}
       </div>
     );
   }

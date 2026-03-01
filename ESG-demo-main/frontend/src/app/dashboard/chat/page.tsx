@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ChatView from "@/components/pdfviewer/ChatView";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService, type ChatResponse } from "@/lib/api";
+import { useT } from "@/i18n/useT";
 
 interface Message {
   text: string;
@@ -13,13 +14,12 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const { t, lang } = useT();
+  const locale = lang === "zh" ? "zh-CN" : "en-US";
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      text: "Welcome to EulerESG. I can help to answer any questions you have about ESG topics, disclosures, or metrics. How can I assist you today?",
-      isUser: false,
-    },
+  const [messages, setMessages] = useState<Message[]>(() => [
+    { text: t("chat.welcomeMessage"), isUser: false },
   ]);
 
   const files = useFileStore((state) => state.files);
@@ -28,6 +28,15 @@ export default function ChatPage() {
   const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
 
   const queryFileId = searchParams.get("file_id");
+
+  useEffect(() => {
+    // Update the default greeting when switching language (only if the chat is still fresh)
+    setMessages((prev) => {
+      if (prev.length !== 1) return prev;
+      if (prev[0]?.isUser) return prev;
+      return [{ text: t("chat.welcomeMessage"), isUser: false }];
+    });
+  }, [lang]);
 
   // Ensure report context exists even after refresh or direct navigation.
   useEffect(() => {
@@ -58,7 +67,7 @@ export default function ChatPage() {
     setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
 
     // 添加加载状态
-    setMessages(prev => [...prev, { text: "Thinking...", isUser: false }]);
+    setMessages(prev => [...prev, { text: t("chat.thinking"), isUser: false }]);
 
     try {
       // 调用后端API：如果选中了文件，则使用 /api/chat/{file_id}（带报告/评估上下文）；
@@ -87,7 +96,7 @@ export default function ChatPage() {
 
     } catch (error) {
       console.error('Chat error:', error);
-      message.error(`Failed to send message: ${error}`);
+      message.error(t("chat.failedToSend", { error: String(error) }));
       
       // 移除加载消息，添加错误消息
       setMessages(prev => {
@@ -103,7 +112,7 @@ export default function ChatPage() {
   const handleClearChat = () => {
     setMessages([
       {
-        text: "Welcome to EulerESG. I can help to answer any questions you have about ESG topics, disclosures, or metrics. How can I assist you today?",
+        text: t("chat.welcomeMessage"),
         isUser: false,
       },
     ]);
@@ -134,7 +143,7 @@ export default function ChatPage() {
               ),
             },
             {
-              title: currentFile?.name || "Chat",
+              title: currentFile?.name || t("chat.breadcrumbChat"),
             },
           ]}
           className="mb-2 !text-lg"

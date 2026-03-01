@@ -2,6 +2,7 @@ import React from "react";
 import { Layout, Upload } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
+import { useT } from "@/i18n/useT";
 
 const { Content } = Layout;
 const { Dragger } = Upload;
@@ -11,6 +12,8 @@ interface UploadAreaProps {
 }
 
 const UploadArea: React.FC<UploadAreaProps> = ({ onBeforeUpload }) => {
+  const { t } = useT();
+
   const props = {
     name: "file",
     multiple: true,
@@ -25,7 +28,8 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onBeforeUpload }) => {
         padding: "0 12px 24px",
         background: "#fff",
         borderRadius: 10,
-      }}>
+      }}
+    >
       <Content
         style={{
           padding: 24,
@@ -33,14 +37,13 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onBeforeUpload }) => {
           minHeight: 280,
           background: "#fff",
           borderRadius: 8,
-        }}>
+        }}
+      >
         <Dragger {...props}>
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
-          <p className="ant-upload-text">
-            Click or drag files to this area to upload
-          </p>
+          <p className="ant-upload-text">{t("upload.draggerText")}</p>
         </Dragger>
       </Content>
     </Layout>

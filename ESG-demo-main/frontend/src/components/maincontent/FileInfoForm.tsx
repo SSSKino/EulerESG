@@ -3,6 +3,7 @@ import { Form, Select, Space } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import type { FormInstance } from "antd/es/form";
 import { industries } from "@/data/industries";
+import { useT } from "@/i18n/useT";
 
 interface FileInfoFormProps {
   form: FormInstance<{
@@ -24,6 +25,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
   selectedIndustry,
   onIndustryChange,
 }) => {
+  const { t } = useT();
   const framework = Form.useWatch("framework", form);
   const isSASBSelected = framework === "SASB";
 
@@ -37,27 +39,30 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
         industry: "",
         semiIndustry: "",
         framework: "",
-      }}>
-      <Form.Item label="File Information">
+      }}
+    >
+      <Form.Item label={t("upload.fileInformation")}>
         <Space direction="vertical" style={{ width: "100%" }}>
-          <p>Name: {selectedUploadFile?.name}</p>
           <p>
-            Size:{" "}
-            {selectedUploadFile?.size
-              ? (selectedUploadFile.size / 1024).toFixed(2)
-              : 0}{" "}
-            KB
+            {t("upload.name")}: {selectedUploadFile?.name}
           </p>
-          <p>Type: {selectedUploadFile?.type || "Unknown"}</p>
+          <p>
+            {t("upload.size")}:{" "}
+            {selectedUploadFile?.size ? (selectedUploadFile.size / 1024).toFixed(2) : 0} KB
+          </p>
+          <p>
+            {t("upload.type")}: {selectedUploadFile?.type || t("upload.unknown")}
+          </p>
         </Space>
       </Form.Item>
 
       <Form.Item
         name="framework"
-        label="Framework"
-        rules={[{ required: true, message: "Please select a framework" }]}>
+        label={t("upload.framework")}
+        rules={[{ required: true, message: t("upload.pleaseSelectFramework") }]}
+      >
         <Select
-          placeholder="Select framework"
+          placeholder={t("upload.selectFramework")}
           options={[
             { label: "SASB", value: "SASB" },
             { label: "GRI", value: "GRI" },
@@ -76,17 +81,17 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
 
       <Form.Item
         name="industry"
-        label="Industry"
-        rules={[
-          { required: isSASBSelected, message: "Please select an industry" },
-        ]}>
+        label={t("upload.industry")}
+        rules={[{ required: isSASBSelected, message: t("upload.pleaseSelectIndustry") }]}
+      >
         <Select
-          placeholder="Select industry"
+          placeholder={t("upload.selectIndustry")}
           disabled={!isSASBSelected}
           onChange={(value) => {
             onIndustryChange(value);
             form.setFieldsValue({ semiIndustry: undefined });
-          }}>
+          }}
+        >
           {Object.keys(industries).map((industry) => (
             <Select.Option key={industry} value={industry}>
               {industry}
@@ -97,16 +102,13 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
 
       <Form.Item
         name="semiIndustry"
-        label="Sub Industry"
-        rules={[
-          {
-            required: isSASBSelected,
-            message: "Please select a Sub Industry",
-          },
-        ]}>
+        label={t("upload.subIndustry")}
+        rules={[{ required: isSASBSelected, message: t("upload.pleaseSelectSubIndustry") }]}
+      >
         <Select
-          placeholder="Select Sub Industry"
-          disabled={!isSASBSelected || !selectedIndustry}>
+          placeholder={t("upload.selectSubIndustry")}
+          disabled={!isSASBSelected || !selectedIndustry}
+        >
           {selectedIndustry &&
             industries[selectedIndustry].map((semiIndustry) => (
               <Select.Option key={semiIndustry} value={semiIndustry}>

@@ -3,6 +3,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { Empty } from "antd";
+import { useT } from "@/i18n/useT";
 
 const Column = dynamic(() => import("@ant-design/plots").then((m) => m.Column), {
   ssr: false,
@@ -35,10 +36,11 @@ function MetricChartsGridInner({
   charts: MetricChartSpec[];
   companyColors: Record<string, string>;
 }) {
+  const { t } = useT();
   if (!charts || charts.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-sm p-6">
-        <Empty description="No comparable metrics with data across multiple companies." />
+        <Empty description={t("crossAnalysis.noComparableMetrics")} />
       </div>
     );
   }

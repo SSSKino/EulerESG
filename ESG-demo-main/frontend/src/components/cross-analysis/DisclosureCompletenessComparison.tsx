@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Alert, Popover, Spin, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import { useT } from "@/i18n/useT";
 
 import { apiService } from "@/lib/api";
 import type { CrossReportSummary } from "@/features/crossAnalysis/types";
@@ -26,13 +27,13 @@ export type AnalysisDataItem = {
 type PerReport = {
   fileId: string;
   label: string;
+  framework?: string | null;
   loading: boolean;
   error: string | null;
   metrics: AnalysisDataItem[];
 };
 
-const PARTIAL_VALUE_TEXT =
-  "Partially disclosed: referenced in the report, but the disclosure is not clear enough to extract a specific value (e.g., missing a precise figure, unit, or reporting period).";
+const PARTIAL_VALUE_TEXT = "";
 
 function safeTrim(v: any): string {
   if (v === null || v === undefined) return "";
@@ -81,10 +82,10 @@ function normalizePage(page: string | number | null | undefined): number | null 
   return Number.isFinite(n) ? n : null;
 }
 
-function statusTag(status: DisclosureStatus) {
-  if (status === "fully_disclosed") return <Tag color="green">Disclosed/Discussed</Tag>;
-  if (status === "partially_disclosed") return <Tag color="gold">Disclosed/Discussed But Not Clear</Tag>;
-  return <Tag color="red">Not Disclosed/Discussed</Tag>;
+function statusTag(t: (key: string, vars?: Record<string, any>) => string, status: DisclosureStatus) {
+  if (status === "fully_disclosed") return <Tag color="green">{t("analysis.summary.disclosed")}</Tag>;
+  if (status === "partially_disclosed") return <Tag color="gold">{t("analysis.summary.partial")}</Tag>;
+  return <Tag color="red">{t("analysis.summary.not")}</Tag>;
 }
 
 function toDisplayValue(v: any): string {
@@ -125,14 +126,16 @@ function openEvidence(fileId: string, page: number | null, title: string) {
 export default function DisclosureCompletenessComparison(props: {
   fileIds: string[];
   reports?: CrossReportSummary[];
-  framework?: string;
 }) {
-  const { fileIds, reports, framework } = props;
+  const { t } = useT();
+  const PARTIAL_VALUE_TEXT = t("analysis.partialValueText");
+  const { fileIds, reports } = props;
 
   const [per, setPer] = useState<PerReport[]>(() =>
     (fileIds || []).map((id) => ({
       fileId: id,
       label: reportLabelFromSummaries(id, reports),
+      framework: null,
       loading: true,
       error: null,
       metrics: [],
@@ -158,6 +161,7 @@ export default function DisclosureCompletenessComparison(props: {
       fileIds.map((id) => ({
         fileId: id,
         label: reportLabelFromSummaries(id, reports),
+        framework: null,
         loading: true,
         error: null,
         metrics: [],
@@ -170,21 +174,11 @@ export default function DisclosureCompletenessComparison(props: {
           try {
             const assessment = await apiService.getAssessmentByFile(id);
 
-            const expectedFramework = safeTrim(framework).toUpperCase();
             const actualFramework = safeTrim(
               (assessment as any)?.framework ??
                 (assessment as any)?.assessment?.framework ??
                 (assessment as any)?.current_framework
-            ).toUpperCase();
-            if (expectedFramework && actualFramework && expectedFramework !== actualFramework) {
-              return {
-                ok: true as const,
-                fileId: id,
-                metrics: [] as AnalysisDataItem[],
-                frameworkMismatch: true as const,
-                frameworkMessage: `Framework mismatch: analyzed with ${actualFramework}, expected ${expectedFramework}`,
-              };
-            }
+            );
 
             const converted: AnalysisDataItem[] = (assessment?.metric_analyses || [])
               .filter((item: any) => {
@@ -255,9 +249,9 @@ export default function DisclosureCompletenessComparison(props: {
                 };
               });
 
-            return { ok: true as const, fileId: id, metrics: converted };
+            return { ok: true as const, fileId: id, framework: actualFramework || null, metrics: converted };
           } catch (e: any) {
-            return { ok: false as const, fileId: id, error: e?.message || "Failed to load assessment", metrics: [] };
+            return { ok: false as const, fileId: id, error: e?.message || t("crossAnalysis.disclosure.failedToLoadAssessment"), metrics: [] };
           }
         })
       );
@@ -267,12 +261,9 @@ export default function DisclosureCompletenessComparison(props: {
       setPer((prev) =>
         prev.map((p) => {
           const r = results.find((x) => x.fileId === p.fileId);
-          if (!r) return { ...p, loading: false, error: "No result", metrics: [] };
+          if (!r) return { ...p, loading: false, error: t("crossAnalysis.disclosure.noResult"), metrics: [] };
           if (!r.ok) return { ...p, loading: false, error: r.error, metrics: [] };
-          if ((r as any).frameworkMismatch) {
-            return { ...p, loading: false, error: (r as any).frameworkMessage || "Framework mismatch", metrics: [] };
-          }
-          return { ...p, loading: false, error: null, metrics: r.metrics };
+          return { ...p, loading: false, error: null, framework: (r as any).framework ?? null, metrics: r.metrics };
         })
       );
     })();
@@ -280,17 +271,9 @@ export default function DisclosureCompletenessComparison(props: {
     return () => {
       cancelled = true;
     };
-  }, [fileIds.join("|"), reports?.map((r) => r.file_id).join("|"), safeTrim(framework)]);
+  }, [fileIds.join("|"), reports?.map((r) => r.file_id).join("|")]);
 
   const anyLoading = per.some((p) => p.loading);
-
-  const frameworkMismatchReports = useMemo(() => {
-    const expected = safeTrim(framework);
-    if (!expected) return [] as Array<{ fileId: string; label: string; message: string }>;
-    return per
-      .filter((p) => safeTrim(p.error).toLowerCase().startsWith("framework mismatch"))
-      .map((p) => ({ fileId: p.fileId, label: p.label, message: safeTrim(p.error) }));
-  }, [per, framework]);
 
   const summaryCards = useMemo(() => {
     return per.map((p) => ({ ...p, summary: computeSummary(p.metrics) }));
@@ -332,7 +315,7 @@ export default function DisclosureCompletenessComparison(props: {
   const columns: ColumnsType<Row> = useMemo(() => {
     const base: ColumnsType<Row> = [
       {
-        title: "Metric",
+        title: t("crossAnalysis.table.metric"),
         dataIndex: "metric_name",
         key: "metric_name",
         width: 360,
@@ -346,12 +329,17 @@ export default function DisclosureCompletenessComparison(props: {
     ];
 
     const perCols: ColumnsType<Row> = per.map((p) => ({
-      title: p.label,
+      title: (
+        <div className="flex items-center gap-2">
+          <span>{p.label}</span>
+          {p.framework ? <Tag>{p.framework}</Tag> : null}
+        </div>
+      ),
       key: p.fileId,
       width: 320,
       render: (_: any, row: Row) => {
         const item = row.byReport[p.fileId];
-        if (p.loading) return <span className="text-slate-400">Loading…</span>;
+        if (p.loading) return <span className="text-slate-400">{t("common.loading")}</span>;
         if (p.error) return <span className="text-red-500">{p.error}</span>;
         if (!item) return <span className="text-slate-400">—</span>;
 
@@ -374,7 +362,7 @@ export default function DisclosureCompletenessComparison(props: {
           >
             <span
               className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
-              aria-label="Analysis"
+              aria-label={t("analysis.analysisLabel")}
               onClick={(e) => e.stopPropagation()}
             >
               !
@@ -387,7 +375,7 @@ export default function DisclosureCompletenessComparison(props: {
           return (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                {statusTag(status)}
+                {statusTag(t, status)}
                 {reasoningNode}
               </div>
             </div>
@@ -398,7 +386,7 @@ export default function DisclosureCompletenessComparison(props: {
 
         const valueNode = rawValueText ? (
           ctx ? (
-            <Popover content={ctx || "No evidence excerpt."} title={null} trigger="hover" mouseEnterDelay={0.2}>
+            <Popover content={ctx || t("analysis.noEvidenceExcerpt")} title={null} trigger="hover" mouseEnterDelay={0.2}>
               <span className="cursor-pointer underline decoration-dotted">{rawValueText}</span>
             </Popover>
           ) : (
@@ -415,16 +403,16 @@ export default function DisclosureCompletenessComparison(props: {
               e.stopPropagation();
               openEvidence(p.fileId, page, evidenceTitle);
             }}
-            title="Open evidence"
+            title={t("crossAnalysis.disclosure.openEvidence")}
           >
-            Evidence (p. {page})
+            {t("crossAnalysis.disclosure.evidencePage", { page })}
           </button>
         ) : null;
 
         return (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              {statusTag(status)}
+              {statusTag(t, status)}
               {reasoningNode}
             </div>
             <div className="text-sm text-slate-900 flex items-baseline gap-2 flex-wrap">
@@ -443,8 +431,8 @@ export default function DisclosureCompletenessComparison(props: {
   if (!fileIds || fileIds.length < 2) {
     return (
       <div className="bg-white rounded-2xl shadow-sm p-6">
-        <div className="text-slate-900 font-semibold">Disclosure completeness</div>
-        <div className="text-slate-600 mt-1">Please select at least two reports (ids=...)</div>
+        <div className="text-slate-900 font-semibold">{t("crossAnalysis.disclosureCompleteness")}</div>
+        <div className="text-slate-600 mt-1">{t("files.selectAtLeastTwoReports")}</div>
       </div>
     );
   }
@@ -453,7 +441,7 @@ export default function DisclosureCompletenessComparison(props: {
     return (
       <div className="bg-white rounded-2xl shadow-sm p-10 text-center">
         <Spin size="large" />
-        <div className="mt-4 text-slate-600">Loading disclosure completeness…</div>
+        <div className="mt-4 text-slate-600">{t("crossAnalysis.disclosure.loading")}</div>
       </div>
     );
   }
@@ -464,30 +452,8 @@ export default function DisclosureCompletenessComparison(props: {
     <div className="space-y-4">
       {anyError ? (
         <Alert
-          message="Some reports could not be loaded"
-          description="One or more selected reports do not have assessment results available. They will appear as errors in the table."
-          type="warning"
-          showIcon
-        />
-      ) : null}
-
-      {frameworkMismatchReports.length ? (
-        <Alert
-          message="Framework mismatch"
-          description={
-            <div className="space-y-1">
-              <div>
-                The following reports were analyzed with a different framework than the one you selected, so they are excluded from the comparison.
-              </div>
-              <ul className="list-disc pl-5">
-                {frameworkMismatchReports.map((r) => (
-                  <li key={r.fileId}>
-                    <span className="font-semibold">{r.label}:</span> {r.message}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          }
+          message={t("crossAnalysis.disclosure.someReportsFailedTitle")}
+          description={t("crossAnalysis.disclosure.someReportsFailedDesc")}
           type="warning"
           showIcon
         />
@@ -495,15 +461,15 @@ export default function DisclosureCompletenessComparison(props: {
 
       {/* Summary cards (mirrors single-report Analysis Summary) */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Analysis Summary</h3>
+        <h3 className="text-xl font-semibold mb-4 text-gray-800">{t("analysis.summaryTitle")}</h3>
 
         <div className="space-y-4">
           {/* Column headers (desktop) */}
           <div className="hidden md:grid md:grid-cols-4 gap-4">
-            <div className="text-xs font-semibold text-slate-700 px-1">Report</div>
-            <div className="text-xs font-semibold text-slate-700 text-center px-1">Not Disclosed/Discussed</div>
-            <div className="text-xs font-semibold text-slate-700 text-center px-1">Disclosed/Discussed But Not Clear</div>
-            <div className="text-xs font-semibold text-slate-700 text-center px-1">Disclosed/Discussed</div>
+            <div className="text-xs font-semibold text-slate-700 px-1">{t("crossAnalysis.table.report")}</div>
+            <div className="text-xs font-semibold text-slate-700 text-center px-1">{t("analysis.summary.not")}</div>
+            <div className="text-xs font-semibold text-slate-700 text-center px-1">{t("analysis.summary.partial")}</div>
+            <div className="text-xs font-semibold text-slate-700 text-center px-1">{t("analysis.summary.disclosed")}</div>
           </div>
 
           {/* Rows */}
@@ -516,13 +482,14 @@ export default function DisclosureCompletenessComparison(props: {
 
             return (
               <div key={p.fileId} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-stretch">
-                <div className="border border-slate-200 rounded-xl p-4 font-semibold text-slate-900 flex items-center">
-                  {p.label}
+                <div className="border border-slate-200 rounded-xl p-4 font-semibold text-slate-900 flex items-center gap-2">
+                  <span>{p.label}</span>
+                  {p.framework ? <Tag>{p.framework}</Tag> : null}
                 </div>
 
                 {p.loading ? (
                   <div className="border border-slate-200 rounded-xl p-4 text-slate-500 md:col-span-3 flex items-center justify-center">
-                    Loading…
+                    {t("common.loading")}
                   </div>
                 ) : p.error ? (
                   <div className="border border-slate-200 rounded-xl p-4 text-red-500 text-sm md:col-span-3 flex items-center">
@@ -530,7 +497,7 @@ export default function DisclosureCompletenessComparison(props: {
                   </div>
                 ) : total === 0 ? (
                   <div className="border border-slate-200 rounded-xl p-4 text-slate-500 text-sm md:col-span-3 flex items-center justify-center">
-                    No metrics found in assessment.
+                    {t("crossAnalysis.disclosure.noMetricsFound")}
                   </div>
                 ) : (
                   <>
@@ -558,7 +525,7 @@ export default function DisclosureCompletenessComparison(props: {
 
       {/* Results table (mirrors single-report Analysis Results, but compared across reports) */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Analysis Results</h3>
+        <h3 className="text-xl font-semibold mb-4 text-gray-800">{t("analysis.resultsTitle")}</h3>
         <Table
           className="ca-table-wrap"
           columns={columns}

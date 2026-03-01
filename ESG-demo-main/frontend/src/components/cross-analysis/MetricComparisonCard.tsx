@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import { useT } from "@/i18n/useT";
 
 const ColumnPlot = dynamic(async () => {
   const mod: any = await import("@ant-design/plots");
@@ -64,6 +65,8 @@ function ClientOnly({ children }: { children: React.ReactNode }) {
 }
 
 export function MetricComparisonCard({ chart }: { chart: MetricChart }) {
+  const { t } = useT();
+  const UNIT_VARIES = t("analysis.unitVaries");
   const reportOrder = useMemo(() => (chart.reportOrder && chart.reportOrder.length ? chart.reportOrder : chart.rows.map((r) => r.report)), [chart]);
 
   const colorMap = useMemo(() => {
@@ -95,7 +98,7 @@ export function MetricComparisonCard({ chart }: { chart: MetricChart }) {
   const yUnitTitle = useMemo(() => {
     if (chart.unitTitle) return chart.unitTitle;
     if (uniqUnits.length === 1) return uniqUnits[0];
-    if (uniqUnits.length > 1) return "Unit varies";
+    if (uniqUnits.length > 1) return UNIT_VARIES;
     return "";
   }, [chart.unitTitle, uniqUnits]);
 
@@ -188,12 +191,12 @@ axis: {
               .replace(/>/g, "&gt;")
               .replace(/\"/g, "&quot;")
               .replace(/'/g, "&#039;");
-          const unitSuffix = unit ? ` ${escapeHtml(unit)}` : (yUnitTitle && yUnitTitle !== "Unit varies" ? ` ${escapeHtml(yUnitTitle)}` : "");
+          const unitSuffix = unit ? ` ${escapeHtml(unit)}` : (yUnitTitle && yUnitTitle !== UNIT_VARIES ? ` ${escapeHtml(yUnitTitle)}` : "");
           return `
             <div style="font-size:12px; color:#0F172A;">
               <div style="font-weight:600; margin-bottom:6px;">${escapeHtml(chart.metric)}</div>
-              <div style="margin-bottom:4px;"><span style="color:#64748B;">Report:</span> ${escapeHtml(report)}</div>
-              <div><span style="color:#64748B;">Value:</span> ${escapeHtml(valueText)}${unitSuffix}</div>
+              <div style="margin-bottom:4px;"><span style="color:#64748B;">${escapeHtml(t("crossAnalysis.table.report"))}:</span> ${escapeHtml(report)}</div>
+              <div><span style="color:#64748B;">${escapeHtml(t("analysis.columns.value"))}:</span> ${escapeHtml(valueText)}${unitSuffix}</div>
             </div>
           `;
         },
@@ -214,7 +217,7 @@ axis: {
   if (!data.length) {
     return (
       <div className="bg-white rounded-2xl shadow-sm p-4 text-center text-[#64748B]">
-        No data
+        {t("common.noDataAvailable")}
       </div>
     );
   }

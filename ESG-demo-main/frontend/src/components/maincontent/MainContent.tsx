@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Form, message } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
 import UploadArea from "./UploadArea";
 import UploadOptionsModal from "./UploadOptionsModal";
+import { useT } from "@/i18n/useT";
 
 interface UploadOptions {
   category: string;
@@ -18,9 +19,11 @@ interface UploadOptions {
 }
 
 const MainContent = () => {
+  const { t, lang } = useT();
+  const locale = lang === "zh" ? "zh-CN" : "en-US";
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUploadFile, setSelectedUploadFile] =
-    useState<UploadFile | null>(null);
+  const [selectedUploadFile, setSelectedUploadFile] = useState<UploadFile | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<string>("");
   const [form] = Form.useForm<UploadOptions>();
 
@@ -39,11 +42,10 @@ const MainContent = () => {
         const { name, size, uid } = selectedUploadFile;
         const values = form.getFieldsValue();
 
-        const fileExtension =
-          name?.split(".").pop()?.toUpperCase() || "Unknown";
+        const fileExtension = name?.split(".").pop()?.toUpperCase() || t("upload.unknown");
 
         // 显示上传进度
-        void message.loading("Uploading file...", 0);
+        void message.loading(t("upload.uploading"), 0);
 
         // 先关闭模态框
         setIsModalOpen(false);
@@ -53,19 +55,19 @@ const MainContent = () => {
         // 立即添加文件到前端列表（pending状态）
         const fileItem = {
           key: uid,
-          name: name || "Unknown File",
-          size: size ? `${(size / 1024).toFixed(2)} KB` : "Unknown",
-          dateUploaded: now.toLocaleDateString(),
+          name: name || t("upload.unknownFile"),
+          size: size ? `${(size / 1024).toFixed(2)} KB` : t("upload.unknown"),
+          dateUploaded: now.toLocaleDateString(locale),
           type: fileExtension,
           tableStatus: "Pending",
-          imageStatus: "Pending", 
+          imageStatus: "Pending",
           status: "pending" as const,
           pages: "-",
           industry: values.industry || "",
           semiIndustry: values.semiIndustry || "",
           framework: values.framework || "",
         };
-        
+
         // 立即添加到store
         useFileStore.getState().addFile(fileItem);
 
@@ -77,37 +79,26 @@ const MainContent = () => {
 
             // 确保file是File对象
             if (!(file instanceof File)) {
-              console.error('File object:', file);
-              console.error('selectedUploadFile:', selectedUploadFile);
-              throw new Error("Invalid file object");
+              throw new Error(t("upload.invalidFile"));
             }
 
-            console.log('Uploading file:', file.name, 'Size:', file.size);
-            console.log('Form values:', values);
-
             // 上传报告并传递行业选择信息，后端会自动使用对应的SASB指标
-            const response = await apiService.uploadReport(file, values.framework, values.industry, values.semiIndustry);
+            await apiService.uploadReport(file, values.framework, values.industry, values.semiIndustry);
 
             message.destroy(); // 销毁loading消息
-            void message.success("File uploaded successfully! Processing...");
+            void message.success(t("upload.uploadSuccessProcessing"));
 
             // 从后端重新加载文件列表以获取真实状态
             // 不再手动设置为"ready"，完全依赖后端返回的状态
             await useFileStore.getState().loadFilesFromBackend();
-
           } catch (error: any) {
             message.destroy(); // 销毁loading消息
-            void message.error(`Upload failed: ${error.message || error}`);
+            void message.error(t("upload.uploadFailed", { error: error?.message || String(error) }));
 
             // 上传失败时，从store中移除该文件
             useFileStore.getState().updateFileStatus(uid, "failed");
 
-            console.error('Upload error:', error);
-            console.error('Upload details:', {
-              selectedUploadFile,
-              originFileObj: selectedUploadFile?.originFileObj,
-              type: typeof selectedUploadFile?.originFileObj
-            });
+            console.error("Upload error:", error);
           }
         })();
       } else {
@@ -118,7 +109,7 @@ const MainContent = () => {
       }
     } catch (error) {
       console.error("Validation failed:", error);
-      void message.error("Please fill in all required fields");
+      void message.error(t("upload.fillRequiredFields"));
     }
   };
 

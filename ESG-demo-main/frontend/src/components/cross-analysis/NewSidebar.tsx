@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import { useMemo } from "react";
+import { useT } from "@/i18n/useT";
 
 export interface NewSidebarProps {
   primaryOptions: string[];
@@ -31,12 +32,13 @@ export function NewSidebar({
   onSelectSecondary,
   onSelectDisclosure,
 }: NewSidebarProps) {
+  const { t } = useT();
   const selectedSecondarySet = useMemo(() => new Set(selectedSecondaries || []), [selectedSecondaries]);
 
   return (
     <div className="w-[320px] bg-white rounded-2xl shadow-sm p-4 h-fit">
       <h3 className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-4">
-        Navigation
+        {t("crossAnalysis.navigation")}
       </h3>
 
       <div className="space-y-1">
@@ -84,7 +86,7 @@ export function NewSidebar({
                       );
                     })
                   ) : (
-                    <div className="px-3 py-2 text-xs text-slate-400">No secondary navigation</div>
+                    <div className="px-3 py-2 text-xs text-slate-400">{t("crossAnalysis.noSecondaryNav")}</div>
                   )}
                 </div>
               )}
@@ -93,7 +95,7 @@ export function NewSidebar({
         })}
       </div>
 
-      {/* Disclosure completeness navigation */}
+      {/* {t("crossAnalysis.disclosureCompleteness")} navigation */}
       <div className="mt-6 pt-4 border-t border-slate-200">
         <button
           onClick={() => onSelectDisclosure?.()}
@@ -103,7 +105,7 @@ export function NewSidebar({
               : "text-[#64748B] hover:bg-slate-50"
           }`}
         >
-          Disclosure completeness
+          {t("crossAnalysis.disclosureCompleteness")}
         </button>
       </div>
     </div>

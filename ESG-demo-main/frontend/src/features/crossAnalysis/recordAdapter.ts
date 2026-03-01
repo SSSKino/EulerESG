@@ -52,7 +52,9 @@ export function normalizeCrossRecord(raw: any): CrossExtractedRecord {
     const sub_topic = asStr(getAny(raw, ["sub_topic", "Sub-topic", "subTopic"])) || "";
     const pageRaw = getAny(raw, ["page", "Page"]);
     const page = pageRaw === null || pageRaw === undefined ? null : (asNumOrNull(pageRaw) ?? null);
-    const data = asStr(getAny(raw, ["data", "Data", "value"])) || "";
+    // Cross Analysis cached records should use `value` (not legacy `data`).
+    // Keep the internal field name as `data` for UI compatibility.
+    const data = asStr(getAny(raw, ["value", "Value"])) || "";
     const year = asStr(getAny(raw, ["year", "Year"])) || null;
     const unit = asStr(getAny(raw, ["unit", "Unit"])) || null;
     const detail = asStr(getAny(raw, ["detail", "Detail"])) || "";

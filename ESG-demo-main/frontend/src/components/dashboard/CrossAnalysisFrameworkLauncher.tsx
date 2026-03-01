@@ -84,7 +84,6 @@ export default function CrossAnalysisFrameworkLauncher() {
       initialValues={initialValues}
       onCancel={handleCancel}
       onConfirm={handleConfirm}
-      title="Select Framework"
     />
   );
 }

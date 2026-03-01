@@ -126,15 +126,15 @@ export const useFileStore = create<FileStore>()(
               return {
                 key: file.file_id,
                 name: file.original_name,
-                size: `${(file.file_size / 1024).toFixed(2)} KB`,
-                dateUploaded: file.upload_time?.split('T')?.[0] || 'Unknown',
-                type: file.original_name?.split('.')?.pop()?.toUpperCase() || 'Unknown',
+                size: (typeof file.file_size === "number" && Number.isFinite(file.file_size)) ? `${(file.file_size / 1024).toFixed(2)} KB` : "-",
+                dateUploaded: file.upload_time?.split('T')?.[0] || '',
+                type: file.original_name?.split('.')?.pop()?.toUpperCase() || '',
                 status: file.status === 'processed' ? 'ready' as const :
                        file.status === 'failed' ? 'failed' as const : 'pending' as const,
                 file_id: file.file_id,
                 backend_status: file.status,
-                industry: file.industry || 'Unknown',
-                semiIndustry: file.semi_industry || 'Unknown',
+                industry: file.industry || '',
+                semiIndustry: file.semi_industry || '',
                 // Normalize page count across backend field variants.
                 pages: normalizeTotalPages(file),
                 framework: file.framework || 'SASB'

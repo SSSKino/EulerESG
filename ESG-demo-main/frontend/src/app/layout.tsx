@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="overflow-x-hidden">
+    <html lang="zh-CN" className="overflow-x-hidden">
       <body className={`${inter.variable} antialiased overflow-x-hidden`}>
         <AntdRegistry>
           <div id="root-layout">{children}</div>

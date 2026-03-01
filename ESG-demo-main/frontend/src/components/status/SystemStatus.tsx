@@ -10,6 +10,7 @@ import {
   BarChartOutlined
 } from "@ant-design/icons";
 import { apiService } from "@/lib/api";
+import { useT } from "@/i18n/useT";
 import type { SystemStatus } from "@/lib/api";
 
 interface SystemStatusMonitorProps {
@@ -18,6 +19,8 @@ interface SystemStatusMonitorProps {
 }
 
 const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose }) => {
+  const { t, lang } = useT();
+  const locale = lang === "zh" ? "zh-CN" : "en-US";
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
@@ -63,9 +66,9 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
 
   const getStatusBadge = (isActive: boolean) => {
     return isActive ? (
-      <Badge status="success" text="Active" />
+      <Badge status="success" text={t("statusPanel.active")} />
     ) : (
-      <Badge status="default" text="Inactive" />
+      <Badge status="default" text={t("statusPanel.inactive")} />
     );
   };
 
@@ -82,10 +85,10 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
       title={
         <Space>
           <ApiOutlined />
-          Backend System Status
+          {t("statusPanel.backendSystemStatus")}
           {lastUpdate && (
             <span style={{ fontSize: '12px', color: '#999', marginLeft: 16 }}>
-              Last Update: {lastUpdate.toLocaleTimeString()}
+              {t("files.lastUpdated", { time: lastUpdate.toLocaleTimeString(locale) })}
             </span>
           )}
         </Space>
@@ -100,10 +103,10 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
           onClick={fetchStatus}
           loading={loading}
         >
-          Refresh
+          {t("common.refresh")}
         </Button>,
         <Button key="close" onClick={onClose}>
-          Close
+          {t("statusPanel.close")}
         </Button>
       ]}
     >
@@ -111,7 +114,7 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
         <>
           {/* 系统总体状态 */}
           <Descriptions size="small" column={1} bordered>
-            <Descriptions.Item label="System Status">
+            <Descriptions.Item label={t("statusPanel.systemStatus")}>
               <Space>
                 {getStatusIcon(status.status === "operational")}
                 <Badge 
@@ -127,28 +130,28 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
           {/* 组件状态 */}
           <div style={{ marginBottom: 16 }}>
             <h4 style={{ marginBottom: 12 }}>
-              <DatabaseOutlined /> Components Status
+              <DatabaseOutlined /> {t("statusPanel.componentsStatus")}
             </h4>
             <Descriptions size="small" column={2} bordered>
-              <Descriptions.Item label="Report Loaded">
+              <Descriptions.Item label={t("statusPanel.reportLoaded")}>
                 <Space>
                   {getStatusIcon(status.components.report_loaded)}
                   {getStatusBadge(status.components.report_loaded)}
                 </Space>
               </Descriptions.Item>
-              <Descriptions.Item label="Metrics Loaded">
+              <Descriptions.Item label={t("statusPanel.metricsLoaded")}>
                 <Space>
                   {getStatusIcon(status.components.metrics_loaded)}
                   {getStatusBadge(status.components.metrics_loaded)}
                 </Space>
               </Descriptions.Item>
-              <Descriptions.Item label="Assessment Available">
+              <Descriptions.Item label={t("statusPanel.assessmentAvailable")}>
                 <Space>
                   {getStatusIcon(status.components.assessment_available)}
                   {getStatusBadge(status.components.assessment_available)}
                 </Space>
               </Descriptions.Item>
-              <Descriptions.Item label="LLM Configured">
+              <Descriptions.Item label={t("statusPanel.llmConfigured")}>
                 <Space>
                   {getStatusIcon(status.components.llm_configured)}
                   {getStatusBadge(status.components.llm_configured)}
@@ -161,13 +164,13 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
           {status.report_info && (
             <div style={{ marginBottom: 16 }}>
               <h4 style={{ marginBottom: 12 }}>
-                <FileTextOutlined /> Report Information
+                <FileTextOutlined /> {t("statusPanel.reportInformation")}
               </h4>
               <Descriptions size="small" column={1} bordered>
-                <Descriptions.Item label="Document ID">
+                <Descriptions.Item label={t("statusPanel.documentId")}>
                   <code>{status.report_info.document_id}</code>
                 </Descriptions.Item>
-                <Descriptions.Item label="Segments Count">
+                <Descriptions.Item label={t("statusPanel.segmentsCount")}>
                   <Badge count={status.report_info.segments_count} showZero color="blue" />
                 </Descriptions.Item>
               </Descriptions>
@@ -178,13 +181,13 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
           {status.metrics_info && (
             <div>
               <h4 style={{ marginBottom: 12 }}>
-                <BarChartOutlined /> Metrics Information
+                <BarChartOutlined /> {t("statusPanel.metricsInformation")}
               </h4>
               <Descriptions size="small" column={1} bordered>
-                <Descriptions.Item label="Collection ID">
+                <Descriptions.Item label={t("statusPanel.collectionId")}>
                   <code>{status.metrics_info.collection_id}</code>
                 </Descriptions.Item>
-                <Descriptions.Item label="Metrics Count">
+                <Descriptions.Item label={t("statusPanel.metricsCount")}>
                   <Badge count={status.metrics_info.metrics_count} showZero color="green" />
                 </Descriptions.Item>
               </Descriptions>
@@ -194,7 +197,7 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
       ) : (
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <SyncOutlined spin style={{ fontSize: '24px', marginBottom: '8px' }} />
-          <p>Loading system status...</p>
+          <p>{t("statusPanel.loadingSystemStatus")}</p>
         </div>
       )}
     </Modal>

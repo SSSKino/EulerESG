@@ -5,6 +5,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 import { getStoredAuth } from "@/lib/auth";
+import { useT } from "@/i18n/useT";
 
 // 设置 PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.js";
@@ -21,6 +22,7 @@ const PDFChatViewer: React.FC<PDFChatViewerProps> = ({
   targetPage,
   targetPageNonce,
 }) => {
+  const { t } = useT();
   const [numPages, setNumPages] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -137,7 +139,7 @@ const PDFChatViewer: React.FC<PDFChatViewerProps> = ({
         </Document>
       </div>
       <p className="mt-2 text-sm text-gray-600">
-        Page {pageNumber} of {numPages}
+        {t("common.page")} {pageNumber} / {numPages || "—"}
       </p>
     </div>
   );

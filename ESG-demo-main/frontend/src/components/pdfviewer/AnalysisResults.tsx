@@ -3,6 +3,7 @@ import { Table, Tag, Popover, Spin, Alert } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
+import { useT } from "@/i18n/useT";
 
 type AnalysisDataItem = {
   metric_id: string;
@@ -128,12 +129,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   onPageNavigate,
   showTable = true,
 }) => {
+  const { t } = useT();
 
   // UI rule:
   // - not_disclosed: show no value and no page
   // - partially_disclosed: value should be a textual reason (no concrete numbers)
-  const PARTIAL_VALUE_TEXT =
-    "Partially disclosed: referenced in the report, but the disclosure is not clear enough to extract a specific value (e.g., missing a precise figure, unit, or reporting period).";
+  const PARTIAL_VALUE_TEXT = t("analysis.partialValueText");
   const files = useFileStore((state) => state.files);
   const currentFile = files.find((file) => file.file_id === fileId);
   const industry = currentFile?.industry;
@@ -146,7 +147,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   useEffect(() => {
     const fetchAnalysisData = async () => {
       if (!currentFile?.file_id) {
-        setError("No file selected");
+        setError(t("analysis.noFileSelected"));
         return;
       }
       
@@ -291,9 +292,9 @@ setAnalysisData(convertedData);
           ((err as any).message.includes("404") || (err as any).message.toLowerCase().includes("no analysis"));
 
         if (isNotAnalyzed) {
-          setError("No analysis available. Please upload and analyze first.");
+          setError(t("analysis.noAnalysisAvailable"));
         } else {
-          setError("Failed to load analysis data. Please ensure the report has been processed and analysis has been completed.");
+          setError(t("analysis.failedToLoad"));
         }
         setAnalysisData([]);
       } finally {
@@ -354,13 +355,13 @@ setAnalysisData(convertedData);
 
     return [
       {
-        title: "Metric",
+        title: t("analysis.columns.metric"),
         dataIndex: "metric_name",
         key: "metric_name",
         width: 200,
       },
       {
-        title: "Status",
+        title: t("analysis.columns.status"),
         dataIndex: "disclosure_status",
         key: "disclosure_status",
         width: 120,
@@ -369,31 +370,31 @@ setAnalysisData(convertedData);
           let text = status;
           if (status === "fully_disclosed") {
             color = "success";
-            text = "Fully Disclosed";
+            text = t("analysis.status.fully");
           } else if (status === "partially_disclosed") {
             color = "warning";
-            text = "Partially Disclosed";
+            text = t("analysis.status.partial");
           } else if (status === "not_disclosed") {
             color = "error";
-            text = "Not Disclosed";
+            text = t("analysis.status.not");
           }
           return <Tag color={color}>{text}</Tag>;
         },
         filters: [
-          { text: "Fully Disclosed", value: "fully_disclosed" },
-          { text: "Partially Disclosed", value: "partially_disclosed" },
-          { text: "Not Disclosed", value: "not_disclosed" },
+          { text: t("analysis.status.fully"), value: "fully_disclosed" },
+          { text: t("analysis.status.partial"), value: "partially_disclosed" },
+          { text: t("analysis.status.not"), value: "not_disclosed" },
         ],
         onFilter: (value, record) => record.disclosure_status === value,
       },
       {
-        title: "Category",
+        title: t("analysis.columns.category"),
         dataIndex: "category",
         key: "category",
         width: 110,
         render: (category?: string) =>
             category ? (
-              <Tag color={getCategoryColor(category)}>{category}</Tag>
+              <Tag color={getCategoryColor(category)}>{category === "Quantitative" ? t("analysis.tags.quantitative") : category === "Discussion and Analysis" ? t("analysis.tags.discussion") : category}</Tag>
             ) : (
               <span className="text-gray-400">-</span>
             ),
@@ -401,7 +402,7 @@ setAnalysisData(convertedData);
         onFilter: (value, record) => (record.category || "") === value,
       },
       {
-        title: "Unit",
+        title: t("analysis.columns.unit"),
         dataIndex: "unit",
         key: "unit",
         width: 90,
@@ -409,7 +410,7 @@ setAnalysisData(convertedData);
         onFilter: (value, record) => (record.unit || "") === value,
       },
       {
-        title: "Type",
+        title: t("analysis.columns.type"),
         dataIndex: "type",
         key: "type",
         width: 120,
@@ -417,7 +418,7 @@ setAnalysisData(convertedData);
         onFilter: (value, record) => (record.type || "") === value,
       },
       {
-        title: "Value",
+        title: t("analysis.columns.value"),
         dataIndex: "value",
         key: "value",
         // Keep more room for value text and evidence indicators.
@@ -438,7 +439,7 @@ setAnalysisData(convertedData);
           const displayValue = isPartiallyDisclosed
             ? PARTIAL_VALUE_TEXT
             : empty
-              ? "Not specified"
+              ? t("analysis.summary.notSpecified")
               : typeof record.value === "number"
                 ? formatNumber(record.value)
                 : String(record.value);
@@ -447,18 +448,18 @@ setAnalysisData(convertedData);
             <div className="max-w-md p-2">
               <div className="text-sm">
                 <div>
-                  <span className="font-semibold">Metric:</span> {record.metric_name}
+                  <span className="font-semibold">{t("analysis.columns.metric")}:</span> {record.metric_name}
                 </div>
                 {!isEmptyValue(record.unit) && (
                   <div>
-                    <span className="font-semibold">Unit:</span> {record.unit}
+                    <span className="font-semibold">{t("analysis.columns.unit")}:</span> {record.unit}
                   </div>
                 )}
               </div>
               {evidenceText ? (
                 <div className="mt-2 text-sm whitespace-pre-wrap">{evidenceText}</div>
               ) : (
-                <div className="mt-2 text-xs text-gray-500">No evidence excerpt available.</div>
+                <div className="mt-2 text-xs text-gray-500">{t("analysis.noEvidenceExcerpt")}</div>
               )}
             </div>
           );
@@ -470,16 +471,16 @@ setAnalysisData(convertedData);
             <div className="max-w-md p-2">
               {evidenceText && (
                 <div className="mb-3">
-                  <div className="text-xs font-semibold text-gray-700">Context</div>
+                  <div className="text-xs font-semibold text-gray-700">{t("analysis.columns.context")}</div>
                   <div className="mt-1 text-sm whitespace-pre-wrap">{evidenceText}</div>
                 </div>
               )}
               <div>
-                <div className="text-xs font-semibold text-gray-700">Analysis</div>
+                <div className="text-xs font-semibold text-gray-700">{t("analysis.analysisLabel")}</div>
                 {record.reasoning ? (
                   <p className="mt-1 text-sm whitespace-pre-wrap">{record.reasoning}</p>
                 ) : (
-                  <p className="mt-1 text-sm text-gray-500">No analysis text available.</p>
+                  <p className="mt-1 text-sm text-gray-500">{t("analysis.noAnalysisText")}</p>
                 )}
               </div>
             </div>
@@ -511,7 +512,7 @@ setAnalysisData(convertedData);
                   <Popover content={llmContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
                     <span
                       className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
-                      aria-label="LLM analysis"
+                      aria-label={t("analysis.llmAnalysis")}
                       onClick={(e) => e.stopPropagation()}
                     >
                       !
@@ -532,7 +533,7 @@ setAnalysisData(convertedData);
                         onPageNavigate?.(pageNumber);
                       }
                     }}
-                    title={pageClickable ? "Jump to page" : undefined}
+                    title={pageClickable ? t("analysis.jumpToPage") : undefined}
                   >
                     {pageLabel}
                   </span>
@@ -544,7 +545,7 @@ setAnalysisData(convertedData);
       },
     ];
   },
-  [data, onPageNavigate]
+  [data, onPageNavigate, t]
 );
 
 
@@ -584,11 +585,11 @@ setAnalysisData(convertedData);
         <h2 className="text-xl font-semibold text-gray-800 !my-0">
           {industry && semiIndustry
             ? `${industry} - ${semiIndustry}`
-            : "Industry Analysis"}
+            : t("analysis.industryAnalysis")}
         </h2>
         <div className="bg-white rounded-lg shadow-sm p-6 text-center">
           <Spin size="large" />
-          <p className="mt-4 text-gray-600">Loading analysis results...</p>
+          <p className="mt-4 text-gray-600">{t("analysis.loadingResults")}</p>
         </div>
       </div>
     );
@@ -603,10 +604,10 @@ setAnalysisData(convertedData);
         <h2 className="text-xl font-semibold text-gray-800 !my-0">
           {industry && semiIndustry
             ? `${industry} - ${semiIndustry}`
-            : "Industry Analysis"}
+            : t("analysis.industryAnalysis")}
         </h2>
         <Alert
-          message="Error"
+          message={t("common.error")}
           description={error}
           type="error"
           showIcon
@@ -614,7 +615,7 @@ setAnalysisData(convertedData);
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-              Retry
+              {t("common.retry")}
             </button>
           }
         />
@@ -630,11 +631,11 @@ setAnalysisData(convertedData);
       <h2 className="text-xl font-semibold text-gray-800 !my-0">
         {industry && semiIndustry
           ? `${industry} - ${semiIndustry}`
-          : "Industry Analysis"}
+          : t("analysis.industryAnalysis")}
       </h2>
       <div className="bg-white rounded-lg shadow-sm p-6 hover:scale-[1.02] hover:shadow-lg transition-transform duration-300">
         <h3 className="text-xl font-semibold mb-6 text-gray-800">
-          Summary
+          {t("analysis.summaryTitle")}
         </h3>
         <div className="flex flex-col gap-8">
           {summary.disclosure && (() => {
@@ -658,19 +659,19 @@ setAnalysisData(convertedData);
                       color: "text-red-500",
                       value: group.red,
                       percent: redPct,
-                      label: "Not Disclosed/Discussed",
+                      label: t("analysis.summary.not"),
                     },
                     {
                       color: "text-yellow-500",
                       value: group.yellow,
                       percent: yellowPct,
-                      label: "Disclosed/Discussed But Not Clear",
+                      label: t("analysis.summary.partial"),
                     },
                     {
                       color: "text-green-500",
                       value: group.green,
                       percent: greenPct,
-                      label: "Disclosed/Discussed",
+                      label: t("analysis.summary.disclosed"),
                     },
                   ].map((item) => (
                     <div
@@ -696,7 +697,7 @@ setAnalysisData(convertedData);
       {showTable && (
         <div className="bg-white rounded-lg shadow-sm p-6 hover:scale-[1.01] hover:shadow-lg transition-transform duration-300">
           <h3 className="text-xl font-semibold mb-6 text-gray-800">
-            Results
+            {t("analysis.resultsTitle")}
           </h3>
           <Table
             columns={columns}

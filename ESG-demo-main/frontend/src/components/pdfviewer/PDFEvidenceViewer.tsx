@@ -8,6 +8,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 import { getStoredAuth } from "@/lib/auth";
+import { useT } from "@/i18n/useT";
 
 // pdf.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.js";
@@ -47,6 +48,8 @@ export default function PDFEvidenceViewer({
   fitTo = "width",
   scrollMode = "container",
 }: PDFEvidenceViewerProps) {
+  const { t } = useT();
+
   const [numPages, setNumPages] = useState<number>(0);
   const [page, setPage] = useState<number>(Math.max(1, initialPage));
   const [zoom, setZoom] = useState<number>(Math.min(2.6, Math.max(0.6, defaultZoom)));
@@ -225,7 +228,7 @@ export default function PDFEvidenceViewer({
             icon={<ChevronRight size={16} />}
             disabled={!!numPages && page >= numPages}
           />
-          <Text style={{ fontSize: 12, opacity: 0.75 }}>Page</Text>
+          <Text style={{ fontSize: 12, opacity: 0.75 }}>{t("common.page")}</Text>
           <InputNumber
             size="small"
             min={1}
@@ -268,8 +271,8 @@ export default function PDFEvidenceViewer({
           file={fileUrl}
           options={pdfOptions}
           onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-          loading={<div style={{ padding: 16, opacity: 0.7 }}>Loading…</div>}
-          error={<div style={{ padding: 16 }}>Failed to load PDF.</div>}
+          loading={<div style={{ padding: 16, opacity: 0.7 }}>{t("common.loading")}</div>}
+          error={<div style={{ padding: 16 }}>{t("common.failedToLoadPdf")}</div>}
         >
           <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
             <Page

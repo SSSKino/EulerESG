@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiService } from "@/lib/api";
 import { getStoredAuth, isAuthenticated, saveAuth } from "@/lib/auth";
+import { useT } from "@/i18n/useT";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useT();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,7 +35,7 @@ export default function LoginPage() {
       saveAuth({ token: result.token, userId: result.userId, email, name });
       router.push("/dashboard");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Login failed";
+      const message = err instanceof Error ? err.message : t("auth.loginFailed");
       setError(message);
     } finally {
       setLoading(false);
@@ -43,29 +46,29 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold text-gray-900">Sign in</h1>
-          <p className="text-sm text-gray-500">Sign in to continue to the dashboard</p>
+          <h1 className="text-2xl font-semibold text-gray-900">{t("auth.signIn")}</h1>
+          <p className="text-sm text-gray-500">{t("auth.signInSubtitle")}</p>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Email</label>
+            <label className="text-sm font-medium text-gray-700">{t("auth.email")}</label>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder={t("auth.emailPlaceholder")}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Password</label>
+            <label className="text-sm font-medium text-gray-700">{t("auth.password")}</label>
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder={t("auth.passwordPlaceholder")}
               required
             />
           </div>
@@ -80,31 +83,30 @@ export default function LoginPage() {
             type="submit"
             className="w-full text-white"
             style={{
-              backgroundColor: "#2F7BBD", 
+              backgroundColor: "#2F7BBD",
               borderColor: "#2F7BBD",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2667A1"
-              ;(e.currentTarget as HTMLButtonElement).style.borderColor = "#2667A1"
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2667A1";
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "#2667A1";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2F7BBD"
-              ;(e.currentTarget as HTMLButtonElement).style.borderColor = "#2F7BBD"
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2F7BBD";
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "#2F7BBD";
             }}
             disabled={loading}
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? t("auth.signingIn") : t("auth.signIn")}
           </Button>
         </form>
 
         <p className="text-sm text-gray-600 text-center">
-          Don&apos;t have an account?{" "}
+          {t("auth.noAccount")} {" "}
           <Link href="/register" className="text-blue-600 hover:underline">
-            Create one
+            {t("auth.createOne")}
           </Link>
         </p>
       </div>
     </div>
   );
 }
-

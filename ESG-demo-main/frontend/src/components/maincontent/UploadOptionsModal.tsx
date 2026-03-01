@@ -3,6 +3,7 @@ import { Modal } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import type { FormInstance } from "antd/es/form";
 import FileInfoForm from "./FileInfoForm";
+import { useT } from "@/i18n/useT";
 
 interface UploadOptionsModalProps {
   isOpen: boolean;
@@ -30,13 +31,17 @@ const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
   onIndustryChange,
   form,
 }) => {
+  const { t } = useT();
   return (
     <Modal
-      title="Upload Options"
+      title={t("upload.uploadOptionsTitle")}
       open={isOpen}
       onOk={onOk}
       onCancel={onCancel}
-      width={600}>
+      width={600}
+      okText={t("common.ok")}
+      cancelText={t("common.cancel")}>
+
       <FileInfoForm
         form={form}
         selectedUploadFile={selectedUploadFile}

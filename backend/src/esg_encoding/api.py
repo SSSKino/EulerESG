@@ -8,6 +8,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from typing import Optional
 import os
+import re
 import json
 import pandas as pd
 from pathlib import Path
@@ -42,6 +43,7 @@ from .cross_analysis_models import (
     CrossRecordsResponse,
     ExcelMetricsRequest,
     ExcelMetricsResponse,
+    CrossDisclosedCacheResponse,
 )
 from .cross_analysis import (
     get_reports_info,
@@ -2158,6 +2160,345 @@ async def cross_analysis_records(req: CrossRecordsRequest):
         records=records,
         generated_at=datetime.utcnow().isoformat() + "Z",
     )
+
+
+# -------------------------
+# Cross Analysis disclosed-data cache (assessment-driven)
+# -------------------------
+
+_cross_disclosed_locks: dict = {}
+_cross_disclosed_locks_guard = threading.Lock()
+
+
+def _cross_disclosed_cache_dir() -> Path:
+    """Where we persist assessment-driven cross-analysis JSON outputs."""
+    d = CROSS_CACHE_DIR / "output" / "json"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def _cross_disclosed_cache_key(file_ids: list[str], version: str = "v3") -> str:
+    """Stable key for a file-id combination."""
+    ids_sorted = sorted([str(x).strip() for x in (file_ids or []) if str(x).strip()])
+    base = version + "|" + "|".join(ids_sorted)
+    h = hashlib.sha1(base.encode("utf-8")).hexdigest()[:16]
+    return f"disclosed_{version}_{h}"  # short, filesystem-friendly
+
+
+def _cross_disclosed_lock_for(key: str) -> threading.Lock:
+    with _cross_disclosed_locks_guard:
+        lk = _cross_disclosed_locks.get(key)
+        if lk is None:
+            lk = threading.Lock()
+            _cross_disclosed_locks[key] = lk
+        return lk
+
+
+def _safe_strip_file_ext(name: str) -> str:
+    try:
+        s = str(name or "").strip()
+        if not s:
+            return ""
+        return re.sub(r"\.[^/.]+$", "", s)
+    except Exception:
+        return str(name or "")
+
+
+def _extract_year_from_text(text: str) -> Optional[str]:
+    """Extract a 4-digit year from a label like 'Bosch (2024)' or 'Bosch_2024_ESG'.
+
+    If multiple years exist, return the latest one.
+    """
+    try:
+        s = str(text or "")
+        years = re.findall(r"\b(19\d{2}|20\d{2})\b", s)
+        if not years:
+            return None
+        # choose the latest year
+        return str(max(int(y) for y in years))
+    except Exception:
+        return None
+
+
+def _find_assessment_json_path(file_id: str, file_info: dict) -> Optional[Path]:
+    """Locate the assessment JSON for a given file_id (canonical + legacy)."""
+    safe_filename = str(file_info.get("safe_filename") or "")
+    base_name = Path(safe_filename).stem if safe_filename else ""
+
+    canonical_dir = Path(file_manager.compliance_outputs)
+    legacy_dir = Path(__file__).resolve().parents[2] / "outputs"  # backend/outputs
+    search_dirs = [canonical_dir]
+    if legacy_dir.exists():
+        search_dirs.append(legacy_dir)
+
+    candidate_names = [f"{file_id}_compliance.json"]
+    if base_name:
+        candidate_names.append(f"{base_name}_compliance.json")
+
+    for d in search_dirs:
+        for name in candidate_names:
+            p = d / name
+            if p.exists():
+                return p
+
+    # strict fuzzy match
+    fuzzy_patterns = [f"*{file_id}*compliance*.json", f"*{file_id}*_compliance.json"]
+    if base_name:
+        fuzzy_patterns.extend([f"*{base_name}*compliance*.json", f"*{base_name}*_compliance.json"])
+    matches: list[Path] = []
+    for d in search_dirs:
+        for pat in fuzzy_patterns:
+            matches.extend(list(d.glob(pat)))
+    matches = [m for m in matches if m.is_file()]
+    if matches:
+        matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+        return matches[0]
+    return None
+
+
+def _normalize_nav_label(v: Optional[str], default: str) -> str:
+    s = str(v or "").strip()
+    return s if s else default
+
+
+def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tuple[list[dict], list[dict], list[float]]:
+    """Build CrossExtractedRecord-like dicts from per-report assessments.
+
+    Returns:
+      - records (list of dict)
+      - reports_info (list of dict from get_reports_info)
+      - assessment_mtimes (list of mtime floats used for cache invalidation)
+    """
+    # Labels + years from backend heuristics
+    reports = get_reports_info(file_ids)
+    report_map = {r.file_id: r for r in reports}
+
+    # Simple normalizers (keep consistent with frontend expectations)
+    def normalize_type_label(x: Optional[str]) -> str:
+        s = _normalize_nav_label(x, "Metrics")
+        return (
+            s.replace("discolosure", "Disclosure")
+             .replace("Sustainability Disclosure", "Disclosure")
+             .replace("activity metric", "Activity Metrics")
+             .replace("Activity Metric", "Activity Metrics")
+        )
+
+    def normalize_category_label(x: Optional[str]) -> str:
+        s = _normalize_nav_label(x, "General")
+        return (
+            s.replace("discussion and analysis", "Discussion and Analysis")
+             .replace("quantitative", "Quantitative")
+             .replace("qualitative", "Qualitative")
+        )
+
+    def strip_metric_prefix(name: str) -> str:
+        s = str(name or "").strip()
+        if not s:
+            return ""
+        s = re.sub(r"^\(\d+\)\s*", "", s)
+        s = re.sub(r"^\d+\s*[\.|\)]\s*", "", s)
+        return s.strip()
+
+    def to_page(v) -> Optional[int]:
+        if v is None:
+            return None
+        if isinstance(v, int):
+            return v
+        if isinstance(v, float) and v == v:
+            return int(v)
+        m = re.search(r"\d+", str(v))
+        return int(m.group(0)) if m else None
+
+    def looks_numeric(v: str) -> bool:
+        return bool(re.search(r"\d", str(v or "")))
+
+    records: list[dict] = []
+    mtimes: list[float] = []
+
+    for fid in file_ids:
+        file_info = file_manager.get_file_info(fid, user_id=user_id)
+        if not file_info:
+            # access denied / missing
+            continue
+
+        assessment_path = _find_assessment_json_path(fid, file_info)
+        if assessment_path is None or not assessment_path.exists():
+            continue
+        try:
+            mtimes.append(float(assessment_path.stat().st_mtime))
+        except Exception:
+            pass
+
+        try:
+            with open(assessment_path, "r", encoding="utf-8") as f:
+                assessment_data = json.load(f)
+            assessment_data = _normalize_assessment_payload(assessment_data)
+        except Exception as e:
+            logger.warning(f"Failed to read assessment json for {fid}: {e}")
+            continue
+
+        analyses = assessment_data.get("metric_analyses") or []
+
+        # prefer filename stem as label
+        rep = report_map.get(fid)
+        label = ""
+        if rep is not None:
+            label = _safe_strip_file_ext(getattr(rep, "filename", "") or "")
+            if not label:
+                label = _safe_strip_file_ext(getattr(rep, "display_name", "") or "")
+            if not label:
+                label = _safe_strip_file_ext(getattr(rep, "short_name", "") or "")
+        if not label:
+            label = fid
+
+        # report year fallback
+        report_year = None
+        if rep is not None:
+            try:
+                ry = getattr(rep, "report_year", None)
+                report_year = str(ry).strip() if ry is not None else None
+            except Exception:
+                report_year = None
+
+        # Normalize display name to the old UI-friendly format: "<Company> (<Year>)" when possible.
+        name = label
+        name_year = _extract_year_from_text(name)
+        if (not name_year) and report_year:
+            # only append when name doesn't already contain a year
+            name = f"{label} ({report_year})"
+            name_year = _extract_year_from_text(name)
+        if not name_year:
+            name_year = report_year
+
+        for a in analyses:
+            metric_name = strip_metric_prefix(a.get("metric_name") or a.get("metric") or a.get("Metric") or "")
+            metric_id = str(a.get("metric_id") or a.get("metricId") or a.get("metric_code") or a.get("code") or a.get("Code") or "").strip()
+            metric_code = str(a.get("metric_code") or a.get("code") or a.get("Code") or "").strip()
+
+            value = a.get("value")
+            value_str = "" if value is None else str(value)
+            unit = str(a.get("unit") or a.get("Unit") or "").strip() or None
+            page = to_page(a.get("page") or a.get("Page") or a.get("page_number") or a.get("pageNumber"))
+            typ = normalize_type_label(a.get("type") or a.get("Type"))
+            cat = normalize_category_label(a.get("category") or a.get("Category"))
+            # detail should come from reasoning (not context)
+            detail = str(a.get("reasoning") or "").strip()
+
+            # Only keep fully_disclosed (compat: if status missing but value looks numeric, keep it)
+            ds = str(a.get("disclosure_status") or "").strip().lower()
+            if ds and ds != "fully_disclosed":
+                continue
+            if (not ds) and (not looks_numeric(value_str)):
+                continue
+
+            # year must be derived from report name per requirement
+            year = _extract_year_from_text(name) or name_year
+
+            topic = metric_name or metric_code or metric_id or "Metric"
+            sub_topic = metric_code or metric_id or ""
+
+            records.append(
+                {
+                    # keep old cross-analysis record shape (v2) but also expose value
+                    "id": fid,
+                    "name": name,
+                    "primary_navigation": typ,
+                    "secondary_navigation": cat,
+                    "topic": topic,
+                    "page": page,
+                    # UI adapter can read either `data` or `value`
+                    "data": value_str,
+                    "value": value_str,
+                    "year": year,
+                    "unit": unit,
+                    "detail": detail,
+                    "disclosure_status": a.get("disclosure_status"),
+                    "metric_id": metric_id or None,
+                }
+            )
+
+    reports_payload = [r.model_dump() for r in reports]
+    return records, reports_payload, mtimes
+
+
+@app.get("/api/cross-analysis/disclosed-cache", response_model=CrossDisclosedCacheResponse)
+async def cross_analysis_disclosed_cache(ids: str, user_id: int = Depends(get_current_user)):
+    """Cross Analysis: build (and cache) disclosed-data records from per-report assessment outputs.
+
+    Cache location:
+      uploads/outputs/cross_analysis/output/json/{cache_key}.json
+
+    If the same file-id combination is selected again, backend will directly return
+    the cached JSON (unless any underlying per-report assessment JSON was updated).
+    """
+
+    file_ids = [x.strip() for x in (ids or "").split(",") if x.strip()]
+    if len(file_ids) < 2:
+        raise HTTPException(status_code=400, detail="At least two file_ids are required")
+
+    # Access check early
+    for fid in file_ids:
+        if not file_manager.get_file_info(fid, user_id=user_id):
+            raise HTTPException(status_code=404, detail=f"File not found or access denied: {fid}")
+
+    ids_sorted = sorted(file_ids)
+    cache_key = _cross_disclosed_cache_key(ids_sorted)
+    cache_dir = _cross_disclosed_cache_dir()
+    cache_path = cache_dir / f"{cache_key}.json"
+
+    lock = _cross_disclosed_lock_for(cache_key)
+    with lock:
+        # If cache exists, validate freshness using assessment mtimes.
+        if cache_path.exists():
+            try:
+                cache_mtime = float(cache_path.stat().st_mtime)
+            except Exception:
+                cache_mtime = 0.0
+
+            # Gather current assessment mtimes
+            _mtimes: list[float] = []
+            for fid in ids_sorted:
+                fi = file_manager.get_file_info(fid, user_id=user_id)
+                if not fi:
+                    continue
+                ap = _find_assessment_json_path(fid, fi)
+                if ap and ap.exists():
+                    try:
+                        _mtimes.append(float(ap.stat().st_mtime))
+                    except Exception:
+                        pass
+
+            latest_assessment_mtime = max(_mtimes) if _mtimes else 0.0
+            if latest_assessment_mtime <= cache_mtime:
+                with open(cache_path, "r", encoding="utf-8") as f:
+                    payload = json.load(f)
+                payload["from_cache"] = True
+                return payload
+
+        # Build new
+        records, _reports_payload, _mtimes = _build_disclosed_records_for_files(ids_sorted, user_id=user_id)
+        payload = {
+            "cache_key": cache_key,
+            "file_ids": ids_sorted,
+            "from_cache": False,
+            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "records": records,
+        }
+
+        # Atomic write
+        tmp = cache_path.with_suffix(".json.tmp")
+        try:
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=2)
+            os.replace(tmp, cache_path)
+        finally:
+            try:
+                if tmp.exists():
+                    tmp.unlink()
+            except Exception:
+                pass
+
+        return payload
 
 
 

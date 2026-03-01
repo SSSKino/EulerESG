@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Card, Empty } from "antd";
+import { useT } from "@/i18n/useT";
 
 const ColumnPlot = dynamic(async () => {
   const mod: any = await import("@ant-design/plots");
@@ -68,6 +69,7 @@ export default function TopicComparisonCharts({
   charts: TopicChartSpec[];
   height?: number;
 }) {
+  const { t } = useT();
   const rows = useMemo(() => {
     const out: TopicChartSpec[][] = [];
     for (let i = 0; i < charts.length; i += 4) out.push(charts.slice(i, i + 4));
@@ -77,7 +79,7 @@ export default function TopicComparisonCharts({
   if (!charts.length) {
     return (
       <Card className="rounded-2xl" bodyStyle={{ padding: 16 }}>
-        <Empty description="No comparable chart data." />
+        <Empty description={t("crossAnalysis.noComparableChartData")} />
       </Card>
     );
   }
@@ -132,7 +134,7 @@ export default function TopicComparisonCharts({
                   const n = Number(d?.value);
                   const val = Number.isFinite(n) ? n.toLocaleString() : String(d?.value ?? "");
                   return {
-                    name: String(d?.company ?? "Company"),
+                    name: String(d?.company ?? t("crossAnalysis.company")),
                     value: c.unit ? `${val} ${c.unit}` : val,
                   };
                 },

@@ -111,7 +111,6 @@ export default function FrameworkGate({ children }: { children: React.ReactNode 
         initialValues={initialValues}
         onCancel={handleCancel}
         onConfirm={handleConfirm}
-        title="Select Framework"
       />
 
       {/* Render children underneath; modal will visually block interactions when open */}

@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Button } from "@/components/ui/button";
 import { Sparkles, X } from "lucide-react";
 import { apiService, ChatResponse } from "@/lib/api";
+import { useT } from "@/i18n/useT";
 
 type Msg = { role: "user" | "assistant"; content: string; ts: number };
 
@@ -27,6 +28,8 @@ export default function AIDrawer({
   dimension: string;
   topic: string;
 }) {
+  const { t } = useT();
+
   const scopeKey = useMemo(() => stableHash(ids.join(",")), [ids]);
   const storageKey = useMemo(() => `cross_chat_${scopeKey}`, [scopeKey]);
   const sessionKey = useMemo(() => `cross_chat_session_${scopeKey}`, [scopeKey]);
@@ -60,7 +63,7 @@ export default function AIDrawer({
     const text = input.trim();
     if (!text) return;
     if (ids.length < 2) {
-      message.warning("Select at least two reports.");
+      message.warning(t("files.selectAtLeastTwoReports"));
       return;
     }
 
@@ -92,11 +95,11 @@ export default function AIDrawer({
       const nextAI: Msg = { role: "assistant", content: res.response, ts: Date.now() };
       setMessages((prev) => [...prev, nextAI]);
     } catch (e: any) {
-      message.error(e?.message || "Chat request failed");
+      message.error(e?.message || t("crossAnalysis.ai.requestFailed"));
       const nextAI: Msg = {
         role: "assistant",
         content:
-          "I couldn't complete the request. Check that the backend is running and that an LLM is configured. If the topic requires report evidence, ensure the selected reports have been analyzed.",
+          t("crossAnalysis.ai.requestFailedFallback"),
         ts: Date.now(),
       };
       setMessages((prev) => [...prev, nextAI]);
@@ -122,17 +125,17 @@ export default function AIDrawer({
         <SheetTrigger asChild>
           <button className="group flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-4 py-3 text-sm shadow-lg backdrop-blur transition hover:bg-white">
             <Sparkles size={18} className="text-slate-600" />
-            <span className="font-medium text-slate-800">Ask</span>
-            <span className="hidden sm:inline text-xs text-slate-500">(evidence-aware)</span>
+            <span className="font-medium text-slate-800">{t("crossAnalysis.ai.ask")}</span>
+            <span className="hidden sm:inline text-xs text-slate-500">{t("crossAnalysis.ai.evidenceAware")}</span>
           </button>
         </SheetTrigger>
         <SheetContent side="right" className="w-[420px] sm:w-[480px]">
           <SheetHeader>
             <div className="flex items-center justify-between gap-3">
-              <SheetTitle className="text-base">Assistant</SheetTitle>
+              <SheetTitle className="text-base">{t("crossAnalysis.ai.assistant")}</SheetTitle>
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={clear}>
-                  Clear
+                  {t("common.clear")}
                 </Button>
                 <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
                   <X size={16} />
@@ -140,7 +143,7 @@ export default function AIDrawer({
               </div>
             </div>
             <div className="mt-1 text-xs text-slate-500">
-              Retrieval + reasoning over the selected reports. Ask to compare, and request citations.
+              {t("crossAnalysis.ai.retrievalHint")}
             </div>
           </SheetHeader>
 
@@ -148,11 +151,11 @@ export default function AIDrawer({
             <div className="flex-1 space-y-3 overflow-auto pr-1">
               {messages.length === 0 ? (
                 <div className="rounded-xl border border-slate-200 bg-white/70 p-3 text-sm text-slate-700">
-                  <div className="font-medium">Suggested prompts</div>
+                  <div className="font-medium">{t("crossAnalysis.ai.suggestedPrompts")}</div>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-slate-600">
-                    <li>Summarize cross-report differences for the current topic.</li>
-                    <li>Which report provides the most value-level disclosure? Cite segments.</li>
-                    <li>List evidence snippets supporting key claims, with page references.</li>
+                    <li>{t("crossAnalysis.ai.prompt1")}</li>
+                    <li>{t("crossAnalysis.ai.prompt2")}</li>
+                    <li>{t("crossAnalysis.ai.prompt3")}</li>
                   </ul>
                 </div>
               ) : null}
@@ -177,15 +180,15 @@ export default function AIDrawer({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onPressEnter={send}
-                placeholder="Ask with scope (e.g., compare across selected reports)…"
+                placeholder={t("crossAnalysis.ai.placeholder")}
                 disabled={sending}
               />
               <Button onClick={send} disabled={sending || !input.trim()}>
-                Send
+                {t("crossAnalysis.ai.send")}
               </Button>
             </div>
             <div className="mt-2 text-[11px] text-slate-500">
-              Context: {dimension} · {topic} · {ids.length} reports
+              {t("crossAnalysis.ai.context")}: {dimension} · {topic} · {ids.length} {t("crossAnalysis.ai.reports")}
             </div>
           </div>
         </SheetContent>

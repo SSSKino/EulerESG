@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import AnalysisResults from "./AnalysisResults";
 import ChatInterface from "./ChatInterface";
 import { PanelLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { useT } from "@/i18n/useT";
 
 interface CollapsibleSectionProps {
   title: string;
@@ -88,6 +89,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   onSendMessage,
   onClearChat,
 }) => {
+  const { t } = useT();
   const [widthMode, setWidthMode] = useState<WidthMode>("balanced");
   const [showAnalysisTable, setShowAnalysisTable] = useState<boolean>(true);
 
@@ -128,13 +130,13 @@ const ChatView: React.FC<ChatViewProps> = ({
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 w-full hover:shadow-lg">
         <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-100">
           <div className="flex items-center gap-2 select-none flex-grow">
-            <h3 className="text-md font-semibold text-gray-800 truncate">Analysis</h3>
+            <h3 className="text-md font-semibold text-gray-800 truncate">{t("chat.analysis")}</h3>
 </div>
 
           <button
             onClick={() => setShowAnalysisTable((s) => !s)}
             className="p-1 hover:bg-gray-200 rounded-md transition-colors"
-            title={showAnalysisTable ? "Hide analysis results" : "Show analysis results"}
+            title={showAnalysisTable ? t("chat.hideAnalysisResults") : t("chat.showAnalysisResults")}
           >
             {showAnalysisTable ? (
               <ChevronUp className="w-4 h-4 text-gray-600" />
@@ -156,7 +158,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       {/* PDF + AI split view with width focus controls */}
       <div className="flex flex-col md:flex-row gap-6 min-h-[600px]">
         <CollapsibleSection
-          title={activeFile?.name || "Document Viewer"}
+          title={activeFile?.name || t("chat.documentViewer")}
           defaultOpen={true}
           className={`${pdfWidthClass} hover:shadow-lg`}
           headerActions={
@@ -167,7 +169,7 @@ const ChatView: React.FC<ChatViewProps> = ({
                 setWidthMode((m) => (m === "aiShrunk" ? "balanced" : "aiShrunk"));
               }}
               className="p-1 hover:bg-gray-200 rounded-md transition-colors"
-              title={widthMode === "aiShrunk" ? "Restore split view" : "Expand PDF width"}
+              title={widthMode === "aiShrunk" ? t("chat.restoreSplitView") : t("chat.expandPdfWidth")}
             >
               <PanelLeft className="w-5 h-5 text-gray-600" />
             </button>
@@ -184,14 +186,14 @@ const ChatView: React.FC<ChatViewProps> = ({
           ) : (
             <div className="h-64 flex items-center justify-center">
               <p className="text-gray-500">
-                {!activeFile?.file_id ? "File not available" : "Unsupported file type"}
+                {!activeFile?.file_id ? t("chat.fileNotAvailable") : t("chat.unsupportedFileType")}
               </p>
             </div>
           )}
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="AI Assistant"
+          title={t("chat.aiAssistant")}
           defaultOpen={true}
           className={`${aiWidthClass} hover:shadow-lg`}
           headerActions={
@@ -202,7 +204,7 @@ const ChatView: React.FC<ChatViewProps> = ({
                 setWidthMode((m) => (m === "pdfShrunk" ? "balanced" : "pdfShrunk"));
               }}
               className="p-1 hover:bg-gray-200 rounded-md transition-colors"
-              title={widthMode === "pdfShrunk" ? "Restore split view" : "Expand AI width"}
+              title={widthMode === "pdfShrunk" ? t("chat.restoreSplitView") : t("chat.expandAiWidth")}
             >
               <PanelLeft className="w-5 h-5 text-gray-600" />
             </button>

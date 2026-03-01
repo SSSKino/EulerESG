@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import PDFEvidenceViewer from "@/components/pdfviewer/PDFEvidenceViewer";
 import { crossTokens } from "@/features/crossAnalysis/tokens";
 import { getStoredAuth } from "@/lib/auth";
+import { useT } from "@/i18n/useT";
 
 const { Title, Text } = Typography;
 
@@ -71,6 +72,7 @@ async function resolveReportId(aliasOrId: string): Promise<string | null> {
 }
 
 export default function CrossEvidencePage() {
+  const { t } = useT();
   const sp = useSearchParams();
   const router = useRouter();
 
@@ -89,7 +91,7 @@ export default function CrossEvidencePage() {
   // NOTE: upstream may encode query params; decode once here to avoid double-encoding.
   const fileId = safeDecode(sp.get("file_id") || "");
   const page = asInt(sp.get("page"), 1);
-  const name = safeDecode(sp.get("name") || "Evidence");
+  const name = safeDecode(sp.get("name") || t("crossAnalysis.evidence.defaultName"));
 
   const [resolvedFileId, setResolvedFileId] = useState<string>(fileId);
   const [resolving, setResolving] = useState<boolean>(false);
@@ -107,7 +109,7 @@ export default function CrossEvidencePage() {
         const resolved = await resolveReportId(fileId);
         if (alive && resolved) setResolvedFileId(resolved);
       } catch (e: any) {
-        if (alive) setResolveError(e?.message || "Failed to resolve report id");
+        if (alive) setResolveError(e?.message || t("common.error"));
       } finally {
         if (alive) setResolving(false);
       }
@@ -123,12 +125,12 @@ export default function CrossEvidencePage() {
     return (
       <div style={{ minHeight: "100vh", width: "100%", background: crossTokens.color.bg, padding: crossTokens.spacing.xl }}>
         <Card style={{ borderRadius: crossTokens.radius.card, border: `1px solid ${crossTokens.color.border}` }}>
-          <Title level={4} style={{ marginTop: 0 }}>Missing file_id</Title>
+          <Title level={4} style={{ marginTop: 0 }}>{t("crossAnalysis.evidence.missingFileIdTitle")}</Title>
           <Text style={{ color: crossTokens.color.subtext }}>
-            Please open this page from the Cross Analysis evidence link.
+            {t("crossAnalysis.evidence.openFromLink")}
           </Text>
           <div style={{ height: 12 }} />
-          <Button onClick={() => router.back()}>Back</Button>
+          <Button onClick={() => router.back()}>{t("common.back")}</Button>
         </Card>
       </div>
     );
@@ -141,17 +143,17 @@ export default function CrossEvidencePage() {
           <div>
             <Title level={3} style={{ margin: 0, color: crossTokens.color.text }}>{name}</Title>
             <Text style={{ color: crossTokens.color.subtext }}>
-              Large-screen PDF view (fit to width by default) · Zoom · Page jump
+              {t("crossAnalysis.evidence.largeScreenHint")}
             </Text>
             {resolving ? (
-              <div><Text style={{ color: crossTokens.color.subtext }}>Resolving report id…</Text></div>
+              <div><Text style={{ color: crossTokens.color.subtext }}>{t("crossAnalysis.evidence.resolvingReportId")}</Text></div>
             ) : resolveError ? (
-              <div><Text style={{ color: "#c0362c" }}>Failed to load PDF: {resolveError}</Text></div>
+              <div><Text style={{ color: "#c0362c" }}>{t("crossAnalysis.evidence.failedToLoadPdf", { error: resolveError })}</Text></div>
             ) : null}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <Button icon={<ArrowLeft size={16} />} onClick={() => router.back()} style={{ borderRadius: 12 }}>
-              Back
+              {t("common.back")}
             </Button>
           </div>
         </div>

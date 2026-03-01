@@ -291,6 +291,7 @@ export default function IssueComparisonCharts({
   height?: number;
   minCategoryWidth?: number;
 }) {
+  const { t } = useT();
   const computedCharts = useMemo(() => getComparableUnitCharts(rows, selectedCompanies), [rows, selectedCompanies]);
   const unitCharts = charts ?? computedCharts;
 
@@ -488,8 +489,8 @@ appendPadding: [8, 8, 0, 8],
         // Force per-element hover/tooltip; avoid axis/region aggregation
         interactions: [{ type: "active-region", enable: false }, { type: "element-active" }, { type: "element-highlight" }],
         meta: {
-          x: { alias: "Topic" },
-          value: { alias: c.unitRaw ? `Value (${c.unitRaw})` : "Value" },
+          x: { alias: t("crossAnalysis.topic") },
+          value: { alias: c.unitRaw ? `${t("crossAnalysis.table.value")} (${c.unitRaw})` : t("crossAnalysis.table.value") },
         },
       };
 
@@ -497,7 +498,7 @@ appendPadding: [8, 8, 0, 8],
 
       return {
         key: c.unitKey,
-        label: c.unitRaw ? c.unitRaw : "No unit",
+        label: c.unitRaw ? c.unitRaw : t("crossAnalysis.noUnit"),
         children: (
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <ClientOnly>
@@ -533,7 +534,7 @@ appendPadding: [8, 8, 0, 8],
             value={metricFilter}
             allowClear
             style={{ width: 260 }}
-            placeholder="Topic"
+            placeholder={t("crossAnalysis.topic")}
             options={metricOptions.map((v) => ({ label: v, value: v }))}
             onChange={(v) => setMetricFilter(v)}
           />
@@ -542,7 +543,7 @@ appendPadding: [8, 8, 0, 8],
             value={yearFilter}
             allowClear
             style={{ width: 140 }}
-            placeholder="Year"
+            placeholder={t("crossAnalysis.year")}
             options={yearOptions.map((v) => ({ label: v, value: v }))}
             onChange={(v) => setYearFilter(v)}
           />

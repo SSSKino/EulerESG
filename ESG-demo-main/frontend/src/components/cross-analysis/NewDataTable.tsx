@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/i18n/useT";
 
 interface DataRow {
   id: number;
@@ -36,6 +37,7 @@ type MultiFilterProps = {
 };
 
 function MultiSelectFilter({ ariaLabel, options, selected, onChange }: MultiFilterProps) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const ref = useRef<HTMLDivElement | null>(null);
@@ -84,12 +86,12 @@ function MultiSelectFilter({ ariaLabel, options, selected, onChange }: MultiFilt
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search…"
+              placeholder={t("common.search")}
               className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:border-slate-400"
             />
             <button
               type="button"
-              aria-label="Clear"
+              aria-label={t("common.clear")}
               onClick={() => setQ("")}
               className="p-2 rounded-lg hover:bg-slate-100 text-slate-500"
             >
@@ -99,7 +101,7 @@ function MultiSelectFilter({ ariaLabel, options, selected, onChange }: MultiFilt
 
           <div className="mt-2 max-h-56 overflow-auto pr-1">
             {shown.length === 0 ? (
-              <div className="text-sm text-slate-500 py-3 text-center">No options</div>
+              <div className="text-sm text-slate-500 py-3 text-center">{t("common.noOptions")}</div>
             ) : (
               shown.map((opt) => (
                 <label key={opt} className="flex items-center gap-2 py-1.5 cursor-pointer select-none">
@@ -121,14 +123,14 @@ function MultiSelectFilter({ ariaLabel, options, selected, onChange }: MultiFilt
               onClick={() => onChange([])}
               className="text-sm text-slate-600 hover:text-slate-900"
             >
-              Clear
+              {t("common.clear")}
             </button>
             <button
               type="button"
               onClick={() => setOpen(false)}
               className="px-3 py-1.5 rounded-lg bg-[#3B82F6] text-white text-sm font-medium hover:bg-[#2563EB]"
             >
-              Apply
+              {t("common.apply")}
             </button>
           </div>
         </div>
@@ -144,6 +146,7 @@ type TextFilterProps = {
 };
 
 function TextFilter({ ariaLabel, value, onChange }: TextFilterProps) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -173,17 +176,17 @@ function TextFilter({ ariaLabel, value, onChange }: TextFilterProps) {
 
       {open ? (
         <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-lg p-3 z-50">
-          <div className="text-xs font-semibold text-slate-600 mb-2">Contains</div>
+          <div className="text-xs font-semibold text-slate-600 mb-2">{t("common.contains")}</div>
           <div className="flex items-center gap-2">
             <input
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder="Type to filter…"
+              placeholder={t("common.typeToFilter")}
               className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:border-slate-400"
             />
             <button
               type="button"
-              aria-label="Clear"
+              aria-label={t("common.clear")}
               onClick={() => onChange("")}
               className="p-2 rounded-lg hover:bg-slate-100 text-slate-500"
             >
@@ -197,7 +200,7 @@ function TextFilter({ ariaLabel, value, onChange }: TextFilterProps) {
               onClick={() => setOpen(false)}
               className="px-3 py-1.5 rounded-lg bg-[#3B82F6] text-white text-sm font-medium hover:bg-[#2563EB]"
             >
-              Apply
+              {t("common.apply")}
             </button>
           </div>
         </div>
@@ -207,6 +210,7 @@ function TextFilter({ ariaLabel, value, onChange }: TextFilterProps) {
 }
 
 export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
+  const { t } = useT();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
@@ -274,9 +278,9 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
             <tr className="border-b border-[#E2E8F0]">
               <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[18%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
-                  Report
+                  {t("crossAnalysis.table.report")}
                   <MultiSelectFilter
-                    ariaLabel="Filter report"
+                    ariaLabel={t("crossAnalysis.table.filterReport")}
                     options={reportOptions}
                     selected={reportFilter}
                     onChange={setReportFilter}
@@ -286,9 +290,9 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
 
               <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[20%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
-                  Metric
+                  {t("crossAnalysis.table.metric")}
                   <MultiSelectFilter
-                    ariaLabel="Filter metric"
+                    ariaLabel={t("crossAnalysis.table.filterMetric")}
                     options={metricOptions}
                     selected={metricFilter}
                     onChange={setMetricFilter}
@@ -298,16 +302,16 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
 
               <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[26%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
-                  Detail
-                  <TextFilter ariaLabel="Filter detail" value={detailQuery} onChange={setDetailQuery} />
+                  {t("crossAnalysis.table.detail")}
+                  <TextFilter ariaLabel={t("crossAnalysis.table.filterDetail")} value={detailQuery} onChange={setDetailQuery} />
                 </div>
               </th>
 
               <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[8%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
-                  Year
+                  {t("crossAnalysis.table.year")}
                   <MultiSelectFilter
-                    ariaLabel="Filter year"
+                    ariaLabel={t("crossAnalysis.table.filterYear")}
                     options={yearOptions}
                     selected={yearFilter}
                     onChange={setYearFilter}
@@ -317,16 +321,16 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
 
               <th className="text-right py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[12%] whitespace-nowrap">
                 <div className="flex items-center justify-end gap-2">
-                  Value
-                  <TextFilter ariaLabel="Filter value" value={valueQuery} onChange={setValueQuery} />
+                  {t("crossAnalysis.table.value")}
+                  <TextFilter ariaLabel={t("crossAnalysis.table.filterValue")} value={valueQuery} onChange={setValueQuery} />
                 </div>
               </th>
 
               <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[10%] whitespace-nowrap">
                 <div className="flex items-center gap-2">
-                  Unit
+                  {t("crossAnalysis.table.unit")}
                   <MultiSelectFilter
-                    ariaLabel="Filter unit"
+                    ariaLabel={t("crossAnalysis.table.filterUnit")}
                     options={unitOptions}
                     selected={unitFilter}
                     onChange={setUnitFilter}
@@ -335,7 +339,7 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
               </th>
 
               <th className="text-left py-3 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wide w-[6%] whitespace-nowrap">
-                Evidence
+                {t("crossAnalysis.table.evidence")}
               </th>
             </tr>
           </thead>
@@ -344,7 +348,7 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
             {currentData.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-8 text-center text-[#64748B]">
-                  No data available
+                  {t("common.noDataAvailable")}
                 </td>
               </tr>
             ) : (
@@ -364,7 +368,7 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                       className="text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium"
                       onClick={() => onViewEvidence?.(row)}
                     >
-                      View
+                      {t("common.view")}
                     </button>
                   </td>
                 </tr>
@@ -377,9 +381,9 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
       <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#E2E8F0]">
         <p className="text-sm text-[#64748B]">
           {filteredData.length === 0 ? (
-            <>Showing 0 to 0 of 0 entries</>
+            <>{t("common.showingZeroEntries")}</>
           ) : (
-            <>Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries</>
+            <>{t("common.showingRange", { from: startIndex + 1, to: Math.min(endIndex, filteredData.length), total: filteredData.length })}</>
           )}
         </p>
 

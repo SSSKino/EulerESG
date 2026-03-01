@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Input, Button, Popconfirm, Tooltip } from "antd";
 import { LoadingOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useT } from "@/i18n/useT";
 
 interface Message {
   text: string;
@@ -14,11 +15,8 @@ interface ChatInterfaceProps {
   onReferenceClick: (page: number) => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  messages,
-  onSendMessage,
-  onClearChat,
-}) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, onClearChat }) => {
+  const { t } = useT();
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +27,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         onSendMessage(inputMessage);
         setInputMessage("");
       } catch (error) {
-        console.error('Failed to send message:', error);
+        console.error("Failed to send message:", error);
       } finally {
         setIsLoading(false);
       }
@@ -44,14 +42,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   return (
     <div className="p-3 h-full flex flex-col min-h-0">
       <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-semibold text-gray-800">Chat</h3>
-        <Tooltip title="Clear chat history">
+        <h3 className="text-lg font-semibold text-gray-800">{t("chat.title")}</h3>
+        <Tooltip title={t("chat.clearTitle")}>
           <Popconfirm
-            title="Clear chat history"
-            description="Are you sure you want to clear all messages?"
+            title={t("chat.clearTitle")}
+            description={t("chat.clearDesc")}
             onConfirm={onClearChat}
-            okText="Yes"
-            cancelText="No">
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
+          >
             <Button
               type="text"
               icon={<DeleteOutlined />}
@@ -60,11 +59,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </Popconfirm>
         </Tooltip>
       </div>
+
       <div className="flex-1 min-h-0 overflow-y-auto mb-3 border rounded-lg p-3 bg-white">
         {messages.length === 0 ? (
-          <p className="text-gray-500 text-center">
-            Chat messages will appear here...
-          </p>
+          <p className="text-gray-500 text-center">{t("chat.empty")}</p>
         ) : (
           <>
             {messages.map((msg, index) => (
@@ -79,17 +77,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {isLoading && (
               <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg w-fit">
                 <LoadingOutlined className="animate-spin" />
-                <span>Thinking...</span>
+                <span>{t("chat.thinking")}</span>
               </div>
             )}
           </>
         )}
       </div>
+
       <div className="flex gap-2">
         <Input.TextArea
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="Type your message..."
+          placeholder={t("chat.placeholder")}
           autoSize={{ minRows: 1, maxRows: 4 }}
           className="flex-1"
           onPressEnter={(e) => {
@@ -100,7 +99,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           }}
         />
         <Button type="primary" onClick={handleSendMessage}>
-          Send
+          {t("chat.send")}
         </Button>
       </div>
     </div>

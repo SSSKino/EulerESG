@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Form, Modal, Select } from "antd";
+import { useT } from "@/i18n/useT";
 
 import { industries } from "@/data/industries";
 
@@ -29,8 +30,9 @@ export default function FrameworkSelectModal({
   initialValues,
   onCancel,
   onConfirm,
-  title = "Select Framework",
+  title = undefined,
 }: Props) {
+  const { t } = useT();
   const [form] = Form.useForm<FrameworkSelectionValues>();
   const [selectedIndustry, setSelectedIndustry] = useState<string>(safeTrim(initialValues?.industry));
 
@@ -76,9 +78,9 @@ export default function FrameworkSelectModal({
   return (
     <Modal
       open={open}
-      title={title}
-      okText="Confirm"
-      cancelText="Cancel"
+      title={title ?? t("cross.selectFramework")}
+      okText={t("cross.confirm")}
+      cancelText={t("common.cancel")}
       onCancel={onCancel}
       onOk={handleOk}
       destroyOnClose
@@ -94,11 +96,11 @@ export default function FrameworkSelectModal({
       >
         <Form.Item
           name="framework"
-          label="Framework"
-          rules={[{ required: true, message: "Please select a framework" }]}
+          label={t("upload.framework")}
+          rules={[{ required: true, message: t("upload.pleaseSelectFramework") }]}
         >
           <Select
-            placeholder="Select framework"
+            placeholder={t("upload.selectFramework")}
             options={[
               { label: "SASB", value: "SASB" },
               { label: "GRI", value: "GRI" },
@@ -115,11 +117,11 @@ export default function FrameworkSelectModal({
 
         <Form.Item
           name="industry"
-          label="Industry"
-          rules={[{ required: isSASBSelected, message: "Please select an industry" }]}
+          label={t("upload.industry")}
+          rules={[{ required: isSASBSelected, message: t("upload.pleaseSelectIndustry") }]}
         >
           <Select
-            placeholder="Select industry"
+            placeholder={t("upload.selectIndustry")}
             disabled={!isSASBSelected}
             onChange={(value) => {
               const v = safeTrim(value);
@@ -137,11 +139,11 @@ export default function FrameworkSelectModal({
 
         <Form.Item
           name="semiIndustry"
-          label="Sub Industry"
-          rules={[{ required: isSASBSelected, message: "Please select a Sub Industry" }]}
+          label={t("upload.subIndustry")}
+          rules={[{ required: isSASBSelected, message: t("upload.pleaseSelectSubIndustry") }]}
         >
           <Select
-            placeholder="Select Sub Industry"
+            placeholder={t("upload.selectSubIndustry")}
             disabled={!isSASBSelected || !selectedIndustry}
           >
             {semiIndustryOptions.map((semi) => (

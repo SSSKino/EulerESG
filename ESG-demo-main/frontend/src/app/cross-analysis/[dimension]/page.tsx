@@ -14,14 +14,10 @@ import { NewHeader } from "@/components/cross-analysis/NewHeader";
 import { MetricChartsGrid, type MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
 import { NewDataTable } from "@/components/cross-analysis/NewDataTable";
 import DisclosureCompletenessComparison from "@/components/cross-analysis/DisclosureCompletenessComparison";
+import { useT } from "@/i18n/useT";
 
 const { Title } = Typography;
 const { useBreakpoint } = Grid;
-
-type ExcelMetricsResponse = {
-  records: any[];
-  generated_at: string;
-};
 
 function safeTrim(v: any): string {
   if (v === null || v === undefined) return "";
@@ -100,43 +96,13 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-// Public JSON files (static outputs) do NOT require auth headers.
-async function tryFetchPublicJson<T>(url: string): Promise<T | null> {
-  try {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
-}
-
-async function loadAllRecordsFromStatic(): Promise<any[] | null> {
-  // The JSON is stored under uploads/outputs/cross_analysis/output/all_records.json on disk.
-  // Browsers cannot read disk paths directly; it must be exposed over HTTP.
-  // We therefore try the corresponding HTTP paths (same-origin), which are usually proxied to the backend.
-  const ts = Date.now();
-  const candidates = [
-    `/uploads/outputs/cross_analysis/output/all_records.json?ts=${ts}`,
-    `/uploads/outputs/cross_analysis/output/all_records.json`,
-    `/uploads/outputs/cross_analysis/excel_output/all_records.json?ts=${ts}`,
-    `/uploads/outputs/cross_analysis/excel_output/all_records.json`,
-    `/output/all_records.json?ts=${ts}`,
-    `/output/all_records.json`,
-  ];
-
-  for (const u of candidates) {
-    const raw = await tryFetchPublicJson<any>(u);
-    if (!raw) continue;
-    if (Array.isArray(raw)) return raw;
-    if (Array.isArray(raw?.records)) return raw.records;
-  }
-  return null;
-}
+// NOTE: Cross Analysis no longer reads cross_analysis/output/all_records.json nor triggers
+// any re-extraction. It builds its dataset directly from per-report assessment outputs.
 
 type TableRow = CrossExtractedRecord;
 
 export default function CrossAnalysisDimensionPage() {
+  const { t } = useT();
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -152,7 +118,6 @@ export default function CrossAnalysisDimensionPage() {
   // data loading (runExtract) on every render, which causes chart flicker.
   // Therefore we only depend on the *string values* we actually use.
   const idsParam = searchParams.get("ids") || "";
-  const frameworkParam = searchParams.get("framework") || "";
 
   // Cache commonly used query params as strings so hooks don't depend on the
   // `useSearchParams()` object identity.
@@ -161,10 +126,8 @@ export default function CrossAnalysisDimensionPage() {
   const secondaryQ = safeTrim(searchParams.get("secondary"));
 
   const ids = useMemo(() => parseIds(idsParam), [idsParam]);
-  const selectedFramework = useMemo(() => safeTrim(frameworkParam), [frameworkParam]);
 
   const [reports, setReports] = useState<CrossReportSummary[]>([]);
-  const [reportsLoading, setReportsLoading] = useState(false);
 
   const [allRecords, setAllRecords] = useState<CrossExtractedRecord[]>([]);
   const [recordsLoading, setRecordsLoading] = useState(false);
@@ -285,7 +248,6 @@ export default function CrossAnalysisDimensionPage() {
     if (ids.length < 2) return;
     let cancelled = false;
     (async () => {
-      setReportsLoading(true);
       try {
         const resp = await fetchJson<{ reports: CrossReportSummary[] }>(
           `/api/cross-analysis/reports?ids=${encodeURIComponent(ids.join(","))}`
@@ -305,7 +267,7 @@ export default function CrossAnalysisDimensionPage() {
           );
         }
       } finally {
-        if (!cancelled) setReportsLoading(false);
+        // no-op
       }
     })();
     return () => {
@@ -352,71 +314,30 @@ export default function CrossAnalysisDimensionPage() {
     setRecordsLoading(true);
     setRecordsError(null);
     try {
-      // Prefer local route first to avoid repeated 404s and UI flicker during dev.
-      // Local route reads from the mounted volume and is typically the fastest path.
-      let localRows: any[] | null = null;
-      const local = await tryFetchPublicJson<any>(`/local/cross-analysis/excel-metrics/direct?ts=${Date.now()}`);
-      if (local && Array.isArray(local.records)) localRows = local.records;
-
-      // Second choice: read the persisted output JSON directly (static file).
-      // This avoids re-triggering expensive extraction and works even if embedding/LLM is unavailable.
-      const staticRows = localRows ? null : await loadAllRecordsFromStatic();
-
-      // Fallback: if neither local nor static output is available, use backend API (may trigger extraction).
-      let rows: any[] | null = localRows || staticRows;
-      if (!rows) {
-        try {
-          const resp = await fetchJson<ExcelMetricsResponse>(`/api/cross-analysis/excel-metrics`, {
-            method: "POST",
-            body: JSON.stringify({ ids }),
-          });
-          rows = Array.isArray(resp?.records) ? resp.records : null;
-        } catch (e) {
-          console.warn("Failed to load records via backend API:", e);
-          rows = null;
-        }
-      }
-
-      if (rows && rows.length) {
-        console.log(`[CrossAnalysis] Loaded ${rows.length} records`);
-
-        // If ids parameter exists, try to filter by ids. If filtering yields nothing, show all.
-        let filteredRecords = rows;
-        if (ids.length >= 2) {
-          const idsSet = new Set(ids);
-          const matchedRecords = rows.filter((record: any) => {
-            const recordId = record.id || record.file_id || "";
-            const recordName = record.name || "";
-            // 匹配 id 或 name
-            return idsSet.has(recordId) || idsSet.has(recordName) || 
-                   Array.from(idsSet).some(id => recordName.includes(id) || id.includes(recordName));
-          });
-          
-          // 如果匹配到记录，使用匹配的记录；否则使用所有记录（避免空显示）
-          if (matchedRecords.length > 0) {
-            filteredRecords = matchedRecords;
-            console.log(`[CrossAnalysis] Filtered to ${filteredRecords.length} records based on ids`);
-          } else {
-            console.log(`[CrossAnalysis] No records matched ids, showing all ${filteredRecords.length} records instead`);
-          }
-        } else {
-          console.log(`[CrossAnalysis] No ids filter, showing all ${filteredRecords.length} records`);
-        }
-        
-        const normalized = normalizeCrossRecords(filteredRecords);
-        console.log(`[CrossAnalysis] Normalized to ${normalized.length} records`);
-        setAllRecords(normalized);
-      } else {
-        console.warn(`[CrossAnalysis] No records available (static output missing and API returned empty)`);
+      if (!ids || ids.length < 2) {
         setAllRecords([]);
+        return;
       }
+
+      // Prefer the backend cached JSON built from per-report assessment outputs.
+      // Cache location:
+      //   uploads/outputs/cross_analysis/output/json/{cache_key}.json
+      const resp = await fetchJson<any>(
+        `/api/cross-analysis/disclosed-cache?ids=${encodeURIComponent(ids.join(","))}`
+      );
+
+      const recordsFlat: any[] = Array.isArray(resp?.records) ? resp.records : [];
+      const normalized = normalizeCrossRecords(recordsFlat);
+      setAllRecords(normalized);
+
+      if (!normalized.length) setRecordsError(t("crossAnalysis.noRecordsFound"));
     } catch (e: any) {
-      setRecordsError(e?.message || "Failed to load records");
+      setRecordsError(e?.message || t("crossAnalysis.failedToLoadRecords"));
       setAllRecords([]);
     } finally {
       setRecordsLoading(false);
     }
-  }, [ids]);
+  }, [ids.join("|"), t]);
 
   // Auto-run on mount and whenever ids change.
   useEffect(() => {
@@ -478,7 +399,7 @@ export default function CrossAnalysisDimensionPage() {
 
     return [
       {
-        title: "Name",
+        title: t("crossAnalysis.table.report"),
         dataIndex: "name",
         key: "name",
         width: isMobile ? 140 : 180,
@@ -491,7 +412,7 @@ export default function CrossAnalysisDimensionPage() {
         render: (v: string) => <span className="text-slate-900">{v || "—"}</span>,
       },
       {
-        title: "Topic",
+        title: t("crossAnalysis.table.metric"),
         dataIndex: "topic",
         key: "topic",
         width: isMobile ? 220 : 260,
@@ -516,7 +437,7 @@ export default function CrossAnalysisDimensionPage() {
         },
       },
       {
-        title: "Sub-topic",
+        title: t("crossAnalysis.table.subTopic"),
         dataIndex: "sub_topic",
         key: "sub_topic",
         width: 220,
@@ -530,7 +451,7 @@ export default function CrossAnalysisDimensionPage() {
         render: (v: string) => <span className="text-slate-700">{v || "—"}</span>,
       },
       {
-        title: "Data",
+        title: t("crossAnalysis.table.value"),
         dataIndex: "data",
         key: "data",
         width: 110,
@@ -538,7 +459,7 @@ export default function CrossAnalysisDimensionPage() {
         render: (v: string) => <span className="font-medium text-slate-900">{v ?? "—"}</span>,
       },
       {
-        title: "Unit",
+        title: t("crossAnalysis.table.unit"),
         dataIndex: "unit",
         key: "unit",
         width: 90,
@@ -546,7 +467,7 @@ export default function CrossAnalysisDimensionPage() {
         render: (v: string | null) => <span className="text-slate-600">{v || "—"}</span>,
       },
       {
-        title: "Year",
+        title: t("crossAnalysis.table.year"),
         dataIndex: "year",
         key: "year",
         width: 90,
@@ -559,7 +480,7 @@ export default function CrossAnalysisDimensionPage() {
         render: (v: string) => <span className="text-slate-700">{v || "—"}</span>,
       },
       {
-        title: "Detail",
+        title: t("crossAnalysis.table.detail"),
         dataIndex: "detail",
         key: "detail",
         onCell: wrapCell,
@@ -578,7 +499,7 @@ export default function CrossAnalysisDimensionPage() {
                 : reportKeyToFileId.get(normalizeReportKey(rawId)) || reportKeyToFileId.get(normalizeReportKey(record?.name)) || rawId)
             : "";
           const page = record?.page ? String(record.page) : "1";
-          const title = `${safeTrim(record?.name) || "Report"} · ${safeTrim(record?.topic) || "Evidence"}`;
+          const title = `${safeTrim(record?.name) || t("crossAnalysis.table.report")} · ${safeTrim(record?.topic) || t("crossAnalysis.evidence.defaultName")}`;
           const qs = new URLSearchParams({
             file_id: fileId,
             page,
@@ -588,7 +509,7 @@ export default function CrossAnalysisDimensionPage() {
           return fileId ? (
             <Link href={href} target="_blank" rel="noopener noreferrer">
               <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
-                Evidence <span aria-hidden className="text-slate-400">↗</span>
+                {t("crossAnalysis.table.evidence")} <span aria-hidden className="text-slate-400">↗</span>
               </span>
             </Link>
           ) : (
@@ -597,7 +518,7 @@ export default function CrossAnalysisDimensionPage() {
         },
       },
     ];
-  }, [companyOptions, topicOptions, subTopicOptions, yearOptions, filterCompanies, filterTopics, filterSubTopics, filterYears, isMobile, reportKeyToFileId]);
+  }, [companyOptions, topicOptions, subTopicOptions, yearOptions, filterCompanies, filterTopics, filterSubTopics, filterYears, isMobile, reportKeyToFileId, t]);
 
   const handleTableChange = useCallback((_: any, filters: any) => {
     setFilterCompanies((filters?.name as string[]) || []);
@@ -616,28 +537,32 @@ export default function CrossAnalysisDimensionPage() {
           <div className="space-y-1 text-xs text-slate-700">
             {sub ? (
               <div>
-                <span className="font-semibold text-slate-900">Sub-topic: </span>
+                <span className="font-semibold text-slate-900">{t("crossAnalysis.table.subTopic")}: </span>
                 {sub}
               </div>
             ) : null}
             {detail ? (
               <div>
-                <span className="font-semibold text-slate-900">Detail: </span>
+                <span className="font-semibold text-slate-900">{t("crossAnalysis.table.detail")}: </span>
                 {detail}
               </div>
             ) : (
-              <div className="text-slate-400">No additional detail.</div>
+              <div className="text-slate-400">{t("crossAnalysis.noAdditionalDetail")}</div>
             )}
           </div>
         );
       },
       rowExpandable: () => true,
     } as const;
-  }, [isMobile]);
+  }, [isMobile, t]);
 
   const onSelectPrimary = useCallback(
     (primary: string, secondaryOverride?: string) => {
       const sp = new URLSearchParams(searchParamsStr);
+      // Cross Analysis no longer relies on a user-selected framework.
+      sp.delete("framework");
+      sp.delete("industry");
+      sp.delete("semiIndustry");
       sp.set("primary", primary);
 
       const secs = secondaryByPrimary.get(primary) || [];
@@ -664,6 +589,10 @@ export default function CrossAnalysisDimensionPage() {
     (secondary: string, toggleMode: boolean) => {
       if (!selectedPrimary) return;
       const sp = new URLSearchParams(searchParamsStr);
+      // Cross Analysis no longer relies on a user-selected framework.
+      sp.delete("framework");
+      sp.delete("industry");
+      sp.delete("semiIndustry");
 
       const secOptions = secondaryByPrimary.get(selectedPrimary) || [];
       let next: string[] = [];
@@ -703,6 +632,10 @@ const [viewMode, setViewMode] = useState<"issue" | "disclosure">("issue");
 const buildNavUrl = useCallback(
   (primary: string, secondaries: string[]) => {
     const next = new URLSearchParams(searchParamsStr);
+    // Cross Analysis no longer relies on a user-selected framework.
+    next.delete("framework");
+    next.delete("industry");
+    next.delete("semiIndustry");
     if (primary) next.set("primary", primary);
     else next.delete("primary");
 
@@ -789,7 +722,7 @@ useEffect(() => {
     return records.map((record, index) => {
       const numericValue = parseFloat(safeTrim((record as any).data)?.replace(/,/g, "") || "0");
       const formattedValue = isNaN(numericValue)
-        ? safeTrim((record as any).data) || "N/A"
+        ? safeTrim((record as any).data) || t("common.na")
         : numericValue.toLocaleString();
       // Extract file_id + page. Rows may come from old JSON where `id` is a company alias (e.g., Google2025).
       // Prefer true uuid file_id; otherwise resolve alias/name to uuid using report meta.
@@ -806,14 +739,14 @@ useEffect(() => {
         : null;
 
       const reportLabel = recordId
-        ? fileIdToReportLabel.get(String(recordId)) || recordName || "Unknown"
-        : recordName || "Unknown";
+        ? fileIdToReportLabel.get(String(recordId)) || recordName || t("common.unknown")
+        : recordName || t("common.unknown");
 
       return {
         id: index + 1,
         report: reportLabel,
         // Use Topic as the metric (requested)
-        metric: safeTrim((record as any).topic) || "N/A",
+        metric: safeTrim((record as any).topic) || t("common.na"),
         // Put sub-topic / detail into the detail column (wrappable)
         detail: [safeTrim((record as any).sub_topic), safeTrim((record as any).detail)]
           .filter(Boolean)
@@ -892,12 +825,12 @@ useEffect(() => {
     >();
 
     records.forEach((record) => {
-      const topic = safeTrim((record as any).topic) || "Metric";
+      const topic = safeTrim((record as any).topic) || t("crossAnalysis.table.metric");
       const unit = safeTrim((record as any).unit) || null;
 
       const fid = safeTrim((record as any).id || (record as any).file_id);
       const fallback = safeTrim((record as any).name);
-      const company = fid ? fileIdToReportLabel.get(fid) || fallback || fid : fallback || "Unknown";
+      const company = fid ? fileIdToReportLabel.get(fid) || fallback || fid : fallback || t("common.unknown");
 
       // Parse the first numeric value from `data`.
       const raw = safeTrim((record as any).data).replace(/,/g, "");
@@ -943,7 +876,7 @@ useEffect(() => {
       });
 
       const years = Array.from(new Set(points.map((p) => safeTrim(p.year)))).filter(Boolean) as string[];
-      const yearInfo = years.length === 1 ? `Year: ${years[0]}` : years.length > 1 ? "Years vary" : undefined;
+      const yearInfo = years.length === 1 ? t("crossAnalysis.yearSingle", { year: years[0] }) : years.length > 1 ? t("crossAnalysis.yearsVary") : undefined;
 
       charts.push({
         key,
@@ -986,7 +919,7 @@ useEffect(() => {
         <div className="flex-1 min-w-0 space-y-4">
           {/* Header Card */}
           <NewHeader
-            dimension={viewMode === "disclosure" ? "Disclosure completeness" : `${selectedPrimary}${selectedSecondaries?.[0] ? " / " + selectedSecondaries[0] : ""}`}
+            dimension={viewMode === "disclosure" ? t("crossAnalysis.disclosureCompleteness") : `${selectedPrimary}${selectedSecondaries?.[0] ? " / " + selectedSecondaries[0] : ""}`}
             reports={reportNames}
             onRefresh={() => runExtract()}
           />
@@ -995,7 +928,6 @@ useEffect(() => {
               <DisclosureCompletenessComparison
                 fileIds={ids}
                 reports={reports}
-                framework={selectedFramework}
               />
           ) : (
             <>
@@ -1021,7 +953,7 @@ useEffect(() => {
                     if (row.fileId) {
                       const params = new URLSearchParams({
                         file_id: row.fileId,
-                        name: row.report || "Evidence",
+                        name: row.report || t("crossAnalysis.evidence.defaultName"),
                       });
                       if (row.page !== null && row.page !== undefined) {
                         params.set("page", String(row.page));
@@ -1035,7 +967,7 @@ useEffect(() => {
                 />
               ) : (
                 <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-[#64748B]">
-                  No records found
+                  {t("crossAnalysis.noRecordsFound")}
                 </div>
               )}
             </>

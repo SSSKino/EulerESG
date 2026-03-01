@@ -137,6 +137,60 @@ class CrossRecordsResponse(BaseModel):
 
 
 # ------------------------------
+# Cross Analysis Disclosed Cache (assessment-driven)
+# ------------------------------
+
+
+class CrossDisclosedRecord(BaseModel):
+    """A lightweight record built from per-report assessment outputs.
+
+    This schema matches the frontend's normalized CrossExtractedRecord shape
+    (primary_navigation / secondary_navigation / topic / sub_topic / data / page / year / unit / detail).
+    """
+
+    id: str  # file_id
+    name: str  # display label (prefer filename stem)
+
+    primary_navigation: str
+    secondary_navigation: str
+
+    topic: str
+    sub_topic: str = ""
+
+    page: Optional[int] = None
+    # Extracted value (string). UI will parse numbers when drawing charts.
+    # NOTE: Historically this field was named `data` in the v2 schema.
+    # We now also expose `value` for clarity/compat with assessment outputs.
+    data: str = ""
+    value: str = ""
+    year: Optional[str] = None
+    unit: Optional[str] = None
+    detail: str = ""
+
+    # Optional fields for debugging / future UX
+    disclosure_status: Optional[str] = None
+    metric_id: Optional[str] = None
+
+    # Keep `data` and `value` in sync both ways.
+    def model_post_init(self, __context):
+        try:
+            if self.value and not self.data:
+                object.__setattr__(self, "data", self.value)
+            elif self.data and not self.value:
+                object.__setattr__(self, "value", self.data)
+        except Exception:
+            pass
+
+
+class CrossDisclosedCacheResponse(BaseModel):
+    cache_key: str
+    file_ids: List[str]
+    from_cache: bool
+    generated_at: str
+    records: List[CrossDisclosedRecord]
+
+
+# ------------------------------
 # Excel Metrics Extraction (catalog-driven)
 # ------------------------------
 
