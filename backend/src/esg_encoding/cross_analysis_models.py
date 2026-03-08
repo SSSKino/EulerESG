@@ -12,6 +12,9 @@ class CrossAnalysisReport(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
     filename: str
     has_assessment: bool
+    framework: Optional[str] = None
+    industry: Optional[str] = None
+    semi_industry: Optional[str] = None
 
 
 class CrossReportsResponse(BaseModel):
@@ -156,6 +159,8 @@ class CrossDisclosedRecord(BaseModel):
 
     topic: str
     sub_topic: str = ""
+
+    category: Optional[str] = None  # Quantitative / Qualitative; charts only for Quantitative
 
     page: Optional[int] = None
     # Extracted value (string). UI will parse numbers when drawing charts.

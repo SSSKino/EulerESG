@@ -7,16 +7,33 @@ interface NewHeaderProps {
   dimension: string;
   reports: string[];
   onRefresh: () => void;
+  /** When all selected reports share the same framework/semi-industry (e.g. from individual analysis), show here. */
+  frameworkLabel?: string | null;
+  semiIndustryLabel?: string | null;
 }
 
-export function NewHeader({ dimension, reports, onRefresh }: NewHeaderProps) {
+export function NewHeader({ dimension, reports, onRefresh, frameworkLabel, semiIndustryLabel }: NewHeaderProps) {
   const { t } = useT();
+  const contextLabel =
+    frameworkLabel && semiIndustryLabel
+      ? `${frameworkLabel} · ${semiIndustryLabel}`
+      : frameworkLabel
+        ? String(frameworkLabel)
+        : semiIndustryLabel
+          ? String(semiIndustryLabel)
+          : null;
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 w-full">
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#0F172A] mb-1">{t("crossAnalysis.title")}</h1>
           <p className="text-sm text-[#64748B] mb-3 capitalize">{dimension}</p>
+          {contextLabel && (
+            <p className="text-xs text-slate-500 mb-2" title={t("crossAnalysis.compare.valuesParsedHint")}>
+              {contextLabel}
+            </p>
+          )}
           <div className="flex gap-2">
             {reports.map((report, index) => (
               <span

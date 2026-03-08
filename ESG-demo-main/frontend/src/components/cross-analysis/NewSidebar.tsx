@@ -1,18 +1,37 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useT } from "@/i18n/useT";
+
+function secondaryKey(primary: string, secondary: string): string {
+  return `${primary}|${secondary}`;
+}
+
+const CATEGORY_LABELS_NO_SECONDARY = new Set([
+  "Quantitative",
+  "Qualitative",
+  "Discussion and Analysis",
+  "General",
+]);
+
+/** tertiaryByPrimaryAndSecondary: primary -> secondary -> metric_name[] (Level 3) */
+export type TertiaryMap = Map<string, Map<string, string[]>>;
 
 export interface NewSidebarProps {
   primaryOptions: string[];
   secondaryByPrimary: Map<string, string[]>;
+  tertiaryByPrimaryAndSecondary: TertiaryMap;
   selectedPrimary: string;
   selectedSecondaries: string[];
+  selectedTertiary: string | null;
   expandedPrimaries: Record<string, boolean>;
+  /** When true (e.g. type is "Activity Metrics"), secondary = metric_name only, no tertiary level; click secondary selects metric. */
+  primaryIsActivityMetrics?: boolean;
   viewMode?: "issue" | "disclosure";
   onTogglePrimary: (primary: string) => void;
   onSelectSecondary: (primary: string, secondary: string) => void;
+  onSelectTertiary: (primary: string, secondary: string, metricName: string) => void;
   onSelectDisclosure?: () => void;
 }
 
@@ -24,16 +43,27 @@ function safeTrim(v: any): string {
 export function NewSidebar({
   primaryOptions,
   secondaryByPrimary,
+  tertiaryByPrimaryAndSecondary,
   selectedPrimary,
   selectedSecondaries,
+  selectedTertiary,
   expandedPrimaries,
+  primaryIsActivityMetrics = false,
   viewMode = "issue",
   onTogglePrimary,
   onSelectSecondary,
+  onSelectTertiary,
   onSelectDisclosure,
 }: NewSidebarProps) {
   const { t } = useT();
   const selectedSecondarySet = useMemo(() => new Set(selectedSecondaries || []), [selectedSecondaries]);
+  const [expandedSecondaries, setExpandedSecondaries] = useState<Record<string, boolean>>({});
+  const isActivityMetrics = primaryIsActivityMetrics && safeTrim(selectedPrimary) === "Activity Metrics";
+
+  const toggleSecondary = useCallback((primary: string, secondary: string) => {
+    const key = secondaryKey(primary, secondary);
+    setExpandedSecondaries((prev) => ({ ...prev, [key]: !prev[key] }));
+  }, []);
 
   return (
     <div className="w-[320px] bg-white rounded-2xl shadow-sm p-4 h-fit">
@@ -45,7 +75,13 @@ export function NewSidebar({
         {primaryOptions.map((primary) => {
           const isExpanded = !!expandedPrimaries?.[primary];
           const isActivePrimary = safeTrim(selectedPrimary) === primary;
-          const secondaries = secondaryByPrimary.get(primary) || [];
+          const rawSecondaries = secondaryByPrimary.get(primary) || [];
+          const isActivityMetricsPrimary = primary === "Activity Metrics";
+          const secondaries =
+            isActivityMetricsPrimary
+              ? rawSecondaries.filter((s) => !CATEGORY_LABELS_NO_SECONDARY.has(s))
+              : rawSecondaries;
+          const innerTertiary = tertiaryByPrimaryAndSecondary.get(primary);
 
           return (
             <div key={primary}>
@@ -69,20 +105,62 @@ export function NewSidebar({
                 <div className="mt-1 ml-3 space-y-1">
                   {secondaries.length ? (
                     secondaries.map((secondary) => {
-                      const isSelected = isActivePrimary && selectedSecondarySet.has(secondary);
+                      const isSelectedSecondary = isActivePrimary && selectedSecondarySet.has(secondary);
+                      const tertiaries = isActivityMetrics ? [] : (innerTertiary?.get(secondary) || []);
+                      const isExpandedSec = !!expandedSecondaries[secondaryKey(primary, secondary)];
+                      const hasTertiaries = !isActivityMetrics && tertiaries.length > 0;
+
                       return (
-                        <button
-                          key={secondary}
-                          onClick={() => onSelectSecondary(primary, secondary)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
-                            isSelected
-                              ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
-                              : "text-[#64748B] hover:bg-slate-50"
-                          }`}
-                          title={secondary}
-                        >
-                          <span className="block truncate">{secondary}</span>
-                        </button>
+                        <div key={secondary}>
+                          <button
+                            onClick={() => {
+                              if (isActivityMetrics) {
+                                onSelectTertiary(primary, secondary, secondary);
+                              } else {
+                                toggleSecondary(primary, secondary);
+                              }
+                            }}
+                            className={`w-full flex items-center justify-between gap-2 text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                              isSelectedSecondary
+                                ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
+                                : "text-[#64748B] hover:bg-slate-50"
+                            }`}
+                            title={secondary}
+                          >
+                            <span className="truncate flex-1 min-w-0">{secondary}</span>
+                            {hasTertiaries && (
+                              <ChevronRight
+                                className={`w-3.5 h-3.5 text-[#64748B] shrink-0 transition-transform ${
+                                  isExpandedSec ? "rotate-90" : ""
+                                }`}
+                              />
+                            )}
+                          </button>
+                          {hasTertiaries && isExpandedSec && (
+                            <div className="ml-3 mt-0.5 space-y-0.5">
+                              {tertiaries.map((metricName) => {
+                                const isSelectedMetric = selectedTertiary === metricName;
+                                return (
+                                  <button
+                                    key={metricName}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onSelectTertiary(primary, secondary, metricName);
+                                    }}
+                                    className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-all ${
+                                      isSelectedMetric
+                                        ? "bg-[#DBEAFE] border border-[#93C5FD] text-[#1E40AF] font-medium"
+                                        : "text-[#64748B] hover:bg-slate-50"
+                                    }`}
+                                    title={metricName}
+                                  >
+                                    <span className="block truncate">{metricName}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
                       );
                     })
                   ) : (

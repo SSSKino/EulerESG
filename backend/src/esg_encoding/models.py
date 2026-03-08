@@ -177,6 +177,7 @@ class DisclosureAnalysis(BaseModel):
     improvement_suggestions: List[str] = Field(default_factory=list, description="Improvement suggestions")
     # Additional SASB fields for display
     category: str = Field(default="", description="Metric category (Quantitative/Qualitative)")
+    topic: str = Field(default="", description="SASB topic / theme (e.g. Energy Management, Data Privacy)")
     unit: str = Field(default="", description="Metric unit")
     type: str = Field(default="", description="Metric type")
     # NOTE:

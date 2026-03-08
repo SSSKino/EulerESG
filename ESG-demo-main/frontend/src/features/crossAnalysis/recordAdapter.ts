@@ -58,6 +58,7 @@ export function normalizeCrossRecord(raw: any): CrossExtractedRecord {
     const year = asStr(getAny(raw, ["year", "Year"])) || null;
     const unit = asStr(getAny(raw, ["unit", "Unit"])) || null;
     const detail = asStr(getAny(raw, ["detail", "Detail"])) || "";
+    const category = asStr(getAny(raw, ["category", "Category"])) || null;
 
     return {
       id,
@@ -71,6 +72,7 @@ export function normalizeCrossRecord(raw: any): CrossExtractedRecord {
       year,
       unit,
       detail,
+      category: category || undefined,
     };
   }
 
@@ -85,6 +87,7 @@ export function normalizeCrossRecord(raw: any): CrossExtractedRecord {
   const year = asStr(getAny(raw, ["year"])) || null;
   const unit = asStr(getAny(raw, ["unit"])) || null;
   const detail = asStr(getAny(raw, ["detail_interpretation"])) || asStr(getAny(raw, ["context"])) || "";
+  const category = asStr(getAny(raw, ["category", "Category"])) || null;
 
   return {
     id,
@@ -98,6 +101,7 @@ export function normalizeCrossRecord(raw: any): CrossExtractedRecord {
     year,
     unit,
     detail,
+    category: category || undefined,
     // Keep legacy fields so the rest of the app can still reference them if needed.
     type: asStr(getAny(raw, ["type"])),
     label: asStr(getAny(raw, ["label"])) || null,

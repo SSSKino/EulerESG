@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button, Card, Empty, Space, Table, Tag, Typography, Skeleton, Grid } from "antd";
+import { Button, Card, Empty, Modal, Space, Table, Tag, Typography, Skeleton, Grid } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
 import { getStoredAuth } from "@/lib/auth";
@@ -14,6 +14,7 @@ import { NewHeader } from "@/components/cross-analysis/NewHeader";
 import { MetricChartsGrid, type MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
 import { NewDataTable } from "@/components/cross-analysis/NewDataTable";
 import DisclosureCompletenessComparison from "@/components/cross-analysis/DisclosureCompletenessComparison";
+import FloatingChatAssistant from "@/components/cross-analysis/FloatingChatAssistant";
 import { useT } from "@/i18n/useT";
 
 const { Title } = Typography;
@@ -124,7 +125,7 @@ export default function CrossAnalysisDimensionPage() {
   const searchParamsStr = searchParams.toString();
   const primaryQ = safeTrim(searchParams.get("primary"));
   const secondaryQ = safeTrim(searchParams.get("secondary"));
-
+  const metricQ = safeTrim(searchParams.get("metric") || "");
   const ids = useMemo(() => parseIds(idsParam), [idsParam]);
 
   const [reports, setReports] = useState<CrossReportSummary[]>([]);
@@ -133,28 +134,76 @@ export default function CrossAnalysisDimensionPage() {
   const [recordsLoading, setRecordsLoading] = useState(false);
   const [recordsError, setRecordsError] = useState<string | null>(null);
 
-  // Data-driven navigation: Primary Navigation -> Secondary Navigation
+  const ACTIVITY_METRICS_PRIMARY = "Activity Metrics";
+  const isActivityMetricsPrimary = (p: string) =>
+    p === ACTIVITY_METRICS_PRIMARY || safeTrim(p).toLowerCase() === "activity metricss";
+  const canonicalPrimary = (p: string) => (isActivityMetricsPrimary(p) ? ACTIVITY_METRICS_PRIMARY : p);
+  const ACTIVITY_METRICS_SKIP_SECONDARY = new Set([
+    "Quantitative",
+    "Qualitative",
+    "Discussion and Analysis",
+    "General",
+  ]);
+
+  // Data-driven navigation: Primary Navigation -> Secondary Navigation (canonical: "Activity Metricss" -> "Activity Metrics")
   const primaryOptions = useMemo(() => {
     return uniqPreserveOrder(
-      (allRecords || []).map((r) => safeTrim((r as any).primary_navigation)).filter(Boolean)
+      (allRecords || []).map((r) => canonicalPrimary(safeTrim((r as any).primary_navigation))).filter(Boolean)
     );
   }, [allRecords]);
 
   const secondaryByPrimary = useMemo(() => {
     const m = new Map<string, string[]>();
     for (const r of allRecords || []) {
-      const p = safeTrim((r as any).primary_navigation);
-      const s = safeTrim((r as any).secondary_navigation);
-      if (!p || !s) continue;
-      const a = m.get(p) || [];
-      if (!a.includes(s)) a.push(s);
-      m.set(p, a);
+      const pRaw = safeTrim((r as any).primary_navigation);
+      if (!pRaw) continue;
+      const p = canonicalPrimary(pRaw);
+      if (isActivityMetricsPrimary(pRaw)) {
+        const metricName = safeTrim((r as any).topic) || safeTrim((r as any).secondary_navigation);
+        if (!metricName || ACTIVITY_METRICS_SKIP_SECONDARY.has(metricName)) continue;
+        const a = m.get(p) || [];
+        if (!a.includes(metricName)) a.push(metricName);
+        m.set(p, a);
+      } else {
+        const s = safeTrim((r as any).secondary_navigation);
+        if (!s) continue;
+        const a = m.get(p) || [];
+        if (!a.includes(s)) a.push(s);
+        m.set(p, a);
+      }
     }
+    m.forEach((arr, key) => {
+      if (key === ACTIVITY_METRICS_PRIMARY) arr.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    });
     return m;
+  }, [allRecords]);
+
+  // Tertiary = metric_name: Level 3 under each (primary, secondary). For "Activity Metrics" there is no tertiary (secondary = metric_name).
+  const tertiaryByPrimaryAndSecondary = useMemo(() => {
+    const outer = new Map<string, Map<string, string[]>>();
+    for (const r of allRecords || []) {
+      const pRaw = safeTrim((r as any).primary_navigation);
+      if (!pRaw) continue;
+      const p = canonicalPrimary(pRaw);
+      if (isActivityMetricsPrimary(pRaw)) continue;
+      const s = safeTrim((r as any).secondary_navigation);
+      const metricName = safeTrim((r as any).topic);
+      if (!p || !s || !metricName) continue;
+      if (!outer.has(p)) outer.set(p, new Map());
+      const inner = outer.get(p)!;
+      if (!inner.has(s)) inner.set(s, []);
+      const arr = inner.get(s)!;
+      if (!arr.includes(metricName)) arr.push(metricName);
+    }
+    outer.forEach((inner) => {
+      inner.forEach((arr) => arr.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })));
+    });
+    return outer;
   }, [allRecords]);
 
   const [selectedPrimary, setSelectedPrimary] = useState<string>("");
   const [selectedSecondaries, setSelectedSecondaries] = useState<string[]>([]);
+  const [selectedTertiary, setSelectedTertiary] = useState<string | null>(null);
   const [expandedPrimaries, setExpandedPrimaries] = useState<Record<string, boolean>>({});
 
   // Table filters (header filter dropdowns)
@@ -170,7 +219,7 @@ export default function CrossAnalysisDimensionPage() {
     setFilterCompanies([]);
   }, []);
 
-  // Resolve selectedPrimary/Secondaries from URL (or slug) after data arrives.
+  // Resolve selectedPrimary / Secondaries / Tertiary (metric) from URL after data arrives.
   useEffect(() => {
     if (!primaryOptions.length) return;
 
@@ -194,22 +243,36 @@ export default function CrossAnalysisDimensionPage() {
     desiredSecondaries = desiredSecondaries.filter((s) => secondaryOptions.includes(s));
     if (!desiredSecondaries.length && secondaryOptions.length) desiredSecondaries = [secondaryOptions[0]];
 
-    // Avoid pointless state updates that can cause continuous rerenders.
+    const inner = tertiaryByPrimaryAndSecondary.get(desiredPrimary);
+    const tertiaryOptions =
+      desiredPrimary === ACTIVITY_METRICS_PRIMARY
+        ? (secondaryByPrimary.get(desiredPrimary) || [])
+        : (inner && desiredSecondaries.length ? inner.get(desiredSecondaries[0]) : undefined) || [];
+    const desiredTertiary = metricQ && tertiaryOptions.includes(metricQ) ? metricQ : null;
+
     setExpandedPrimaries((prev) => (prev?.[desiredPrimary] ? prev : { ...prev, [desiredPrimary]: true }));
 
     setSelectedPrimary((prev) => (prev === desiredPrimary ? prev : desiredPrimary));
     setSelectedSecondaries((prev) => (arraysEqual(prev, desiredSecondaries) ? prev : desiredSecondaries));
-  }, [primaryOptions.join("|"), secondaryByPrimary, dimensionSlug, primaryQ, secondaryQ]);
+    setSelectedTertiary((prev) => (prev === desiredTertiary ? prev : desiredTertiary));
+  }, [primaryOptions.join("|"), secondaryByPrimary, tertiaryByPrimaryAndSecondary, dimensionSlug, primaryQ, secondaryQ, metricQ]);
 
   const records = useMemo(() => {
     const p = selectedPrimary;
     const secondarySet = selectedSecondaries.length ? new Set(selectedSecondaries) : null;
+    const metricName = selectedTertiary;
+    const isActivityMetrics = p === ACTIVITY_METRICS_PRIMARY;
     return (allRecords || []).filter((r) => {
-      if (p && safeTrim((r as any).primary_navigation) !== p) return false;
-      if (secondarySet && !secondarySet.has(safeTrim((r as any).secondary_navigation))) return false;
+      if (p && canonicalPrimary(safeTrim((r as any).primary_navigation)) !== p) return false;
+      if (isActivityMetrics) {
+        if (metricName && safeTrim((r as any).topic) !== metricName) return false;
+      } else {
+        if (secondarySet && !secondarySet.has(safeTrim((r as any).secondary_navigation))) return false;
+        if (metricName && safeTrim((r as any).topic) !== metricName) return false;
+      }
       return true;
     });
-  }, [allRecords, selectedPrimary, selectedSecondaries]);
+  }, [allRecords, selectedPrimary, selectedSecondaries, selectedTertiary]);
 
   const topicOptions = useMemo(() => {
     return uniqPreserveOrder(records.map((r) => safeTrim((r as any).topic)).filter(Boolean)).sort((a, b) => a.localeCompare(b));
@@ -275,6 +338,25 @@ export default function CrossAnalysisDimensionPage() {
     };
   }, [ids.join(",")]);
 
+  // Only allow comparison when all selected reports share the same framework, industry, and sub-industry.
+  const canCompare = useMemo(() => {
+    if (!reports || reports.length < 2) return false;
+    const fw = (reports as any[]).map((r) => safeTrim(r?.framework ?? ""));
+    const ind = (reports as any[]).map((r) => safeTrim(r?.industry ?? ""));
+    const semi = (reports as any[]).map((r) => safeTrim(r?.semi_industry ?? ""));
+    if (fw.some((x) => !x) || ind.some((x) => !x) || semi.some((x) => !x)) return false;
+    const firstFw = fw[0];
+    const firstInd = ind[0];
+    const firstSemi = semi[0];
+    return (
+      fw.every((x) => x === firstFw) &&
+      ind.every((x) => x === firstInd) &&
+      semi.every((x) => x === firstSemi)
+    );
+  }, [reports]);
+
+  const subIndustryMismatch = ids.length >= 2 && reports.length >= 2 && !canCompare;
+
   // Prefer using the uploaded report's filename as the display label across Cross Analysis.
   const fileIdToReportLabel = useMemo(() => {
     const m = new Map<string, string>();
@@ -339,10 +421,11 @@ export default function CrossAnalysisDimensionPage() {
     }
   }, [ids.join("|"), t]);
 
-  // Auto-run on mount and whenever ids change.
+  // Load comparative data only when all reports share the same framework, industry, and sub-industry.
   useEffect(() => {
+    if (!canCompare || ids.length < 2) return;
     runExtract();
-  }, [ids.join("|"), runExtract]);
+  }, [ids.join("|"), runExtract, canCompare]);
 
   // Grouping by Secondary Navigation (this is the "active panel" selector)
   const recordsBySecondaryAll = useMemo(() => {
@@ -559,11 +642,9 @@ export default function CrossAnalysisDimensionPage() {
   const onSelectPrimary = useCallback(
     (primary: string, secondaryOverride?: string) => {
       const sp = new URLSearchParams(searchParamsStr);
-      // Cross Analysis no longer relies on a user-selected framework.
-      sp.delete("framework");
-      sp.delete("industry");
-      sp.delete("semiIndustry");
+      // Preserve framework/industry/semiIndustry when switching navigation
       sp.set("primary", primary);
+      sp.delete("metric");
 
       const secs = secondaryByPrimary.get(primary) || [];
       const nextSecs = secondaryOverride && secs.includes(secondaryOverride)
@@ -575,6 +656,7 @@ export default function CrossAnalysisDimensionPage() {
       else sp.delete("secondary");
 
       clearTableFilters();
+      setSelectedTertiary(null);
 
       const qs = sp.toString();
       router.push(`/cross-analysis/${slugify(primary)}${qs ? `?${qs}` : ""}`);
@@ -589,10 +671,8 @@ export default function CrossAnalysisDimensionPage() {
     (secondary: string, toggleMode: boolean) => {
       if (!selectedPrimary) return;
       const sp = new URLSearchParams(searchParamsStr);
-      // Cross Analysis no longer relies on a user-selected framework.
-      sp.delete("framework");
-      sp.delete("industry");
-      sp.delete("semiIndustry");
+      // Preserve framework/industry/semiIndustry when switching navigation
+      sp.delete("metric");
 
       const secOptions = secondaryByPrimary.get(selectedPrimary) || [];
       let next: string[] = [];
@@ -614,6 +694,8 @@ export default function CrossAnalysisDimensionPage() {
       if (next.length) sp.set("secondary", next.join(","));
       else sp.delete("secondary");
 
+      setSelectedTertiary(null);
+
       const qs = sp.toString();
       router.replace(`/cross-analysis/${slugify(selectedPrimary)}${qs ? `?${qs}` : ""}`);
       setSelectedSecondaries(next);
@@ -630,17 +712,15 @@ export default function CrossAnalysisDimensionPage() {
 const [viewMode, setViewMode] = useState<"issue" | "disclosure">("issue");
 
 const buildNavUrl = useCallback(
-  (primary: string, secondaries: string[]) => {
+  (primary: string, secondaries: string[], metric?: string | null) => {
     const next = new URLSearchParams(searchParamsStr);
-    // Cross Analysis no longer relies on a user-selected framework.
-    next.delete("framework");
-    next.delete("industry");
-    next.delete("semiIndustry");
+    // Preserve framework/industry/semiIndustry (and ids) when switching navigation
     if (primary) next.set("primary", primary);
     else next.delete("primary");
-
     if (secondaries && secondaries.length) next.set("secondary", secondaries.join(","));
     else next.delete("secondary");
+    if (metric) next.set("metric", metric);
+    else next.delete("metric");
 
     const slug = slugify(primary || "nav");
     const qs = next.toString();
@@ -654,13 +734,13 @@ const handleTogglePrimary = useCallback(
     setViewMode("issue");
     setExpandedPrimaries((prev) => ({ ...prev, [primary]: safeTrim(selectedPrimary) === primary ? !prev?.[primary] : true }));
 
-    // If user clicks a different primary, switch to it and select its first secondary by default.
     if (safeTrim(selectedPrimary) !== primary) {
       const secs = secondaryByPrimary.get(primary) || [];
       const nextSecondaries = secs.length ? [secs[0]] : [];
       setSelectedPrimary(primary);
       setSelectedSecondaries(nextSecondaries);
-      router.replace(buildNavUrl(primary, nextSecondaries));
+      setSelectedTertiary(null);
+      router.replace(buildNavUrl(primary, nextSecondaries, null));
     }
   },
   [router, buildNavUrl, selectedPrimary, secondaryByPrimary]
@@ -672,7 +752,20 @@ const handleSelectSecondary = useCallback(
     setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
     setSelectedPrimary(primary);
     setSelectedSecondaries([secondary]);
-    router.replace(buildNavUrl(primary, [secondary]));
+    setSelectedTertiary(null);
+    router.replace(buildNavUrl(primary, [secondary], null));
+  },
+  [router, buildNavUrl]
+);
+
+const handleSelectTertiary = useCallback(
+  (primary: string, secondary: string, metricName: string) => {
+    setViewMode("issue");
+    setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
+    setSelectedPrimary(primary);
+    setSelectedSecondaries([secondary]);
+    setSelectedTertiary(metricName);
+    router.replace(buildNavUrl(primary, [secondary], metricName));
   },
   [router, buildNavUrl]
 );
@@ -681,26 +774,28 @@ const handleSelectDisclosure = useCallback(() => {
   setViewMode("disclosure");
 }, []);
 
-// Normalize URL (slug + query) once selection is resolved from data/URL,
-// so navigation state remains stable even when users land on /cross-analysis/<dimension>?ids=...
+// Normalize URL (slug + query) once selection is resolved from data/URL.
 useEffect(() => {
   if (!selectedPrimary) return;
 
   const pQ = primaryQ;
   const sQ = secondaryQ;
+  const mQ = searchParams.get("metric") || "";
   const desiredSlug = slugify(selectedPrimary);
   const curSlug = safeTrim((params as any)?.dimension || "");
   const desiredSecondaryStr = (selectedSecondaries || []).join(",");
+  const desiredMetric = selectedTertiary || "";
 
   const needsUpdate =
     pQ !== selectedPrimary ||
     (desiredSecondaryStr ? sQ !== desiredSecondaryStr : !!sQ) ||
+    desiredMetric !== mQ ||
     (curSlug && curSlug !== desiredSlug);
 
   if (needsUpdate) {
-    router.replace(buildNavUrl(selectedPrimary, selectedSecondaries || []));
+    router.replace(buildNavUrl(selectedPrimary, selectedSecondaries || [], selectedTertiary));
   }
-}, [selectedPrimary, (selectedSecondaries || []).join("|"), primaryQ, secondaryQ, router, buildNavUrl, params]);
+}, [selectedPrimary, (selectedSecondaries || []).join("|"), selectedTertiary, primaryQ, secondaryQ, router, buildNavUrl, params, searchParams]);
 
   // 生成新样式需要的表格数据
   const newTableData = useMemo(() => {
@@ -720,10 +815,14 @@ useEffect(() => {
     });
 
     return records.map((record, index) => {
-      const numericValue = parseFloat(safeTrim((record as any).data)?.replace(/,/g, "") || "0");
-      const formattedValue = isNaN(numericValue)
-        ? safeTrim((record as any).data) || t("common.na")
-        : numericValue.toLocaleString();
+      const dataStr = safeTrim((record as any).data);
+      const numericValue = parseFloat(dataStr?.replace(/,/g, "") || "0");
+      const isNotDisclosed = !dataStr || (!Number.isFinite(numericValue) && (record as any).disclosure_status !== "fully_disclosed");
+      const formattedValue = isNotDisclosed
+        ? ""
+        : isNaN(numericValue)
+          ? dataStr || t("common.na")
+          : numericValue.toLocaleString();
       // Extract file_id + page. Rows may come from old JSON where `id` is a company alias (e.g., Google2025).
       // Prefer true uuid file_id; otherwise resolve alias/name to uuid using report meta.
       const recordName = safeTrim((record as any).name) || "";
@@ -745,24 +844,22 @@ useEffect(() => {
       return {
         id: index + 1,
         report: reportLabel,
-        // Use Topic as the metric (requested)
         metric: safeTrim((record as any).topic) || t("common.na"),
-        // Put sub-topic / detail into the detail column (wrappable)
         detail: [safeTrim((record as any).sub_topic), safeTrim((record as any).detail)]
           .filter(Boolean)
           .join(" — "),
         year: parseInt(safeTrim((record as any).year) || "0") || new Date().getFullYear(),
         value: formattedValue,
+        isNotDisclosed,
         unit: safeTrim((record as any).unit) || "",
-        fileId: recordId, // 保存 file_id（优先使用记录的 id，否则通过名称查找）
-        page: pageNumber, // 保存原始记录的 page
+        fileId: recordId,
+        page: pageNumber,
       };
     });
-  }, [records, reports, fileIdToReportLabel, reportKeyToFileId]);
+  }, [records, reports, fileIdToReportLabel, reportKeyToFileId, t]);
 
-  // 获取报告名称列表（从 records 中提取唯一的报告名称）
+  // Report display names (may duplicate when same filename for multiple reports)
   const reportNames = useMemo(() => {
-    // Prefer report meta returned from backend.
     if (reports.length > 0) {
       return reports
         .map((r) => {
@@ -771,13 +868,7 @@ useEffect(() => {
         })
         .filter(Boolean);
     }
-
-    // Fallback: if ids exist, at least show them.
-    if (ids.length > 0) {
-      return ids;
-    }
-
-    // Last resort: derive from records.
+    if (ids.length > 0) return ids;
     const uniqueNames = new Set<string>();
     allRecords.forEach((record) => {
       const name = safeTrim((record as any).name);
@@ -786,7 +877,49 @@ useEffect(() => {
     return Array.from(uniqueNames);
   }, [reports, allRecords, ids]);
 
-  // Assign a stable color per company/report (used by all charts)
+  // One slot per report with a unique chart label so the bar chart always shows one bar per report.
+  // When two reports share the same name (e.g. "bmw esg 2024"), use "bmw esg 2024", "bmw esg 2024 (2)".
+  const reportChartSlots = useMemo(() => {
+    if (reports.length > 0) {
+      const nameCount = new Map<string, number>();
+      return reports.map((r) => {
+        const fileId = safeTrim((r as any)?.file_id) || "";
+        const fn = safeTrim((r as any)?.filename);
+        const base = (fn ? stripFileExt(fn) : "") || safeTrim((r as any)?.short_name) || safeTrim((r as any)?.display_name) || fileId;
+        const count = (nameCount.get(base) ?? 0) + 1;
+        nameCount.set(base, count);
+        const label = count === 1 ? base : `${base} (${count})`;
+        return { fileId, label };
+      });
+    }
+    const nameCount = new Map<string, number>();
+    return (ids.length ? ids : reportNames.map((_, i) => String(i))).map((fileId, i) => {
+      const base = reportNames[i] || fileId || String(i);
+      const count = (nameCount.get(base) ?? 0) + 1;
+      nameCount.set(base, count);
+      const label = count === 1 ? base : `${base} (${count})`;
+      return { fileId, label };
+    });
+  }, [reports, reportNames, ids]);
+
+  // Reuse framework & sub-industry when all selected reports share the same (no re-prompt).
+  const reportsFrameworkLabel = useMemo(() => {
+    if (!reports.length) return null;
+    const fw = (reports as any[]).map((r) => safeTrim(r.framework)).filter(Boolean);
+    if (fw.length !== reports.length) return null;
+    const first = fw[0];
+    return fw.every((x) => x === first) ? first : null;
+  }, [reports]);
+
+  const reportsSemiIndustryLabel = useMemo(() => {
+    if (!reports.length) return null;
+    const semi = (reports as any[]).map((r) => safeTrim(r.semi_industry)).filter(Boolean);
+    if (semi.length !== reports.length) return null;
+    const first = semi[0];
+    return semi.every((x) => x === first) ? first : null;
+  }, [reports]);
+
+  // Assign a stable color per report slot (one bar per report; used by all charts)
   const companyColors = useMemo(() => {
     const palette = [
       "#1677ff",
@@ -799,16 +932,15 @@ useEffect(() => {
       "#a0d911",
     ];
     const map: Record<string, string> = {};
-    reportNames.forEach((name, idx) => {
-      map[name] = palette[idx % palette.length];
+    reportChartSlots.forEach((slot, idx) => {
+      map[slot.label] = palette[idx % palette.length];
     });
     return map;
-  }, [reportNames]);
+  }, [reportChartSlots]);
 
-  // Build charts that compare the same indicator (Topic) across different companies that have data.
-  // If different indicators are disclosed, they become separate charts in a grid (max 4 per row).
+  // Build charts: one point per report (by file_id) so we always get one bar per report; value null = Not Disclosed.
   const metricCharts = useMemo<MetricChartSpec[]>(() => {
-    if (!records.length) return [];
+    if (!records.length && !reportChartSlots.length) return [];
 
     const yearNum = (y: string | null | undefined) => {
       const n = Number(safeTrim(y));
@@ -820,61 +952,52 @@ useEffect(() => {
       {
         topic: string;
         unit: string | null;
-        perCompany: Map<string, { value: number; year: string | null }>;
+        category: string | null;
+        perFileId: Map<string, { value: number | null; year: string | null }>;
       }
     >();
 
     records.forEach((record) => {
       const topic = safeTrim((record as any).topic) || t("crossAnalysis.table.metric");
       const unit = safeTrim((record as any).unit) || null;
+      const category = safeTrim((record as any).category) || null;
 
       const fid = safeTrim((record as any).id || (record as any).file_id);
-      const fallback = safeTrim((record as any).name);
-      const company = fid ? fileIdToReportLabel.get(fid) || fallback || fid : fallback || t("common.unknown");
 
-      // Parse the first numeric value from `data`.
       const raw = safeTrim((record as any).data).replace(/,/g, "");
       const match = raw.match(/-?\d+(?:\.\d+)?/);
-      if (!match) return;
-      const value = Number(match[0]);
-      if (!Number.isFinite(value)) return;
-
+      const value = match && Number.isFinite(Number(match[0])) ? Number(match[0]) : null;
       const year = safeTrim((record as any).year) || null;
 
       const key = `${topic}||${unit || ""}`;
       if (!byKey.has(key)) {
-        byKey.set(key, { topic, unit, perCompany: new Map() });
+        byKey.set(key, { topic, unit, category, perFileId: new Map() });
       }
       const bucket = byKey.get(key)!;
-      const prev = bucket.perCompany.get(company);
-
-      // Keep the most recent year per company for this Topic+Unit.
-      if (!prev || yearNum(year) > yearNum(prev.year)) {
-        bucket.perCompany.set(company, { value, year });
+      if (category === "Quantitative") bucket.category = "Quantitative";
+      const prev = bucket.perFileId.get(fid);
+      if (!prev || (value != null && (prev.value == null || yearNum(year) > yearNum(prev.year)))) {
+        bucket.perFileId.set(fid, { value, year });
       }
     });
 
     const charts: MetricChartSpec[] = [];
     byKey.forEach((bucket, key) => {
-      const points = Array.from(bucket.perCompany.entries()).map(([company, v]) => ({
-        company,
-        value: v.value,
-        year: v.year,
-      }));
+      const cat = bucket.category ? safeTrim(bucket.category) : "";
+      if (cat && cat !== "Quantitative") return;
 
-      // Compare only metrics that have data for >=2 companies.
-      if (points.length < 2) return;
-
-      // Keep company order consistent with the header list when possible.
-      points.sort((a, b) => {
-        const ai = reportNames.indexOf(a.company);
-        const bi = reportNames.indexOf(b.company);
-        if (ai !== -1 && bi !== -1) return ai - bi;
-        if (ai !== -1) return -1;
-        if (bi !== -1) return 1;
-        return a.company.localeCompare(b.company);
+      const perFileId = bucket.perFileId;
+      // One point per report slot so the chart always shows one bar per report (disclosed or Not Disclosed).
+      const points: { company: string; value: number | null; year: string | null }[] = reportChartSlots.map((slot) => {
+        const v = perFileId.get(slot.fileId);
+        return {
+          company: slot.label,
+          value: v ? v.value : null,
+          year: v ? v.year : null,
+        };
       });
 
+      // Include chart even when all values are Not Disclosed (show hatched bars for each report)
       const years = Array.from(new Set(points.map((p) => safeTrim(p.year)))).filter(Boolean) as string[];
       const yearInfo = years.length === 1 ? t("crossAnalysis.yearSingle", { year: years[0] }) : years.length > 1 ? t("crossAnalysis.yearsVary") : undefined;
 
@@ -887,12 +1010,38 @@ useEffect(() => {
       });
     });
 
-    charts.sort((a, b) => b.points.length - a.points.length || a.topic.localeCompare(b.topic));
+    charts.sort((a, b) => {
+      const aWithData = a.points.filter((p) => p.value != null).length;
+      const bWithData = b.points.filter((p) => p.value != null).length;
+      return bWithData - aWithData || a.topic.localeCompare(b.topic);
+    });
     return charts;
-  }, [records, fileIdToReportLabel, reportNames]);
+  }, [records, reportChartSlots, t]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#FFFFFF] p-6 w-full">
+      {ids.length < 2 ? (
+        <div className="w-full flex flex-col items-center justify-center min-h-[50vh] text-slate-600">
+          <p className="text-base mb-2">{t("crossAnalysis.title")}</p>
+          <p className="text-sm">{t("files.selectAtLeastTwoReports")}</p>
+        </div>
+      ) : subIndustryMismatch ? (
+        <>
+          <Modal
+            open={true}
+            title={t("crossAnalysis.title")}
+            closable={false}
+            maskClosable={false}
+            footer={
+              <Button type="primary" onClick={() => router.push("/dashboard")}>
+                {t("common.back")}
+              </Button>
+            }
+          >
+            <p className="text-slate-700">{t("crossAnalysis.sameSubIndustryRequired")}</p>
+          </Modal>
+        </>
+      ) : (
       <div className="w-full flex gap-6">
         {/* Left Sidebar - 新样式 */}
         {recordsLoading ? (
@@ -904,12 +1053,16 @@ useEffect(() => {
             <NewSidebar
               primaryOptions={primaryOptions}
               secondaryByPrimary={secondaryByPrimary}
+              tertiaryByPrimaryAndSecondary={tertiaryByPrimaryAndSecondary}
               selectedPrimary={selectedPrimary}
               selectedSecondaries={selectedSecondaries}
+              selectedTertiary={selectedTertiary}
               expandedPrimaries={expandedPrimaries}
+              primaryIsActivityMetrics={selectedPrimary === ACTIVITY_METRICS_PRIMARY}
               viewMode={viewMode}
               onTogglePrimary={handleTogglePrimary}
               onSelectSecondary={handleSelectSecondary}
+              onSelectTertiary={handleSelectTertiary}
               onSelectDisclosure={handleSelectDisclosure}
             />
           </div>
@@ -917,11 +1070,19 @@ useEffect(() => {
 
         {/* Main Content Area - 新样式 */}
         <div className="flex-1 min-w-0 space-y-4">
-          {/* Header Card */}
+          {/* Header Card: reuse framework/semi-industry from report analysis when all reports share the same */}
           <NewHeader
-            dimension={viewMode === "disclosure" ? t("crossAnalysis.disclosureCompleteness") : `${selectedPrimary}${selectedSecondaries?.[0] ? " / " + selectedSecondaries[0] : ""}`}
+            dimension={
+              viewMode === "disclosure"
+                ? t("crossAnalysis.disclosureCompleteness")
+                : selectedTertiary
+                  ? `${selectedPrimary}${selectedSecondaries?.[0] ? " / " + selectedSecondaries[0] : ""} / ${selectedTertiary}`
+                  : `${selectedPrimary}${selectedSecondaries?.[0] ? " / " + selectedSecondaries[0] : ""}`
+            }
             reports={reportNames}
             onRefresh={() => runExtract()}
+            frameworkLabel={reportsFrameworkLabel}
+            semiIndustryLabel={reportsSemiIndustryLabel}
           />
 
           {viewMode === "disclosure" ? (
@@ -974,6 +1135,10 @@ useEffect(() => {
           )}
         </div>
       </div>
+      )}
+
+      {/* 悬浮 AI 助手：仅在对比分析主内容展示时显示 */}
+      {canCompare && <FloatingChatAssistant />}
     </div>
   );
 }

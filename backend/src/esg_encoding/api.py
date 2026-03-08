@@ -13,6 +13,7 @@ import json
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from loguru import logger
 from dotenv import load_dotenv
 import time
@@ -262,11 +263,64 @@ async def access_error_handler(request: Request, exc: AccessError):
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     """Handle all other exceptions (HTTP 500)"""
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    # Use {} placeholder so str(exc) is not interpreted as format string (avoids KeyError when exc contains '{...}')
+    logger.error("Unhandled exception: {}", exc, exc_info=True)
     return JSONResponse(
         status_code=500,
         content={"error": "A system error ocurred"}
     )
+
+
+def _sanitize_compliance_filename_part(s: Optional[str]) -> str:
+    """Make a string safe for use in compliance output filenames (e.g. subindustry)."""
+    if not s or not str(s).strip():
+        return "report"
+    s = str(s).strip()
+    for c in '<>:"/\\|?*':
+        s = s.replace(c, "_")
+    return s[:80] if len(s) > 80 else s
+
+
+def _assessment_date_sydney_iso(dt: datetime) -> str:
+    """Return assessment_date as ISO string in Australia/Sydney timezone."""
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+    return dt.astimezone(ZoneInfo("Australia/Sydney")).isoformat()
+
+
+def _compliance_result_filename(report_name: str, llm_model: Optional[str]) -> str:
+    """Build filename field: report name + LLM model name + 'result', e.g. BMW2024ESG_GPT5.2result."""
+    stem = (Path(report_name).stem if report_name else "report").strip()
+    model = (llm_model or "LLM").strip()
+    for c in '<>:"/\\|?*':
+        model = model.replace(c, "_")
+    return f"{stem}_{model}result"
+
+
+def _resolve_compliance_json_path(
+    assessment_dir: Path,
+    legacy_dir: Path,
+    file_id: str,
+    stem: Optional[str] = None,
+) -> Optional[Path]:
+    """Locate compliance JSON for a file_id (exact names first, then glob for Subindustry_fileid_compliance.json)."""
+    candidates: list[Path] = [
+        assessment_dir / f"{file_id}_compliance.json",
+        legacy_dir / f"{file_id}_compliance.json",
+    ]
+    if stem:
+        candidates.append(assessment_dir / f"{stem}_compliance.json")
+        candidates.append(legacy_dir / f"{stem}_compliance.json")
+    for p in candidates:
+        if p.exists():
+            return p
+    for d in (assessment_dir, legacy_dir):
+        if not d.exists():
+            continue
+        for p in d.glob(f"*{file_id}*_compliance.json"):
+            if p.is_file():
+                return p
+    return None
 
 
 @app.get("/")
@@ -470,16 +524,20 @@ async def upload_report(
                 report_path.write_text(compliance_report, encoding="utf-8")
 
                 # Save JSON / XLSX assessment data for frontend use (canonical: uploads/outputs/compliance_reports/)
+                # Filenames use subindustry name for readability (e.g. Automobiles_<file_id>_compliance.json)
                 json_report_dir = Path(file_manager.compliance_outputs)
                 json_report_dir.mkdir(parents=True, exist_ok=True)
-
-                json_report_path = json_report_dir / f"{file_info['file_id']}_compliance.json"
-                xlsx_report_path = json_report_dir / f"{file_info['file_id']}_compliance.xlsx"
+                sanitized_subindustry = _sanitize_compliance_filename_part(semiIndustry or "report")
+                json_report_path = json_report_dir / f"{sanitized_subindustry}_{file_info['file_id']}_compliance.json"
+                xlsx_report_path = json_report_dir / f"{sanitized_subindustry}_{file_info['file_id']}_compliance.xlsx"
                 
-                # Convert assessment data to JSON format
+                # Convert assessment data to JSON format (assessment_date in Sydney time, filename = report name + LLM model)
+                config = system_components.get("config")
+                llm_model_name = getattr(config, "llm_model", None) if config else None
                 assessment_json = {
                     "report_id": assessment.report_id,
-                    "assessment_date": assessment.assessment_date.isoformat(),
+                    "assessment_date": _assessment_date_sydney_iso(assessment.assessment_date),
+                    "filename": _compliance_result_filename(file.filename or "", llm_model_name),
                     "total_metrics": assessment.total_metrics_analyzed,
                     "overall_score": assessment.overall_compliance_score,
                     "total_metrics_analyzed": assessment.total_metrics_analyzed,
@@ -538,9 +596,10 @@ async def upload_report(
                     assessment_json,
                     record_path='metric_analyses',
                     meta=[
-                        'report_id', 
-                        'assessment_date', 
-                        'total_metrics', 
+                        'report_id',
+                        'assessment_date',
+                        'filename',
+                        'total_metrics',
                         'overall_score',
                         ['disclosure_summary', 'fully_disclosed'],
                         ['disclosure_summary', 'partially_disclosed'],
@@ -804,13 +863,19 @@ async def analyze_compliance():
             file_id = None
         if not file_id:
             file_id = str(getattr(assessment, "report_id", "unknown"))
+        semi_industry = system_components.get("current_semi_industry") or "report"
+        sanitized_subindustry = _sanitize_compliance_filename_part(semi_industry)
+        json_report_path = json_report_dir / f"{sanitized_subindustry}_{file_id}_compliance.json"
 
-        json_report_path = json_report_dir / f"{file_id}_compliance.json"
-        
-        # 将评估数据转换为JSON格式
+        # 将评估数据转换为JSON格式（assessment_date 悉尼时间，filename = 报告名 + LLM 模型名）
+        file_meta = file_manager.metadata.get("files", {}).get(file_id, {})
+        report_name = file_meta.get("original_name") or file_meta.get("safe_filename") or file_id
+        config = system_components.get("config")
+        llm_model_name = getattr(config, "llm_model", None) if config else None
         assessment_json = {
             "report_id": assessment.report_id,
-            "assessment_date": assessment.assessment_date.isoformat(),
+            "assessment_date": _assessment_date_sydney_iso(assessment.assessment_date),
+            "filename": _compliance_result_filename(report_name, llm_model_name),
             "total_metrics": assessment.total_metrics_analyzed,
             "overall_score": assessment.overall_compliance_score,
                     "total_metrics_analyzed": assessment.total_metrics_analyzed,
@@ -1010,18 +1075,10 @@ def _load_specific_report_context(file_id: str):
                 pass
         return summary
 
-    # 1) Load compliance assessment JSON for this file_id
-    assessment_candidates = [
-        assessment_dir / f"{file_id}_compliance.json",
-    ]
-    if stem:
-        assessment_candidates.append(assessment_dir / f"{stem}_compliance.json")
-    if legacy_outputs_dir.exists():
-        assessment_candidates.append(legacy_outputs_dir / f"{file_id}_compliance.json")
-        if stem:
-            assessment_candidates.append(legacy_outputs_dir / f"{stem}_compliance.json")
-
-    assessment_json_path = next((p for p in assessment_candidates if p.exists()), None)
+    # 1) Load compliance assessment JSON for this file_id (supports Subindustry_fileid_compliance.json naming)
+    assessment_json_path = _resolve_compliance_json_path(
+        assessment_dir, legacy_outputs_dir, file_id, stem
+    )
 
     if assessment_json_path is not None and assessment_json_path.exists():
         try:
@@ -1040,7 +1097,23 @@ def _load_specific_report_context(file_id: str):
                     status_raw = d.get("disclosure_status") or d.get("status")
                     d["disclosure_status"] = _parse_status(status_raw)
                     d.pop("status", None)
-                    metric_analyses.append(DisclosureAnalysis(**d))
+                    # Build from explicit kwargs to avoid KeyError for missing "type"/"category"/"topic"
+                    metric_analyses.append(DisclosureAnalysis(
+                        metric_id=d.get("metric_id", ""),
+                        metric_name=d.get("metric_name", ""),
+                        metric_code=d.get("metric_code", d.get("metric_id", "")),
+                        disclosure_status=d["disclosure_status"],
+                        reasoning=d.get("reasoning", ""),
+                        evidence_segments=d.get("evidence_segments", []) or [],
+                        improvement_suggestions=d.get("improvement_suggestions", []) or [],
+                        category=d.get("category", d.get("Category", "")),
+                        topic=d.get("topic", d.get("Topic", "")),
+                        unit=d.get("unit", "") or "",
+                        type=d.get("type", d.get("Type", "")),
+                        value=d.get("value"),
+                        context=d.get("context"),
+                        page=d.get("page"),
+                    ))
                 except Exception as e:
                     logger.warning(f"Invalid metric analysis item in {assessment_json_path}: {e}")
                     continue
@@ -1324,6 +1397,7 @@ def _load_latest_assessment_for_chat():
                 evidence_segments=item.get("evidence_segments", []),
                 improvement_suggestions=item.get("improvement_suggestions", []),
                 category=item.get("category", ""),
+                topic=item.get("topic", ""),
                 unit=item.get("unit", ""),
                 type=item.get("type", ""),
                 value=item.get("value"),
@@ -1654,7 +1728,7 @@ def _normalize_assessment_payload(payload: dict) -> dict:
     for a in mas:
         if not isinstance(a, dict):
             continue
-        # Key normalization
+        # Key normalization (ensure type/category/topic exist to avoid KeyError downstream)
         if "value" not in a and "data" in a:
             a["value"] = a.get("data")
         a.setdefault("page", None)
@@ -1663,6 +1737,9 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         a.setdefault("context", a.get("specific_data_found") or a.get("evidence") or "")
         a.setdefault("evidence_segments", [])
         a.setdefault("improvement_suggestions", [])
+        a.setdefault("type", a.get("Type") or "")
+        a.setdefault("category", a.get("Category") or "")
+        a.setdefault("topic", a.get("Topic") or "")
 
         # --- UI/Output rules for disclosure statuses ---
         # 1) not_disclosed -> do not output any page/value
@@ -1759,14 +1836,13 @@ async def get_latest_assessment(user_id: int = Depends(get_current_user)):
                 "message": "No analysis reports available"
             }
 
-        # 按上传时间倒序，找到第一个存在合规 JSON 的文件
+        # 按上传时间倒序，找到第一个存在合规 JSON 的文件（支持 Subindustry_fileid_compliance.json 命名）
         for f in sorted(user_files, key=lambda x: x["upload_time"], reverse=True):
-            for d in (canonical_dir, legacy_dir):
-                json_file = d / f"{f['file_id']}_compliance.json"
-                if json_file.exists():
-                    logger.info(f"Loading latest assessment for user {user_id} from: {json_file}")
-                    with open(json_file, 'r', encoding='utf-8') as fp:
-                        return _normalize_assessment_payload(json.load(fp))
+            json_file = _find_assessment_json_path(f["file_id"], f)
+            if json_file and json_file.exists():
+                logger.info(f"Loading latest assessment for user {user_id} from: {json_file}")
+                with open(json_file, "r", encoding="utf-8") as fp:
+                    return _normalize_assessment_payload(json.load(fp))
 
         # 若用户有文件但尚未生成合规结果
         return {
@@ -2376,39 +2452,42 @@ def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tup
             metric_code = str(a.get("metric_code") or a.get("code") or a.get("Code") or "").strip()
 
             value = a.get("value")
+            ds = str(a.get("disclosure_status") or "").strip().lower()
+            is_disclosed = ds == "fully_disclosed" or ((not ds) and value is not None and looks_numeric(str(value)))
             value_str = "" if value is None else str(value)
+            if not is_disclosed:
+                value_str = ""
             unit = str(a.get("unit") or a.get("Unit") or "").strip() or None
             page = to_page(a.get("page") or a.get("Page") or a.get("page_number") or a.get("pageNumber"))
             typ = normalize_type_label(a.get("type") or a.get("Type"))
             cat = normalize_category_label(a.get("category") or a.get("Category"))
-            # detail should come from reasoning (not context)
             detail = str(a.get("reasoning") or "").strip()
 
-            # Only keep fully_disclosed (compat: if status missing but value looks numeric, keep it)
-            ds = str(a.get("disclosure_status") or "").strip().lower()
-            if ds and ds != "fully_disclosed":
-                continue
-            if (not ds) and (not looks_numeric(value_str)):
-                continue
-
-            # year must be derived from report name per requirement
             year = _extract_year_from_text(name) or name_year
 
-            topic = metric_name or metric_code or metric_id or "Metric"
+            # Primary nav = type; Secondary nav = SASB Topic (type → topic hierarchy).
+            # For "Activity Metrics", secondary = metric_name only (no category like "Quantitative").
+            sasb_topic = str(a.get("topic") or a.get("Topic") or "").strip() or cat
+            topic_label = metric_name or metric_code or metric_id or "Metric"
             sub_topic = metric_code or metric_id or ""
+            secondary_nav = (
+                topic_label
+                if typ and str(typ).strip().lower() in ("activity metrics",)
+                else sasb_topic
+            )
 
             records.append(
                 {
-                    # keep old cross-analysis record shape (v2) but also expose value
                     "id": fid,
                     "name": name,
                     "primary_navigation": typ,
-                    "secondary_navigation": cat,
-                    "topic": topic,
+                    "secondary_navigation": secondary_nav,
+                    "topic": topic_label,
+                    "sub_topic": sub_topic,
+                    "category": normalize_category_label(a.get("category") or a.get("Category")) or None,
                     "page": page,
-                    # UI adapter can read either `data` or `value`
                     "data": value_str,
-                    "value": value_str,
+                    "value": value_str or "",  # CrossDisclosedRecord.value is str; use "" for not disclosed
                     "year": year,
                     "unit": unit,
                     "detail": detail,
@@ -2473,6 +2552,15 @@ async def cross_analysis_disclosed_cache(ids: str, user_id: int = Depends(get_cu
                 with open(cache_path, "r", encoding="utf-8") as f:
                     payload = json.load(f)
                 payload["from_cache"] = True
+                # Normalize cached records: value/data must be str; category optional
+                for r in payload.get("records") or []:
+                    if isinstance(r, dict):
+                        if r.get("value") is None:
+                            r["value"] = ""
+                        if r.get("data") is None:
+                            r["data"] = r.get("value", "") or ""
+                        if "category" not in r:
+                            r["category"] = None
                 return payload
 
         # Build new
@@ -2984,18 +3072,24 @@ async def delete_file(file_id: str, user_id: int = Depends(get_current_user)):
                 emb_path.unlink()
                 deleted_items.append(f"嵌入文件: {emb_path.name}")
 
-        # 4. 删除合规分析报告
+        # 4. 删除合规分析报告（含 Subindustry_fileid_compliance.json / .xlsx 命名）
+        canonical_compliance = Path(file_manager.compliance_outputs)
         compliance_paths = [
-            Path(file_manager.compliance_outputs) / f"{file_id}_compliance.json",
+            canonical_compliance / f"{file_id}_compliance.json",
+            canonical_compliance / f"{file_id}_compliance.xlsx",
         ]
         if stem:
-            compliance_paths.append(Path(file_manager.compliance_outputs) / f"{stem}_compliance.json")
+            compliance_paths.append(canonical_compliance / f"{stem}_compliance.json")
+            compliance_paths.append(canonical_compliance / f"{stem}_compliance.xlsx")
+        compliance_paths.extend(canonical_compliance.glob(f"*{file_id}*_compliance.json"))
+        compliance_paths.extend(canonical_compliance.glob(f"*{file_id}*_compliance.xlsx"))
 
         # Legacy location (older builds): backend/outputs
         legacy_outputs_dir = Path(__file__).resolve().parents[2] / "outputs"
         if legacy_outputs_dir.exists():
             compliance_paths.extend(list(legacy_outputs_dir.glob(f"*{file_id}*.md")))
             compliance_paths.extend(list(legacy_outputs_dir.glob(f"*{file_id}*compliance*.json")))
+            compliance_paths.extend(list(legacy_outputs_dir.glob(f"*{file_id}*compliance*.xlsx")))
 
         for comp_path in compliance_paths:
             if comp_path.exists():
@@ -3097,17 +3191,11 @@ async def get_latest_report(user_id: int = Depends(get_current_user)):
             Path(__file__).resolve().parents[2] / "outputs",
         ]
 
-        # 获取用户自己的报告文件列表，按上传时间倒序
+        # 获取用户自己的报告文件列表，按上传时间倒序（支持 Subindustry_fileid_compliance.json 命名）
         user_files = file_manager.list_user_files(user_id, file_type="report")
         for f in sorted(user_files, key=lambda x: x["upload_time"], reverse=True):
-            # 先查 JSON 拿 report_id
-            json_file = None
-            for d in json_dirs:
-                p = d / f"{f['file_id']}_compliance.json"
-                if p.exists():
-                    json_file = p
-                    break
-            if not json_file:
+            json_file = _find_assessment_json_path(f["file_id"], f)
+            if not json_file or not json_file.exists():
                 continue
 
             with open(json_file, "r", encoding="utf-8") as jf:
@@ -3158,16 +3246,8 @@ async def get_report_by_file_id(file_id: str, user_id: int = Depends(get_current
         file_info = file_manager.get_file_info(file_id, user_id=user_id)
         if not file_info:
             raise HTTPException(status_code=404, detail="File not found or access denied")
-        legacy_outputs_dir = Path(__file__).resolve().parents[2] / "outputs"
-        json_dirs = [Path(file_manager.compliance_outputs), legacy_outputs_dir]
-
-        json_file = None
-        for d in json_dirs:
-            p = d / f"{file_id}_compliance.json"
-            if p.exists():
-                json_file = p
-                break
-        if not json_file:
+        json_file = _find_assessment_json_path(file_id, file_info)
+        if not json_file or not json_file.exists():
             raise HTTPException(status_code=404, detail=f"No assessment found for file {file_id}")
 
         # Read JSON to get report_id

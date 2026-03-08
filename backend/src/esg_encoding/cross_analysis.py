@@ -2409,30 +2409,84 @@ def compare_topic(
 
 def get_reports_info(file_ids: List[str]) -> List[CrossAnalysisReport]:
     reports: List[CrossAnalysisReport] = []
-    meta = file_manager.metadata.get("files", {})
+    raw_meta = file_manager.metadata.get("files", {}) if file_manager.metadata else {}
+    meta = raw_meta if isinstance(raw_meta, dict) else {}
 
     for fid in file_ids:
-        info = meta.get(fid, {})
-        filename = str(info.get("original_name") or info.get("safe_filename") or fid)
-        has_assessment = bool((UPLOADS_DIR / "outputs" / "compliance_reports" / f"{fid}_compliance.json").exists()) or bool((Path(__file__).parent.parent.parent / "outputs" / f"{fid}_compliance.json").exists())
-        display, short, conf = extract_company_name(fid, filename)
-
-        ry = extract_report_year(fid, filename)
-
-        # user-facing label: 公司名称 + 年份（不使用 file_id / 文件名）
-        if ry and str(ry) not in display:
-            short = f"{display} {ry}".strip()
-        else:
-            short = display.strip() if display else short
-
-        # Persist display name to metadata for stability
         try:
-            if fid in meta:
-                meta[fid]["display_name"] = display
-                meta[fid]["short_name"] = short
-                meta[fid]["display_confidence"] = conf
+            raw_info = meta.get(fid, {})
+            info = raw_info if isinstance(raw_info, dict) else {}
+            filename = str(info.get("original_name") or info.get("safe_filename") or fid)
+            canonical = UPLOADS_DIR / "outputs" / "compliance_reports"
+            legacy = Path(__file__).parent.parent.parent / "outputs"
+            has_assessment = (
+                (canonical / f"{fid}_compliance.json").exists()
+                or (legacy / f"{fid}_compliance.json").exists()
+                or any(canonical.glob(f"*{fid}*_compliance.json"))
+                or (legacy.exists() and any(legacy.glob(f"*{fid}*_compliance.json")))
+            )
+            display, short, conf = extract_company_name(fid, filename)
+            ry = extract_report_year(fid, filename)
+            if ry and str(ry) not in display:
+                short = f"{display} {ry}".strip()
+            else:
+                short = display.strip() if display else short
+        except Exception as e:
+            logger.warning(f"[get_reports_info] Fallback for {fid}: {e}")
+            filename = fid
+            display = fid[:24] + "..." if len(fid) > 24 else fid
+            short = display
+            conf = 0.0
+            ry = None
+            has_assessment = False
+
+        try:
+            entry = meta.get(fid)
+            if isinstance(entry, dict):
+                entry["display_name"] = display
+                entry["short_name"] = short
+                entry["display_confidence"] = conf
         except Exception:
             pass
+
+        framework = None
+        industry = None
+        semi_industry = None
+        info_entry = meta.get(fid) if fid in meta else None
+        if isinstance(info_entry, dict):
+            framework = info_entry.get("framework") or None
+            industry = info_entry.get("industry") or None
+            semi_industry = info_entry.get("semi_industry") or None
+
+        # Fallback: read from compliance JSON when metadata is missing (e.g. for same-subindustry check).
+        if has_assessment and (framework is None or semi_industry is None):
+            for d in (canonical, legacy):
+                if not d.exists():
+                    continue
+                for p in d.glob(f"*{fid}*_compliance.json"):
+                    if not p.is_file():
+                        continue
+                    try:
+                        with open(p, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                        if framework is None and isinstance(data.get("framework"), str):
+                            framework = data["framework"].strip() or None
+                        if industry is None and isinstance(data.get("industry"), str):
+                            industry = data.get("industry", "").strip() or None
+                        if semi_industry is None:
+                            stem = p.stem
+                            if stem.endswith(f"_{fid}"):
+                                part = stem[: -len(fid) - 1].strip("_ ")
+                                if part:
+                                    semi_industry = part
+                            if semi_industry is None and isinstance(data.get("semi_industry"), str):
+                                semi_industry = data["semi_industry"].strip() or None
+                    except Exception as e:
+                        logger.debug(f"[get_reports_info] Fallback read {p}: {e}")
+                    break
+                else:
+                    continue
+                break
 
         reports.append(CrossAnalysisReport(
             file_id=fid,
@@ -2442,12 +2496,16 @@ def get_reports_info(file_ids: List[str]) -> List[CrossAnalysisReport]:
             confidence=float(conf),
             filename=filename,
             has_assessment=has_assessment,
+            framework=framework,
+            industry=industry,
+            semi_industry=semi_industry,
         ))
 
     # best-effort persist metadata updates
     try:
-        file_manager.metadata["files"] = meta
-        file_manager._save_metadata()
+        if isinstance(getattr(file_manager, "metadata", None), dict):
+            file_manager.metadata["files"] = meta
+            file_manager._save_metadata()
     except Exception:
         pass
 

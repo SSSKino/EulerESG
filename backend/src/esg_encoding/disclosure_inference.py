@@ -105,6 +105,7 @@ class DisclosureInferenceEngine:
                             improvement_suggestions=[],
                             # SASB display fields
                             category=getattr(metric, 'sasb_category', ''),
+                            topic=(getattr(metric, 'sasb_topic', None) or ''),
                             unit=getattr(metric, 'unit', ''),
                             type=getattr(metric, 'sasb_type', ''),
                             value=None,  # No value found
@@ -122,6 +123,7 @@ class DisclosureInferenceEngine:
                         improvement_suggestions=[],
                         # SASB display fields
                         category=getattr(metric, 'sasb_category', ''),
+                        topic=(getattr(metric, 'sasb_topic', None) or ''),
                         unit=getattr(metric, 'unit', ''),
                         type=getattr(metric, 'sasb_type', ''),
                         value=None,  # No value found
@@ -448,6 +450,7 @@ class DisclosureInferenceEngine:
                 improvement_suggestions=llm_result.get("improvement_suggestions", []),  # This field is optional
                 # SASB display fields
                 category=getattr(metric, 'sasb_category', '') if metric else '',
+                topic=(getattr(metric, 'sasb_topic', None) or '') if metric else '',
                 unit=getattr(metric, 'unit', '') or '' if metric else '',
                 type=getattr(metric, 'sasb_type', '') if metric else '',
                 value=found_value,

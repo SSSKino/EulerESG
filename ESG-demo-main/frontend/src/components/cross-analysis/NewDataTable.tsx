@@ -14,6 +14,7 @@ interface DataRow {
   unit: string;
   fileId?: string;
   page?: number | null;
+  isNotDisclosed?: boolean;
 }
 
 interface NewDataTableProps {
@@ -361,7 +362,19 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                   <td className="py-3 px-3 text-sm text-[#0F172A] break-words whitespace-normal">{row.metric}</td>
                   <td className="py-3 px-3 text-sm text-[#64748B] break-words whitespace-normal">{row.detail}</td>
                   <td className="py-3 px-3 text-sm text-[#0F172A]">{row.year}</td>
-                  <td className="py-3 px-3 text-sm font-bold text-[#0F172A] text-right break-words whitespace-normal">{row.value}</td>
+                  <td className="py-3 px-3 text-sm text-right break-words whitespace-normal">
+                    {(row as DataRow).isNotDisclosed ? (
+                      <span
+                        className="italic text-slate-400 font-normal inline-flex items-center gap-1"
+                        title={t("crossAnalysis.notDisclosed")}
+                      >
+                        N/D
+                        <span className="text-slate-400" aria-hidden>ⓘ</span>
+                      </span>
+                    ) : (
+                      <span className="font-bold text-[#0F172A]">{row.value}</span>
+                    )}
+                  </td>
                   <td className="py-3 px-3 text-sm text-[#64748B] break-words whitespace-normal">{row.unit}</td>
                   <td className="py-3 px-3">
                     <button

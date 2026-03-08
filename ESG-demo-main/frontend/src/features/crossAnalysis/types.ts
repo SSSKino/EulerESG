@@ -27,6 +27,9 @@ export type CrossReportSummary = {
   confidence: number;
   filename: string;
   has_assessment: boolean;
+  framework?: string | null;
+  industry?: string | null;
+  semi_industry?: string | null;
 };
 
 export type CrossCompareReport = {
@@ -71,6 +74,7 @@ export type CrossExtractedRecord = {
   data: string; // 具体数据（文本形式，前端解析数值）
   year: string | null;
   unit: string | null;
+  category?: string | null; // Quantitative | Qualitative; charts only for Quantitative
 
   // 对数据的具体解读（不再使用 context）
   detail: string;

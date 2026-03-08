@@ -83,7 +83,7 @@ export default function FrameworkSelectModal({
       cancelText={t("common.cancel")}
       onCancel={onCancel}
       onOk={handleOk}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         form={form}
