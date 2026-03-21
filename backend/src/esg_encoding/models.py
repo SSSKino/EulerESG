@@ -20,6 +20,7 @@ class MetricSource(str, Enum):
     """Metric source enumeration"""
     GRI = "gri"
     SASB = "sasb"
+    CDP = "cdp"
     TCFD = "tcfd"
     UNGC = "ungc"
     CUSTOM = "custom"
@@ -182,9 +183,12 @@ class DisclosureAnalysis(BaseModel):
     type: str = Field(default="", description="Metric type")
     # NOTE:
     # - value/page/context 需要支持“有数值的量化披露”与“只有定性描述”的两类输出。
-    # - value 允许为 number 或 string（例如保留原文格式），前端统一以 string|number 处理。
+    # - value：有则仅为数字；无量化或未披露时用 "n/a"；理由与叙述放在 reasoning / context。
     # - context 用于前端 hover/Popover 展示“证据摘要/摘录”，同时可用于回溯。
-    value: Optional[Union[str, int, float]] = Field(default=None, description="Found numeric value from report")
+    value: Optional[Union[str, int, float]] = Field(
+        default=None,
+        description="Metric-specific numeric disclosure only; otherwise 'n/a'",
+    )
     context: Optional[str] = Field(default=None, description="Evidence context/excerpt for the found value")
     page: Optional[int] = Field(default=None, description="Page number where value/context is found")
 

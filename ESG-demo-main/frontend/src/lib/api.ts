@@ -175,35 +175,59 @@ class APIService {
     return this.fetchWithError(url);
   }
 
-  // Delete file
-  async deleteFile(fileId: string) {
-    console.log(`Calling DELETE ${API_BASE_URL}/api/files/${fileId}`);
-    const result = await this.fetchWithError(`${API_BASE_URL}/api/files/${fileId}`, {
-      method: 'DELETE'
+  // Delete file; optional scope_key removes one multi-scope compliance row only (keeps PDF).
+  async deleteFile(fileId: string, scopeKey?: string) {
+    const q =
+      scopeKey && String(scopeKey).trim()
+        ? `?scope_key=${encodeURIComponent(String(scopeKey).trim())}`
+        : "";
+    const url = `${API_BASE_URL}/api/files/${fileId}${q}`;
+    console.log(`Calling DELETE ${url}`);
+    const result = await this.fetchWithError(url, {
+      method: "DELETE",
     });
-    console.log('Delete API response:', result);
+    console.log("Delete API response:", result);
     return result;
   }
 
-  // Upload PDF report
+  // Upload PDF report (SASB: industry + semiIndustry; GRI: griSector + griTopic)
+  // scopeSlugs: JSON string array of extra scopes — one PDF encode, separate compliance JSON per slug.
   async uploadReport(
-    file: File, 
-    framework?: string, 
-    industry?: string, 
-    semiIndustry?: string
+    file: File,
+    framework?: string,
+    industry?: string,
+    semiIndustry?: string,
+    griSector?: string,
+    griTopic?: string,
+    scopeSlugs?: string
   ): Promise<UploadResponse> {
     const formData = new FormData();
-    formData.append('file', file);
-    
-    // Add framework and industry selection information
-    if (framework) formData.append('framework', framework);
-    if (industry) formData.append('industry', industry);
-    if (semiIndustry) formData.append('semiIndustry', semiIndustry);
-
+    formData.append("file", file);
+    if (framework) formData.append("framework", framework);
+    if (industry) formData.append("industry", industry);
+    if (semiIndustry) formData.append("semiIndustry", semiIndustry);
+    if (griSector) formData.append("griSector", griSector);
+    if (griTopic) formData.append("griTopic", griTopic);
+    if (scopeSlugs) formData.append("scopeSlugs", scopeSlugs);
     return this.fetchWithError(`${API_BASE_URL}/api/upload-report`, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
+  }
+
+  async getAssessmentScopesForFile(fileId: string): Promise<{
+    file_id: string;
+    framework?: string;
+    default_scope_key?: string | null;
+    outputs: { scope_key: string; json_filename: string; overall_score: number }[];
+  }> {
+    return this.fetchWithError(`${API_BASE_URL}/api/assessment/${fileId}/scopes`, { method: "GET" });
+  }
+
+  // GRI options for Sector / Topic dropdowns
+  async getGriOptions(): Promise<{ sectors: { slug: string; label: string }[]; topicsBySector: Record<string, { slug: string; label: string }[]> }> {
+    const res = await this.fetchWithError(`${API_BASE_URL}/api/gri/options`, { method: "GET" });
+    return res as { sectors: { slug: string; label: string }[]; topicsBySector: Record<string, { slug: string; label: string }[]> };
   }
 
   // Upload ESG metrics - REMOVED: This function was never used and had misleading logic
@@ -253,8 +277,9 @@ class APIService {
   }
 
   // 根据文件ID获取评估结果
-  async getAssessmentByFile(fileId: string) {
-    return this.fetchWithError(`${API_BASE_URL}/api/assessment/${fileId}`);
+  async getAssessmentByFile(fileId: string, scope?: string) {
+    const qs = scope ? `?scope=${encodeURIComponent(scope)}` : "";
+    return this.fetchWithError(`${API_BASE_URL}/api/assessment/${fileId}${qs}`);
   }
 
   // 获取最新的评估结果

@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request, Dep
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from typing import Optional
+from typing import List, Optional, Set
 import os
 import re
 import json
@@ -18,6 +18,7 @@ from loguru import logger
 from dotenv import load_dotenv
 import time
 import threading
+import asyncio
 import hashlib
 
 from .models import (
@@ -59,7 +60,7 @@ from .auth.dependencies import get_current_user, get_current_user_optional
 from .report_encoder import ReportEncoder
 from .metric_processor import MetricProcessor
 from .dual_channel_retrieval import DualChannelRetriever
-from .disclosure_inference import DisclosureInferenceEngine
+from .disclosure_inference import DisclosureInferenceEngine, COMPLIANCE_VALUE_NA
 from .esg_chatbot import ESGChatbot
 from .hipporag_patch import enable_hipporag
 from .file_manager import file_manager
@@ -125,6 +126,8 @@ system_components = {
     "current_framework": None,  # Store framework (e.g., SASB, GRI)
     "current_industry": None,  # Store main industry
     "current_semi_industry": None,  # Store sub-industry
+    "current_gri_sector": None,  # GRI sector slug when framework is GRI
+    "current_gri_topic": None,   # GRI topic slug when framework is GRI
     "current_company": None  # Store company name
 }
 
@@ -133,6 +136,9 @@ system_components = {
 # -----------------------------
 _excel_metrics_jobs = {}  # key -> {"thread": Thread, "started_at": float}
 _excel_metrics_jobs_lock = threading.Lock()
+
+# Single global ESGChatbot: serialize context/session ops vs background upload (HippoRAG + load_context).
+_chatbot_ops_lock = threading.RLock()
 
 
 # Deleted deprecated function _parse_compliance_report() (179 lines)
@@ -271,6 +277,257 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
+def _parse_scope_slugs_json(raw: Optional[str], fallback: Optional[str]) -> List[str]:
+    """Parse JSON array of scope slugs from multipart field `scopeSlugs`, else single fallback."""
+    if raw:
+        s = str(raw).strip()
+        if s:
+            try:
+                data = json.loads(s)
+                if isinstance(data, list):
+                    out = [str(x).strip() for x in data if str(x).strip()]
+                    if out:
+                        return out
+            except Exception:
+                pass
+    if fallback and str(fallback).strip():
+        return [str(fallback).strip()]
+    return []
+
+
+def _compliance_manifest_path(assessment_dir: Path, file_id: str) -> Path:
+    return assessment_dir / f"{file_id}_compliance_manifest.json"
+
+
+def _load_compliance_manifest(assessment_dir: Path, file_id: str) -> Optional[dict]:
+    p = _compliance_manifest_path(assessment_dir, file_id)
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _write_compliance_manifest(
+    assessment_dir: Path,
+    file_id: str,
+    framework: str,
+    outputs: List[dict],
+    expected_scope_keys: Optional[List[str]] = None,
+) -> None:
+    assessment_dir.mkdir(parents=True, exist_ok=True)
+    default_sk = None
+    if outputs:
+        default_sk = outputs[0].get("scope_key")
+    elif expected_scope_keys:
+        default_sk = expected_scope_keys[0]
+    body: dict = {
+        "file_id": file_id,
+        "framework": framework,
+        "default_scope_key": default_sk,
+        "outputs": outputs,
+    }
+    if expected_scope_keys:
+        body["expected_scope_keys"] = expected_scope_keys
+    _compliance_manifest_path(assessment_dir, file_id).write_text(
+        json.dumps(body, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+
+def _compliance_file_stem_for_scope(fw: str, file_info: dict, scope_key: str) -> str:
+    """Filename segment before `_{file_id}_compliance.*` (matches upload naming)."""
+    sk = str(scope_key).strip()
+    if not sk:
+        return _sanitize_compliance_filename_part("report")
+    if fw == "GRI":
+        gs = (file_info.get("gri_sector") or "").strip()
+        return _sanitize_compliance_filename_part(f"GRI_{gs}_{sk}")
+    if fw == "SASB":
+        return _sanitize_compliance_filename_part(sk)
+    if fw == "CDP":
+        return _sanitize_compliance_filename_part(f"CDP_{sk}")
+    if fw == "TCFD":
+        return _sanitize_compliance_filename_part(f"TCFD_{sk}")
+    return _sanitize_compliance_filename_part(sk)
+
+
+def _compliance_json_path_for_scope(
+    assessment_dir: Path,
+    file_id: str,
+    fw: str,
+    file_info: dict,
+    scope_key: str,
+) -> Optional[Path]:
+    """Resolve per-scope compliance JSON path (matches upload naming)."""
+    sk = str(scope_key).strip()
+    if not sk:
+        return None
+    part = _compliance_file_stem_for_scope(fw, file_info, sk)
+    p = assessment_dir / f"{part}_{file_id}_compliance.json"
+    return p if p.is_file() else None
+
+
+def _paths_for_scope_compliance_bundle(
+    file_manager, file_id: str, file_info: dict, scope_key: str
+) -> tuple[Path, Path, Path]:
+    """json, xlsx, markdown paths for one scope (may not exist on disk)."""
+    fw = (file_info.get("framework") or "").strip()
+    part = _compliance_file_stem_for_scope(fw, file_info, scope_key)
+    compliance_dir = Path(file_manager.compliance_outputs)
+    json_p = compliance_dir / f"{part}_{file_id}_compliance.json"
+    xlsx_p = compliance_dir / f"{part}_{file_id}_compliance.xlsx"
+    md_stem = _sanitize_compliance_filename_part(f"{part}")
+    md_p = Path(file_manager.markdown_outputs) / f"compliance_report_{file_id}_{md_stem}.md"
+    return json_p, xlsx_p, md_p
+
+
+def _build_scope_rows(
+    file_manager, file_info: dict, m: Optional[dict]
+) -> List[dict]:
+    """One row per expected scope for UI; ready when output JSON exists (or manifest lists it)."""
+    file_id = file_info.get("file_id")
+    if not file_id:
+        return []
+    fw = (file_info.get("framework") or "").strip()
+    expected: List[str] = []
+    if m and isinstance(m.get("expected_scope_keys"), list) and m["expected_scope_keys"]:
+        expected = [str(x).strip() for x in m["expected_scope_keys"] if str(x).strip()]
+    else:
+        raw = file_info.get("scope_slugs_json")
+        if raw:
+            try:
+                slugs = json.loads(raw)
+                if isinstance(slugs, list) and len(slugs) > 1:
+                    expected = [str(x).strip() for x in slugs if str(x).strip()]
+            except Exception:
+                pass
+    if len(expected) <= 1:
+        return []
+
+    done_manifest: Set[str] = set()
+    if m:
+        for o in m.get("outputs") or []:
+            sk = o.get("scope_key")
+            if sk is not None:
+                done_manifest.add(str(sk))
+
+    assessment_dir = Path(file_manager.compliance_outputs)
+    rows: List[dict] = []
+    for sk in expected:
+        path = _compliance_json_path_for_scope(
+            assessment_dir, str(file_id), fw, file_info, sk
+        )
+        ready = path is not None or sk in done_manifest
+        rows.append(
+            {
+                "scope_key": sk,
+                "ready": ready,
+                "label": _slug_to_label(sk),
+            }
+        )
+    return rows
+
+
+def _scope_progress_for_report(file_manager, file_info: dict) -> dict:
+    """Derive multi-scope analysis progress from manifest and/or compliance JSON files."""
+    if file_info.get("file_type") != "report":
+        return {}
+    file_id = file_info.get("file_id")
+    if not file_id:
+        return {}
+    assessment_dir = Path(file_manager.compliance_outputs)
+    m = _load_compliance_manifest(assessment_dir, file_id)
+    scope_rows = _build_scope_rows(file_manager, file_info, m)
+    n_done = 0
+    n_exp = 0
+
+    if m:
+        outs = m.get("outputs") or []
+        n_done = len(outs) if isinstance(outs, list) else 0
+        try:
+            glob_n = len(list(assessment_dir.glob(f"*{file_id}*_compliance.json")))
+            n_done = max(n_done, glob_n)
+        except Exception:
+            pass
+        exp = m.get("expected_scope_keys")
+        if isinstance(exp, list) and len(exp) > 0:
+            n_exp = len(exp)
+        elif n_done > 0:
+            n_exp = n_done
+    else:
+        try:
+            n_done = len(list(assessment_dir.glob(f"*{file_id}*_compliance.json")))
+        except Exception:
+            n_done = 0
+        raw = file_info.get("scope_slugs_json")
+        if raw:
+            try:
+                slugs = json.loads(raw)
+                if isinstance(slugs, list) and slugs:
+                    n_exp = len(slugs)
+            except Exception:
+                pass
+
+    unknown_total = bool(not m and n_done > 0 and n_exp == 0)
+
+    st = str(file_info.get("status", "")).lower()
+    partial = (n_exp > 0 and n_done > 0 and n_done < n_exp) or (
+        unknown_total and st == "pending"
+    )
+    all_done = (n_exp > 0 and n_done >= n_exp) or (
+        unknown_total and n_done > 0 and st == "processed"
+    )
+    return {
+        "scope_analysis_completed": n_done,
+        "scope_analysis_total": n_exp,
+        "scope_analysis_partial": partial,
+        "scope_analysis_all_done": all_done,
+        "scope_analysis_unknown_total": unknown_total,
+        "scope_rows": scope_rows,
+    }
+
+
+def _enrich_file_records_with_scope_progress(
+    file_manager, files: List[dict]
+) -> List[dict]:
+    out: List[dict] = []
+    for f in files:
+        if f.get("file_type") != "report":
+            out.append(f)
+            continue
+        extra = _scope_progress_for_report(file_manager, f)
+        merged = {**f, **extra}
+        out.append(merged)
+    return out
+
+
+def _json_path_from_manifest(
+    assessment_dir: Path, file_id: str, scope_key: Optional[str]
+) -> Optional[Path]:
+    m = _load_compliance_manifest(assessment_dir, file_id)
+    if not m:
+        return None
+    outs = m.get("outputs") or []
+    if not outs:
+        return None
+    want = (scope_key or "").strip()
+    if want:
+        for o in outs:
+            if o.get("scope_key") == want:
+                fn = o.get("json_filename")
+                if fn:
+                    p = assessment_dir / fn
+                    if p.is_file():
+                        return p
+    fn0 = outs[0].get("json_filename")
+    if fn0:
+        p0 = assessment_dir / fn0
+        if p0.is_file():
+            return p0
+    return None
+
+
 def _sanitize_compliance_filename_part(s: Optional[str]) -> str:
     """Make a string safe for use in compliance output filenames (e.g. subindustry)."""
     if not s or not str(s).strip():
@@ -279,6 +536,49 @@ def _sanitize_compliance_filename_part(s: Optional[str]) -> str:
     for c in '<>:"/\\|?*':
         s = s.replace(c, "_")
     return s[:80] if len(s) > 80 else s
+
+
+def _slug_to_label(slug: str) -> str:
+    """Convert slug (e.g. coal_sector) to display label (e.g. Coal Sector)."""
+    if not slug:
+        return ""
+    return slug.replace("_", " ").strip().title()
+
+
+def _get_gri_sectors_and_topics() -> dict:
+    """Scan backend/data/gri_metrics/*.json and return sectors + topics per sector.
+    Filenames are {sector_slug}_{topic_slug}.json (e.g. coal_sector_climate_change.json).
+    Sector slug ends with '_sector' or '_sectors'; we split on that to get sector vs topic.
+    """
+    gri_dir = Path(__file__).parent.parent.parent / "data" / "gri_metrics"
+    if not gri_dir.exists():
+        return {"sectors": [], "topicsBySector": {}}
+    sectors_set = set()
+    topics_by_sector = {}
+    for p in gri_dir.glob("*.json"):
+        stem = p.stem
+        sector_slug, topic_slug = None, None
+        if "_sectors_" in stem:
+            idx = stem.index("_sectors_") + len("_sectors_")
+            sector_slug = stem[:idx].rstrip("_")
+            topic_slug = stem[idx:].lstrip("_")
+        elif "_sector_" in stem:
+            idx = stem.index("_sector_") + len("_sector_")
+            sector_slug = stem[:idx].rstrip("_")
+            topic_slug = stem[idx:].lstrip("_")
+        if not sector_slug or not topic_slug:
+            continue
+        sectors_set.add(sector_slug)
+        if sector_slug not in topics_by_sector:
+            topics_by_sector[sector_slug] = set()
+        topics_by_sector[sector_slug].add(topic_slug)
+    sectors = sorted(sectors_set)
+    sectors_list = [{"slug": s, "label": _slug_to_label(s)} for s in sectors]
+    topics_by_sector_list = {
+        s: [{"slug": t, "label": _slug_to_label(t)} for t in sorted(topics_by_sector[s])]
+        for s in sectors
+    }
+    return {"sectors": sectors_list, "topicsBySector": topics_by_sector_list}
 
 
 def _assessment_date_sydney_iso(dt: datetime) -> str:
@@ -297,6 +597,113 @@ def _compliance_result_filename(report_name: str, llm_model: Optional[str]) -> s
     return f"{stem}_{model}result"
 
 
+# Compliance JSON uses the same metric shape as SASB exports; GRI/CDP/TCFD rows are normalized to match.
+_SASB_EXPORT_METRIC_TYPE = "Sustainability Disclosure Topics & Metrics"
+
+
+def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
+    """Canonical per-metric object for compliance JSON (SASB key order)."""
+    return {
+        "metric_id": analysis.metric_id,
+        "metric_name": analysis.metric_name,
+        "metric_code": analysis.metric_code,
+        "disclosure_status": analysis.disclosure_status.value
+        if hasattr(analysis.disclosure_status, "value")
+        else analysis.disclosure_status,
+        "reasoning": analysis.reasoning,
+        "unit": getattr(analysis, "unit", "") or "",
+        "category": getattr(analysis, "category", "") or "",
+        "topic": getattr(analysis, "topic", "") or "",
+        "type": getattr(analysis, "type", "") or "",
+        "page": getattr(analysis, "page", None),
+        "value": getattr(analysis, "value", None),
+        "context": getattr(analysis, "context", None),
+        "evidence_segments": list(getattr(analysis, "evidence_segments", None) or []),
+        "improvement_suggestions": list(
+            getattr(analysis, "improvement_suggestions", None) or []
+        ),
+    }
+
+
+def _normalize_non_sasb_compliance_metric_row(
+    m: dict, framework: Optional[str]
+) -> None:
+    """Align GRI/CDP/TCFD metric fields with SASB JSON semantics (type/topic/category)."""
+    fw = (framework or "").strip().upper()
+    if fw not in ("GRI", "CDP", "TCFD"):
+        return
+    topic = (m.get("topic") or "").strip()
+    typ = (m.get("type") or "").strip()
+    ctx = m.get("context")
+    ctx_str = ctx if isinstance(ctx, str) else ("" if ctx is None else str(ctx))
+    parts = []
+    if topic:
+        parts.append(f"Framework topic: {topic}")
+    if typ and typ != _SASB_EXPORT_METRIC_TYPE:
+        parts.append(f"Framework disclosure type: {typ}")
+    if parts:
+        prefix = " | ".join(parts)
+        m["context"] = f"{prefix}\n{ctx_str}".strip() if ctx_str else prefix
+    m["topic"] = ""
+    m["type"] = _SASB_EXPORT_METRIC_TYPE
+    if not (m.get("category") or "").strip():
+        unit = (m.get("unit") or "").strip()
+        m["category"] = "Quantitative" if unit else "Discussion and Analysis"
+
+
+def _apply_partial_disclosure_json_rules(metric_rows: Optional[List[dict]]) -> None:
+    """Match upload/analyze pipelines: partial/not disclosed value and page handling."""
+    for m in metric_rows or []:
+        if not isinstance(m, dict):
+            continue
+        s = str(m.get("disclosure_status", "") or "").strip().lower()
+        if "partial" in s:
+            v = m.get("value")
+            if not (isinstance(v, (int, float)) and not isinstance(v, bool)):
+                m["value"] = COMPLIANCE_VALUE_NA
+        elif "not" in s:
+            m["page"] = None
+            m["value"] = COMPLIANCE_VALUE_NA
+
+
+def _build_compliance_assessment_json(
+    assessment: ComplianceAssessment,
+    report_path_str: str,
+    result_filename: str,
+) -> dict:
+    """Root + metric_analyses in the same shape as SASB compliance JSON."""
+    fw = getattr(assessment, "framework", None)
+    metric_rows = [
+        _metric_row_from_disclosure_analysis(a) for a in assessment.metric_analyses
+    ]
+    for row in metric_rows:
+        _normalize_non_sasb_compliance_metric_row(row, fw)
+    _apply_partial_disclosure_json_rules(metric_rows)
+    return {
+        "report_id": assessment.report_id,
+        "assessment_date": _assessment_date_sydney_iso(assessment.assessment_date),
+        "filename": result_filename,
+        "total_metrics": assessment.total_metrics_analyzed,
+        "overall_score": assessment.overall_compliance_score,
+        "total_metrics_analyzed": assessment.total_metrics_analyzed,
+        "overall_compliance_score": assessment.overall_compliance_score,
+        "report_file_path": report_path_str,
+        "framework": fw,
+        "disclosure_summary": {
+            "fully_disclosed": assessment.disclosure_summary.get(
+                DisclosureStatus.FULLY_DISCLOSED, 0
+            ),
+            "partially_disclosed": assessment.disclosure_summary.get(
+                DisclosureStatus.PARTIALLY_DISCLOSED, 0
+            ),
+            "not_disclosed": assessment.disclosure_summary.get(
+                DisclosureStatus.NOT_DISCLOSED, 0
+            ),
+        },
+        "metric_analyses": metric_rows,
+    }
+
+
 def _resolve_compliance_json_path(
     assessment_dir: Path,
     legacy_dir: Path,
@@ -304,6 +711,9 @@ def _resolve_compliance_json_path(
     stem: Optional[str] = None,
 ) -> Optional[Path]:
     """Locate compliance JSON for a file_id (exact names first, then glob for Subindustry_fileid_compliance.json)."""
+    jp = _json_path_from_manifest(assessment_dir, file_id, None)
+    if jp is not None and jp.is_file():
+        return jp
     candidates: list[Path] = [
         assessment_dir / f"{file_id}_compliance.json",
         legacy_dir / f"{file_id}_compliance.json",
@@ -371,52 +781,29 @@ async def login_endpoint(request: LoginRequest):
     return AuthResponse(**result)
 
 
-@app.post("/api/upload-report")
-async def upload_report(
-    file: UploadFile = File(...),
-    industry: Optional[str] = Form(None),
-    semiIndustry: Optional[str] = Form(None),
-    framework: Optional[str] = Form(None),
-    user_id: int = Depends(get_current_user)
-):
-    """
-    Upload and process ESG report
-    
-    Args:
-        file: PDF file
-        industry: Main industry classification (optional)
-        semiIndustry: Sub-industry (for SASB metrics selection)
-        framework: Framework selection (SASB/GRI/TCFD)
-        
-    Returns:
-        Processing results, including complete processing chain output (report processing + metrics matching + classification + knowledge base update)
-    """
-    # ===== DEBUG: Function called =====
-    logger.info(f"=== UPLOAD_REPORT ENDPOINT CALLED ===")
-    logger.info(f"File: {file.filename}")
-    logger.info(f"Framework: {framework}")
-    logger.info(f"Industry: {industry}")
-    logger.info(f"SemiIndustry: {semiIndustry}")
-    logger.info(f"=== END DEBUG ===")
-    
-    if not file.filename.endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported")
-    
+def _sync_upload_report_body(
+    content: bytes,
+    filename: str,
+    industry: Optional[str],
+    semiIndustry: Optional[str],
+    framework: Optional[str],
+    griSector: Optional[str],
+    griTopic: Optional[str],
+    scopeSlugs: Optional[str],
+    user_id: int,
+) -> dict:
+    """PDF encode + assessment off the event loop (keeps /api/files responsive)."""
     try:
-        logger.info("=== STARTING FILE PROCESSING ===")
-        # Read file content
-        content = await file.read()
-        logger.info(f"File content read successfully, size: {len(content)} bytes")
-        
-        # Save file using file manager
         logger.info("Saving file using file manager...")
         file_info = file_manager.save_uploaded_file(
             file_content=content,
-            filename=file.filename,
+            filename=filename,
             file_type="report",
             industry=industry,
             framework=framework,
             semi_industry=semiIndustry,
+            gri_sector=griSector,
+            gri_topic=griTopic,
             user_id=user_id
         )
         logger.info(f"File saved at: {file_info['file_path']}")
@@ -446,264 +833,394 @@ async def upload_report(
         system_components["current_report"] = report_content
         logger.info("Report content stored in system components")
         
-        # Store framework and industry information
+        # Store framework and industry / GRI information
         system_components["current_framework"] = framework
         system_components["current_industry"] = industry
         system_components["current_semi_industry"] = semiIndustry
+        system_components["current_gri_sector"] = griSector
+        system_components["current_gri_topic"] = griTopic
         # Extract company name from filename (remove extension)
-        company_name = file.filename.rsplit('.', 1)[0] if file.filename else "Unknown Company"
+        company_name = filename.rsplit('.', 1)[0] if filename else "Unknown Company"
         system_components["current_company"] = company_name
-        logger.info(f"Stored framework and industry info - Framework: {framework}, Industry: {industry}, Semi-Industry: {semiIndustry}, Company: {company_name}")
+        logger.info(f"Stored framework and industry info - Framework: {framework}, Industry: {industry}, Semi-Industry: {semiIndustry}, GRI: {griSector}/{griTopic}, Company: {company_name}")
         
         # Get report summary
         logger.info("Getting report summary...")
         summary = encoder.get_report_summary(report_content)
         logger.info("Report summary obtained")
         
-        # Load corresponding metrics based on user-selected framework and industry
-        metrics = None
-        if framework == "SASB" and semiIndustry:
-            # Use SASB metrics
-            processor = system_components["metric_processor"]
-            metrics = processor.load_sasb_metrics_by_industry(semiIndustry)
-            
-            system_components["current_metrics"] = metrics
-            logger.info(f"Loaded SASB metrics for industry: {semiIndustry}")
-        else:
-            # Industry/semiIndustry must be provided
-            raise ValueError("Industry classification (semiIndustry) is required for analysis. Please provide a valid industry.")
-        
-        # Now with report and metrics, perform complete processing chain
-        if metrics:
-            try:
-                # Execute complete processing chain: dual-channel retrieval + disclosure inference engine classification
-                dual_retriever = system_components["dual_retriever"]
-                retrieval_results = dual_retriever.retrieve_for_collection(
-                    report_content,
-                    metrics
+        # Build scope list: one retrieval + assessment per slug; single PDF encode above.
+        fw = (framework or "").strip()
+        processor = system_components["metric_processor"]
+        scopes_list: List[tuple[str, dict]] = []
+
+        if fw == "GRI":
+            topics = _parse_scope_slugs_json(scopeSlugs, griTopic)
+            if not griSector or not str(griSector).strip() or not topics:
+                raise ValueError(
+                    "GRI sector and at least one topic are required. Use griTopic or scopeSlugs JSON array."
                 )
-                
-                #print("======== CHECK ALL METRICS ========")
-                #print(metrics)
-                # Execute disclosure inference (classification)
+            gs = str(griSector).strip()
+            for t in topics:
+                scopes_list.append((t, {"griSector": gs, "griTopic": t}))
+        elif fw == "SASB":
+            semis = _parse_scope_slugs_json(scopeSlugs, semiIndustry)
+            if not semis:
+                raise ValueError(
+                    "SASB sub-industry is required. Use semiIndustry or scopeSlugs JSON array."
+                )
+            for s in semis:
+                scopes_list.append((s, {"semiIndustry": s}))
+        elif fw == "CDP":
+            topics = _parse_scope_slugs_json(scopeSlugs, semiIndustry)
+            if not topics:
+                raise ValueError("CDP Topic is required. Use semiIndustry or scopeSlugs JSON array.")
+            for t in topics:
+                scopes_list.append((t, {"semiIndustry": t}))
+        elif fw == "TCFD":
+            topics = _parse_scope_slugs_json(scopeSlugs, semiIndustry)
+            if not topics:
+                raise ValueError("TCFD Topic is required. Use semiIndustry or scopeSlugs JSON array.")
+            for t in topics:
+                scopes_list.append((t, {"semiIndustry": t}))
+        else:
+            raise ValueError("Please select a framework (SASB, GRI, CDP, or TCFD) and the required options.")
+
+        _, p0 = scopes_list[0]
+        if fw == "GRI":
+            system_components["current_gri_topic"] = p0["griTopic"]
+            system_components["current_gri_sector"] = p0["griSector"]
+            system_components["current_semi_industry"] = semiIndustry
+        elif fw == "SASB":
+            system_components["current_semi_industry"] = p0["semiIndustry"]
+        elif fw in ("CDP", "TCFD"):
+            system_components["current_semi_industry"] = p0["semiIndustry"]
+
+        # Pre-build HippoRAG index once per document (not per scope).
+        try:
+            with _chatbot_ops_lock:
+                retriever = getattr(system_components["chatbot"], "_hipporag_retriever", None)
+                if retriever and getattr(retriever, "is_enabled", lambda: False)():
+                    retriever.ensure_index(report_content.document_id, report_content)
+        except Exception as e:
+            logger.warning(f"HippoRAG pre-index failed for {file_info['file_id']}: {e}")
+
+        dual_retriever = system_components["dual_retriever"]
+        disclosure_engine = system_components["disclosure_engine"]
+        json_report_dir = Path(file_manager.compliance_outputs)
+        json_report_dir.mkdir(parents=True, exist_ok=True)
+        config = system_components.get("config")
+        llm_model_name = getattr(config, "llm_model", None) if config else None
+
+        manifest_rows: List[dict] = []
+        last_assessment = None
+        last_report_path_str = ""
+        expected_scope_keys = [s[0] for s in scopes_list]
+
+        try:
+            finfo_early = file_manager.metadata.get("files", {}).get(file_info["file_id"])
+            if isinstance(finfo_early, dict):
+                finfo_early["scope_slugs_json"] = json.dumps(
+                    expected_scope_keys, ensure_ascii=False
+                )
+                file_manager._save_metadata()
+        except Exception as e:
+            logger.warning(f"Early scope_slugs_json patch failed: {e}")
+
+        _write_compliance_manifest(
+            json_report_dir,
+            file_info["file_id"],
+            fw,
+            [],
+            expected_scope_keys=expected_scope_keys,
+        )
+
+        try:
+            for scope_key, params in scopes_list:
+                if fw == "GRI":
+                    metrics = processor.load_gri_metrics_by_sector_topic(
+                        params["griSector"], params["griTopic"]
+                    )
+                    semi_for_disclosure = (
+                        f"GRI {params['griSector']} {params['griTopic']}".strip()
+                    )
+                    sanitized_part = _sanitize_compliance_filename_part(
+                        f"GRI_{params['griSector']}_{params['griTopic']}"
+                    )
+                elif fw == "SASB":
+                    metrics = processor.load_sasb_metrics_by_industry(params["semiIndustry"])
+                    semi_for_disclosure = params["semiIndustry"]
+                    sanitized_part = _sanitize_compliance_filename_part(params["semiIndustry"])
+                elif fw == "CDP":
+                    metrics = processor.load_cdp_metrics_by_topic(params["semiIndustry"])
+                    semi_for_disclosure = params["semiIndustry"] or "CDP"
+                    sanitized_part = _sanitize_compliance_filename_part(
+                        f"CDP_{params['semiIndustry']}"
+                    )
+                else:  # TCFD
+                    metrics = processor.load_tcfd_metrics_by_topic(params["semiIndustry"])
+                    semi_for_disclosure = params["semiIndustry"] or "TCFD"
+                    sanitized_part = _sanitize_compliance_filename_part(
+                        f"TCFD_{params['semiIndustry']}"
+                    )
+
+                system_components["current_metrics"] = metrics
+                logger.info(f"Loaded metrics for scope_key={scope_key} ({fw})")
+
+                retrieval_results = dual_retriever.retrieve_for_collection(
+                    report_content, metrics
+                )
                 t_start = time.time()
-                disclosure_engine = system_components["disclosure_engine"]
                 assessment = disclosure_engine.analyze_compliance(
                     retrieval_results,
                     report_content,
                     file_info["file_path"],
-                    metrics,  # Pass all metrics
+                    metrics,
                     framework=framework,
                     industry=industry,
-                    semi_industry=semiIndustry
+                    semi_industry=semi_for_disclosure,
                 )
-                t_end = time.time()
-                logger.info(f"Disclosure inference took {t_end - t_start} seconds")
-                
-                # Store assessment results
-                system_components["current_assessment"] = assessment
-                
-                # Update chatbot knowledge base (including ESG content + classification results and comments)
-                system_components["chatbot"].load_context(
-                    report_content,
-                    assessment
+                logger.info(
+                    f"Disclosure inference scope={scope_key} took {time.time() - t_start:.2f}s"
                 )
+                last_assessment = assessment
 
-                # Pre-build HippoRAG index so chat won"t fall back while indexing.
-                try:
-                    retriever = getattr(system_components["chatbot"], "_hipporag_retriever", None)
-                    if retriever and getattr(retriever, "is_enabled", lambda: False)():
-                        retriever.ensure_index(report_content.document_id, report_content)
-                except Exception as e:
-                    logger.warning(f"HippoRAG pre-index failed for {file_info['file_id']}: {e}")
-                
-                # Generate and save compliance report (canonical location: uploads/outputs/markdown/)
                 compliance_report = disclosure_engine.generate_compliance_report(assessment)
-                report_path = Path(file_manager.markdown_outputs) / f"compliance_report_{assessment.report_id}.md"
+                md_stem = _sanitize_compliance_filename_part(f"{sanitized_part}")
+                report_path = (
+                    Path(file_manager.markdown_outputs)
+                    / f"compliance_report_{file_info['file_id']}_{md_stem}.md"
+                )
                 report_path.parent.mkdir(parents=True, exist_ok=True)
                 report_path.write_text(compliance_report, encoding="utf-8")
+                last_report_path_str = str(report_path)
 
-                # Save JSON / XLSX assessment data for frontend use (canonical: uploads/outputs/compliance_reports/)
-                # Filenames use subindustry name for readability (e.g. Automobiles_<file_id>_compliance.json)
-                json_report_dir = Path(file_manager.compliance_outputs)
-                json_report_dir.mkdir(parents=True, exist_ok=True)
-                sanitized_subindustry = _sanitize_compliance_filename_part(semiIndustry or "report")
-                json_report_path = json_report_dir / f"{sanitized_subindustry}_{file_info['file_id']}_compliance.json"
-                xlsx_report_path = json_report_dir / f"{sanitized_subindustry}_{file_info['file_id']}_compliance.xlsx"
-                
-                # Convert assessment data to JSON format (assessment_date in Sydney time, filename = report name + LLM model)
-                config = system_components.get("config")
-                llm_model_name = getattr(config, "llm_model", None) if config else None
-                assessment_json = {
-                    "report_id": assessment.report_id,
-                    "assessment_date": _assessment_date_sydney_iso(assessment.assessment_date),
-                    "filename": _compliance_result_filename(file.filename or "", llm_model_name),
-                    "total_metrics": assessment.total_metrics_analyzed,
-                    "overall_score": assessment.overall_compliance_score,
-                    "total_metrics_analyzed": assessment.total_metrics_analyzed,
-                    "overall_compliance_score": assessment.overall_compliance_score,
-                    "report_file_path": str(report_path),
-                    "framework": getattr(assessment, "framework", None),
-                    "disclosure_summary": {
-                        "fully_disclosed": assessment.disclosure_summary.get(DisclosureStatus.FULLY_DISCLOSED, 0),
-                        "partially_disclosed": assessment.disclosure_summary.get(DisclosureStatus.PARTIALLY_DISCLOSED, 0),
-                        "not_disclosed": assessment.disclosure_summary.get(DisclosureStatus.NOT_DISCLOSED, 0)
-                    },
-                    "metric_analyses": [
-                        {
-                            "metric_id": analysis.metric_id,
-                            "metric_name": analysis.metric_name,
-                            "metric_code": analysis.metric_code,
-                            "disclosure_status": analysis.disclosure_status.value if hasattr(analysis.disclosure_status, 'value') else analysis.disclosure_status,
-                            "reasoning": analysis.reasoning,
-                            "unit": getattr(analysis, 'unit', ''),
-                            "category": getattr(analysis, 'category', ''),
-                            "topic": getattr(analysis, 'topic', ''),
-                            "type": getattr(analysis, 'type', ''),
-                            "page": getattr(analysis, 'page', None),
-                            "value": getattr(analysis, 'value', None),
-                            "context": getattr(analysis, 'context', None),
-                            "evidence_segments": getattr(analysis, 'evidence_segments', None) or [],
-                            "improvement_suggestions": getattr(analysis, 'improvement_suggestions', None) or []
-                        }
-                        for analysis in assessment.metric_analyses
-                    ]
-                }
+                json_filename = f"{sanitized_part}_{file_info['file_id']}_compliance.json"
+                json_report_path = json_report_dir / json_filename
+                xlsx_report_path = json_report_dir / f"{sanitized_part}_{file_info['file_id']}_compliance.xlsx"
 
-                # Enforce UI/Output rules in the persisted JSON as well:
-                # - not_disclosed -> remove page/value
-                # - partially_disclosed -> replace value with a textual reason (no concrete numbers)
-                for m in assessment_json.get("metric_analyses", []) or []:
-                    s = str(m.get("disclosure_status", "") or "").strip().lower()
-                    if "partial" in s:
-                        m["value"] = (
-                            "Partially disclosed: referenced in the report, but the disclosure is not clear enough to extract a specific value "
-                            "(e.g., missing a precise figure, unit, or reporting period)."
-                        )
-                    elif "not" in s:
-                        m["page"] = None
-                        m["value"] = None
-                
+                assessment_json = _build_compliance_assessment_json(
+                    assessment,
+                    str(report_path),
+                    _compliance_result_filename(filename or "", llm_model_name),
+                )
+
                 with open(json_report_path, "w", encoding="utf-8") as f:
                     json.dump(assessment_json, f, indent=2, ensure_ascii=False)
 
-                logger.info(f"Assessment JSON saved to: {json_report_path}")
-
-                ### ======== JSON FLATTENING ========
-
-
                 df_flat = pd.json_normalize(
                     assessment_json,
-                    record_path='metric_analyses',
+                    record_path="metric_analyses",
                     meta=[
-                        'report_id',
-                        'assessment_date',
-                        'filename',
-                        'total_metrics',
-                        'overall_score',
-                        ['disclosure_summary', 'fully_disclosed'],
-                        ['disclosure_summary', 'partially_disclosed'],
-                        ['disclosure_summary', 'not_disclosed']
-                    ]
+                        "report_id",
+                        "assessment_date",
+                        "filename",
+                        "total_metrics",
+                        "overall_score",
+                        ["disclosure_summary", "fully_disclosed"],
+                        ["disclosure_summary", "partially_disclosed"],
+                        ["disclosure_summary", "not_disclosed"],
+                    ],
                 )
-
                 column_map = {
-                    'metric_name': 'Metric',
-                    'category': 'Category',
-                    'unit': 'Unit',
-                    'metric_code': 'Code',
-                    'topic': 'Topic',
-                    'type': 'Type',
-                    'context': 'Value',         # Assuming 'context' is the ground-truth value from the doc
-                    'page': 'Page',
-                    'reasoning': 'Context',     # Assuming 'reasoning' is your model's output (like the 'ChatGPT' column)
-                    'disclosure_status': 'Model Disclosure Status' # Adding this as it's important
+                    "metric_name": "Metric",
+                    "category": "Category",
+                    "unit": "Unit",
+                    "metric_code": "Code",
+                    "topic": "Topic",
+                    "type": "Type",
+                    "context": "Value",
+                    "page": "Page",
+                    "reasoning": "Context",
+                    "disclosure_status": "Model Disclosure Status",
                 }
                 df_renamed = df_flat.rename(columns=column_map)
-
                 final_columns = [
-                    'Metric',
-                    'Category',
-                    'Unit',
-                    'Code',
-                    'Topic',
-                    'Type',
-                    'Value',    # From JSON 'context'
-                    'Page',     # From JSON 'page'
-                    'Context',  # From JSON 'reasoning'
-                    'Model Disclosure Status', # From JSON 'disclosure_status'
-                    'ChatGPT',  # New empty column for benchmarking
-                    'InputWrong',# New empty column
-                    'comment'   # New empty column
+                    "Metric",
+                    "Category",
+                    "Unit",
+                    "Code",
+                    "Topic",
+                    "Type",
+                    "Value",
+                    "Page",
+                    "Context",
+                    "Model Disclosure Status",
+                    "ChatGPT",
+                    "InputWrong",
+                    "comment",
                 ]
-
                 df_final = df_renamed.reindex(columns=final_columns)
                 df_final.to_excel(xlsx_report_path, index=False, sheet_name="Benchmark")
 
-                logger.info(f"Successfully converted JSON to Excel at: {xlsx_report_path}")
-                
-                file_manager.move_report_file(file_info["file_id"], "processed")
-                logger.info(f"Complete processing chain finished. Score: {assessment.overall_compliance_score:.2%}")
-                
-                return {
-                    "status": "success",
-                    "message": "Report uploaded and fully processed",
-                    "report_id": report_content.document_id,
-                    "file_id": file_info["file_id"],
-                    "summary": summary,
-                    "assessment": {
-                        "total_metrics": assessment.total_metrics_analyzed,
-                        "overall_score": assessment.overall_compliance_score,
-                        "disclosure_summary": assessment.disclosure_summary,
-                        "report_path": str(report_path)
+                manifest_rows.append(
+                    {
+                        "scope_key": scope_key,
+                        "json_filename": json_filename,
+                        "overall_score": float(assessment.overall_compliance_score or 0.0),
                     }
-                }
-                
-            except Exception as assessment_error:
-                error_str = str(assessment_error)
-                logger.error(f"Error in assessment processing: {assessment_error}")
-                
-                # 检查是否是LLM访问错误
-                is_llm_error = "403" in error_str or "AccessDenied" in error_str or "Unpurchased" in error_str or "LLM" in error_str
-                
-                # If inference fails, still save report but mark as partially processed
-                file_manager.move_report_file(file_info["file_id"], "processed")
-                
-                error_message = "Report processed but assessment failed"
-                if is_llm_error:
-                    error_message = (
-                        "分析失败：LLM模型访问被拒绝。请检查 `backend/config/.env` 文件中的 `LLM_MODEL` 配置，"
-                        "确保使用可访问的模型（如 'qwen-plus' 或 'qwen-turbo'）。"
-                    )
-                
-                return {
-                    "status": "partial_success",
-                    "message": error_message,
-                    "report_id": report_content.document_id,
-                    "file_id": file_info["file_id"],
-                    "summary": summary,
-                    "error": str(assessment_error),
-                    "error_type": "llm_access_denied" if is_llm_error else "unknown"
-                }
-        else:
-            # When no metrics, only process report and wait for metrics upload
+                )
+                _write_compliance_manifest(
+                    json_report_dir,
+                    file_info["file_id"],
+                    fw,
+                    manifest_rows,
+                    expected_scope_keys=expected_scope_keys,
+                )
+
+            system_components["current_assessment"] = last_assessment
+            if last_assessment:
+                with _chatbot_ops_lock:
+                    system_components["chatbot"].load_context(report_content, last_assessment)
+
+            # Persist primary scope on file record for listings / cross-analysis defaults
+            try:
+                finfo = file_manager.metadata.get("files", {}).get(file_info["file_id"])
+                if isinstance(finfo, dict):
+                    finfo["scope_slugs_json"] = json.dumps([s[0] for s in scopes_list], ensure_ascii=False)
+                    if fw == "GRI":
+                        finfo["gri_topic"] = scopes_list[0][0]
+                        finfo["gri_sector"] = scopes_list[0][1]["griSector"]
+                        finfo["semi_industry"] = None
+                    elif fw == "SASB":
+                        finfo["semi_industry"] = scopes_list[0][0]
+                    elif fw in ("CDP", "TCFD"):
+                        finfo["semi_industry"] = scopes_list[0][0]
+                    file_manager._save_metadata()
+            except Exception as e:
+                logger.warning(f"Failed to patch file metadata with multi-scope info: {e}")
+
             file_manager.move_report_file(file_info["file_id"], "processed")
-            
-            logger.info(f"Report processed, waiting for metrics: {file.filename}")
-            
+            if last_assessment:
+                logger.info(
+                    f"Complete processing chain finished ({len(scopes_list)} scope(s)). "
+                    f"Last score: {last_assessment.overall_compliance_score:.2%}"
+                )
+
             return {
                 "status": "success",
-                "message": "Report processed, awaiting metrics for full analysis",
+                "message": "Report uploaded and fully processed",
                 "report_id": report_content.document_id,
                 "file_id": file_info["file_id"],
-                "summary": summary
+                "summary": summary,
+                "scopes": manifest_rows,
+                "assessment": {
+                    "total_metrics": last_assessment.total_metrics_analyzed if last_assessment else 0,
+                    "overall_score": last_assessment.overall_compliance_score if last_assessment else 0,
+                    "disclosure_summary": last_assessment.disclosure_summary if last_assessment else {},
+                    "report_path": last_report_path_str,
+                },
             }
-        
+
+        except Exception as assessment_error:
+            error_str = str(assessment_error)
+            logger.error(f"Error in assessment processing: {assessment_error}")
+
+            try:
+                _write_compliance_manifest(
+                    json_report_dir,
+                    file_info["file_id"],
+                    fw,
+                    manifest_rows,
+                    expected_scope_keys=expected_scope_keys,
+                )
+            except Exception as me:
+                logger.warning(f"Failed to write partial compliance manifest: {me}")
+
+            is_llm_error = "403" in error_str or "AccessDenied" in error_str or "Unpurchased" in error_str or "LLM" in error_str
+
+            file_manager.move_report_file(file_info["file_id"], "processed")
+
+            error_message = "Report processed but assessment failed"
+            if is_llm_error:
+                error_message = (
+                    "分析失败：LLM模型访问被拒绝。请检查 `backend/config/.env` 文件中的 `LLM_MODEL` 配置，"
+                    "确保使用可访问的模型（如 'qwen-plus' 或 'qwen-turbo'）。"
+                )
+
+            return {
+                "status": "partial_success",
+                "message": error_message,
+                "report_id": report_content.document_id,
+                "file_id": file_info["file_id"],
+                "summary": summary,
+                "error": str(assessment_error),
+                "error_type": "llm_access_denied" if is_llm_error else "unknown"
+            }
+
     except Exception as e:
         logger.error(f"Error processing report: {e}")
         # If processing fails, move to failed directory
         if 'file_info' in locals():
             file_manager.move_report_file(file_info["file_id"], "failed")
+        raise
+
+
+@app.post("/api/upload-report")
+async def upload_report(
+    file: UploadFile = File(...),
+    industry: Optional[str] = Form(None),
+    semiIndustry: Optional[str] = Form(None),
+    framework: Optional[str] = Form(None),
+    griSector: Optional[str] = Form(None),
+    griTopic: Optional[str] = Form(None),
+    scopeSlugs: Optional[str] = Form(None),
+    user_id: int = Depends(get_current_user)
+):
+    """
+    Upload and process ESG report
+    
+    Args:
+        file: PDF file
+        industry: Main industry classification (optional, for SASB)
+        semiIndustry: Sub-industry (for SASB metrics selection)
+        framework: Framework selection (SASB/GRI/TCFD)
+        griSector: GRI sector slug (when framework=GRI)
+        griTopic: GRI topic slug (when framework=GRI); if scopeSlugs is set, this is optional fallback for a single topic
+        scopeSlugs: Optional JSON array of scope slugs (GRI topic slugs, SASB semi-industries, CDP/TCFD topic slugs).
+            One PDF encode; one retrieval+assessment per slug; separate *_compliance.json per scope.
+        
+    Returns:
+        Processing results, including complete processing chain output (report processing + metrics matching + classification + knowledge base update)
+
+    Note:
+        Heavy work runs in a thread pool (`asyncio.to_thread`) so the event loop can still
+        serve GET /api/files and other requests while analysis runs. HippoRAG ``ensure_index`` and
+        final ``chatbot.load_context`` use ``_chatbot_ops_lock`` so opening Chat does not race
+        the shared ``ESGChatbot`` instance. Concurrent uploads still share global ``system_components``
+        (last write wins); use one analysis at a time for stable chat context.
+    """
+    # ===== DEBUG: Function called =====
+    logger.info(f"=== UPLOAD_REPORT ENDPOINT CALLED ===")
+    logger.info(f"File: {file.filename}")
+    logger.info(f"Framework: {framework}")
+    logger.info(f"Industry: {industry}")
+    logger.info(f"SemiIndustry: {semiIndustry}")
+    logger.info(f"GRI Sector: {griSector}, GRI Topic: {griTopic}")
+    logger.info(f"scopeSlugs: {scopeSlugs}")
+    logger.info(f"=== END DEBUG ===")
+    
+    if not file.filename.endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+    
+    try:
+        logger.info("=== STARTING FILE PROCESSING ===")
+        content = await file.read()
+        logger.info(f"File content read successfully, size: {len(content)} bytes")
+        return await asyncio.to_thread(
+            _sync_upload_report_body,
+            content,
+            file.filename or "",
+            industry,
+            semiIndustry,
+            framework,
+            griSector,
+            griTopic,
+            scopeSlugs,
+            user_id,
+        )
+    except Exception as e:
+        logger.error(f"Error processing report: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -820,25 +1337,31 @@ async def analyze_compliance():
         
         # 执行披露推理
         disclosure_engine = system_components["disclosure_engine"]
+        fw = system_components.get("current_framework")
+        semi_label = system_components.get("current_semi_industry")
+        if fw == "GRI":
+            gs, gt = system_components.get("current_gri_sector"), system_components.get("current_gri_topic")
+            semi_label = f"GRI {gs or ''} {gt or ''}".strip() or "GRI"
         assessment = disclosure_engine.analyze_compliance(
             retrieval_results,
             system_components["current_report"],
             system_components["current_report"].document_content.file_path,
             system_components["current_metrics"],  # 传入所有指标
-            framework=system_components.get("current_framework"),
+            framework=fw,
             industry=system_components.get("current_industry"),
-            semi_industry=system_components.get("current_semi_industry")
+            semi_industry=semi_label
         )
         
         # 存储评估结果
         system_components["current_assessment"] = assessment
         
         # 更新聊天机器人上下文
-        system_components["chatbot"].load_context(
-            system_components["current_report"],
-            assessment
-        )
-        
+        with _chatbot_ops_lock:
+            system_components["chatbot"].load_context(
+                system_components["current_report"],
+                assessment
+            )
+
         # 生成合规报告
         compliance_report = disclosure_engine.generate_compliance_report(assessment)
         
@@ -863,8 +1386,13 @@ async def analyze_compliance():
             file_id = None
         if not file_id:
             file_id = str(getattr(assessment, "report_id", "unknown"))
-        semi_industry = system_components.get("current_semi_industry") or "report"
-        sanitized_subindustry = _sanitize_compliance_filename_part(semi_industry)
+        fw = system_components.get("current_framework")
+        gs, gt = None, None
+        if fw == "GRI":
+            gs, gt = system_components.get("current_gri_sector"), system_components.get("current_gri_topic")
+            sanitized_subindustry = _sanitize_compliance_filename_part(f"GRI_{gs or ''}_{gt or ''}" if (gs or gt) else "GRI_report")
+        else:
+            sanitized_subindustry = _sanitize_compliance_filename_part(system_components.get("current_semi_industry") or "report")
         json_report_path = json_report_dir / f"{sanitized_subindustry}_{file_id}_compliance.json"
 
         # 将评估数据转换为JSON格式（assessment_date 悉尼时间，filename = 报告名 + LLM 模型名）
@@ -872,39 +1400,12 @@ async def analyze_compliance():
         report_name = file_meta.get("original_name") or file_meta.get("safe_filename") or file_id
         config = system_components.get("config")
         llm_model_name = getattr(config, "llm_model", None) if config else None
-        assessment_json = {
-            "report_id": assessment.report_id,
-            "assessment_date": _assessment_date_sydney_iso(assessment.assessment_date),
-            "filename": _compliance_result_filename(report_name, llm_model_name),
-            "total_metrics": assessment.total_metrics_analyzed,
-            "overall_score": assessment.overall_compliance_score,
-                    "total_metrics_analyzed": assessment.total_metrics_analyzed,
-                    "overall_compliance_score": assessment.overall_compliance_score,
-                    "report_file_path": str(report_path),
-                    "framework": getattr(assessment, "framework", None),
-                    "disclosure_summary": {
-                "fully_disclosed": assessment.disclosure_summary.get(DisclosureStatus.FULLY_DISCLOSED, 0),
-                "partially_disclosed": assessment.disclosure_summary.get(DisclosureStatus.PARTIALLY_DISCLOSED, 0),
-                "not_disclosed": assessment.disclosure_summary.get(DisclosureStatus.NOT_DISCLOSED, 0)
-            },
-            "metric_analyses": [
-                {
-                    "metric_id": analysis.metric_id,
-                    "metric_name": analysis.metric_name,
-                    "disclosure_status": analysis.disclosure_status.value if hasattr(analysis.disclosure_status, 'value') else analysis.disclosure_status,
-                    "reasoning": analysis.reasoning,
-                    "unit": getattr(analysis, 'unit', ''),
-                    "category": getattr(analysis, 'category', ''),
-                    "topic": getattr(analysis, 'topic', ''),
-                    "type": getattr(analysis, 'type', ''),
-                    "page": getattr(analysis, 'page', None),
-                    "value": getattr(analysis, 'value', None),
-                    "context": getattr(analysis, 'context', None)
-                }
-                for analysis in assessment.metric_analyses
-            ]
-        }
-        
+        assessment_json = _build_compliance_assessment_json(
+            assessment,
+            str(report_path),
+            _compliance_result_filename(report_name, llm_model_name),
+        )
+
         with open(json_report_path, "w", encoding="utf-8") as f:
             json.dump(assessment_json, f, indent=2, ensure_ascii=False)
         
@@ -1309,22 +1810,19 @@ async def chat_with_file(
         raise HTTPException(status_code=404, detail="File not found or access denied")
     
     chatbot = system_components["chatbot"]
-    
-    history_list = _load_chat_history(file_id) # Returns List[Dict]
+
+    history_list = _load_chat_history(file_id)  # Returns List[Dict]
     assessment, report_content = _load_specific_report_context(file_id)
-    
-    chatbot.load_context(report_content, assessment)
-    
-    # We treat file_id as the session_id for simplicity
-    chatbot.restore_session(session_id=file_id, history_data=history_list)
-    
-    # Ensure request.session_id matches file_id
-    request.session_id = file_id 
-    response = chatbot.chat(request)
-    
-    updated_history = chatbot.get_session_history_as_dict(file_id)
+
+    with _chatbot_ops_lock:
+        chatbot.load_context(report_content, assessment)
+        chatbot.restore_session(session_id=file_id, history_data=history_list)
+        request.session_id = file_id
+        response = chatbot.chat(request)
+        updated_history = chatbot.get_session_history_as_dict(file_id)
+
     _save_chat_history(file_id, updated_history)
-    
+
     return response
 
 @app.delete("/api/chat/{file_id}")
@@ -1655,32 +2153,49 @@ async def chat(request: ChatRequest):
             report_content = _load_report_content_for_chat()
             logger.info(f"Loaded report content from files: {report_content is not None}")
 
-        # 如果没有数据，仍然允许聊天，但只能回答一般性问题
-        if not latest_assessment and not report_content:
-            logger.warning("No analysis data available for chat. Chatbot will work in general mode only.")
-            # 不加载上下文，让chatbot回答一般性问题
-            # chatbot.load_context()  # 不调用，让chatbot使用默认行为
-        # 加载到聊天机器人
-        elif latest_assessment and report_content:
-            # 如果有评估和报告内容，创建增强的知识库
-            enhanced_content = _create_enhanced_knowledge_base(latest_assessment, report_content)
-            chatbot.load_context(
-                compliance_assessment=latest_assessment,
-                report_content=enhanced_content if enhanced_content else report_content
-            )
-            segments_count = len(enhanced_content.document_content.segments) if enhanced_content and hasattr(enhanced_content, 'document_content') else (len(report_content.document_content.segments) if report_content and hasattr(report_content, 'document_content') else 0)
-            logger.info(f"Loaded enhanced knowledge base: {latest_assessment.total_metrics_analyzed} metrics + {segments_count} content segments")
-        elif latest_assessment:
-            # 只有评估数据
-            chatbot.load_context(compliance_assessment=latest_assessment)
-            logger.info(f"Loaded assessment data: {latest_assessment.total_metrics_analyzed} metrics")
-        elif report_content:
-            # 只有报告内容
-            chatbot.load_context(report_content=report_content)
-            segments_count = len(report_content.document_content.segments) if hasattr(report_content, 'document_content') and report_content.document_content else 0
-            logger.info(f"Loaded report content: {segments_count} segments")
+        with _chatbot_ops_lock:
+            # 如果没有数据，仍然允许聊天，但只能回答一般性问题
+            if not latest_assessment and not report_content:
+                logger.warning(
+                    "No analysis data available for chat. Chatbot will work in general mode only."
+                )
+            elif latest_assessment and report_content:
+                enhanced_content = _create_enhanced_knowledge_base(
+                    latest_assessment, report_content
+                )
+                chatbot.load_context(
+                    compliance_assessment=latest_assessment,
+                    report_content=enhanced_content if enhanced_content else report_content,
+                )
+                segments_count = (
+                    len(enhanced_content.document_content.segments)
+                    if enhanced_content and hasattr(enhanced_content, "document_content")
+                    else (
+                        len(report_content.document_content.segments)
+                        if report_content
+                        and hasattr(report_content, "document_content")
+                        else 0
+                    )
+                )
+                logger.info(
+                    f"Loaded enhanced knowledge base: {latest_assessment.total_metrics_analyzed} metrics + {segments_count} content segments"
+                )
+            elif latest_assessment:
+                chatbot.load_context(compliance_assessment=latest_assessment)
+                logger.info(
+                    f"Loaded assessment data: {latest_assessment.total_metrics_analyzed} metrics"
+                )
+            elif report_content:
+                chatbot.load_context(report_content=report_content)
+                segments_count = (
+                    len(report_content.document_content.segments)
+                    if hasattr(report_content, "document_content")
+                    and report_content.document_content
+                    else 0
+                )
+                logger.info(f"Loaded report content: {segments_count} segments")
 
-        response = chatbot.chat(request)
+            response = chatbot.chat(request)
         return response
         
     except HTTPException:
@@ -1755,14 +2270,15 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         else:
             status_norm = status_raw
 
+        def _payload_value_is_numeric(v) -> bool:
+            return isinstance(v, (int, float)) and not isinstance(v, bool)
+
         if status_norm == "not_disclosed":
             a["page"] = None
-            a["value"] = None
-        elif status_norm == "partially_disclosed":
-            a["value"] = (
-                "Partially disclosed: referenced in the report, but the disclosure is not clear enough to extract a specific value "
-                "(e.g., missing a precise figure, unit, or reporting period)."
-            )
+            a["value"] = COMPLIANCE_VALUE_NA
+        elif status_norm in ("fully_disclosed", "partially_disclosed"):
+            if not _payload_value_is_numeric(a.get("value")):
+                a["value"] = COMPLIANCE_VALUE_NA
         norm.append(a)
 
     payload["metric_analyses"] = norm
@@ -1892,8 +2408,43 @@ async def get_user_history(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/assessment/{file_id}/scopes")
+async def list_assessment_scopes_for_file(file_id: str, user_id: int = Depends(get_current_user)):
+    """List per-scope compliance outputs when upload used multiple scopeSlugs (manifest)."""
+    file_info = file_manager.get_file_info(file_id, user_id=user_id)
+    if not file_info:
+        raise HTTPException(status_code=404, detail="File not found or access denied")
+    canonical_dir = Path(file_manager.compliance_outputs)
+    m = _load_compliance_manifest(canonical_dir, file_id)
+    if not m:
+        return {
+            "file_id": file_id,
+            "outputs": [],
+            "default_scope_key": None,
+            "expected_scope_keys": [],
+            "pending_scope_keys": [],
+        }
+    outs = m.get("outputs") or []
+    exp = m.get("expected_scope_keys")
+    expected = exp if isinstance(exp, list) else []
+    done_keys = {str(o.get("scope_key", "")) for o in outs if isinstance(o, dict)}
+    pending = [k for k in expected if str(k) not in done_keys]
+    return {
+        "file_id": file_id,
+        "framework": m.get("framework"),
+        "default_scope_key": m.get("default_scope_key"),
+        "outputs": outs,
+        "expected_scope_keys": expected,
+        "pending_scope_keys": pending,
+    }
+
+
 @app.get("/api/assessment/{file_id}")
-async def get_assessment_by_file(file_id: str, user_id: int = Depends(get_current_user)):
+async def get_assessment_by_file(
+    file_id: str,
+    user_id: int = Depends(get_current_user),
+    scope: Optional[str] = None,
+):
     """
     根据文件ID获取合规评估结果（从JSON文件）(只能访问自己的文件)
 
@@ -1919,23 +2470,28 @@ async def get_assessment_by_file(file_id: str, user_id: int = Depends(get_curren
 
         canonical_dir = Path(file_manager.compliance_outputs)
         legacy_dir = Path(__file__).resolve().parents[2] / "outputs"  # backend/outputs
+
+        json_file = _json_path_from_manifest(canonical_dir, file_id, scope)
+        if json_file is None or not json_file.is_file():
+            json_file = None
+
         search_dirs = [canonical_dir]
         if legacy_dir.exists():
             search_dirs.append(legacy_dir)
 
-        candidate_names = [f"{file_id}_compliance.json"]
-        if base_name:
-            candidate_names.append(f"{base_name}_compliance.json")
+        if json_file is None:
+            candidate_names = [f"{file_id}_compliance.json"]
+            if base_name:
+                candidate_names.append(f"{base_name}_compliance.json")
 
-        json_file = None
-        for d in search_dirs:
-            for name in candidate_names:
-                p = d / name
-                if p.exists():
-                    json_file = p
+            for d in search_dirs:
+                for name in candidate_names:
+                    p = d / name
+                    if p.exists():
+                        json_file = p
+                        break
+                if json_file is not None:
                     break
-            if json_file is not None:
-                break
 
         if json_file is None:
             # Best-effort fuzzy match (keep strict to compliance-like names to avoid false positives)
@@ -1994,8 +2550,9 @@ async def get_chat_history(session_id: str):
         聊天历史
     """
     chatbot = system_components["chatbot"]
-    history = chatbot.get_session_history(session_id)
-    
+    with _chatbot_ops_lock:
+        history = chatbot.get_session_history(session_id)
+
     if not history:
         raise HTTPException(status_code=404, detail="Session not found")
     
@@ -2024,8 +2581,9 @@ async def clear_chat_session(session_id: str):
         操作结果
     """
     chatbot = system_components["chatbot"]
-    success = chatbot.clear_session(session_id)
-    
+    with _chatbot_ops_lock:
+        success = chatbot.clear_session(session_id)
+
     if not success:
         raise HTTPException(status_code=404, detail="Session not found")
     
@@ -2062,6 +2620,15 @@ async def get_system_status():
     }
 
 
+@app.get("/api/gri/options")
+async def get_gri_options(user_id: int = Depends(get_current_user)):
+    """
+    Return GRI sector and topic options for framework dropdowns.
+    sectors: [{ slug, label }]; topicsBySector: { sector_slug: [{ slug, label }] }.
+    """
+    return _get_gri_sectors_and_topics()
+
+
 @app.get("/api/files")
 async def list_files(
     file_type: Optional[str] = None, 
@@ -2087,7 +2654,9 @@ async def list_files(
             for ftype in ['report', 'metrics']:
                 all_files.extend(file_manager.list_files_by_type(ftype, status, user_id=user_id))
             files = sorted(all_files, key=lambda x: x["upload_time"], reverse=True)
-        
+
+        files = _enrich_file_records_with_scope_progress(file_manager, files)
+
         return {
             "status": "success",
             "files": files,
@@ -2150,6 +2719,30 @@ async def serve_pdf(file_id: str, user_id: int = Depends(get_current_user)):
 
 
 
+def _validate_cross_analysis_compatibility(file_ids: list[str]) -> None:
+    """Raise HTTPException 400 if reports are not comparable: different framework, or GRI with different sector/topic."""
+    if len(file_ids) < 2:
+        return
+    reports = get_reports_info(file_ids)
+    if len(reports) < 2:
+        raise HTTPException(status_code=400, detail="Could not resolve at least two reports.")
+    frameworks = [str(r.framework or "").strip() for r in reports]
+    uniq_fw = set(frameworks)
+    if len(uniq_fw) > 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Cross analysis requires the same framework for all reports (e.g. SASB with SASB, GRI with GRI).",
+        )
+    if uniq_fw == {"GRI"}:
+        sectors = [str(getattr(r, "gri_sector", None) or "").strip() for r in reports]
+        topics = [str(getattr(r, "gri_topic", None) or "").strip() for r in reports]
+        if len(set(sectors)) > 1 or len(set(topics)) > 1:
+            raise HTTPException(
+                status_code=400,
+                detail="GRI cross analysis requires the same Sector and Topic for all reports.",
+            )
+
+
 @app.get("/api/cross-analysis/reports", response_model=CrossReportsResponse)
 async def cross_analysis_reports(ids: str):
     """
@@ -2159,7 +2752,7 @@ async def cross_analysis_reports(ids: str):
     file_ids = [x.strip() for x in (ids or "").split(",") if x.strip()]
     if len(file_ids) < 2:
         raise HTTPException(status_code=400, detail="At least two file_ids are required")
-
+    _validate_cross_analysis_compatibility(file_ids)
     reports = get_reports_info(file_ids)
     return CrossReportsResponse(reports=reports)
 
@@ -2173,6 +2766,7 @@ async def cross_analysis_compare(req: CrossCompareRequest):
     - Returns evidence with page for PDF preview.
     """
     file_ids = list(req.file_ids)
+    _validate_cross_analysis_compatibility(file_ids)
     # Resolve display labels
     reports = get_reports_info(file_ids)
     label_map = {r.file_id: (r.display_name, r.short_name, r.confidence, getattr(r, "report_year", None)) for r in reports}
@@ -2211,6 +2805,7 @@ async def cross_analysis_records(req: CrossRecordsRequest):
         uploads/outputs/cross_analysis/output/
     """
     file_ids = list(req.file_ids)
+    _validate_cross_analysis_compatibility(file_ids)
     reports = get_reports_info(file_ids)
     label_map = {r.file_id: (r.display_name, r.short_name, r.confidence, getattr(r, "report_year", None)) for r in reports}
 
@@ -2298,10 +2893,14 @@ def _extract_year_from_text(text: str) -> Optional[str]:
 
 def _find_assessment_json_path(file_id: str, file_info: dict) -> Optional[Path]:
     """Locate the assessment JSON for a given file_id (canonical + legacy)."""
+    canonical_dir = Path(file_manager.compliance_outputs)
+    manifest_path = _json_path_from_manifest(canonical_dir, file_id, None)
+    if manifest_path is not None and manifest_path.is_file():
+        return manifest_path
+
     safe_filename = str(file_info.get("safe_filename") or "")
     base_name = Path(safe_filename).stem if safe_filename else ""
 
-    canonical_dir = Path(file_manager.compliance_outputs)
     legacy_dir = Path(__file__).resolve().parents[2] / "outputs"  # backend/outputs
     search_dirs = [canonical_dir]
     if legacy_dir.exists():
@@ -2388,6 +2987,20 @@ def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tup
     def looks_numeric(v: str) -> bool:
         return bool(re.search(r"\d", str(v or "")))
 
+    def is_purely_numeric_value(v) -> bool:
+        """True if value is a single number (int/float or with %), for GRI cross-analysis comparison."""
+        if v is None:
+            return False
+        s = str(v).strip()
+        if not s:
+            return False
+        s = s.rstrip("%").strip()
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
+
     records: list[dict] = []
     mtimes: list[float] = []
 
@@ -2396,6 +3009,9 @@ def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tup
         if not file_info:
             # access denied / missing
             continue
+
+        rep = report_map.get(fid)
+        framework = (file_info or {}).get("framework") or (getattr(rep, "framework", None) if rep else None)
 
         assessment_path = _find_assessment_json_path(fid, file_info)
         if assessment_path is None or not assessment_path.exists():
@@ -2457,6 +3073,12 @@ def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tup
             value_str = "" if value is None else str(value)
             if not is_disclosed:
                 value_str = ""
+            # GRI cross-analysis: only purely numeric values count as disclosed; otherwise treat as not disclosed
+            disclosure_status = a.get("disclosure_status")
+            if framework == "GRI" and value_str and not is_purely_numeric_value(value_str):
+                value_str = ""
+                is_disclosed = False
+                disclosure_status = "not_disclosed"
             unit = str(a.get("unit") or a.get("Unit") or "").strip() or None
             page = to_page(a.get("page") or a.get("Page") or a.get("page_number") or a.get("pageNumber"))
             typ = normalize_type_label(a.get("type") or a.get("Type"))
@@ -2491,7 +3113,7 @@ def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tup
                     "year": year,
                     "unit": unit,
                     "detail": detail,
-                    "disclosure_status": a.get("disclosure_status"),
+                    "disclosure_status": disclosure_status,
                     "metric_id": metric_id or None,
                 }
             )
@@ -2514,6 +3136,7 @@ async def cross_analysis_disclosed_cache(ids: str, user_id: int = Depends(get_cu
     file_ids = [x.strip() for x in (ids or "").split(",") if x.strip()]
     if len(file_ids) < 2:
         raise HTTPException(status_code=400, detail="At least two file_ids are required")
+    _validate_cross_analysis_compatibility(file_ids)
 
     # Access check early
     for fid in file_ids:
@@ -3017,22 +3640,200 @@ async def cleanup_orphaned_reports():
         raise HTTPException(status_code=500, detail=f"Cleanup failed: {str(e)}")
 
 
-@app.delete("/api/files/{file_id}")
-async def delete_file(file_id: str, user_id: int = Depends(get_current_user)):
+def _expected_scope_keys_from_meta(file_info: dict, m: Optional[dict]) -> List[str]:
+    if m and isinstance(m.get("expected_scope_keys"), list) and m["expected_scope_keys"]:
+        return [str(x).strip() for x in m["expected_scope_keys"] if str(x).strip()]
+    raw = file_info.get("scope_slugs_json")
+    if raw:
+        try:
+            data = json.loads(raw)
+            if isinstance(data, list):
+                return [str(x).strip() for x in data if str(x).strip()]
+        except Exception:
+            pass
+    return []
+
+
+def _unlink_compliance_reports_dir_for_file_id(
+    file_id: str,
+    stem: Optional[str],
+    deleted_items: List[str],
+) -> None:
+    """Delete every artifact under compliance_reports/ that belongs to this upload (JSON, XLSX, manifest)."""
+    canonical = Path(file_manager.compliance_outputs)
+    if not canonical.is_dir():
+        return
+    fid = str(file_id).strip()
+    if not fid:
+        return
+    candidates: Set[Path] = set()
+
+    for suffix in ("_compliance.json", "_compliance.xlsx", "_compliance_manifest.json"):
+        p = canonical / f"{fid}{suffix}"
+        if p.is_file():
+            candidates.add(p)
+
+    for pattern in (
+        f"*{fid}*_compliance*.json",
+        f"*{fid}*_compliance*.xlsx",
+    ):
+        try:
+            for p in canonical.glob(pattern):
+                if p.is_file():
+                    candidates.add(p)
+        except Exception as e:
+            logger.warning(f"Compliance glob failed {pattern!r} in {canonical}: {e}")
+
+    if stem:
+        st = str(stem).strip()
+        if st:
+            for suffix in ("_compliance.json", "_compliance.xlsx"):
+                p = canonical / f"{st}{suffix}"
+                if p.is_file():
+                    candidates.add(p)
+
+    for p in sorted(candidates, key=lambda x: str(x)):
+        try:
+            p.unlink()
+            deleted_items.append(f"合规报告: {p.name}")
+        except Exception as e:
+            logger.warning(f"Failed to remove compliance artifact {p}: {e}")
+
+
+def _unlink_compliance_markdown_for_file_id(file_id: str, deleted_items: List[str]) -> None:
+    """Remove compliance_report_* markdown written next to PDF pipeline (uploads/outputs/markdown/)."""
+    md_dir = Path(file_manager.markdown_outputs)
+    if not md_dir.is_dir():
+        return
+    fid = str(file_id).strip()
+    if not fid:
+        return
+    candidates: Set[Path] = set()
+    single = md_dir / f"compliance_report_{fid}.md"
+    if single.is_file():
+        candidates.add(single)
+    try:
+        for p in md_dir.glob(f"compliance_report_{fid}_*.md"):
+            if p.is_file():
+                candidates.add(p)
+    except Exception as e:
+        logger.warning(f"Compliance markdown glob failed for {fid}: {e}")
+    for p in sorted(candidates, key=lambda x: str(x)):
+        try:
+            p.unlink()
+            deleted_items.append(f"合规Markdown: {p.name}")
+        except Exception as e:
+            logger.warning(f"Failed to remove {p}: {e}")
+
+
+def _patch_file_primary_scope_fields(file_id: str, fw: str, new_exp: List[str]) -> None:
+    finfo = file_manager.metadata.get("files", {}).get(file_id)
+    if not isinstance(finfo, dict) or not new_exp:
+        return
+    finfo["scope_slugs_json"] = json.dumps(new_exp, ensure_ascii=False)
+    if fw == "GRI":
+        finfo["gri_topic"] = new_exp[0]
+        # gri_sector unchanged
+        finfo["semi_industry"] = None
+    elif fw == "SASB":
+        finfo["semi_industry"] = new_exp[0]
+    elif fw in ("CDP", "TCFD"):
+        finfo["semi_industry"] = new_exp[0]
+    file_manager._save_metadata()
+
+
+def _try_delete_one_scope_only(
+    file_id: str, file_info: dict, scope_key: str
+) -> Optional[dict]:
     """
-    完全删除文件及其所有相关数据 (只能删除自己的文件)
-    
-    Args:
-        file_id: 文件ID
-        user_id: 当前用户ID (从token自动获取)
-        
-    Returns:
-        删除结果
+    Delete one multi-scope compliance bundle; update manifest + metadata.
+    Returns response dict if handled; None => caller should run full file delete.
+    """
+    assessment_dir = Path(file_manager.compliance_outputs)
+    m = _load_compliance_manifest(assessment_dir, file_id)
+    expected = _expected_scope_keys_from_meta(file_info, m)
+    fw = (file_info.get("framework") or "").strip() or "SASB"
+
+    json_p, xlsx_p, md_p = _paths_for_scope_compliance_bundle(
+        file_manager, file_id, file_info, scope_key
+    )
+    deleted_items: List[str] = []
+    for p in (json_p, xlsx_p, md_p):
+        try:
+            if p.exists():
+                p.unlink()
+                deleted_items.append(f"合规输出: {p.name}")
+        except Exception as e:
+            logger.warning(f"Failed to remove {p}: {e}")
+
+    # Multi-scope upload: drop this slug from manifest + metadata, keep PDF
+    if len(expected) >= 2 and scope_key in expected:
+        new_exp = [x for x in expected if x != scope_key]
+        if not new_exp:
+            return None
+        outputs = [
+            o
+            for o in (m.get("outputs") or [])
+            if str(o.get("scope_key")) != str(scope_key)
+        ]
+        _write_compliance_manifest(
+            assessment_dir, file_id, fw, outputs, expected_scope_keys=new_exp
+        )
+        _patch_file_primary_scope_fields(file_id, fw, new_exp)
+        return {
+            "status": "success",
+            "message": "Removed this analysis scope; report PDF kept",
+            "deleted_items": deleted_items,
+            "scope_only": True,
+        }
+
+    # Single scope in manifest matches this row → remove whole report
+    if len(expected) == 1 and expected[0] == scope_key:
+        return None
+
+    # Drift / legacy: strip manifest outputs for this key; keep file record + PDF
+    if m:
+        outputs = [
+            o
+            for o in (m.get("outputs") or [])
+            if str(o.get("scope_key")) != str(scope_key)
+        ]
+        ek = [x for x in (m.get("expected_scope_keys") or []) if str(x) != str(scope_key)]
+        _write_compliance_manifest(
+            assessment_dir,
+            file_id,
+            fw,
+            outputs,
+            expected_scope_keys=ek if ek else None,
+        )
+    return {
+        "status": "success",
+        "message": "Removed compliance outputs for this scope",
+        "deleted_items": deleted_items,
+        "scope_only": True,
+    }
+
+
+@app.delete("/api/files/{file_id}")
+async def delete_file(
+    file_id: str,
+    scope_key: Optional[str] = None,
+    user_id: int = Depends(get_current_user),
+):
+    """
+    删除文件。若提供 scope_key（多子范围上传中的一行），只删除该 scope 的合规 JSON/XLSX/MD 并更新 manifest，
+    保留 PDF 与其它 scope；若该 scope 是清单中最后一个配置项，则退化为整份报告删除。
     """
     file_info = file_manager.get_file_info(file_id, user_id=user_id)
     if not file_info:
         raise HTTPException(status_code=404, detail="File not found or access denied")
-    
+
+    sk = (scope_key or "").strip()
+    if sk and file_info.get("file_type") == "report":
+        partial = _try_delete_one_scope_only(file_id, file_info, sk)
+        if partial is not None:
+            return partial
+
     try:
         deleted_items = []
         
@@ -3072,29 +3873,24 @@ async def delete_file(file_id: str, user_id: int = Depends(get_current_user)):
                 emb_path.unlink()
                 deleted_items.append(f"嵌入文件: {emb_path.name}")
 
-        # 4. 删除合规分析报告（含 Subindustry_fileid_compliance.json / .xlsx 命名）
-        canonical_compliance = Path(file_manager.compliance_outputs)
-        compliance_paths = [
-            canonical_compliance / f"{file_id}_compliance.json",
-            canonical_compliance / f"{file_id}_compliance.xlsx",
-        ]
-        if stem:
-            compliance_paths.append(canonical_compliance / f"{stem}_compliance.json")
-            compliance_paths.append(canonical_compliance / f"{stem}_compliance.xlsx")
-        compliance_paths.extend(canonical_compliance.glob(f"*{file_id}*_compliance.json"))
-        compliance_paths.extend(canonical_compliance.glob(f"*{file_id}*_compliance.xlsx"))
+        # 4. 删除合规输出：uploads/outputs/compliance_reports（JSON / XLSX / manifest 及一切含 file_id 的合规文件）
+        _unlink_compliance_reports_dir_for_file_id(file_id, stem, deleted_items)
+        _unlink_compliance_markdown_for_file_id(file_id, deleted_items)
 
         # Legacy location (older builds): backend/outputs
         legacy_outputs_dir = Path(__file__).resolve().parents[2] / "outputs"
         if legacy_outputs_dir.exists():
-            compliance_paths.extend(list(legacy_outputs_dir.glob(f"*{file_id}*.md")))
-            compliance_paths.extend(list(legacy_outputs_dir.glob(f"*{file_id}*compliance*.json")))
-            compliance_paths.extend(list(legacy_outputs_dir.glob(f"*{file_id}*compliance*.xlsx")))
-
-        for comp_path in compliance_paths:
-            if comp_path.exists():
-                comp_path.unlink()
-                deleted_items.append(f"合规报告: {comp_path.name}")
+            legacy_paths: List[Path] = []
+            legacy_paths.extend(legacy_outputs_dir.glob(f"*{file_id}*.md"))
+            legacy_paths.extend(legacy_outputs_dir.glob(f"*{file_id}*compliance*.json"))
+            legacy_paths.extend(legacy_outputs_dir.glob(f"*{file_id}*compliance*.xlsx"))
+            for comp_path in legacy_paths:
+                if comp_path.is_file():
+                    try:
+                        comp_path.unlink()
+                        deleted_items.append(f"合规报告(legacy): {comp_path.name}")
+                    except Exception as e:
+                        logger.warning(f"Failed to remove legacy output {comp_path}: {e}")
 
         # 5. 清理系统组件中的相关数据
         # NOTE: ReportContent.document_id = doc_<stem>_<hash> (not the file_id)
@@ -3117,18 +3913,22 @@ async def delete_file(file_id: str, user_id: int = Depends(get_current_user)):
             system_components["current_framework"] = None
             system_components["current_industry"] = None
             system_components["current_semi_industry"] = None
+            system_components["current_gri_sector"] = None
+            system_components["current_gri_topic"] = None
             system_components["current_company"] = None
         
         # 6. 清理聊天机器人上下文
         if system_components.get("chatbot"):
             chatbot = system_components["chatbot"]
-            # 清理与该文件相关的聊天上下文
-            if getattr(chatbot, "report_content", None) is not None:
-                rc = chatbot.report_content
-                if stem and hasattr(rc, "document_id") and stem in str(getattr(rc, "document_id", "")):
-                    chatbot.report_content = None
-                    chatbot.compliance_assessment = None
-                    deleted_items.append("聊天机器人上下文")
+            with _chatbot_ops_lock:
+                if getattr(chatbot, "report_content", None) is not None:
+                    rc = chatbot.report_content
+                    if stem and hasattr(rc, "document_id") and stem in str(
+                        getattr(rc, "document_id", "")
+                    ):
+                        chatbot.report_content = None
+                        chatbot.compliance_assessment = None
+                        deleted_items.append("聊天机器人上下文")
         
         # 7. 从元数据中删除
         del file_manager.metadata["files"][file_id]

@@ -1,0 +1,222 @@
+[
+  {
+    "Metric": "Description of approach to identifying and addressing data security risks",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "SV-ED-230a.1",
+    "Topic": "Data Security",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of policies and practices relating to collection, usage, and retention of student information",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "SV-ED-230a.2",
+    "Topic": "Data Security",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Number of data breaches",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ED-230a.3",
+    "Topic": "Data Security",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) percentage that are personal data breaches",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ED-230a.3",
+    "Topic": "Data Security",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(3) number of students affected",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ED-230a.3",
+    "Topic": "Data Security",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Graduation rate",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ED-260a.1",
+    "Topic": "Quality of Education & Gainful Employment",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "On-time completion rate",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ED-260a.2",
+    "Topic": "Quality of Education & Gainful Employment",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Job placement rate",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ED-260a.3",
+    "Topic": "Quality of Education & Gainful Employment",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of policies relating to student indebtedness and programme loan defaults",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "SV-ED-260a.6",
+    "Topic": "Quality of Education & Gainful Employment",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "SV-ED-270a.1",
+    "Topic": "Marketing & Recruiting Practices",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "SV-ED-270a.2",
+    "Topic": "Marketing & Recruiting Practices",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Instruction and student services expenses",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "SV-ED-270a.3",
+    "Topic": "Marketing & Recruiting Practices",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) Marketing and recruiting expenses",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "SV-ED-270a.3",
+    "Topic": "Marketing & Recruiting Practices",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Revenue from: (1) government-funded student aid",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "SV-ED-270a.4",
+    "Topic": "Marketing & Recruiting Practices",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Revenue from: (2) private student loans",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "SV-ED-270a.4",
+    "Topic": "Marketing & Recruiting Practices",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of students enrolled",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ED-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of applications received for enrollment",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ED-000.B",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average registered credits per student, percentage online",
+    "Category": "Quantitative",
+    "Unit": "Number, Percentage (%)",
+    "Code": "SV-ED-000.C",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of: (1) teaching staff",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ED-000.D",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of: (2) all other staff",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ED-000.D",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

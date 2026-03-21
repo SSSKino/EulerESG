@@ -4,6 +4,7 @@ import { Breadcrumb, Button, message } from "antd";
 import { useRouter } from "next/navigation";
 import { useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
+import { canCrossAnalyzeFiles } from "@/store/useFileStore";
 import MainContent from "../maincontent/MainContent";
 import FileTable from "./FileTable";
 import LoadingModal from "./LoadingModal";
@@ -16,7 +17,6 @@ export default function PDFViewer() {
   const [progress, setProgress] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedRows, setSelectedRows] = useState<File[]>([]);
-  const updateFileStatus = useFileStore((state) => state.updateFileStatus);
   const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
   const loading = useFileStore((state) => state.loading);
 
@@ -27,10 +27,14 @@ export default function PDFViewer() {
 
   useEffect(() => {
     if (progress === 100 && selectedFile && selectedFile.file_id) {
-      updateFileStatus(selectedFile.file_id, "ready");
-      router.push(`/dashboard/chat?file_id=${encodeURIComponent(selectedFile.file_id)}`);
+      void loadFilesFromBackend();
+      let url = `/dashboard/chat?file_id=${encodeURIComponent(selectedFile.file_id)}`;
+      if (selectedFile.analysis_scope_key) {
+        url += `&scope=${encodeURIComponent(selectedFile.analysis_scope_key)}`;
+      }
+      router.push(url);
     }
-  }, [progress, selectedFile, updateFileStatus, router]);
+  }, [progress, selectedFile, loadFilesFromBackend, router]);
 
   const handleChatClick = (file: File) => {
     setIsModalOpen(true);
@@ -51,14 +55,17 @@ export default function PDFViewer() {
     }, 200);
   };
 
+  const crossAnalysisAllowed = canCrossAnalyzeFiles(selectedRows);
   const handleCrossAnalyze = () => {
     if (selectedRows.length < 2) {
       message.info(t("files.selectAtLeastTwoReports"));
       return;
     }
-    const ids = selectedRows
-      .map((f) => f.file_id || f.key)
-      .filter(Boolean);
+    if (!crossAnalysisAllowed) {
+      message.warning(t("files.crossAnalysisSameFramework"));
+      return;
+    }
+    const ids = [...new Set(selectedRows.map((f) => f.file_id).filter(Boolean) as string[])];
     if (ids.length < 2) {
       message.info(t("files.selectAtLeastTwoReports"));
       return;
@@ -80,8 +87,9 @@ export default function PDFViewer() {
         <div className="flex items-center justify-end mb-4">
           <Button
             type="primary"
-            disabled={selectedRows.length < 2}
+            disabled={selectedRows.length < 2 || !crossAnalysisAllowed}
             onClick={handleCrossAnalyze}
+            title={selectedRows.length >= 2 && !crossAnalysisAllowed ? t("files.crossAnalysisSameFramework") : undefined}
           >
             {t("files.crossAnalysisBeta")}
           </Button>

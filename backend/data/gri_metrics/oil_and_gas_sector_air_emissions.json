@@ -1,0 +1,29 @@
+[
+  {
+    "Metric": "Disclosure 3-3 Management of material topics",
+    "Code": "11.3.1",
+    "Topic": "Air Emissions",
+    "Type": "Management of the topic",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 305-7 Nitrogen oxides (NO ), sulfur oxides (SO ), and other significant air emissions",
+    "Code": "11.3.2",
+    "Topic": "Air Emissions",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 416-1 Assessment of the health and safety impacts of product and service categories",
+    "Code": "11.3.3",
+    "Topic": "Air Emissions",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

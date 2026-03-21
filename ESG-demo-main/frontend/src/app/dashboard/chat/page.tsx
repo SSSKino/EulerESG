@@ -28,6 +28,7 @@ export default function ChatPage() {
   const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
 
   const queryFileId = searchParams.get("file_id");
+  const queryScope = searchParams.get("scope");
 
   useEffect(() => {
     // Update the default greeting when switching language (only if the chat is still fresh)
@@ -52,10 +53,17 @@ export default function ChatPage() {
     }
   }, [files?.length, loadFilesFromBackend]);
 
-  const currentFile = useMemo(
-    () => files.find((file) => file.file_id === (queryFileId || selectedFileId)) || null,
-    [files, queryFileId, selectedFileId]
-  );
+  const currentFile = useMemo(() => {
+    const id = queryFileId || selectedFileId;
+    if (!id) return null;
+    const cands = files.filter((f) => f.file_id === id);
+    if (cands.length === 0) return null;
+    if (queryScope) {
+      const hit = cands.find((f) => f.analysis_scope_key === queryScope);
+      if (hit) return hit;
+    }
+    return cands[0];
+  }, [files, queryFileId, selectedFileId, queryScope]);
 
   const handleBackToList = () => {
     router.push("/dashboard");

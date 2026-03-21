@@ -1,0 +1,200 @@
+[
+  {
+    "Metric": "Percentage of (1) gender representation for (a) executive management",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ME-260a.1",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (1) gender representation for (b) non-executive management",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ME-260a.1",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (1) gender representation for (c) professionals",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ME-260a.1",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (1) gender representation for (d) all other employees",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ME-260a.1",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (2) diversity group representation for (a) executive management",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ME-260a.1",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (2) diversity group representation for (b) non-executive management",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ME-260a.1",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (2) diversity group representation for (c) professionals",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ME-260a.1",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (2) diversity group representation for (d) all other employees",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-ME-260a.1",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of policies and procedures for ensuring pluralism in news media content",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "SV-ME-260a.2",
+    "Topic": "Media Pluralism",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Total amount of monetary losses as a result of legal proceedings associated with libel or slander",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "SV-ME-270a.1",
+    "Topic": "Journalistic Integrity & Sponsorship Identification",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Revenue from embedded advertising",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "SV-ME-270a.2",
+    "Topic": "Journalistic Integrity & Sponsorship Identification",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of approach for ensuring journalistic integrity of news programming related to: (1) truthfulness, accuracy, objectivity, fairness, and accountability, (2) independence of content or transparency of potential bias, and (3) protection of privacy and limitation of harm",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "SV-ME-270a.3",
+    "Topic": "Journalistic Integrity & Sponsorship Identification",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of approach to ensuring intellectual property (IP) protection",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "SV-ME-520a.1",
+    "Topic": "Intellectual Property Protection & Media Piracy",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Total recipients of media",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ME-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) households reached by broadcast TV",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ME-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(3) subscribers to cable networks",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ME-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(4) circulation for magazines and newspapers",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ME-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Total number of media productions and publications produced",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-ME-000.B",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

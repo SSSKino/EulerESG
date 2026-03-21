@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from "react";
-import { Table, Tag, Popover, Spin, Alert } from "antd";
+import { Table, Tag, Spin, Alert, Select, Space } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
@@ -21,6 +21,8 @@ type AnalysisDataItem = {
 
 interface AnalysisResultsProps {
   fileId?: string;
+  /** When the file list row is one scope of a multi-scope upload, load that assessment JSON. */
+  preferredScopeKey?: string;
   onPageNavigate?: (page: number) => void;
   /**
    * Controls whether the detailed results table is rendered.
@@ -38,20 +40,6 @@ const formatNumber = (v: number) => {
   } catch {
     return String(v);
   }
-};
-
-const normalizePage = (page: string | number | null | undefined): number | null => {
-  if (page === null || page === undefined) return null;
-  if (typeof page === "number") return Number.isFinite(page) ? page : null;
-  const s = String(page).trim();
-  if (!s) return null;
-  // Accept formats: "12", "12, 13", "12-13", "p. 12"
-  const firstToken = s.split(",")[0].trim();
-  const rangeFirst = firstToken.split("-")[0].trim();
-  const m = rangeFirst.match(/\d+/);
-  if (!m) return null;
-  const n = parseInt(m[0], 10);
-  return Number.isFinite(n) ? n : null;
 };
 
 const isEmptyValue = (value: unknown) => {
@@ -126,23 +114,35 @@ const extractContextText = (raw: any): string => {
 
 const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   fileId,
+  preferredScopeKey,
   onPageNavigate,
   showTable = true,
 }) => {
   const { t } = useT();
 
-  // UI rule:
-  // - not_disclosed: show no value and no page
-  // - partially_disclosed: value should be a textual reason (no concrete numbers)
-  const PARTIAL_VALUE_TEXT = t("analysis.partialValueText");
   const files = useFileStore((state) => state.files);
-  const currentFile = files.find((file) => file.file_id === fileId);
+  const currentFile =
+    files.find((f) => {
+      if (f.file_id !== fileId) return false;
+      const ps = (preferredScopeKey || "").trim();
+      if (ps) return f.analysis_scope_key === ps;
+      return !f.analysis_scope_key;
+    }) ?? files.find((f) => f.file_id === fileId);
   const industry = currentFile?.industry;
   const semiIndustry = currentFile?.semiIndustry;
   
   const [analysisData, setAnalysisData] = useState<AnalysisDataItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [assessmentScopeOptions, setAssessmentScopeOptions] = useState<
+    { scope_key: string; json_filename: string; overall_score: number }[]
+  >([]);
+  const [selectedAssessmentScope, setSelectedAssessmentScope] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const ps = (preferredScopeKey || "").trim();
+    setSelectedAssessmentScope(ps || undefined);
+  }, [fileId, preferredScopeKey]);
 
   useEffect(() => {
     const fetchAnalysisData = async () => {
@@ -150,14 +150,29 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         setError(t("analysis.noFileSelected"));
         return;
       }
-      
+
       setLoading(true);
       setError(null);
       try {
-        // First try to get by file_id, if failed then get latest assessment results
+        let scopeOpts: { scope_key: string; json_filename: string; overall_score: number }[] = [];
+        try {
+          const sc = await apiService.getAssessmentScopesForFile(currentFile.file_id);
+          scopeOpts = sc.outputs || [];
+        } catch {
+          scopeOpts = [];
+        }
+        setAssessmentScopeOptions(scopeOpts);
+
+        const scopeQuery =
+          selectedAssessmentScope ||
+          (scopeOpts.length ? scopeOpts[0].scope_key : undefined);
+
         let assessment;
         try {
-          assessment = await apiService.getAssessmentByFile(currentFile.file_id);
+          assessment = await apiService.getAssessmentByFile(
+            currentFile.file_id,
+            scopeOpts.length ? scopeQuery : undefined
+          );
         } catch (fileIdError) {
           console.log('Failed to get assessment by file_id, trying latest:', fileIdError);
           try {
@@ -303,18 +318,7 @@ setAnalysisData(convertedData);
     };
 
     fetchAnalysisData();
-  }, [currentFile?.file_id, fileId]);
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case "Quantitative":
-        return "blue";
-      case "Discussion and Analysis":
-        return "purple";
-      default:
-        return "default";
-    }
-  };
+  }, [currentFile?.file_id, currentFile?.analysis_scope_key, fileId, preferredScopeKey, selectedAssessmentScope, t]);
 
   const data = analysisData.map((item, index) => ({
     ...item,
@@ -323,36 +327,6 @@ setAnalysisData(convertedData);
 
   const columns: ColumnsType<AnalysisDataItem> = useMemo(
   () => {
-    const categoryOptions = Array.from(
-      new Set(
-        (data || [])
-          .map((d) => (d.category || "").trim())
-          .filter((c) => c.length > 0)
-      )
-    )
-      .sort((a, b) => a.localeCompare(b))
-      .map((c) => ({ text: c, value: c }));
-
-    const unitOptions = Array.from(
-      new Set(
-        (data || [])
-          .map((d) => (d.unit || "").trim())
-          .filter((u) => u.length > 0)
-      )
-    )
-      .sort((a, b) => a.localeCompare(b))
-      .map((u) => ({ text: u, value: u }));
-
-    const typeOptions = Array.from(
-      new Set(
-        (data || [])
-          .map((d) => (d.type || "").trim())
-          .filter((t) => t.length > 0)
-      )
-    )
-      .sort((a, b) => a.localeCompare(b))
-      .map((t) => ({ text: t, value: t }));
-
     return [
       {
         title: t("analysis.columns.metric"),
@@ -388,164 +362,38 @@ setAnalysisData(convertedData);
         onFilter: (value, record) => record.disclosure_status === value,
       },
       {
-        title: t("analysis.columns.category"),
-        dataIndex: "category",
-        key: "category",
-        width: 110,
-        render: (category?: string) =>
-            category ? (
-              <Tag color={getCategoryColor(category)}>{category === "Quantitative" ? t("analysis.tags.quantitative") : category === "Discussion and Analysis" ? t("analysis.tags.discussion") : category}</Tag>
-            ) : (
-              <span className="text-gray-400">-</span>
-            ),
-        filters: categoryOptions,
-        onFilter: (value, record) => (record.category || "") === value,
-      },
-      {
-        title: t("analysis.columns.unit"),
-        dataIndex: "unit",
-        key: "unit",
-        width: 90,
-        filters: unitOptions,
-        onFilter: (value, record) => (record.unit || "") === value,
-      },
-      {
-        title: t("analysis.columns.type"),
-        dataIndex: "type",
-        key: "type",
-        width: 120,
-        filters: typeOptions,
-        onFilter: (value, record) => (record.type || "") === value,
+        title: t("analysis.columns.page"),
+        dataIndex: "page",
+        key: "page",
+        width: 100,
+        render: (page: string | number | null) => {
+          if (isEmptyValue(page)) return "n/a";
+          return String(page);
+        },
       },
       {
         title: t("analysis.columns.value"),
         dataIndex: "value",
         key: "value",
-        // Keep more room for value text and evidence indicators.
+        width: 160,
+        render: (value: string | number | null) => {
+          if (isEmptyValue(value)) return "n/a";
+          return typeof value === "number" ? formatNumber(value) : String(value);
+        },
+      },
+      {
+        title: t("analysis.columns.context"),
+        dataIndex: "context",
+        key: "context",
         width: 420,
-        render: (_value: string | number | null, record: AnalysisDataItem) => {
-          const isNotDisclosed = record.disclosure_status === "not_disclosed";
-          const isPartiallyDisclosed = record.disclosure_status === "partially_disclosed";
-
-          // If not disclosed, keep value empty and hide evidence/page/LLM hover indicators.
-          if (isNotDisclosed) {
-            return <span className="text-gray-400"></span>;
-          }
-
-          const evidenceText = record.context ? String(record.context).trim() : "";
-          const hasEvidence = !!evidenceText;
-
-          const empty = isEmptyValue(record.value);
-          const displayValue = isPartiallyDisclosed
-            ? PARTIAL_VALUE_TEXT
-            : empty
-              ? t("analysis.summary.notSpecified")
-              : typeof record.value === "number"
-                ? formatNumber(record.value)
-                : String(record.value);
-
-          const evidenceContent = (
-            <div className="max-w-md p-2">
-              <div className="text-sm">
-                <div>
-                  <span className="font-semibold">{t("analysis.columns.metric")}:</span> {record.metric_name}
-                </div>
-                {!isEmptyValue(record.unit) && (
-                  <div>
-                    <span className="font-semibold">{t("analysis.columns.unit")}:</span> {record.unit}
-                  </div>
-                )}
-              </div>
-              {evidenceText ? (
-                <div className="mt-2 text-sm whitespace-pre-wrap">{evidenceText}</div>
-              ) : (
-                <div className="mt-2 text-xs text-gray-500">{t("analysis.noEvidenceExcerpt")}</div>
-              )}
-            </div>
-          );
-
-          // Hover content for the "!" icon. Requirements:
-          // - Do not use "LLM Analysis" as a title.
-          // - Include original context from the raw JSON when available.
-          const llmContent = (
-            <div className="max-w-md p-2">
-              {evidenceText && (
-                <div className="mb-3">
-                  <div className="text-xs font-semibold text-gray-700">{t("analysis.columns.context")}</div>
-                  <div className="mt-1 text-sm whitespace-pre-wrap">{evidenceText}</div>
-                </div>
-              )}
-              <div>
-                <div className="text-xs font-semibold text-gray-700">{t("analysis.analysisLabel")}</div>
-                {record.reasoning ? (
-                  <p className="mt-1 text-sm whitespace-pre-wrap">{record.reasoning}</p>
-                ) : (
-                  <p className="mt-1 text-sm text-gray-500">{t("analysis.noAnalysisText")}</p>
-                )}
-              </div>
-            </div>
-          );
-
-          const pageText = !isEmptyValue(record.page) ? String(record.page) : "";
-          const pageNumber = normalizePage(record.page);
-          const pageClickable = pageNumber !== null && !!onPageNavigate;
-          const pageLabel = pageNumber !== null ? String(pageNumber) : pageText;
-
-          return (
-            <div className="flex items-center gap-2 w-full">
-              {/* Left: value */}
-              <div className="min-w-0">
-                <Popover content={evidenceContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
-                  <span
-                    className={
-                      hasEvidence ? "cursor-pointer underline decoration-dotted" : ""
-                    }
-                  >
-                    {displayValue}
-                  </span>
-                </Popover>
-              </div>
-
-              {/* Right: hover (LLM) + page. Reserve space and avoid pushing too far right. */}
-              <div className="flex items-center gap-2 shrink-0 min-w-[56px] pr-3">
-                {(record.reasoning || record.reasoning === "") && (
-                  <Popover content={llmContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
-                    <span
-                      className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
-                      aria-label={t("analysis.llmAnalysis")}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      !
-                    </span>
-                  </Popover>
-                )}
-
-                {!isEmptyValue(record.page) && (
-                  <span
-                    className={
-                      pageClickable
-                        ? "text-blue-500 cursor-pointer hover:underline text-xs"
-                        : "text-gray-500 text-xs"
-                    }
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (pageClickable && pageNumber !== null) {
-                        onPageNavigate?.(pageNumber);
-                      }
-                    }}
-                    title={pageClickable ? t("analysis.jumpToPage") : undefined}
-                  >
-                    {pageLabel}
-                  </span>
-                )}
-              </div>
-            </div>
-          );
+        render: (context: string | null) => {
+          const text = (context || "").trim();
+          return text || "n/a";
         },
       },
     ];
   },
-  [data, onPageNavigate, t]
+  [t]
 );
 
 
@@ -633,6 +481,22 @@ setAnalysisData(convertedData);
           ? `${industry} - ${semiIndustry}`
           : t("analysis.industryAnalysis")}
       </h2>
+      {assessmentScopeOptions.length > 1 && (
+        <div className="bg-white rounded-lg shadow-sm px-4 py-3">
+          <Space wrap align="center">
+            <span className="text-sm text-gray-600">{t("analysis.scopeLabel")}</span>
+            <Select
+              style={{ minWidth: 220 }}
+              value={selectedAssessmentScope ?? assessmentScopeOptions[0]?.scope_key}
+              options={assessmentScopeOptions.map((o) => ({
+                label: o.scope_key.replace(/_/g, " "),
+                value: o.scope_key,
+              }))}
+              onChange={(v) => setSelectedAssessmentScope(v)}
+            />
+          </Space>
+        </div>
+      )}
       <div className="bg-white rounded-lg shadow-sm p-6 hover:scale-[1.02] hover:shadow-lg transition-transform duration-300">
         <h3 className="text-xl font-semibold mb-6 text-gray-800">
           {t("analysis.summaryTitle")}

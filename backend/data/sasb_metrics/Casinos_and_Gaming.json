@@ -1,0 +1,145 @@
+[
+  {
+    "Metric": "(1) Total energy consumed",
+    "Category": "Quantitative",
+    "Unit": "Gigajoules (GJ)",
+    "Code": "SV-CA-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) percentage grid electricity",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-CA-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(3) percentage renewable",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-CA-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of gaming facilities that implement the Responsible Gambling Standards and Criteria for Venues",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by revenue",
+    "Code": "SV-CA-260a.1",
+    "Topic": "Responsible Gaming",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of online gaming operations that implement the Responsible Gambling Council (RGC) Standards and Criteria for iGaming",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by revenue",
+    "Code": "SV-CA-260a.2",
+    "Topic": "Responsible Gaming",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of gaming floor where smoking is allowed",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) of gaming floor area",
+    "Code": "SV-CA-320a.1",
+    "Topic": "Smoke-free Casinos",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of gaming staff who work in areas where smoking is allowed",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) of man-hours",
+    "Code": "SV-CA-320a.2",
+    "Topic": "Smoke-free Casinos",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of anti-money laundering policies and practices",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "SV-CA-510a.1",
+    "Topic": "Internal Controls on Money Laundering",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Total amount of monetary losses as a result of legal proceedings associated with money laundering",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "SV-CA-510a.2",
+    "Topic": "Internal Controls on Money Laundering",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of tables",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-CA-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of slots",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-CA-000.B",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of active online gaming customers",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-CA-000.C",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Total area of gaming floor",
+    "Category": "Quantitative",
+    "Unit": "Square metres (m²)",
+    "Code": "SV-CA-000.D",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

@@ -1,0 +1,202 @@
+[
+  {
+    "Metric": "Gross global Scope 1 emissions",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t) CO2-e, Percentage (%)",
+    "Code": "EM-MD-110a.1",
+    "Topic": "Greenhouse Gas Emissions",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "percentage methane",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t) CO2-e, Percentage (%)",
+    "Code": "EM-MD-110a.1",
+    "Topic": "Greenhouse Gas Emissions",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "percentage covered under emissions-limiting regulations",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t) CO2-e, Percentage (%)",
+    "Code": "EM-MD-110a.1",
+    "Topic": "Greenhouse Gas Emissions",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-MD-110a.2",
+    "Topic": "Greenhouse Gas Emissions",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-MD-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (2) SOx",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-MD-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-MD-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (4) particulate matter (PM10)",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-MD-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Description of environmental management policies and practices for active operations",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-MD-160a.1",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Percentage of land owned, leased, or operated within areas of protected conservation status or endangered species habitat",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by land area",
+    "Code": "EM-MD-160a.2",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Terrestrial land area disturbed",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha), Percentage (%)",
+    "Code": "EM-MD-160a.3",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) percentage of impacted area restored",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha), Percentage (%)",
+    "Code": "EM-MD-160a.3",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Number of hydrocarbon spills",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "EM-MD-160a.4",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) aggregate volume of hydrocarbon spills",
+    "Category": "Quantitative",
+    "Unit": "Barrels (bbls)",
+    "Code": "EM-MD-160a.4",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(3) volume in Arctic",
+    "Category": "Quantitative",
+    "Unit": "Number, Barrels (bbls)",
+    "Code": "EM-MD-160a.4",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(4) volume in sites with high biodiversity significance",
+    "Category": "Quantitative",
+    "Unit": "Number, Barrels (bbls)",
+    "Code": "EM-MD-160a.4",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(5) volume recovered",
+    "Category": "Quantitative",
+    "Unit": "Number, Barrels (bbls)",
+    "Code": "EM-MD-160a.4",
+    "Topic": "Ecological Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Total amount of monetary losses as a result of legal proceedings associated with pipeline and storage regulations",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "EM-MD-520a.1",
+    "Topic": "Competitive Behaviour",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Number of reportable pipeline incidents",
+    "Category": "Quantitative",
+    "Unit": "Number, Percentage (%)",
+    "Code": "EM-MD-540a.1",
+    "Topic": "Operational Safety, Emergency Preparedness & Response",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "(2) percentage significant",
+    "Category": "Quantitative",
+    "Unit": "Number, Percentage (%)",
+    "Code": "EM-MD-540a.1",
+    "Topic": "Operational Safety, Emergency Preparedness & Response",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Percentage of (1) natural gas pipelines inspected",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "EM-MD-540a.2",
+    "Topic": "Operational Safety, Emergency Preparedness & Response",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Percentage of (2) hazardous liquid pipelines inspected",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "EM-MD-540a.2",
+    "Topic": "Operational Safety, Emergency Preparedness & Response",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Number of (1) accident releases from rail transportation",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "EM-MD-540a.3",
+    "Topic": "Operational Safety, Emergency Preparedness & Response",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Number of (2) non-accident releases (NARs) from rail transportation",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "EM-MD-540a.3",
+    "Topic": "Operational Safety, Emergency Preparedness & Response",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Discussion of management systems used to integrate a culture of safety and emergency preparedness throughout the value chain and throughout project lifecycles",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-MD-540a.4",
+    "Topic": "Operational Safety, Emergency Preparedness & Response",
+    "Type": "Activity Metrics"
+  }
+]

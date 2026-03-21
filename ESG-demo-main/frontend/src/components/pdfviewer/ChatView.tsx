@@ -64,6 +64,7 @@ interface FileData {
   file_id?: string;
   filename?: string;
   framework?: string;
+  analysis_scope_key?: string;
 }
 
 interface Message {
@@ -149,6 +150,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         <div className="p-4">
           <AnalysisResults
             fileId={activeFile?.file_id}
+            preferredScopeKey={activeFile?.analysis_scope_key}
             onPageNavigate={(page) => navigateToPage(page)}
             showTable={showAnalysisTable}
           />

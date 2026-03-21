@@ -1,0 +1,56 @@
+[
+  {
+    "Metric": "Disclosure 3-3 Management of material topics",
+    "Code": "11.14.1",
+    "Topic": "Economic impacts",
+    "Type": "Management of the topic",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 201-1 Direct economic value generated and distributed",
+    "Code": "11.14.2",
+    "Topic": "Economic impacts",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 202-2 Proportion of senior management hired from the local community",
+    "Code": "11.14.3",
+    "Topic": "Economic impacts",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 203-1 Infrastructure investments and services supported",
+    "Code": "11.14.4",
+    "Topic": "Economic impacts",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 203-2 Significant indirect economic impacts",
+    "Code": "11.14.5",
+    "Topic": "Economic impacts",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 204-1 Proportion of spending on local suppliers",
+    "Code": "11.14.6",
+    "Topic": "Economic impacts",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

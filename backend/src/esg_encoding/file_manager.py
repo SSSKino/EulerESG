@@ -141,22 +141,26 @@ class FileManager:
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
     
-    def save_uploaded_file(self, file_content: bytes, filename: str, 
+    def save_uploaded_file(self, file_content: bytes, filename: str,
                           file_type: str = "report", industry: str = None,
                           framework: str = None, semi_industry: str = None,
+                          gri_sector: Optional[str] = None,
+                          gri_topic: Optional[str] = None,
                           user_id: Optional[int] = None) -> Dict[str, str]:
         """
         保存上传的文件
-        
+
         Args:
             file_content: 文件内容
             filename: 原始文件名
             file_type: 文件类型 ('report', 'metrics')
-            industry: 行业分类
+            industry: 行业分类 (SASB)
             framework: 框架类型
-            semi_industry: 子行业
+            semi_industry: 子行业 (SASB)
+            gri_sector: GRI 行业板块 slug (framework=GRI 时)
+            gri_topic: GRI 主题 slug (framework=GRI 时)
             user_id: 用户ID
-            
+
         Returns:
             文件信息字典
         """
@@ -195,7 +199,7 @@ class FileManager:
             # 生成文件哈希
             file_hash = self._generate_file_hash(target_path)
             
-            # 记录文件元数据
+            # 记录文件元数据（GRI 时保存 gri_sector/gri_topic 供列表展示）
             file_info = {
                 "file_id": file_id,
                 "original_name": filename,
@@ -211,6 +215,8 @@ class FileManager:
                 "industry": industry,
                 "framework": framework,
                 "semi_industry": semi_industry,
+                "gri_sector": gri_sector,
+                "gri_topic": gri_topic,
                 "user_id": user_id
             }
             

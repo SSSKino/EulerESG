@@ -8,6 +8,7 @@ import FrameworkSelectModal, {
 } from "@/components/cross-analysis/FrameworkSelectModal";
 import { getDefaultDimensionKey } from "@/data/crossTaxonomy";
 import { isAuthenticated } from "@/lib/auth";
+import { applyFrameworkToSearchParams } from "@/lib/crossAnalysisFramework";
 
 /**
  * A thin route guard for Cross Analysis routes.
@@ -77,20 +78,7 @@ export default function FrameworkGate({ children }: { children: React.ReactNode 
       // ignore
     }
 
-    const qs = new URLSearchParams(qsString);
-    qs.set("framework", values.framework);
-
-    if (values.framework === "SASB") {
-      if (values.industry) qs.set("industry", values.industry);
-      else qs.delete("industry");
-
-      if (values.semiIndustry) qs.set("semiIndustry", values.semiIndustry);
-      else qs.delete("semiIndustry");
-    } else {
-      qs.delete("industry");
-      qs.delete("semiIndustry");
-    }
-
+    const qs = applyFrameworkToSearchParams(new URLSearchParams(qsString), values);
     const nextQs = qs.toString();
 
     // If we are at the Cross Analysis entry route, redirect to the default dimension.

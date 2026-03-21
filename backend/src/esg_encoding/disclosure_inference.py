@@ -4,7 +4,7 @@ Disclosure Inference Engine - Use LLM to analyze ESG metric disclosure status
 
 from asyncio.subprocess import Process
 import json
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 import re
 from datetime import datetime
 import openai
@@ -19,6 +19,79 @@ from .models import (
     ReportContent,
     MetricCollection
 )
+
+
+def _is_claude_model(model_name: str) -> bool:
+    """Return True if the model is Claude (Anthropic) so we can use json_schema response_format."""
+    if not model_name:
+        return False
+    m = model_name.strip().lower()
+    return "claude" in m or "anthropic" in m
+
+
+# JSON schema for disclosure analysis (used when response_format is json_schema, e.g. Claude)
+DISCLOSURE_JSON_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "has_disclosure": {"type": "boolean"},
+        "disclosure_quality": {"type": "string"},
+        "reasoning": {"type": "string"},
+        "value": {"type": ["number", "null"]},
+        "page": {"type": ["integer", "null"]},
+        "evidence_segment_id": {"type": ["string", "null"]},
+        "evidence_quote": {"type": ["string", "null"]},
+        "specific_data_found": {"type": ["string", "null"]},
+        "improvement_suggestions": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
+    },
+    "required": ["reasoning"],
+    "additionalProperties": False,
+}
+
+# Stored in assessment JSON when no metric-specific number is disclosed / extractable.
+COMPLIANCE_VALUE_NA = "n/a"
+
+
+def _parse_llm_numeric_value_only(raw: object) -> Optional[Union[int, float]]:
+    """
+    Accept only a JSON number or a string that is *entirely* one numeric literal
+    (optional commas, optional trailing %). Never scrape the first digit from a longer sentence.
+    """
+    if raw is None or raw is False:
+        return None
+    if isinstance(raw, bool):
+        return None
+    if isinstance(raw, int):
+        return raw
+    if isinstance(raw, float):
+        if raw != raw or raw in (float("inf"), float("-inf")):  # NaN / inf
+            return None
+        return raw
+    s = str(raw).strip()
+    if not s or s.lower() in ("n/a", "na", "none", "null", "-", "—", "--"):
+        return None
+    s2 = s.replace(",", "").strip()
+    if s2.endswith("%"):
+        s2 = s2[:-1].strip()
+    if not re.fullmatch(r"-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?", s2):
+        return None
+    try:
+        n = float(s2)
+    except ValueError:
+        return None
+    if n == int(n) and abs(n) < 1e15:
+        return int(n)
+    return n
+
+
+def _finalize_compliance_value_field(
+    found_numeric: Optional[Union[int, float]],
+) -> Union[int, float, str]:
+    if isinstance(found_numeric, (int, float)) and not isinstance(found_numeric, bool):
+        return found_numeric
+    return COMPLIANCE_VALUE_NA
 
 
 class DisclosureInferenceEngine:
@@ -92,7 +165,25 @@ class DisclosureInferenceEngine:
                     retrieval_result = retrieval_map[metric.metric_id]
                     # Only perform LLM analysis when matching content is actually found
                     if retrieval_result.total_matches > 0:
-                        analysis = self._analyze_single_metric(retrieval_result, report_content, metric)
+                        try:
+                            analysis = self._analyze_single_metric(retrieval_result, report_content, metric)
+                        except Exception as e:
+                            logger.warning(f"Metric analysis failed for {metric.metric_name}, using fallback: {e}")
+                            analysis = DisclosureAnalysis(
+                                metric_id=metric.metric_id,
+                                metric_name=metric.metric_name,
+                                metric_code=metric.metric_code,
+                                disclosure_status=DisclosureStatus.NOT_DISCLOSED,
+                                reasoning=f"Analysis failed: {e}",
+                                evidence_segments=[],
+                                improvement_suggestions=[],
+                                category=getattr(metric, 'sasb_category', ''),
+                                topic=(getattr(metric, 'sasb_topic', None) or ''),
+                                unit=getattr(metric, 'unit', ''),
+                                type=getattr(metric, 'sasb_type', ''),
+                                value=COMPLIANCE_VALUE_NA,
+                                page=None
+                            )
                     else:
                         # Retrieval result exists but no matching content, directly mark as not disclosed
                         analysis = DisclosureAnalysis(
@@ -108,8 +199,8 @@ class DisclosureInferenceEngine:
                             topic=(getattr(metric, 'sasb_topic', None) or ''),
                             unit=getattr(metric, 'unit', ''),
                             type=getattr(metric, 'sasb_type', ''),
-                            value=None,  # No value found
-                            page=None   # No page found
+                            value=COMPLIANCE_VALUE_NA,
+                            page=None
                         )
                 else:
                     # No relevant content retrieved, directly mark as not disclosed
@@ -126,8 +217,8 @@ class DisclosureInferenceEngine:
                         topic=(getattr(metric, 'sasb_topic', None) or ''),
                         unit=getattr(metric, 'unit', ''),
                         type=getattr(metric, 'sasb_type', ''),
-                        value=None,  # No value found
-                        page=None   # No page found
+                        value=COMPLIANCE_VALUE_NA,
+                        page=None
                     )
                 metric_analyses.append(analysis)
                 
@@ -179,6 +270,75 @@ class DisclosureInferenceEngine:
                    f"Not disclosed: {disclosure_summary[DisclosureStatus.NOT_DISCLOSED]}")
         
         return assessment
+    
+    def _extract_json_from_llm_response(self, content: str) -> Optional[dict]:
+        """Extract a JSON object from LLM response text. Returns None if no valid JSON found."""
+        if not content or not content.strip():
+            return None
+        content = content.strip()
+        # 1) Direct parse
+        try:
+            return json.loads(content)
+        except Exception:
+            pass
+        # 2) Strip markdown code fences (```json ... ``` or ``` ... ```)
+        for pattern in [
+            r"```(?:json)?\s*(\{[\s\S]*?\})\s*```",
+            r"```\s*(\{[\s\S]*?\})\s*```",
+        ]:
+            m = re.search(pattern, content, re.DOTALL)
+            if m:
+                try:
+                    return json.loads(m.group(1).strip())
+                except Exception:
+                    pass
+        # 3) Find first { and extract balanced-brace JSON
+        start = content.find("{")
+        if start >= 0:
+            depth = 0
+            for i in range(start, len(content)):
+                if content[i] == "{":
+                    depth += 1
+                elif content[i] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        try:
+                            return json.loads(content[start : i + 1])
+                        except Exception:
+                            break
+        # 4) Greedy first {...} (original fallback)
+        mobj = re.search(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", content, re.DOTALL)
+        if mobj:
+            try:
+                return json.loads(mobj.group(0))
+            except Exception:
+                pass
+        return None
+    
+    def _fallback_disclosure_analysis(
+        self,
+        retrieval_result: MetricRetrievalResult,
+        metric: Optional['ESGMetric'],
+        evidence_segment_ids: List[str],
+        reasoning: str,
+    ) -> DisclosureAnalysis:
+        """Return a NOT_DISCLOSED analysis when LLM fails or returns invalid output."""
+        return DisclosureAnalysis(
+            metric_id=retrieval_result.metric_id,
+            metric_name=retrieval_result.metric_name,
+            metric_code=retrieval_result.metric_code,
+            disclosure_status=DisclosureStatus.NOT_DISCLOSED,
+            reasoning=reasoning,
+            evidence_segments=evidence_segment_ids or [],
+            improvement_suggestions=[],
+            category=getattr(metric, "sasb_category", "") if metric else "",
+            topic=(getattr(metric, "sasb_topic", None) or "") if metric else "",
+            unit=(getattr(metric, "unit", None) or "") if metric else "",
+            type=getattr(metric, "sasb_type", "") if metric else "",
+            value=COMPLIANCE_VALUE_NA,
+            page=None,
+            context=None,
+        )
     
     def _analyze_single_metric(
         self, 
@@ -239,7 +399,11 @@ class DisclosureInferenceEngine:
             retrieval_result.metric_name,
             retrieval_result.metric_id,
             relevant_segments,
-            segment_metadata
+            segment_metadata,
+            metric_unit=(getattr(metric, "unit", None) or "") if metric else "",
+            metric_description=(getattr(metric, "description", None) or "").strip()
+            if metric
+            else "",
         )
         
         try:
@@ -268,10 +432,14 @@ class DisclosureInferenceEngine:
             {json_example}
             """
             
-            system_prompt_json = f"""
-            You are a professional ESG compliance analysis expert. Please analyze metric
-            disclosure status based on the provided information.
-            """
+            system_prompt_json = """
+You are a professional ESG compliance analysis expert.
+For the JSON output, the "value" field must be ONLY a number when the report gives a
+single quantitative figure that directly answers THIS exact metric (same substance/KPI).
+Never put narrative text in "value". Never pick a number that belongs to a different
+pollutant, indicator, or line item than the metric asks for. If unsure, use null for
+value and explain in "reasoning" / "specific_data_found".
+"""
 
             FORCE_JSON = True # If model outputs thought train in response
             
@@ -283,7 +451,17 @@ class DisclosureInferenceEngine:
             queries = []
             
             if (FORCE_JSON):
-                api_kwargs["response_format"] = {"type": "json_object"}
+                if _is_claude_model(self.config.llm_model):
+                    api_kwargs["response_format"] = {
+                        "type": "json_schema",
+                        "json_schema": {
+                            "name": "disclosure_analysis",
+                            "strict": True,
+                            "schema": DISCLOSURE_JSON_SCHEMA,
+                        },
+                    }
+                else:
+                    api_kwargs["response_format"] = {"type": "json_object"}
                 queries.append({"role": "system", "content": system_prompt_json})
                 queries.append({"role": "user", "content": prompt})
 
@@ -305,26 +483,28 @@ class DisclosureInferenceEngine:
             
             # Parse JSON response (response_format=json_object should already guarantee JSON)
             content = (response.choices[0].message.content or "").strip()
-
-            # Some models/tools may still wrap JSON in markdown fences; strip defensively.
-            if content.startswith("```"):
-                fence_match = re.search(r"```(?:json)?\s*(\{.*\})\s*```", content, re.DOTALL)
-                if fence_match:
-                    content = fence_match.group(1).strip()
-
-            try:
-                llm_result = json.loads(content)
-            except Exception:
-                # Fallback: extract the first JSON object in the text
-                mobj = re.search(r"\{.*\}", content, re.DOTALL)
-                if not mobj:
-                    raise ValueError("LLM returned no JSON object")
-                llm_result = json.loads(mobj.group(0))
+            llm_result = self._extract_json_from_llm_response(content)
+            if llm_result is None:
+                logger.warning(
+                    f"LLM did not return valid JSON for metric {retrieval_result.metric_name}; "
+                    "returning fallback NOT_DISCLOSED analysis."
+                )
+                return self._fallback_disclosure_analysis(
+                    retrieval_result, metric, evidence_segment_ids,
+                    reasoning="LLM did not return valid JSON; analysis skipped."
+                )
 
 
             # Validate required fields from LLM
             if "reasoning" not in llm_result or not llm_result["reasoning"]:
-                raise ValueError(f"LLM response missing required 'reasoning' field for metric {retrieval_result.metric_name}")
+                logger.warning(
+                    f"LLM response missing required 'reasoning' for metric {retrieval_result.metric_name}; "
+                    "returning fallback analysis."
+                )
+                return self._fallback_disclosure_analysis(
+                    retrieval_result, metric, evidence_segment_ids,
+                    reasoning="LLM response missing required reasoning field."
+                )
 
             # Classify disclosure status
             disclosure_status = self._classify_disclosure_status(llm_result)
@@ -332,7 +512,9 @@ class DisclosureInferenceEngine:
             # -----------------------------
             # Extract value / page / context
             # -----------------------------
-            found_value = None
+            # Only the top-level JSON "value" may become a stored number — never mine
+            # specific_data_found / evidence_quote (avoids wrong pollutant or table cell).
+            found_numeric = _parse_llm_numeric_value_only(llm_result.get("value", None))
             found_page = None
             found_context = None
 
@@ -343,43 +525,7 @@ class DisclosureInferenceEngine:
                 if m.get("page_number") is not None
             }
 
-            def _extract_first_number(t: str):
-                if not t:
-                    return None
-                m = re.search(r"-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?", t)
-                if not m:
-                    return None
-                try:
-                    return float(m.group(0).replace(",", ""))
-                except Exception:
-                    return None
-
-            # 1) Prefer structured value from LLM (value -> specific_data_found -> evidence_quote)
-            raw_value = llm_result.get("value", None)
-            if raw_value is None:
-                raw_value = llm_result.get("specific_data_found", None)
-            if raw_value is None:
-                raw_value = llm_result.get("evidence_quote", None)
-
-            if raw_value is not None and raw_value is not False:
-                if isinstance(raw_value, (int, float)) and not isinstance(raw_value, bool):
-                    found_value = raw_value
-                else:
-                    if isinstance(raw_value, list):
-                        raw_value_text = "; ".join(str(x) for x in raw_value if x is not None).strip()
-                    else:
-                        raw_value_text = str(raw_value).strip()
-
-                    # Try to extract numeric value
-                    n = _extract_first_number(raw_value_text)
-                    if n is not None:
-                        found_value = n
-                    else:
-                        # Keep a short qualitative value for UI (avoid over-long text)
-                        if raw_value_text:
-                            found_value = raw_value_text[:240]
-
-# 2) Prefer page specified by LLM if valid
+            # 1) Prefer page specified by LLM if valid
             llm_page = llm_result.get("page", None)
             if llm_page is not None:
                 try:
@@ -391,7 +537,7 @@ class DisclosureInferenceEngine:
                 except Exception:
                     pass
 
-# 3) If LLM returned an evidence segment id, map it back to page
+            # 2) If LLM returned an evidence segment id, map it back to page
             evidence_seg_id = llm_result.get("evidence_segment_id", None)
             if found_page is None and evidence_seg_id and segment_metadata:
                 for meta in segment_metadata:
@@ -399,7 +545,7 @@ class DisclosureInferenceEngine:
                         found_page = meta.get("page_number")
                         break
 
-            # 4) As fallback, pick page of highest scoring segment (or top retrieval result)
+            # 3) As fallback, pick page of highest scoring segment (or top retrieval result)
             best_segment_meta = None
             if segment_metadata:
                 best_segment_meta = max(segment_metadata, key=lambda x: x.get("score", 0) or 0)
@@ -414,7 +560,7 @@ class DisclosureInferenceEngine:
                 except Exception:
                     pass
 
-# 5) Context: prefer a short quote from LLM; fallback to specific_data_found; then best segment excerpt
+            # 4) Context: prefer a short quote from LLM; fallback to specific_data_found; then best segment excerpt
             quote = llm_result.get("evidence_quote", None)
             if quote:
                 found_context = str(quote).strip()
@@ -438,7 +584,12 @@ class DisclosureInferenceEngine:
                     excerpt = str(relevant_segments[idx]).strip()
                     if excerpt:
                         found_context = excerpt[:600]
-            
+
+            if disclosure_status == DisclosureStatus.NOT_DISCLOSED:
+                stored_value: Union[int, float, str] = COMPLIANCE_VALUE_NA
+            else:
+                stored_value = _finalize_compliance_value_field(found_numeric)
+
             # Create analysis result
             analysis = DisclosureAnalysis(
                 metric_id=retrieval_result.metric_id,
@@ -453,26 +604,34 @@ class DisclosureInferenceEngine:
                 topic=(getattr(metric, 'sasb_topic', None) or '') if metric else '',
                 unit=getattr(metric, 'unit', '') or '' if metric else '',
                 type=getattr(metric, 'sasb_type', '') if metric else '',
-                value=found_value,
+                value=stored_value,
                 context=found_context,
                 page=found_page
             )
             
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse LLM JSON response for metric {retrieval_result.metric_name}: {e}")
-            raise ValueError(f"LLM returned invalid JSON format: {e}")
+            logger.warning(f"Failed to parse LLM JSON for metric {retrieval_result.metric_name}: {e}")
+            return self._fallback_disclosure_analysis(
+                retrieval_result, metric, evidence_segment_ids,
+                reasoning=f"LLM returned invalid JSON: {e}",
+            )
         except Exception as e:
-            logger.error(f"LLM analysis failed for metric {retrieval_result.metric_name}: {e}")
-            raise RuntimeError(f"LLM analysis error: {e}")
+            logger.warning(f"LLM analysis failed for metric {retrieval_result.metric_name}: {e}")
+            return self._fallback_disclosure_analysis(
+                retrieval_result, metric, evidence_segment_ids,
+                reasoning=f"Analysis error: {e}",
+            )
 
         return analysis
     
     def _build_analysis_prompt(
-        self, 
-        metric_name: str, 
+        self,
+        metric_name: str,
         metric_id: str,
         segments: List[str],
-        segment_metadata: List[Dict] = None
+        segment_metadata: List[Dict] = None,
+        metric_unit: str = "",
+        metric_description: str = "",
     ) -> str:
         """
         Build LLM analysis prompt containing segment tag information
@@ -482,6 +641,8 @@ class DisclosureInferenceEngine:
             metric_id: Metric ID
             segments: Related segment content
             segment_metadata: Segment metadata information
+            metric_unit: Expected unit for quantitative metrics (if any)
+            metric_description: Extra metric definition from framework data
             
         Returns:
             str: Prompt text
@@ -513,12 +674,23 @@ class DisclosureInferenceEngine:
 
         segments_text = "\n\n".join(segments_text_parts)
 
+        unit_line = (
+            f"- Expected unit (if quantitative): {metric_unit}\n"
+            if (metric_unit or "").strip()
+            else ""
+        )
+        desc_line = (
+            f"- Metric definition / guidance: {metric_description}\n"
+            if (metric_description or "").strip()
+            else ""
+        )
+
         prompt = f"""As a professional ESG compliance analysis expert, please conduct a unified disclosure analysis for the following metric.
 
 Metric Information:
 - Metric Name: {metric_name}
 - Metric Code: {metric_id}
-
+{unit_line}{desc_line}
 All Related Retrieved Segments (with segment_id + tag info):
 {segments_text if segments_text else "No related segments found"}
 
@@ -528,15 +700,19 @@ Output Rules (must follow):
 1) Respond ONLY with a JSON object. No markdown, no backticks.
 2) If you output a page, it MUST be one of the Tag Info pages shown above.
 3) If you output evidence_segment_id, it MUST be one of the Segment IDs shown above.
-4) value must be a NUMBER if you found a numeric disclosure; otherwise you may provide a SHORT STRING for qualitative disclosure. Use null only if no disclosure is found.
-5) evidence_quote must be a short excerpt (<= 180 chars) that supports the value (or the qualitative statement).
+4) "value" must be a single JSON NUMBER only when the report clearly discloses one quantitative figure that **directly answers this exact metric** (same substance, scope, and line item the metric asks for). Example: if the metric is about NOx emissions specifically, the number must be NOx — not SO2, not total air emissions, and not an unrelated table cell.
+5) If the metric lists several sub-items (e.g. "(1) NOx"), use a number only when the text explicitly breaks out that sub-item. If the report only gives combined totals or another pollutant, set "value" to null and explain in "reasoning" why the metric-specific figure is missing.
+6) Do **not** grab the first number appearing in a paragraph if that number could belong to a different KPI than this metric. When in doubt, use null for "value".
+7) For purely qualitative / narrative disclosure (no clear single number for this metric), set "value" to null. Put the narrative and interpretation in "reasoning" and supporting detail in "specific_data_found".
+8) If there is no relevant disclosure for this metric, set has_disclosure false, disclosure_quality "none", and "value" to null.
+9) evidence_quote must be a short excerpt (<= 180 chars) that supports your conclusion (the numeric figure if any, or the qualitative point).
 
 Return JSON format:
 {{
   "has_disclosure": true/false,
   "disclosure_quality": "high/medium/low/none",
   "reasoning": "Comprehensive reasoning based on all segments",
-  "value": <number|string|null>,
+  "value": <number|null>,
   "page": <int|null>,
   "evidence_segment_id": "<segment_id|null>",
   "evidence_quote": "<short quote|null>",

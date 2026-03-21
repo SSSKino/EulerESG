@@ -1,0 +1,56 @@
+[
+  {
+    "Metric": "Disclosure 3-3 Management of material topics",
+    "Code": "13.8.1",
+    "Topic": "Waste",
+    "Type": "Management of the topic",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 306-1 Waste generation and significant waste-related impacts",
+    "Code": "13.8.2",
+    "Topic": "Waste",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 306-2 Management of significant waste-related impacts",
+    "Code": "13.8.3",
+    "Topic": "Waste",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 306-3 Waste generated\nAdditional sector recommendations\nThe following additional sector recommendations are for organizations in the\nfishing sector:\n• Report a breakdown of the total weight of waste generated on vessels to which\nthe International Convention for the Prevention of Pollution from Ships\n(MARPOL) is applicable by MARPOL categories in metric tons.21\n• Describe the recovery and disposal operations used to manage each MARPOL\ncategory of waste.",
+    "Code": "13.8.4",
+    "Topic": "Waste",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 306-4 Waste diverted from disposal",
+    "Code": "13.8.5",
+    "Topic": "Waste",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 306-5 Waste directed to disposal",
+    "Code": "13.8.6",
+    "Topic": "Waste",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

@@ -1,0 +1,101 @@
+[
+  {
+    "Metric": "(1) Number of recalls",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "CG-TS-250a.1",
+    "Topic": "Chemical & Safety Hazards of Products",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) total units recalled",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "CG-TS-250a.1",
+    "Topic": "Chemical & Safety Hazards of Products",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Total amount of monetary losses as a result of legal proceedings associated with product safety",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "CG-TS-250a.3",
+    "Topic": "Chemical & Safety Hazards of Products",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+    "Category": "Discussion and\nAnalysis",
+    "Unit": "n/a",
+    "Code": "CG-TS-250a.4",
+    "Topic": "Chemical & Safety Hazards of Products",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of facilities audited to a social responsibility code of conduct",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "CG-TS-430a.1",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Direct suppliers’ social responsibility audit\n(1) non-conformance rate",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "CG-TS-430a.2",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Direct suppliers’ social responsibility audit\n(2) associated corrective action rate for (a)\npriority non-conformances",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "CG-TS-430a.2",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Direct suppliers’ social responsibility audit\n(2) associated corrective action rate for (b) other non-conformances",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "CG-TS-430a.2",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Direct suppliers’ social responsibility audit\n(2) associated corrective action rate for (b) other non-conformances",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "CG-TS-430a.2",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

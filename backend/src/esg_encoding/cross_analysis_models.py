@@ -15,6 +15,8 @@ class CrossAnalysisReport(BaseModel):
     framework: Optional[str] = None
     industry: Optional[str] = None
     semi_industry: Optional[str] = None
+    gri_sector: Optional[str] = None
+    gri_topic: Optional[str] = None
 
 
 class CrossReportsResponse(BaseModel):

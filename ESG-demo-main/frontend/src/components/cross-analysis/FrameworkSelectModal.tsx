@@ -4,7 +4,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Form, Modal, Select } from "antd";
 import { useT } from "@/i18n/useT";
 
-import { industries } from "@/data/industries";
+import { industries, SASB_OTHER_INDUSTRY_KEY } from "@/data/industries";
+import { CDP_TOPIC_OPTIONS } from "@/data/cdpTopics";
+import { TCFD_TOPIC_OPTIONS } from "@/data/tcfdTopics";
 
 export type FrameworkSelectionValues = {
   framework: string;
@@ -52,6 +54,9 @@ export default function FrameworkSelectModal({
 
   const framework = Form.useWatch("framework", form);
   const isSASBSelected = framework === "SASB";
+  const isCDPSelected = framework === "CDP";
+  const isTCFDSelected = framework === "TCFD";
+  const isTopicOnlyFramework = isCDPSelected || isTCFDSelected;
 
   const industryOptions = useMemo(() => Object.keys(industries || {}), []);
 
@@ -70,6 +75,12 @@ export default function FrameworkSelectModal({
     };
     if (out.framework === "SASB") {
       out.industry = safeTrim(values.industry) || undefined;
+      out.semiIndustry = safeTrim(values.semiIndustry) || undefined;
+    } else if (out.framework === "CDP") {
+      out.industry = "CDP";
+      out.semiIndustry = safeTrim(values.semiIndustry) || undefined;
+    } else if (out.framework === "TCFD") {
+      out.industry = "TCFD";
       out.semiIndustry = safeTrim(values.semiIndustry) || undefined;
     }
     onConfirm(out);
@@ -104,13 +115,16 @@ export default function FrameworkSelectModal({
             options={[
               { label: "SASB", value: "SASB" },
               { label: "GRI", value: "GRI" },
+              { label: "CDP", value: "CDP" },
               { label: "TCFD", value: "TCFD" },
             ]}
             onChange={(value) => {
-              if (value !== "SASB") {
-                setSelectedIndustry("");
-                form.setFieldsValue({ industry: undefined, semiIndustry: undefined } as any);
+              if (value === "SASB") {
+                form.setFieldsValue({ semiIndustry: undefined } as any);
+                return;
               }
+              setSelectedIndustry("");
+              form.setFieldsValue({ industry: undefined, semiIndustry: undefined } as any);
             }}
           />
         </Form.Item>
@@ -119,6 +133,7 @@ export default function FrameworkSelectModal({
           name="industry"
           label={t("upload.industry")}
           rules={[{ required: isSASBSelected, message: t("upload.pleaseSelectIndustry") }]}
+          hidden={isTopicOnlyFramework}
         >
           <Select
             placeholder={t("upload.selectIndustry")}
@@ -131,7 +146,7 @@ export default function FrameworkSelectModal({
           >
             {industryOptions.map((ind) => (
               <Select.Option key={ind} value={ind}>
-                {ind}
+                {ind === SASB_OTHER_INDUSTRY_KEY ? t("upload.sasbIndustryOther") : ind}
               </Select.Option>
             ))}
           </Select>
@@ -139,18 +154,48 @@ export default function FrameworkSelectModal({
 
         <Form.Item
           name="semiIndustry"
-          label={t("upload.subIndustry")}
-          rules={[{ required: isSASBSelected, message: t("upload.pleaseSelectSubIndustry") }]}
+          label={
+            isCDPSelected ? t("upload.cdpTopic") : isTCFDSelected ? t("upload.tcfdTopic") : t("upload.subIndustry")
+          }
+          rules={[
+            {
+              required: isSASBSelected || isTopicOnlyFramework,
+              message: isCDPSelected
+                ? t("upload.pleaseSelectCdpTopic")
+                : isTCFDSelected
+                  ? t("upload.pleaseSelectTcfdTopic")
+                  : t("upload.pleaseSelectSubIndustry"),
+            },
+          ]}
         >
           <Select
-            placeholder={t("upload.selectSubIndustry")}
-            disabled={!isSASBSelected || !selectedIndustry}
+            placeholder={
+              isCDPSelected
+                ? t("upload.selectCdpTopic")
+                : isTCFDSelected
+                  ? t("upload.selectTcfdTopic")
+                  : t("upload.selectSubIndustry")
+            }
+            disabled={isTopicOnlyFramework ? false : !isSASBSelected || !selectedIndustry}
+            allowClear={isTopicOnlyFramework}
           >
-            {semiIndustryOptions.map((semi) => (
-              <Select.Option key={semi} value={semi}>
-                {semi}
-              </Select.Option>
-            ))}
+            {isCDPSelected
+              ? CDP_TOPIC_OPTIONS.map((o) => (
+                  <Select.Option key={o.slug} value={o.slug}>
+                    {o.label}
+                  </Select.Option>
+                ))
+              : isTCFDSelected
+                ? TCFD_TOPIC_OPTIONS.map((o) => (
+                    <Select.Option key={o.slug} value={o.slug}>
+                      {o.label}
+                    </Select.Option>
+                  ))
+                : semiIndustryOptions.map((semi) => (
+                    <Select.Option key={semi} value={semi}>
+                      {semi}
+                    </Select.Option>
+                  ))}
           </Select>
         </Form.Item>
       </Form>

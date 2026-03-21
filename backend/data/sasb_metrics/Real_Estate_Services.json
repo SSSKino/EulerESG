@@ -1,0 +1,156 @@
+[
+  {
+    "Metric": "Revenue from energy and sustainability services",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "IF-RS-410a.1",
+    "Topic": "Sustainability Services",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Floor area under management provided with energy and sustainability services",
+    "Category": "Quantitative",
+    "Unit": "Square metres (m²)",
+    "Code": "IF-RS-410a.2",
+    "Topic": "Sustainability Services",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) number of buildings under management provided with energy and sustainability services",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-RS-410a.2",
+    "Topic": "Sustainability Services",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Floor area under management that obtained an energy rating",
+    "Category": "Quantitative",
+    "Unit": "Square metres (m²)",
+    "Code": "IF-RS-410a.3",
+    "Topic": "Sustainability Services",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) number of buildings under management that obtained an energy rating",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-RS-410a.3",
+    "Topic": "Sustainability Services",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Brokerage revenue from dual agency transactions",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "IF-RS-510a.1",
+    "Topic": "Transparent Information & Management of Conflict of Interest",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Revenue from transactions associated with appraisal services",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "IF-RS-510a.2",
+    "Topic": "Transparent Information & Management of Conflict of Interest",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Total amount of monetary losses as a result of legal proceedings associated with professional integrity, including duty of care",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "IF-RS-510a.3",
+    "Topic": "Transparent Information & Management of Conflict of Interest",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of property management clients, categorised by: (1) tenants",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-RS-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of property management clients, categorised by: (2) real estate owners",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-RS-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Floor area under management with owner operational control",
+    "Category": "Quantitative",
+    "Unit": "Square metres (m²)",
+    "Code": "IF-RS-000.B",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of buildings under management with owner operational control",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-RS-000.C",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of leases transacted, categorised by: (1) tenants",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-RS-000.D",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of leases transacted, categorised by: (2) real estate owners",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-RS-000.D",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

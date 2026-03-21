@@ -1,0 +1,234 @@
+[
+  {
+    "Metric": "Total fuel consumed",
+    "Category": "Quantitative",
+    "Unit": "Gigajoules (GJ), Percentage (%)",
+    "Code": "EM-SV-110a.1",
+    "Topic": "Emissions Reduction Services & Fuels Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "percentage renewable",
+    "Category": "Quantitative",
+    "Unit": "Gigajoules (GJ), Percentage (%)",
+    "Code": "EM-SV-110a.1",
+    "Topic": "Emissions Reduction Services & Fuels Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "percentage used in: (1) on-road equipment and vehicles",
+    "Category": "Quantitative",
+    "Unit": "Gigajoules (GJ), Percentage (%)",
+    "Code": "EM-SV-110a.1",
+    "Topic": "Emissions Reduction Services & Fuels Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "percentage used in: (2) off-road equipment",
+    "Category": "Quantitative",
+    "Unit": "Gigajoules (GJ), Percentage (%)",
+    "Code": "EM-SV-110a.1",
+    "Topic": "Emissions Reduction Services & Fuels Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Discussion of strategy or plans to address air emissions-related risks, opportunities and impacts",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-SV-110a.2",
+    "Topic": "Emissions Reduction Services & Fuels Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Percentage of engines in service that comply with the highest level of emissions standards for non-road diesel engine emissions",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "EM-SV-110a.3",
+    "Topic": "Emissions Reduction Services & Fuels Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Total volume of water handled in operations",
+    "Category": "Quantitative",
+    "Unit": "Thousand cubic metres (m³), Percentage (%)",
+    "Code": "EM-SV-140a.1",
+    "Topic": "Water Management Services",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) percentage recycled",
+    "Category": "Quantitative",
+    "Unit": "Thousand cubic metres (m³), Percentage (%)",
+    "Code": "EM-SV-140a.1",
+    "Topic": "Water Management Services",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Discussion of strategy or plans to address water consumption and disposal-related risks, opportunities and impacts",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-SV-140a.2",
+    "Topic": "Water Management Services",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Volume of hydraulic fracturing fluid used",
+    "Category": "Quantitative",
+    "Unit": "Thousand cubic metres (m³), Percentage (%)",
+    "Code": "EM-SV-150a.1",
+    "Topic": "Chemicals Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) percentage hazardous",
+    "Category": "Quantitative",
+    "Unit": "Thousand cubic metres (m³), Percentage (%)",
+    "Code": "EM-SV-150a.1",
+    "Topic": "Chemicals Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Discussion of strategy or plans to address chemical-related risks, opportunities, and impacts",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-SV-150a.2",
+    "Topic": "Chemicals Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Average disturbed land area per (1) oil well site",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha)",
+    "Code": "EM-SV-160a.1",
+    "Topic": "Ecological Impact Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Average disturbed land area per (2) gas well site",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha)",
+    "Code": "EM-SV-160a.1",
+    "Topic": "Ecological Impact Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Discussion of strategy or plan to address risks and opportunities related to ecological impacts from core activities",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-SV-160a.2",
+    "Topic": "Ecological Impact Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-SV-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-SV-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) fatality rate for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-SV-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) fatality rate for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-SV-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(3) near miss frequency rate (NMFR) for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-SV-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(3) near miss frequency rate (NMFR) for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-SV-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(4) average hours of health, safety, and emergency response training for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-SV-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(4) average hours of health, safety, and emergency response training for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-SV-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Description of management systems used to integrate a culture of safety throughout the value chain and project lifecycle",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-SV-320a.2",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Number of road accidents and incidents",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "EM-SV-320a.3",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Amount of net revenue in countries that have the 20 lowest rankings in Transparency International's Corruption Perception Index",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "EM-SV-510a.1",
+    "Topic": "Business Ethics & Payments Transparency",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Description of the management system for prevention of corruption and bribery throughout the value chain",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-SV-510a.2",
+    "Topic": "Business Ethics & Payments Transparency",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-SV-530a.1",
+    "Topic": "Management of the Legal & Regulatory Environment",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Description of management systems used to identify and mitigate catastrophic and tail-end risks",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-SV-540a.1",
+    "Topic": "Critical Incident Risk Management",
+    "Type": "Activity Metrics"
+  }
+]

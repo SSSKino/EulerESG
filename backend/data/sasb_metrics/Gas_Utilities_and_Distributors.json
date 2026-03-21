@@ -1,0 +1,211 @@
+[
+  {
+    "Metric": "Average retail gas rate for (1) residential customers",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "IF-GU-240a.1",
+    "Topic": "Energy Affordability",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average retail gas rate for (2) commercial customers",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "IF-GU-240a.1",
+    "Topic": "Energy Affordability",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average retail gas rate for (3) industrial customers",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "IF-GU-240a.1",
+    "Topic": "Energy Affordability",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average retail gas rate for (4) transportation services only",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "IF-GU-240a.1",
+    "Topic": "Energy Affordability",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Number of residential customer gas disconnections for non-payment",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-GU-240a.3",
+    "Topic": "Energy Affordability",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) percentage reconnected within 30 days",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "IF-GU-240a.3",
+    "Topic": "Energy Affordability",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Discussion of impact of external factors on customer affordability of gas, including the economic conditions of the service territory",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "IF-GU-240a.4",
+    "Topic": "Energy Affordability",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Customer gas savings from efficiency measures, by market",
+    "Category": "Quantitative",
+    "Unit": "Million British Thermal Units (MMBtu)",
+    "Code": "IF-GU-420a.2",
+    "Topic": "End-Use Efficiency",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of (1) reportable pipeline incidents",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-GU-540a.1",
+    "Topic": "Integrity of Gas Delivery Infrastructure",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of (2) corrective actions received",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-GU-540a.1",
+    "Topic": "Integrity of Gas Delivery Infrastructure",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of (3) violations of pipeline safety statutes",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-GU-540a.1",
+    "Topic": "Integrity of Gas Delivery Infrastructure",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of distribution pipeline that is (1) cast or wrought iron",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by length",
+    "Code": "IF-GU-540a.2",
+    "Topic": "Integrity of Gas Delivery Infrastructure",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of distribution pipeline that is (2) unprotected steel",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by length",
+    "Code": "IF-GU-540a.2",
+    "Topic": "Integrity of Gas Delivery Infrastructure",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of gas (1) transmission pipelines inspected",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by length",
+    "Code": "IF-GU-540a.3",
+    "Topic": "Integrity of Gas Delivery Infrastructure",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of gas (2) distribution pipelines inspected",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by length",
+    "Code": "IF-GU-540a.3",
+    "Topic": "Integrity of Gas Delivery Infrastructure",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of efforts to manage the integrity of gas delivery infrastructure, including risks related to safety and emissions",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "IF-GU-540a.4",
+    "Topic": "Integrity of Gas Delivery Infrastructure",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of (1) residential customers served",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-GU-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of (2) commercial customers served",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-GU-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of (3) industrial customers served",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "IF-GU-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

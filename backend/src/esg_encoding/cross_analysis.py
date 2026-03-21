@@ -2407,6 +2407,37 @@ def compare_topic(
     return out
 
 
+def _load_compliance_manifest_ca(assessment_dir: Path, file_id: str) -> Optional[dict]:
+    p = assessment_dir / f"{file_id}_compliance_manifest.json"
+    if not p.is_file():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _gri_sector_slug_from_compliance_stem(
+    stem: str, file_id: str, gri_topic: str
+) -> Optional[str]:
+    """Recover GRI sector slug from upload filename stem GRI_{sector}_{topic}_{fid}_compliance."""
+    suf = f"_{file_id}_compliance"
+    if not stem.endswith(suf):
+        return None
+    part = stem[: -len(suf)]
+    if not part.startswith("GRI_"):
+        return None
+    inner = part[4:]
+    t = (gri_topic or "").strip()
+    if not t:
+        return None
+    topic_suffix = f"_{t}"
+    if not inner.endswith(topic_suffix):
+        return None
+    s = inner[: -len(topic_suffix)]
+    return s or None
+
+
 def get_reports_info(file_ids: List[str]) -> List[CrossAnalysisReport]:
     reports: List[CrossAnalysisReport] = []
     raw_meta = file_manager.metadata.get("files", {}) if file_manager.metadata else {}
@@ -2452,14 +2483,18 @@ def get_reports_info(file_ids: List[str]) -> List[CrossAnalysisReport]:
         framework = None
         industry = None
         semi_industry = None
+        gri_sector = None
+        gri_topic = None
         info_entry = meta.get(fid) if fid in meta else None
         if isinstance(info_entry, dict):
             framework = info_entry.get("framework") or None
             industry = info_entry.get("industry") or None
             semi_industry = info_entry.get("semi_industry") or None
+            gri_sector = info_entry.get("gri_sector") or None
+            gri_topic = info_entry.get("gri_topic") or None
 
         # Fallback: read from compliance JSON when metadata is missing (e.g. for same-subindustry check).
-        if has_assessment and (framework is None or semi_industry is None):
+        if has_assessment and (framework is None or semi_industry is None or (framework == "GRI" and (gri_sector is None or gri_topic is None))):
             for d in (canonical, legacy):
                 if not d.exists():
                     continue
@@ -2481,6 +2516,26 @@ def get_reports_info(file_ids: List[str]) -> List[CrossAnalysisReport]:
                                     semi_industry = part
                             if semi_industry is None and isinstance(data.get("semi_industry"), str):
                                 semi_industry = data["semi_industry"].strip() or None
+                        # GRI: legacy keys on JSON; otherwise manifest + filename stem (SASB-shaped JSON omits gri_*).
+                        if framework == "GRI" and (gri_sector is None or gri_topic is None):
+                            if gri_sector is None and isinstance(data.get("gri_sector"), str):
+                                gri_sector = data["gri_sector"].strip() or None
+                            if gri_topic is None and isinstance(data.get("gri_topic"), str):
+                                gri_topic = data["gri_topic"].strip() or None
+                        if framework == "GRI" and (gri_sector is None or gri_topic is None):
+                            man = _load_compliance_manifest_ca(d, fid)
+                            if isinstance(man, dict):
+                                outs = man.get("outputs") or []
+                                if gri_topic is None and outs and isinstance(outs[0], dict):
+                                    sk = outs[0].get("scope_key")
+                                    if isinstance(sk, str) and sk.strip():
+                                        gri_topic = sk.strip()
+                            if gri_topic and gri_sector is None:
+                                gs = _gri_sector_slug_from_compliance_stem(
+                                    p.stem, fid, gri_topic
+                                )
+                                if gs:
+                                    gri_sector = gs
                     except Exception as e:
                         logger.debug(f"[get_reports_info] Fallback read {p}: {e}")
                     break
@@ -2499,6 +2554,8 @@ def get_reports_info(file_ids: List[str]) -> List[CrossAnalysisReport]:
             framework=framework,
             industry=industry,
             semi_industry=semi_industry,
+            gri_sector=gri_sector,
+            gri_topic=gri_topic,
         ))
 
     # best-effort persist metadata updates

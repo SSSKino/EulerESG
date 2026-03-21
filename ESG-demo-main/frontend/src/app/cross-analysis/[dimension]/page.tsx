@@ -338,24 +338,29 @@ export default function CrossAnalysisDimensionPage() {
     };
   }, [ids.join(",")]);
 
-  // Only allow comparison when all selected reports share the same framework, industry, and sub-industry.
+  // Only allow comparison when all selected reports share the same framework and scope:
+  // - SASB/TCFD: same industry and sub-industry (semi_industry).
+  // - GRI: same Sector and Topic (gri_sector, gri_topic); GRI has no sub-industry.
   const canCompare = useMemo(() => {
     if (!reports || reports.length < 2) return false;
-    const fw = (reports as any[]).map((r) => safeTrim(r?.framework ?? ""));
-    const ind = (reports as any[]).map((r) => safeTrim(r?.industry ?? ""));
-    const semi = (reports as any[]).map((r) => safeTrim(r?.semi_industry ?? ""));
-    if (fw.some((x) => !x) || ind.some((x) => !x) || semi.some((x) => !x)) return false;
-    const firstFw = fw[0];
-    const firstInd = ind[0];
-    const firstSemi = semi[0];
-    return (
-      fw.every((x) => x === firstFw) &&
-      ind.every((x) => x === firstInd) &&
-      semi.every((x) => x === firstSemi)
-    );
+    const arr = reports as any[];
+    const fw = arr.map((r) => safeTrim(r?.framework ?? ""));
+    if (fw.some((x) => !x)) return false;
+    if (!fw.every((x) => x === fw[0])) return false;
+    const isGRI = fw[0] === "GRI";
+    if (isGRI) {
+      const sectors = arr.map((r) => safeTrim(r?.gri_sector ?? ""));
+      const topics = arr.map((r) => safeTrim(r?.gri_topic ?? ""));
+      if (sectors.some((x) => !x) || topics.some((x) => !x)) return false;
+      return sectors.every((x) => x === sectors[0]) && topics.every((x) => x === topics[0]);
+    }
+    const ind = arr.map((r) => safeTrim(r?.industry ?? ""));
+    const semi = arr.map((r) => safeTrim(r?.semi_industry ?? ""));
+    if (ind.some((x) => !x) || semi.some((x) => !x)) return false;
+    return ind.every((x) => x === ind[0]) && semi.every((x) => x === semi[0]);
   }, [reports]);
 
-  const subIndustryMismatch = ids.length >= 2 && reports.length >= 2 && !canCompare;
+  const scopeMismatch = ids.length >= 2 && reports.length >= 2 && !canCompare;
 
   // Prefer using the uploaded report's filename as the display label across Cross Analysis.
   const fileIdToReportLabel = useMemo(() => {
@@ -421,7 +426,7 @@ export default function CrossAnalysisDimensionPage() {
     }
   }, [ids.join("|"), t]);
 
-  // Load comparative data only when all reports share the same framework, industry, and sub-industry.
+  // Load comparative data only when all reports share the same framework and scope (SASB: sub-industry; GRI: Sector+Topic).
   useEffect(() => {
     if (!canCompare || ids.length < 2) return;
     runExtract();
@@ -1025,7 +1030,7 @@ useEffect(() => {
           <p className="text-base mb-2">{t("crossAnalysis.title")}</p>
           <p className="text-sm">{t("files.selectAtLeastTwoReports")}</p>
         </div>
-      ) : subIndustryMismatch ? (
+      ) : scopeMismatch ? (
         <>
           <Modal
             open={true}
@@ -1038,7 +1043,7 @@ useEffect(() => {
               </Button>
             }
           >
-            <p className="text-slate-700">{t("crossAnalysis.sameSubIndustryRequired")}</p>
+            <p className="text-slate-700">{t("crossAnalysis.sameScopeRequired")}</p>
           </Modal>
         </>
       ) : (

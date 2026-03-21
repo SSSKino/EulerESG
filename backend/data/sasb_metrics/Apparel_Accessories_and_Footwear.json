@@ -1,0 +1,178 @@
+[
+  {
+    "Metric": "Discussion of processes to maintain compliance with restricted substances regulations",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "CG-AA-250a.1",
+    "Topic": "Management of Chemicals in Products",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "CG-AA-250a.2",
+    "Topic": "Management of Chemicals in Products",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "CG-AA-430a.1",
+    "Topic": "Environmental Impacts in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "CG-AA-430a.1",
+    "Topic": "Environmental Impacts in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "CG-AA-430a.2",
+    "Topic": "Environmental Impacts in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "CG-AA-430a.2",
+    "Topic": "Environmental Impacts in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "CG-AA-430b.1",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "CG-AA-430b.1",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of (3) total audits conducted by a third-party auditor",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "CG-AA-430b.1",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Priority non-conformance rate for suppliers' labour code of conduct audits",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "CG-AA-430b.2",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) associated corrective action rate for suppliers' labour code of conduct audits",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "CG-AA-430b.2",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "CG-AA-430b.3",
+    "Topic": "Labour Conditions in the Supply Chain",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "CG-AA-440a.3",
+    "Topic": "Raw Materials Sourcing",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Amount of priority raw materials purchased, by material",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "CG-AA-440a.4",
+    "Topic": "Raw Materials Sourcing",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) amount of each priority raw material that is certified to a third-party environmental or social standard, by standard",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "CG-AA-440a.4",
+    "Topic": "Raw Materials Sourcing",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Annual production",
+    "Category": "Quantitative",
+    "Unit": "Number of units",
+    "Code": "CG-AA-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

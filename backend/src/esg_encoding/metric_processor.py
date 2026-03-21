@@ -25,6 +25,71 @@ from .models import (
 )
 from .exceptions import ESGEncodingError, ContentEmbeddingError
 
+_SASB_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "sasb_metrics"
+_CDP_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "cdp_metrics"
+_CDP_TOPIC_SLUGS = frozenset(
+    {
+        "Organization",
+        "Risk_and_Impact",
+        "Risk_Disclosure",
+        "Governance",
+        "Strategy",
+        "Climate",
+        "Water",
+        "Biodiversity",
+    }
+)
+_TCFD_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "tcfd_metrics"
+_TCFD_TOPIC_SLUGS = frozenset(
+    {
+        "Governance",
+        "Strategy",
+        "Risk_Management",
+        "Metrics_and_Targets",
+    }
+)
+_SASB_MANIFEST_PATH = _SASB_METRICS_DIR / "manifest.json"
+_SASB_INDUSTRY_FILE_MAP_FALLBACK: Dict[str, str] = {
+    "Software & IT Services": "software_&_it_services.json",
+    "Hardware": "Hardware.json",
+    "Semiconductors": "semiconductors.json",
+    "Internet Media & Services": "Internet_Media_and_Services.json",
+    "Telecommunication Services": "telecommunication_services.json",
+    "Electronic Manufacturing Services & Original Design Manufacturing": "Electronic_Manufacturing_Servic.json",
+    "Investment Banking & Brokerage": "Investment_Banking_and_Brokerage.json",
+    "Commercial Banks": "Commercial_Banks.json",
+    "Asset Management & Custody Activities": "Asset_Management_and_Custody_Activities.json",
+    "E-Commerce": "E-Commerce.json",
+    "Apparel, Accessories & Footwear": "Apparel_Accessories_and_Footwear.json",
+    "Household & Personal Products": "Household_and_Personal_Products.json",
+    "Multiline and Specialty Retailers & Distributors": "Multiline_and_Specialty_Retailers_and_Distributors.json",
+    "Automobiles": "Automobiles.json",
+    "Auto Parts": "Auto_Parts.json",
+    "Car Rental & Leasing": "Car_Rental_and_Leasing.json",
+}
+_sasb_industry_file_map_cache: Optional[Dict[str, str]] = None
+
+
+def _load_sasb_industry_file_mapping() -> Dict[str, str]:
+    """semi_industry label -> JSON filename under data/sasb_metrics (from manifest.json)."""
+    global _sasb_industry_file_map_cache
+    if _sasb_industry_file_map_cache is not None:
+        return _sasb_industry_file_map_cache
+    if _SASB_MANIFEST_PATH.exists():
+        with open(_SASB_MANIFEST_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+        _sasb_industry_file_map_cache = dict(data.get("semi_industry_to_file", {}))
+    else:
+        _sasb_industry_file_map_cache = dict(_SASB_INDUSTRY_FILE_MAP_FALLBACK)
+    return _sasb_industry_file_map_cache
+
+
+def _reload_sasb_industry_file_mapping() -> Dict[str, str]:
+    """Force refresh the SASB manifest mapping (used when runtime files changed)."""
+    global _sasb_industry_file_map_cache
+    _sasb_industry_file_map_cache = None
+    return _load_sasb_industry_file_mapping()
+
 
 class MetricProcessor:
     """指标处理器 - 负责指标的提取、精炼和语义扩展"""
@@ -213,6 +278,8 @@ class MetricProcessor:
                         source = MetricSource.GRI
                     elif 'sasb' in source_value:
                         source = MetricSource.SASB
+                    elif 'cdp' in source_value:
+                        source = MetricSource.CDP
                     elif 'tcfd' in source_value:
                         source = MetricSource.TCFD
                     elif 'ungc' in source_value:
@@ -285,37 +352,19 @@ class MetricProcessor:
             logger.info(f"load_sasb_metrics_by_industry called with semi_industry: {semi_industry} (type: {type(semi_industry)})")
             if semi_industry is None:
                 raise ValueError("semi_industry parameter is required and cannot be None")
-            # 行业名称到文件名的映射
-            industry_file_mapping = {
-                "Software & IT Services": "software_&_it_services.json",
-                "Hardware": "Hardware.json",
-                "Semiconductors": "semiconductors.json",
-                "Internet Media & Services": "Internet_Media_and_Services.json",
-                "Telecommunication Services": "telecommunication_services.json",
-                "Electronic Manufacturing Services & Original Design Manufacturing": "Electronic_Manufacturing_Servic.json",
-              
-                # Financials metrics
-                "Investment Banking & Brokerage": "Investment_Banking_and_Brokerage.json",
-                "Commercial Banks": "commercial_banks.json",
-                "Asset Management & Custody Activities": "Asset_Manage_and_Custody_Activity.json",
+            industry_file_mapping = _load_sasb_industry_file_mapping()
 
-                # Consumers good metrics
-                "E-Commerce": "E-Commerce.json",
-                "Apparel, Accessories & Footwear": "apparel_accessories_&_footwear.json",
-                "Household & Personal Products": "Household_and_Personal_Products.json",
-                "Multiline and Specialty Retailers & Distributors": "Multiline_and_Specialty_Retaile.json",
-
-                # Transportation metrics
-                "Automobiles": "Automobiles.json",
-                "Auto Parts": "Auto_Parts.json",
-                "Car Rental & Leasing": "Car_Rental_and_Leasing.json",
-            }
-            
             if semi_industry not in industry_file_mapping:
-                raise ValueError(f"Unsupported industry: {semi_industry}. Supported industries: {list(industry_file_mapping.keys())}")
-            
-            # 构建文件路径 - 统一使用sasb_metrics目录
-            file_path = Path(__file__).parent.parent.parent / "data" / "sasb_metrics" / industry_file_mapping[semi_industry]
+                # Runtime-safe refresh: manifest may have been updated while backend is running.
+                industry_file_mapping = _reload_sasb_industry_file_mapping()
+
+            if semi_industry not in industry_file_mapping:
+                raise ValueError(
+                    f"Unsupported industry: {semi_industry}. "
+                    f"Supported industries: {list(industry_file_mapping.keys())}"
+                )
+
+            file_path = _SASB_METRICS_DIR / industry_file_mapping[semi_industry]
             
             if not file_path.exists():
                 raise FileNotFoundError(f"SASB metrics file not found: {file_path}. Please ensure the metrics data file exists.")
@@ -429,6 +478,251 @@ class MetricProcessor:
             logger.error(f"Error loading SASB metrics for {semi_industry}: {e}")
             raise RuntimeError(f"Failed to load SASB metrics for industry '{semi_industry}': {e}")
     
+    def load_gri_metrics_by_sector_topic(self, sector_slug: str, topic_slug: str) -> MetricCollection:
+        """
+        Load GRI metrics for a single sector-topic from backend/data/gri_metrics.
+        File naming: {sector_slug}_{topic_slug}.json (e.g. coal_sector_climate_change.json).
+        
+        Args:
+            sector_slug: Sector slug (e.g. coal_sector, oil_and_gas_sector)
+            topic_slug: Topic slug (e.g. climate_change, biodiversity)
+            
+        Returns:
+            MetricCollection: GRI metrics for that sector-topic
+        """
+        try:
+            if not sector_slug or not topic_slug:
+                raise ValueError("GRI sector_slug and topic_slug are required")
+            gri_dir = Path(__file__).parent.parent.parent / "data" / "gri_metrics"
+            file_name = f"{sector_slug.strip()}_{topic_slug.strip()}.json"
+            file_path = gri_dir / file_name
+            if not file_path.exists():
+                raise FileNotFoundError(
+                    f"GRI metrics file not found: {file_path}. "
+                    f"Expected file naming: {{sector_slug}}_{{topic_slug}}.json"
+                )
+            with open(file_path, "r", encoding="utf-8") as f:
+                gri_data = json.load(f)
+            if not isinstance(gri_data, list):
+                raise ValueError(f"GRI file must be a JSON array: {file_path}")
+            metrics = []
+            for i, item in enumerate(gri_data):
+                metric_name = item.get("Metric") or item.get("metric") or f"GRI metric {i+1}"
+                topic_raw = item.get("Topic") or item.get("topic") or ""
+                if topic_raw is None:
+                    topic = ""
+                elif isinstance(topic_raw, float):
+                    topic = "" if (math.isnan(topic_raw) or math.isinf(topic_raw)) else str(topic_raw)
+                else:
+                    topic = str(topic_raw)
+                code = item.get("Code") or item.get("code") or ""
+                type_str = item.get("Type") or item.get("type") or ""
+                category = self._determine_metric_category(topic)
+                keywords = self._extract_keywords_from_sasb(item)  # same shape as GRI (Metric, Topic)
+                metric_id = f"gri_{i}_{metric_name[:50].replace(' ', '_').replace('(', '').replace(')', '').replace(',', '')}"
+                metric = ESGMetric(
+                    metric_id=metric_id,
+                    metric_name=metric_name,
+                    metric_code=code,
+                    category=category,
+                    source=MetricSource.GRI,
+                    keywords=keywords,
+                    description=f"{topic}: {metric_name}" if topic else metric_name,
+                    unit=None,
+                    sasb_category="",
+                    sasb_type=type_str if type_str else "",
+                    sasb_topic=topic or None,
+                )
+                metrics.append(metric)
+            collection = MetricCollection(
+                collection_id=f"gri_{sector_slug}_{topic_slug}_{uuid.uuid4().hex[:8]}",
+                collection_name=f"GRI Metrics — {sector_slug} / {topic_slug}",
+                metrics=metrics,
+            )
+            logger.info(f"Loaded {len(metrics)} GRI metrics for {sector_slug} / {topic_slug}")
+            return collection
+        except Exception as e:
+            logger.error(f"Error loading GRI metrics for {sector_slug}/{topic_slug}: {e}")
+            raise RuntimeError(f"Failed to load GRI metrics: {e}") from e
+
+    def load_cdp_metrics_by_topic(self, topic_slug: str) -> MetricCollection:
+        """
+        Load CDP metrics from backend/data/cdp_metrics/{topic_slug}.json (same item shape as SASB JSON).
+        """
+        try:
+            if not topic_slug or not str(topic_slug).strip():
+                raise ValueError("CDP topic slug is required")
+            slug = str(topic_slug).strip()
+            if slug not in _CDP_TOPIC_SLUGS:
+                raise ValueError(
+                    f"Unsupported CDP topic: {slug}. Supported: {sorted(_CDP_TOPIC_SLUGS)}"
+                )
+            file_path = _CDP_METRICS_DIR / f"{slug}.json"
+            if not file_path.exists():
+                raise FileNotFoundError(f"CDP metrics file not found: {file_path}")
+            with open(file_path, "r", encoding="utf-8") as f:
+                cdp_data = json.load(f)
+            if not isinstance(cdp_data, list):
+                raise ValueError(f"CDP file must be a JSON array: {file_path}")
+            metrics = []
+            for i, item in enumerate(cdp_data):
+                metric_name_raw = item.get("Metric") or item.get("metric") or f"CDP metric {i+1}"
+                topic_raw = item.get("Topic") or item.get("topic") or ""
+                if topic_raw is None:
+                    topic = ""
+                elif isinstance(topic_raw, float):
+                    topic = "" if (math.isnan(topic_raw) or math.isinf(topic_raw)) else str(topic_raw)
+                else:
+                    topic = str(topic_raw)
+                category = self._determine_metric_category(topic)
+                keywords = self._extract_keywords_from_sasb(item)
+                metric_code = item.get("Code") or item.get("code") or ""
+                unit_raw = item.get("Unit") or item.get("unit") or ""
+                if unit_raw is None or unit_raw == "":
+                    unit = None
+                elif isinstance(unit_raw, float):
+                    unit = None if (math.isnan(unit_raw) or math.isinf(unit_raw)) else str(unit_raw)
+                else:
+                    unit = str(unit_raw) if unit_raw else None
+                sasb_category_raw = item.get("Category") or item.get("category") or ""
+                sasb_category = (
+                    ""
+                    if sasb_category_raw is None
+                    else (
+                        ""
+                        if isinstance(sasb_category_raw, float)
+                        and (math.isnan(sasb_category_raw) or math.isinf(sasb_category_raw))
+                        else str(sasb_category_raw)
+                    )
+                )
+                sasb_type_raw = item.get("Type") or item.get("type") or ""
+                sasb_type = (
+                    ""
+                    if sasb_type_raw is None
+                    else (
+                        ""
+                        if isinstance(sasb_type_raw, float)
+                        and (math.isnan(sasb_type_raw) or math.isinf(sasb_type_raw))
+                        else str(sasb_type_raw)
+                    )
+                )
+                metric_id = (
+                    f"cdp_{i}_{metric_name_raw[:50].replace(' ', '_').replace('(', '').replace(')', '').replace(',', '')}"
+                )
+                metric = ESGMetric(
+                    metric_id=metric_id,
+                    metric_name=metric_name_raw,
+                    metric_code=str(metric_code) if metric_code is not None else "",
+                    category=category,
+                    source=MetricSource.CDP,
+                    keywords=keywords,
+                    description=f"{topic}: {metric_name_raw}" if topic else str(metric_name_raw),
+                    unit=unit,
+                    sasb_category=sasb_category,
+                    sasb_type=sasb_type,
+                    sasb_topic=topic or None,
+                )
+                metrics.append(metric)
+            collection = MetricCollection(
+                collection_id=f"cdp_{slug.lower()}_{uuid.uuid4().hex[:8]}",
+                collection_name=f"CDP Metrics — {slug}",
+                metrics=metrics,
+            )
+            logger.info(f"Loaded {len(metrics)} CDP metrics for topic: {slug}")
+            return collection
+        except Exception as e:
+            logger.error(f"Error loading CDP metrics for {topic_slug}: {e}")
+            raise RuntimeError(f"Failed to load CDP metrics: {e}") from e
+
+    def load_tcfd_metrics_by_topic(self, topic_slug: str) -> MetricCollection:
+        """
+        Load TCFD metrics from backend/data/tcfd_metrics/{topic_slug}.json (SASB-like item shape).
+        """
+        try:
+            if not topic_slug or not str(topic_slug).strip():
+                raise ValueError("TCFD topic slug is required")
+            slug = str(topic_slug).strip()
+            if slug not in _TCFD_TOPIC_SLUGS:
+                raise ValueError(
+                    f"Unsupported TCFD topic: {slug}. Supported: {sorted(_TCFD_TOPIC_SLUGS)}"
+                )
+            file_path = _TCFD_METRICS_DIR / f"{slug}.json"
+            if not file_path.exists():
+                raise FileNotFoundError(f"TCFD metrics file not found: {file_path}")
+            with open(file_path, "r", encoding="utf-8") as f:
+                tcfd_data = json.load(f)
+            if not isinstance(tcfd_data, list):
+                raise ValueError(f"TCFD file must be a JSON array: {file_path}")
+            metrics = []
+            for i, item in enumerate(tcfd_data):
+                metric_name_raw = item.get("Metric") or item.get("metric") or f"TCFD metric {i+1}"
+                topic_raw = item.get("Topic") or item.get("topic") or ""
+                if topic_raw is None:
+                    topic = ""
+                elif isinstance(topic_raw, float):
+                    topic = "" if (math.isnan(topic_raw) or math.isinf(topic_raw)) else str(topic_raw)
+                else:
+                    topic = str(topic_raw)
+                category = self._determine_metric_category(topic)
+                keywords = self._extract_keywords_from_sasb(item)
+                metric_code = item.get("Code") or item.get("code") or ""
+                unit_raw = item.get("Unit") or item.get("unit") or ""
+                if unit_raw is None or unit_raw == "":
+                    unit = None
+                elif isinstance(unit_raw, float):
+                    unit = None if (math.isnan(unit_raw) or math.isinf(unit_raw)) else str(unit_raw)
+                else:
+                    unit = str(unit_raw) if unit_raw else None
+                sasb_category_raw = item.get("Category") or item.get("category") or ""
+                sasb_category = (
+                    ""
+                    if sasb_category_raw is None
+                    else (
+                        ""
+                        if isinstance(sasb_category_raw, float)
+                        and (math.isnan(sasb_category_raw) or math.isinf(sasb_category_raw))
+                        else str(sasb_category_raw)
+                    )
+                )
+                sasb_type_raw = item.get("Type") or item.get("type") or ""
+                sasb_type = (
+                    ""
+                    if sasb_type_raw is None
+                    else (
+                        ""
+                        if isinstance(sasb_type_raw, float)
+                        and (math.isnan(sasb_type_raw) or math.isinf(sasb_type_raw))
+                        else str(sasb_type_raw)
+                    )
+                )
+                metric_id = (
+                    f"tcfd_{i}_{metric_name_raw[:50].replace(' ', '_').replace('(', '').replace(')', '').replace(',', '')}"
+                )
+                metric = ESGMetric(
+                    metric_id=metric_id,
+                    metric_name=metric_name_raw,
+                    metric_code=str(metric_code) if metric_code is not None else "",
+                    category=category,
+                    source=MetricSource.TCFD,
+                    keywords=keywords,
+                    description=f"{topic}: {metric_name_raw}" if topic else str(metric_name_raw),
+                    unit=unit,
+                    sasb_category=sasb_category,
+                    sasb_type=sasb_type,
+                    sasb_topic=topic or None,
+                )
+                metrics.append(metric)
+            collection = MetricCollection(
+                collection_id=f"tcfd_{slug.lower()}_{uuid.uuid4().hex[:8]}",
+                collection_name=f"TCFD Metrics — {slug}",
+                metrics=metrics,
+            )
+            logger.info(f"Loaded {len(metrics)} TCFD metrics for topic: {slug}")
+            return collection
+        except Exception as e:
+            logger.error(f"Error loading TCFD metrics for {topic_slug}: {e}")
+            raise RuntimeError(f"Failed to load TCFD metrics: {e}") from e
+
     def _determine_metric_category(self, topic: str) -> MetricCategory:
         """
         根据主题确定指标类别

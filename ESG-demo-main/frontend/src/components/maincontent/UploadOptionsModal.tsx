@@ -3,6 +3,7 @@ import { Modal } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import type { FormInstance } from "antd/es/form";
 import FileInfoForm from "./FileInfoForm";
+import type { FileInfoFormValues } from "./FileInfoForm";
 import { useT } from "@/i18n/useT";
 
 interface UploadOptionsModalProps {
@@ -12,14 +13,7 @@ interface UploadOptionsModalProps {
   onOk: () => void;
   onCancel: () => void;
   onIndustryChange: (value: string) => void;
-  form: FormInstance<{
-    category: string;
-    description: string;
-    tags: string[];
-    industry: string;
-    semiIndustry: string;
-    framework: string;
-  }>;
+  form: FormInstance<FileInfoFormValues>;
 }
 
 const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({

@@ -47,6 +47,16 @@ export function applyFrameworkToSearchParams(
     else out.delete("industry");
     if (semi) out.set("semiIndustry", semi);
     else out.delete("semiIndustry");
+  } else if (values.framework === "CDP") {
+    out.set("industry", "CDP");
+    const semi = safeTrim(values.semiIndustry);
+    if (semi) out.set("semiIndustry", semi);
+    else out.delete("semiIndustry");
+  } else if (values.framework === "TCFD") {
+    out.set("industry", "TCFD");
+    const semi = safeTrim(values.semiIndustry);
+    if (semi) out.set("semiIndustry", semi);
+    else out.delete("semiIndustry");
   } else {
     out.delete("industry");
     out.delete("semiIndustry");
