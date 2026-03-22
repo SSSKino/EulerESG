@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from "react";
-import { Table, Tag, Spin, Alert, Select, Space } from "antd";
+import { Table, Tag, Spin, Alert, Select, Space, Popover } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
@@ -40,6 +40,20 @@ const formatNumber = (v: number) => {
   } catch {
     return String(v);
   }
+};
+
+/** Parse first page number from "12", "12-13", "p. 12", etc. */
+const normalizePage = (page: string | number | null | undefined): number | null => {
+  if (page === null || page === undefined) return null;
+  if (typeof page === "number") return Number.isFinite(page) ? page : null;
+  const s = String(page).trim();
+  if (!s) return null;
+  const firstToken = s.split(",")[0].trim();
+  const rangeFirst = firstToken.split("-")[0].trim();
+  const m = rangeFirst.match(/\d+/);
+  if (!m) return null;
+  const n = parseInt(m[0], 10);
+  return Number.isFinite(n) ? n : null;
 };
 
 const isEmptyValue = (value: unknown) => {
@@ -327,18 +341,32 @@ setAnalysisData(convertedData);
 
   const columns: ColumnsType<AnalysisDataItem> = useMemo(
   () => {
+    const pad = {
+      style: {
+        padding: "16px 28px",
+        verticalAlign: "top" as const,
+      },
+    };
     return [
       {
         title: t("analysis.columns.metric"),
         dataIndex: "metric_name",
         key: "metric_name",
-        width: 200,
+        width: "33.33%",
+        onCell: () => pad,
+        onHeaderCell: () => pad,
+        render: (text: string) => (
+          <span className="block break-words whitespace-normal leading-relaxed">{text}</span>
+        ),
       },
       {
         title: t("analysis.columns.status"),
         dataIndex: "disclosure_status",
         key: "disclosure_status",
-        width: 120,
+        width: "33.33%",
+        align: "center",
+        onCell: () => pad,
+        onHeaderCell: () => pad,
         render: (status: string) => {
           let color = "default";
           let text = status;
@@ -362,38 +390,79 @@ setAnalysisData(convertedData);
         onFilter: (value, record) => record.disclosure_status === value,
       },
       {
-        title: t("analysis.columns.page"),
-        dataIndex: "page",
-        key: "page",
-        width: 100,
-        render: (page: string | number | null) => {
-          if (isEmptyValue(page)) return "n/a";
-          return String(page);
-        },
-      },
-      {
         title: t("analysis.columns.value"),
         dataIndex: "value",
         key: "value",
-        width: 160,
-        render: (value: string | number | null) => {
-          if (isEmptyValue(value)) return "n/a";
-          return typeof value === "number" ? formatNumber(value) : String(value);
-        },
-      },
-      {
-        title: t("analysis.columns.context"),
-        dataIndex: "context",
-        key: "context",
-        width: 420,
-        render: (context: string | null) => {
-          const text = (context || "").trim();
-          return text || "n/a";
+        width: "33.34%",
+        onCell: () => pad,
+        onHeaderCell: () => pad,
+        render: (_value: string | number | null, record: AnalysisDataItem) => {
+          const isNotDisclosed = record.disclosure_status === "not_disclosed";
+          const cellText =
+            isNotDisclosed && isEmptyValue(record.value) ? null : isEmptyValue(record.value)
+              ? "n/a"
+              : typeof record.value === "number"
+                ? formatNumber(record.value)
+                : String(record.value);
+
+          const ctx = (record.context || "").trim();
+          const pageNum = normalizePage(record.page);
+          const pageRaw = !isEmptyValue(record.page) ? String(record.page) : "";
+          const pageLabel = pageNum !== null ? String(pageNum) : pageRaw || "n/a";
+          const pageClickable = pageNum !== null && !!onPageNavigate;
+          const hasHoverDetail = !!(ctx || pageRaw || pageNum !== null);
+
+          const hoverBody = (
+            <div className="max-w-md space-y-2 p-1">
+              <div>
+                <div className="text-xs font-semibold text-gray-700">{t("analysis.columns.page")}</div>
+                {pageClickable ? (
+                  <button
+                    type="button"
+                    className="mt-0.5 text-sm text-blue-600 hover:underline cursor-pointer bg-transparent border-0 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPageNavigate?.(pageNum!);
+                    }}
+                  >
+                    {pageLabel}
+                  </button>
+                ) : (
+                  <div className="mt-0.5 text-sm text-gray-800">{pageLabel}</div>
+                )}
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-gray-700">{t("analysis.columns.context")}</div>
+                <div className="mt-0.5 text-sm whitespace-pre-wrap text-gray-800 max-h-64 overflow-y-auto">
+                  {ctx || "n/a"}
+                </div>
+              </div>
+            </div>
+          );
+
+          const inner =
+            cellText === null ? (
+              <span className="text-gray-400" />
+            ) : (
+              <span className={hasHoverDetail ? "cursor-help underline decoration-dotted" : ""}>
+                {cellText}
+              </span>
+            );
+
+          if (!hasHoverDetail) {
+            return inner;
+          }
+
+          return (
+            <Popover content={hoverBody} title={null} trigger="hover" mouseEnterDelay={0.15}>
+              {inner}
+            </Popover>
+          );
         },
       },
     ];
   },
-  [t]
+  [t, onPageNavigate]
 );
 
 
@@ -569,6 +638,7 @@ setAnalysisData(convertedData);
             className="w-full analysis-results-table"
             scroll={{ y: 300 }}
             tableLayout="fixed"
+            size="middle"
             pagination={false}
             rowKey="key"
           />
