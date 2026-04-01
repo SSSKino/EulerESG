@@ -1,0 +1,145 @@
+[
+  {
+    "Metric": "(1) Total energy consumed",
+    "Category": "Quantitative",
+    "Unit": "Gigajoules (GJ)",
+    "Code": "SV-LF-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) percentage grid electricity",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-LF-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(3) percentage renewable",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-LF-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Fatality rate for customers",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "SV-LF-250a.1",
+    "Topic": "Customer Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) Injury rate for customers",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "SV-LF-250a.1",
+    "Topic": "Customer Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Percentage of facilities inspected for safety",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-LF-250a.2",
+    "Topic": "Customer Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) percentage of facilities that failed inspection",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "SV-LF-250a.2",
+    "Topic": "Customer Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "SV-LF-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "SV-LF-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) near miss frequency rate (NMFR) for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "SV-LF-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) near miss frequency rate (NMFR) for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "SV-LF-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Attendance",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-LF-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of customer-days",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "SV-LF-000.B",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

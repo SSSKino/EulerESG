@@ -1,0 +1,123 @@
+[
+  {
+    "Metric": "Area of forestland certified to a third-party forest management standard",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha)",
+    "Code": "RR-FM-160a.1",
+    "Topic": "Ecosystem Services & Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of certified forestland certified to each standard",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "RR-FM-160a.1",
+    "Topic": "Ecosystem Services & Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Area of forestland with protected conservation status",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha)",
+    "Code": "RR-FM-160a.2",
+    "Topic": "Ecosystem Services & Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Area of forestland in endangered species habitat",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha)",
+    "Code": "RR-FM-160a.3",
+    "Topic": "Ecosystem Services & Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of approach to optimising opportunities from ecosystem services provided by forestlands",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "RR-FM-160a.4",
+    "Topic": "Ecosystem Services & Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Area of forestland in indigenous land",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha)",
+    "Code": "RR-FM-210a.1",
+    "Topic": "Rights of Indigenous Peoples",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of engagement processes and due diligence practices with respect to human rights, indigenous rights, and the local community",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "RR-FM-210a.2",
+    "Topic": "Rights of Indigenous Peoples",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of strategy to manage opportunities for and risks to forest management and timber production presented by climate change",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "RR-FM-450a.1",
+    "Topic": "Climate Change Adaptation",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Area of forestland owned, leased, or managed by the entity",
+    "Category": "Quantitative",
+    "Unit": "Hectares (ha)",
+    "Code": "RR-FM-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Aggregate standing timber inventory",
+    "Category": "Quantitative",
+    "Unit": "Cubic metres (m³)",
+    "Code": "RR-FM-000.B",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Timber harvest volume",
+    "Category": "Quantitative",
+    "Unit": "Cubic metres (m³)",
+    "Code": "RR-FM-000.C",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

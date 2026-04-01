@@ -1,0 +1,29 @@
+[
+  {
+    "Metric": "Disclosure 3-3 Management of material topics",
+    "Code": "13.12.1",
+    "Topic": "Local communities",
+    "Type": "Management of the topic",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 413-1 Operations with local community engagement, impact\nassessments, and development programs",
+    "Code": "13.12.2",
+    "Topic": "Local communities",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 413-2 Operations with significant actual and potential negative impacts\non local communities",
+    "Code": "13.12.3",
+    "Topic": "Local communities",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

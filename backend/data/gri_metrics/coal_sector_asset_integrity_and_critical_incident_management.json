@@ -1,0 +1,38 @@
+[
+  {
+    "Metric": "Disclosure 3-3 Management of material topics",
+    "Code": "12.13.1",
+    "Topic": "Asset integrity and critical incident management",
+    "Type": "Management of the topic",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 306-3 Significant spills",
+    "Code": "12.13.2",
+    "Topic": "Asset integrity and critical incident management",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Critical incidents:\nReport the number of critical incidents in the reporting period and describe their impacts.",
+    "Code": "12.13.3",
+    "Topic": "Asset integrity and critical incident management",
+    "Type": "Additional sector disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Tailings facilities:\n• List the organization’s tailings facilities, and report the name, location, and ownership status.\nFor each tailings facility: describe the tailings facility;\n- report whether the facility is active, inactive, or closed;\n- report the Consequence Classification;\n- report the date and main findings of the most recent risk assessment;\nreport the dates of the most recent and next independent technical reviews.6\n-\n•\nDescribe actions taken to:\n- manage impacts from tailings facilities, including during closure and post-closure;\nprevent catastrophic failures of tailings facilities.7",
+    "Code": "12.13.4",
+    "Topic": "Asset integrity and critical incident management",
+    "Type": "Additional sector disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

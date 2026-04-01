@@ -1,0 +1,222 @@
+[
+  {
+    "Metric": "(1) Total energy consumed",
+    "Category": "Quantitative",
+    "Unit": "Gigajoules (GJ)",
+    "Code": "RR-FC-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) percentage grid electricity",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "RR-FC-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(3) percentage renewable",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "RR-FC-130a.1",
+    "Topic": "Energy Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "RR-FC-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "RR-FC-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) fatality rate for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "RR-FC-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) fatality rate for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "RR-FC-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "RR-FC-320a.2",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average storage capacity of batteries, by product application and technology type",
+    "Category": "Quantitative",
+    "Unit": "Specific energy (Wh/kg)",
+    "Code": "RR-FC-410a.1",
+    "Topic": "Product Efficiency",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average energy efficiency of fuel cells as (1) electrical efficiency, by product application and technology type",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "RR-FC-410a.2",
+    "Topic": "Product Efficiency",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average energy efficiency of fuel cells as (2) thermal efficiency, by product application and technology type",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "RR-FC-410a.2",
+    "Topic": "Product Efficiency",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average battery efficiency as coulombic efficiency, by product application and technology type",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "RR-FC-410a.3",
+    "Topic": "Product Efficiency",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average operating lifetime of fuel cells, by product application and technology type",
+    "Category": "Quantitative",
+    "Unit": "Hours (h)",
+    "Code": "RR-FC-410a.4",
+    "Topic": "Product Efficiency",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Average operating lifetime of batteries, by product application and technology type",
+    "Category": "Quantitative",
+    "Unit": "Number of cycles",
+    "Code": "RR-FC-410a.5",
+    "Topic": "Product Efficiency",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of products sold that are recyclable or reusable",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by weight",
+    "Code": "RR-FC-410b.1",
+    "Topic": "Product End-of-life Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(1) Weight of end-of-life material recovered",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "RR-FC-410b.2",
+    "Topic": "Product End-of-life Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) percentage recycled",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%)",
+    "Code": "RR-FC-410b.2",
+    "Topic": "Product End-of-life Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of approach to manage use, reclamation, and disposal of hazardous materials",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "RR-FC-410b.3",
+    "Topic": "Product End-of-life Management",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of the management of risks associated with the use of critical materials",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "RR-FC-440a.1",
+    "Topic": "Materials Sourcing",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Number of units sold",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "RR-FC-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

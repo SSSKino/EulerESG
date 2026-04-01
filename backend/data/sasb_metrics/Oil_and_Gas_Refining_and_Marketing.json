@@ -1,0 +1,266 @@
+[
+  {
+    "Metric": "Gross global Scope 1 emissions",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t) CO2-e, Percentage (%)",
+    "Code": "EM-RM-110a.1",
+    "Topic": "Greenhouse Gas Emissions",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "percentage covered under emissions-limiting regulations",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t) CO2-e, Percentage (%)",
+    "Code": "EM-RM-110a.1",
+    "Topic": "Greenhouse Gas Emissions",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-RM-110a.2",
+    "Topic": "Greenhouse Gas Emissions",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-RM-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (2) SOx",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-RM-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (3) particulate matter (PM10)",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-RM-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (4) H2S",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-RM-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Air emissions of the following pollutants: (5) volatile organic compounds (VOCs)",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t)",
+    "Code": "EM-RM-120a.1",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Number of refineries in or near areas of dense population",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "EM-RM-120a.2",
+    "Topic": "Air Quality",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Total water withdrawn",
+    "Category": "Quantitative",
+    "Unit": "Thousand cubic metres (m3), Percentage (%)",
+    "Code": "EM-RM-140a.1",
+    "Topic": "Water Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) total water consumed; percentage of each in regions with High or Extremely High Baseline Water Stress",
+    "Category": "Quantitative",
+    "Unit": "Thousand cubic metres (m3), Percentage (%)",
+    "Code": "EM-RM-140a.1",
+    "Topic": "Water Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Number of incidents of non-compliance associated with water quality permits, standards, and regulations",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "EM-RM-140a.2",
+    "Topic": "Water Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Amount of hazardous waste generated",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t), Percentage (%)",
+    "Code": "EM-RM-150a.1",
+    "Topic": "Hazardous Materials Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) percentage recycled",
+    "Category": "Quantitative",
+    "Unit": "Metric tonnes (t), Percentage (%)",
+    "Code": "EM-RM-150a.1",
+    "Topic": "Hazardous Materials Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Number of underground storage tanks (USTs)",
+    "Category": "Quantitative",
+    "Unit": "Number, Percentage (%)",
+    "Code": "EM-RM-150a.2",
+    "Topic": "Hazardous Materials Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) number of UST releases requiring clean up",
+    "Category": "Quantitative",
+    "Unit": "Number, Percentage (%)",
+    "Code": "EM-RM-150a.2",
+    "Topic": "Hazardous Materials Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(3) percentage in jurisdictions with UST financial assurance funds",
+    "Category": "Quantitative",
+    "Unit": "Number, Percentage (%)",
+    "Code": "EM-RM-150a.2",
+    "Topic": "Hazardous Materials Management",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) fatality rate for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(2) fatality rate for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(3) near miss frequency rate (NMFR) for (a) direct employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "(3) near miss frequency rate (NMFR) for (b) contract employees",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-320a.1",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Discussion of management systems used to integrate a culture of safety",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-RM-320a.2",
+    "Topic": "Workforce Health & Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics"
+  },
+  {
+    "Metric": "Total addressable market and share of market for advanced biofuels and associated infrastructure",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency, Percentage (%)",
+    "Code": "EM-RM-410a.2",
+    "Topic": "Product Specifications & Clean Fuel Blends",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Volumes of renewable fuels for fuel blending: (1) net amount produced",
+    "Category": "Quantitative",
+    "Unit": "Barrels of oil equivalent (BOE)",
+    "Code": "EM-RM-410a.3",
+    "Topic": "Product Specifications & Clean Fuel Blends",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Volumes of renewable fuels for fuel blending: (2) net amount purchased",
+    "Category": "Quantitative",
+    "Unit": "Barrels of oil equivalent (BOE)",
+    "Code": "EM-RM-410a.3",
+    "Topic": "Product Specifications & Clean Fuel Blends",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Total amount of monetary losses as a result of legal proceedings associated with price fixing or price manipulation",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "EM-RM-520a.1",
+    "Topic": "Pricing Integrity & Transparency",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-RM-530a.1",
+    "Topic": "Management of the Legal & Regulatory Environment",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Process Safety Event (PSE) rates for Loss of Primary Containment (LOPC) of greater consequence (Tier 1)",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-540a.1",
+    "Topic": "Critical Incident Risk Management",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Process Safety Event (PSE) rates for Loss of Primary Containment (LOPC) of lesser consequence (Tier 2)",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-540a.1",
+    "Topic": "Critical Incident Risk Management",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Challenges to Safety Systems indicator rate (Tier 3)",
+    "Category": "Quantitative",
+    "Unit": "Rate",
+    "Code": "EM-RM-540a.2",
+    "Topic": "Critical Incident Risk Management",
+    "Type": "Activity Metrics"
+  },
+  {
+    "Metric": "Discussion of measurement of Operating Discipline and Management System Performance through Tier 4 Indicators",
+    "Category": "Discussion and Analysis",
+    "Unit": "",
+    "Code": "EM-RM-540a.3",
+    "Topic": "Critical Incident Risk Management",
+    "Type": "Activity Metrics"
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "Metric": "Disclosure 3-3 Management of material topics",
+    "Code": "14.4.1",
+    "Topic": "Biodiversity",
+    "Type": "Management of the topic",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 101-1 Policies to halt and reverse biodiversity loss",
+    "Code": "14.4.2",
+    "Topic": "Biodiversity",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 101-2 Management of biodiversity impacts",
+    "Code": "14.4.3",
+    "Topic": "Biodiversity",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 101-4 Identification of biodiversity impacts",
+    "Code": "14.4.4",
+    "Topic": "Biodiversity",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 101-5 Locations with biodiversity impacts\nAdditional sector recommendations\n• Report information on the ecologically sensitive areas for all mine sites.",
+    "Code": "14.4.5",
+    "Topic": "Biodiversity",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 101-6 Direct drivers of biodiversity loss\nAdditional sector recommendations\n• Report direct drivers of biodiversity loss for all mine sites.",
+    "Code": "14.4.6",
+    "Topic": "Biodiversity",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 101-7 Changes to the state of biodiversity\nAdditional sector recommendations\n• Report changes in the state of biodiversity for all mine sites.",
+    "Code": "14.4.7",
+    "Topic": "Biodiversity",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 101-8 Ecosystem services\nAdditional sector recommendations\n• Report information on ecosystem services for all mine sites.",
+    "Code": "14.4.8",
+    "Topic": "Biodiversity",
+    "Type": "Topic Standard disclosure",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

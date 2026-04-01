@@ -1,0 +1,90 @@
+[
+  {
+    "Metric": "(1) Number of recalls issued",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "CG-AM-250a.1",
+    "Topic": "Product Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "(2) total units recalled",
+    "Category": "Quantitative",
+    "Unit": "Number",
+    "Code": "CG-AM-250a.1",
+    "Topic": "Product Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Discussion of process to identify and manage safety risks associated with the use of its products",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "CG-AM-250a.2",
+    "Topic": "Product Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Total amount of monetary losses because of legal proceedings associated with product safety",
+    "Category": "Quantitative",
+    "Unit": "Presentation currency",
+    "Code": "CG-AM-250a.3",
+    "Topic": "Product Safety",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of eligible products by revenue certified to an energy efficiency certification",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by revenue",
+    "Code": "CG-AM-410a.1",
+    "Topic": "Product Lifecycle Environmental Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Percentage of eligible products by revenue certified to an environmental product lifecycle standard",
+    "Category": "Quantitative",
+    "Unit": "Percentage (%) by revenue",
+    "Code": "CG-AM-410a.2",
+    "Topic": "Product Lifecycle Environmental Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Description of efforts to manage products end-of-life impacts",
+    "Category": "Discussion and Analysis",
+    "Unit": "n/a",
+    "Code": "CG-AM-410a.3",
+    "Topic": "Product Lifecycle Environmental Impacts",
+    "Type": "Sustainability Disclosure Topics & Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Annual production",
+    "Category": "Quantitative",
+    "Unit": "Number of units",
+    "Code": "CG-AM-000.A",
+    "Topic": "",
+    "Type": "Activity Metrics",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "Metric": "Disclosure 3-3 Management of material topics",
+    "Code": "12.9.1",
+    "Topic": "Local communities",
+    "Type": "Management of the topic",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 413-1 Operations with local community engagement, impact\nassessments, and development programs",
+    "Code": "12.9.2",
+    "Topic": "Local communities",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Disclosure 413-2 Operations with significant actual and potential negative impacts\non local communities",
+    "Code": "12.9.3",
+    "Topic": "Local communities",
+    "Type": "Topic Standard disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  },
+  {
+    "Metric": "Grievances from local communities:\nReport the number and type of grievances from local communities identified, including:\n• percentage of the grievances that were addressed and resolved;\n• percentage of the grievances that were resolved through remediation.",
+    "Code": "12.9.4",
+    "Topic": "Local communities",
+    "Type": "Additional sector disclosures",
+    "Value": null,
+    "Page": null,
+    "Context": null
+  }
+]
