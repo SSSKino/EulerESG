@@ -30,6 +30,123 @@ from .models import (
 from .exceptions import ESGEncodingError, ContentEmbeddingError
 
 
+def _clean_query_fragment(value: Optional[Union[str, int, float]]) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip()
+    text = re.sub(r"\s+", " ", text)
+    return text
+
+
+def _definition_fragments(definition: str, limit: int = 6) -> List[str]:
+    text = _clean_query_fragment(definition)
+    if not text:
+        return []
+    # prioritize short lead sentences/clauses that are most descriptive for retrieval
+    parts = re.split(r"[\n.;:]+", text)
+    fragments: List[str] = []
+    for part in parts:
+        part = _clean_query_fragment(part)
+        if len(part) < 6:
+            continue
+        if part not in fragments:
+            fragments.append(part)
+        if len(fragments) >= limit:
+            break
+    return fragments
+
+
+def _keyword_tokens_from_text(text: str, min_len: int = 3, limit: int = 16) -> List[str]:
+    clean = _clean_query_fragment(text)
+    if not clean:
+        return []
+    tokens = re.findall(r"[A-Za-z][A-Za-z0-9\-_/]{%d,}" % (min_len - 1), clean)
+    # also keep compact parenthetical numeric/code-like fragments and mixed case units
+    tokens.extend(re.findall(r"[A-Za-z]{1,6}-[A-Za-z0-9.]+", clean))
+    seen = []
+    for token in tokens:
+        token = token.strip()
+        if len(token) < min_len and not re.search(r"\d", token):
+            continue
+        if token.lower() not in {s.lower() for s in seen}:
+            seen.append(token)
+        if len(seen) >= limit:
+            break
+    return seen
+
+
+def _build_weighted_lexical_terms(metric: ESGMetric, semantic_expansion: Optional[SemanticExpansion] = None) -> List[Tuple[str, float]]:
+    weighted_terms: List[Tuple[str, float]] = []
+
+    def add(term: Optional[str], weight: float):
+        cleaned = _clean_query_fragment(term)
+        if len(cleaned) < 2:
+            return
+        weighted_terms.append((cleaned, weight))
+
+    # strongest anchors
+    add(metric.metric_name, 3.2)
+    add(metric.metric_code, 3.0)
+    add(metric.sasb_topic, 2.2)
+    add(metric.unit, 1.8)
+
+    for kw in metric.keywords or []:
+        add(kw, 1.6)
+
+    for frag in _definition_fragments(metric.definition, limit=6):
+        add(frag, 1.7)
+
+    # alias/tokens derived from important fields
+    for token in _keyword_tokens_from_text(metric.metric_name, min_len=3, limit=12):
+        add(token, 1.2)
+    for token in _keyword_tokens_from_text(metric.metric_code, min_len=2, limit=6):
+        add(token, 1.4)
+    for token in _keyword_tokens_from_text(metric.unit or "", min_len=2, limit=6):
+        add(token, 1.0)
+    for token in _keyword_tokens_from_text(metric.sasb_topic or "", min_len=3, limit=8):
+        add(token, 1.1)
+
+    if semantic_expansion is not None:
+        for kw in semantic_expansion.expanded_keywords or []:
+            add(kw, 1.0)
+
+    dedup: Dict[str, Tuple[str, float]] = {}
+    for term, weight in weighted_terms:
+        key = term.lower()
+        existing = dedup.get(key)
+        if existing is None or weight > existing[1]:
+            dedup[key] = (term, weight)
+
+    return list(dedup.values())
+
+
+def _build_semantic_query(metric: ESGMetric, semantic_expansion: Optional[SemanticExpansion] = None) -> str:
+    parts: List[str] = []
+    for value in [metric.metric_name, metric.metric_code, metric.sasb_topic, metric.unit, metric.definition]:
+        cleaned = _clean_query_fragment(value)
+        if cleaned:
+            parts.append(cleaned)
+    if semantic_expansion is not None:
+        desc = _clean_query_fragment(semantic_expansion.semantic_description)
+        if desc:
+            parts.append(desc)
+        expanded = [
+            _clean_query_fragment(k) for k in (semantic_expansion.expanded_keywords or [])
+            if _clean_query_fragment(k)
+        ]
+        if expanded:
+            parts.append(" ".join(expanded[:20]))
+    # dedupe while preserving order
+    seen = set()
+    ordered: List[str] = []
+    for part in parts:
+        key = part.lower()
+        if key not in seen:
+            seen.add(key)
+            ordered.append(part)
+    return "\n".join(ordered)
+
+
 class KeywordRetriever:
     """Keyword retriever"""
     
@@ -70,48 +187,41 @@ class KeywordRetriever:
         
         return results
     
-    def search_in_report(self, report_content: ReportContent, metric: ESGMetric) -> List[RetrievalResult]:
+    def search_in_report(self, report_content: ReportContent, metric: ESGMetric,
+                         semantic_expansion: Optional[SemanticExpansion] = None) -> List[RetrievalResult]:
         """
-        Search for metric-related content in report
-        
-        Args:
-            report_content: Report content
-            metric: ESG metric
-            
-        Returns:
-            List[RetrievalResult]: Retrieval results
+        Search for metric-related content in report using enriched lexical query terms.
         """
         results = []
-        
+        weighted_terms = _build_weighted_lexical_terms(metric, semantic_expansion)
+        total_weight = sum(weight for _, weight in weighted_terms) or 1.0
+
         for segment in report_content.document_content.segments:
-            # Search keywords
-            keyword_matches = self.search_keywords_in_text(
-                segment.content, 
-                metric.keywords
-            )
-            
-            if keyword_matches:
-                # Calculate keyword matching score
-                matched_keywords = [kw for kw, _ in keyword_matches]
-                total_matches = sum(len(positions) for _, positions in keyword_matches)
-                
-                # Simple score calculation: matched keywords count / total keywords count
-                score = len(matched_keywords) / len(metric.keywords) if metric.keywords else 0
-                
+            matched_terms: List[str] = []
+            matched_weight = 0.0
+            for term, weight in weighted_terms:
+                if not term:
+                    continue
+                keyword_matches = self.search_keywords_in_text(segment.content, [term])
+                if keyword_matches:
+                    matched_terms.append(term)
+                    matched_weight += weight
+
+            if matched_terms:
+                score = min(1.0, matched_weight / total_weight)
                 result = RetrievalResult(
                     segment_id=segment.segment_id,
                     content=segment.content,
                     page_number=segment.page_number,
                     score=score,
                     retrieval_type="keyword",
-                    matched_keywords=matched_keywords,
+                    matched_keywords=matched_terms[:20],
                     metric_id=metric.metric_id
                 )
                 results.append(result)
-        
-        # Sort by score
+
         results.sort(key=lambda x: x.score, reverse=True)
-        
+
         logger.info(f"Keyword retrieval for metric {metric.metric_id} found {len(results)} results")
         return results[:self.config.top_k]
 
@@ -163,7 +273,8 @@ class SemanticRetriever:
             self.reranker = None
     
     def search_by_semantic(self, report_content: ReportContent, 
-                          semantic_expansion: SemanticExpansion) -> List[RetrievalResult]:
+                          semantic_expansion: SemanticExpansion,
+                          metric: Optional[ESGMetric] = None) -> List[RetrievalResult]:
         """
         Search by semantic similarity
         
@@ -175,11 +286,13 @@ class SemanticRetriever:
             List[RetrievalResult]: Retrieval results
         """
         try:
-            # Get metric's semantic embedding
-            if not semantic_expansion.embedding:
-                raise ValueError("No embedding vector in semantic expansion")
-            
-            query_embedding = np.array(semantic_expansion.embedding).reshape(1, -1)
+            # Build enriched semantic query from framework fields + semantic expansion
+            query_text = _build_semantic_query(metric, semantic_expansion) if metric is not None else _clean_query_fragment(semantic_expansion.semantic_description)
+            if not query_text:
+                raise ValueError("No semantic query text available")
+
+            query_embedding_arr = self.embedding_model.encode(query_text, convert_to_tensor=False)
+            query_embedding = np.array(query_embedding_arr).reshape(1, -1)
             
             # Get report segments' embeddings
             segment_embeddings = []
@@ -200,8 +313,6 @@ class SemanticRetriever:
             # Use BGE-Reranker-v2-M3 if available, otherwise fallback to cosine similarity
             if self.reranker is not None:
                 # Use BGE-Reranker-v2-M3 for more accurate relevance scoring
-                query_text = semantic_expansion.semantic_description
-                
                 # Prepare query-document pairs for reranker
                 query_doc_pairs = [[query_text, segment.content] for segment in segments]
                 
@@ -294,13 +405,13 @@ class DualChannelRetriever:
             logger.info(f"Starting dual-channel retrieval for metric {metric.metric_name}")
             
             # Keyword retrieval
-            keyword_results = self.keyword_retriever.search_in_report(report_content, metric)
+            keyword_results = self.keyword_retriever.search_in_report(report_content, metric, semantic_expansion)
             
             # Semantic retrieval
             semantic_results = []
             if semantic_expansion:
                 semantic_results = self.semantic_retriever.search_by_semantic(
-                    report_content, semantic_expansion
+                    report_content, semantic_expansion, metric
                 )
             
             # Combine results

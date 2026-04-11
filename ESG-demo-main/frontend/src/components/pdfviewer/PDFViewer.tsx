@@ -41,7 +41,7 @@ export default function PDFViewer() {
     setProgress(0);
     setSelectedFile(file);
     useFileStore.getState().setSelectedFileId(file.file_id || null);
-    apiService.prefetchAssessmentByFile(file.file_id, file.analysis_scope_key);
+    apiService.prefetchAssessmentByFile(file.file_id, file.analysis_scope_key, true);
 
     // 2秒内完成进度条
     const interval = setInterval(() => {

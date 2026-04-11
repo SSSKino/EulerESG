@@ -62,17 +62,18 @@ class ExcelExporter:
             
             for metric in metric_analyses:
                 row = {
-                    "Metric": metric.get("metric_name", ""),
-                    "Category": metric.get("category", ""),
-                    "Unit": metric.get("unit", ""),
-                    "Code": metric.get("metric_id", ""),
-                    "Topic": metric.get("topic", ""),
-                    "Type": metric.get("type", ""),
-                    "Value": self._format_value(metric.get("value")),
-                    "Page": self._format_page(metric.get("page")),
-                    "Context": metric.get("context", ""),
-                    "Disclosure Status": metric.get("disclosure_status", ""),
-                    "LLM Analysis": metric.get("reasoning", "")
+                    "Metric": metric.get("Metric", metric.get("metric_name", "")),
+                    "Category": metric.get("Category", metric.get("category", "")),
+                    "Unit": metric.get("Unit", metric.get("unit", "")),
+                    "Code": metric.get("Code", metric.get("metric_code", metric.get("metric_id", ""))),
+                    "Topic": metric.get("Topic", metric.get("topic", "")),
+                    "Type": metric.get("Type", metric.get("type", "")),
+                    "Definition": metric.get("Definition", metric.get("definition", "")),
+                    "Value": self._format_value(metric.get("Value", metric.get("value"))),
+                    "Page": self._format_page(metric.get("Page", metric.get("page"))),
+                    "Context": metric.get("Context", metric.get("context", "")),
+                    "Disclosure Status": metric.get("Disclosure Status", metric.get("disclosure_status", "")),
+                    "LLM Analysis": metric.get("LLM Analysis", metric.get("reasoning", ""))
                 }
                 excel_data.append(row)
             
@@ -99,6 +100,22 @@ class ExcelExporter:
                 self._apply_excel_formatting(worksheet, df)
                 
                 # Add metadata sheet
+                def _status_of(metric: Dict[str, Any]) -> str:
+                    raw = (
+                        metric.get("Disclosure Status")
+                        or metric.get("disclosure_status")
+                        or metric.get("Model Disclosure Status")
+                        or ""
+                    )
+                    s = str(raw).strip().lower()
+                    if "full" in s:
+                        return "fully_disclosed"
+                    if "partial" in s:
+                        return "partially_disclosed"
+                    if "not" in s:
+                        return "not_disclosed"
+                    return s
+
                 metadata = {
                     "Analysis Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "Company": company_name or "Unknown",
@@ -106,9 +123,9 @@ class ExcelExporter:
                     "Sub-Industry": semi_industry,
                     "Report ID": report_id or "N/A",
                     "Total Metrics": len(metric_analyses),
-                    "Fully Disclosed": sum(1 for m in metric_analyses if m.get("disclosure_status") == "fully_disclosed"),
-                    "Partially Disclosed": sum(1 for m in metric_analyses if m.get("disclosure_status") == "partially_disclosed"),
-                    "Not Disclosed": sum(1 for m in metric_analyses if m.get("disclosure_status") == "not_disclosed")
+                    "Fully Disclosed": sum(1 for m in metric_analyses if _status_of(m) == "fully_disclosed"),
+                    "Partially Disclosed": sum(1 for m in metric_analyses if _status_of(m) == "partially_disclosed"),
+                    "Not Disclosed": sum(1 for m in metric_analyses if _status_of(m) == "not_disclosed")
                 }
                 
                 metadata_df = pd.DataFrame(list(metadata.items()), columns=["Field", "Value"])
@@ -190,13 +207,14 @@ class ExcelExporter:
             adjusted_width = min(max_length + 2, 50)
             worksheet.column_dimensions[column_letter].width = adjusted_width
         
-        # Apply text wrapping to Context and LLM Analysis columns
+        # Apply text wrapping to verbose text columns using dynamic indexes
         wrap_alignment = Alignment(wrap_text=True, vertical="top")
+        column_index = {name: idx + 1 for idx, name in enumerate(df.columns)}
         for row in range(2, len(df) + 2):
-            # Context column (column 9)
-            worksheet.cell(row=row, column=9).alignment = wrap_alignment
-            # LLM Analysis column (column 11)
-            worksheet.cell(row=row, column=11).alignment = wrap_alignment
+            for col_name in ("Definition", "Context", "LLM Analysis"):
+                col_idx = column_index.get(col_name)
+                if col_idx:
+                    worksheet.cell(row=row, column=col_idx).alignment = wrap_alignment
         
         # Color code disclosure status
         status_colors = {
@@ -205,13 +223,14 @@ class ExcelExporter:
             "not_disclosed": "FFC7CE"  # Light red
         }
         
-        status_col = 10  # Disclosure Status column
-        for row in range(2, len(df) + 2):
-            cell = worksheet.cell(row=row, column=status_col)
-            if cell.value in status_colors:
-                cell.fill = PatternFill(start_color=status_colors[cell.value], 
-                                       end_color=status_colors[cell.value], 
-                                       fill_type="solid")
+        status_col = column_index.get("Disclosure Status")
+        if status_col:
+            for row in range(2, len(df) + 2):
+                cell = worksheet.cell(row=row, column=status_col)
+                if cell.value in status_colors:
+                    cell.fill = PatternFill(start_color=status_colors[cell.value], 
+                                           end_color=status_colors[cell.value], 
+                                           fill_type="solid")
     
     def _apply_metadata_formatting(self, worksheet, df):
         """Apply formatting to the metadata worksheet"""

@@ -24,52 +24,30 @@ export type MetricChartSpec = {
   points: MetricChartPoint[];
 };
 
-function normalizeUnit(unit?: string | null): string {
-  return String(unit ?? "").trim().toLowerCase();
-}
-
-function isPercentUnit(unit?: string | null): boolean {
-  const u = normalizeUnit(unit);
-  return (
-    u === "%" ||
-    u === "percent" ||
-    u === "percentage" ||
-    u.includes("%") ||
-    u.includes("percent") ||
-    u.includes("percentage")
-  );
-}
-
-function clampPercentValue(value: number): number {
-  if (!Number.isFinite(value)) return value;
-  if (value < 0) return 0;
-  if (value > 100) return 100;
-  return value;
-}
-
-function getYAxisMax(values: number[], unit?: string | null): number {
-  if (!values.length) return 1;
-  const maxValue = Math.max(...values);
-  if (isPercentUnit(unit)) return 100;
-  if (!(maxValue > 0)) return 1;
-  return maxValue * 1.01;
-}
-
-function formatAxisLabel(text: any, compact: boolean): string {
+function wrapAxisLabel(text: any, maxLen = 22): string {
   const s = String(text ?? "");
-  if (!compact) return s;
-  if (s.length <= 18) return s;
-  return `${s.slice(0, 18)}…`;
-}
+  if (s.length <= maxLen) return s;
 
-function formatCompactNumber(value: any): string {
-  const num = Number(value);
-  if (!Number.isFinite(num)) return String(value ?? "");
-  const abs = Math.abs(num);
-  if (abs >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(0)}B`;
-  if (abs >= 1_000_000) return `${(num / 1_000_000).toFixed(0)}M`;
-  if (abs >= 1_000) return `${(num / 1_000).toFixed(0)}K`;
-  return num.toLocaleString();
+  if (s.includes(" ")) {
+    const words = s.split(/\s+/).filter(Boolean);
+    const lines: string[] = [];
+    let line = "";
+
+    for (const w of words) {
+      const next = line ? `${line} ${w}` : w;
+      if (next.length > maxLen) {
+        if (line) lines.push(line);
+        line = w;
+      } else {
+        line = next;
+      }
+    }
+
+    if (line) lines.push(line);
+    return lines.join("\n");
+  }
+
+  return s;
 }
 
 function chunk<T>(arr: T[], size: number): T[][] {
@@ -130,23 +108,13 @@ function MetricChartsGridInner({
       {rows.map((row, rowIndex) => (
         <div key={`chart-row-${rowIndex}`} className="grid grid-cols-1 md:grid-cols-12 gap-2.5">
           {row.map((chart) => {
-            const percentChart = isPercentUnit(chart.unit);
-
-            const data = chart.points.map((point) => {
-              const rawValue = Number(point.value);
-              const finalValue =
-                percentChart && Number.isFinite(rawValue)
-                  ? clampPercentValue(rawValue)
-                  : rawValue;
-
-              return {
-                company: point.company,
-                colorKey: point.colorKey || point.company,
-                value: finalValue,
-                year: point.year ?? null,
-                unit: chart.unit ? String(chart.unit) : "",
-              };
-            });
+            const data = chart.points.map((point) => ({
+              company: point.company,
+              colorKey: point.colorKey || point.company,
+              value: Number(point.value),
+              year: point.year ?? null,
+              unit: chart.unit ? String(chart.unit) : "",
+            }));
 
             const rowSpanClass = getRowSpan(row.length);
             const shouldSpanTwo =
@@ -154,10 +122,9 @@ function MetricChartsGridInner({
               (chart.topic.length > 34 || data.length >= 4 || data.some((d) => String(d.company).length > 18));
             const spanClass = shouldSpanTwo ? "md:col-span-6" : rowSpanClass;
             const compactLabels = !shouldSpanTwo && row.length === 4;
-            const chartHeight = shouldSpanTwo || row.length < 4 ? 438 : 398;
-            const yValues = data.map((d) => Number(d.value)).filter((n) => Number.isFinite(n));
+            const labelWrapLen = row.length < 4 ? 28 : 20;
+            const chartHeight = shouldSpanTwo || row.length < 4 ? 430 : 390;
 
-            const isPercent = isPercentUnit(chart.unit);
             const config: any = {
               data,
               xField: "company",
@@ -168,20 +135,14 @@ function MetricChartsGridInner({
                   domain: colorDomain,
                   range: colorRange,
                 },
-                y: {
-                  domainMin: 0,
-                  domainMax: getYAxisMax(yValues, chart.unit),
-                  nice: !isPercent,
-                },
               },
               color: ({ colorKey }: any) => companyColors[String(colorKey)] || "#1677ff",
               legend: false,
               animation: false,
               autoFit: true,
-              padding: [0, 0, 0, 0],
-              appendPadding: 0,
+              padding: [11, 11, 11, 11],
+              appendPadding: [0, 0, 0, 0],
               margin: 0,
-              inset: 5,
               columnWidthRatio: data.length >= 4 ? 0.58 : data.length === 1 ? 0.44 : 0.54,
               columnStyle: { radius: [8, 8, 0, 0] },
               axis: {
@@ -191,31 +152,28 @@ function MetricChartsGridInner({
                   labelAutoRotate: false,
                   labelAutoWrap: false,
                   labelFill: "#64748B",
-                  labelFontSize: 13,
-                  labelFormatter: (value: any) => formatAxisLabel(value, compactLabels),
+                  labelFontSize: 14,
+                  labelFormatter: (value: any) => wrapAxisLabel(value, labelWrapLen),
                 },
                 y: {
                   title: false,
                   labelAutoHide: false,
                   labelFill: "#64748B",
-                  labelFontSize: 13,
-                  labelFormatter: (value: any) => formatCompactNumber(value),
-                  line: false,
-                  grid: true,
-                  gridStroke: "#E2E8F0",
-                  gridLineDash: [3, 3],
-                  tick: false,
+                  labelFontSize: 14,
+                  labelFormatter: (v: any) => {
+                    const num = Number(v);
+                    if (!Number.isFinite(num)) return String(v ?? "");
+                    if (Math.abs(num) >= 1_000_000_000) return `${((num / 1_000_000_000).toFixed(1))}B`;
+                    if (Math.abs(num) >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+                    if (Math.abs(num) >= 1000) return `${(num / 1000).toFixed(1)}K`;
+                    return num.toLocaleString();
+                  },
                 },
               },
               tooltip: {
                 title: false,
                 marker: false,
                 shared: false,
-                offset: 200,
-                showDelay: 400,
-                hideDelay: 0,
-                follow: false,
-                enterable: false,
                 items: [
                   (datum: any) => ({ name: "Name", value: datum.company }),
                   (datum: any) => ({ name: "Year", value: datum.year || "—" }),
@@ -241,7 +199,7 @@ function MetricChartsGridInner({
                   </div>
                 </div>
 
-                <div className="w-full min-h-[304px] pt-2">
+                <div className="w-full min-h-[288px] pt-2">
                   <Column {...config} />
                 </div>
               </div>

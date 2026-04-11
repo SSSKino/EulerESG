@@ -68,7 +68,7 @@ export function NewSidebar({
 
   return (
     <div className="w-[320px] bg-white rounded-2xl shadow-sm p-4 h-fit">
-      <h3 className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-4">
+      <h3 className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-4 pl-8">
         {t("crossAnalysis.navigation")}
       </h3>
 
@@ -90,16 +90,16 @@ export function NewSidebar({
                 onClick={() => onTogglePrimary(primary)}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all ${
                   isActivePrimary
-                    ? "bg-white border border-slate-300 shadow-sm"
-                    : "bg-transparent hover:bg-slate-50"
+                    ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A]"
+                    : "bg-transparent border border-transparent text-[#0F172A] hover:bg-slate-50"
                 }`}
               >
-                <span className="text-sm font-medium text-[#0F172A] truncate">{primary}</span>
-                <ChevronRight
+                <span className="text-sm font-medium truncate">{primary}</span>
+                {/* <ChevronRight
                   className={`w-4 h-4 text-[#64748B] transition-transform ${
                     isExpanded ? "rotate-90" : ""
                   }`}
-                />
+                /> */}
               </button>
 
               {isExpanded && (
@@ -125,7 +125,7 @@ export function NewSidebar({
                               className={`flex-1 min-w-0 flex items-center text-left px-3 py-2 rounded-lg text-sm transition-all ${
                                 isSelectedSecondary
                                   ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
-                                  : "text-[#64748B] hover:bg-slate-50"
+                                  : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
                               }`}
                               title={secondary}
                             >
@@ -163,7 +163,7 @@ export function NewSidebar({
                                     className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-all ${
                                       isSelectedMetric
                                         ? "bg-[#DBEAFE] border border-[#93C5FD] text-[#1E40AF] font-medium"
-                                        : "text-[#64748B] hover:bg-slate-50"
+                                        : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
                                     }`}
                                     title={metricName}
                                   >
@@ -192,7 +192,7 @@ export function NewSidebar({
           className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all ${
             viewMode === "disclosure"
               ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
-              : "text-[#64748B] hover:bg-slate-50"
+              : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
           }`}
         >
           {t("crossAnalysis.disclosureCompleteness")}

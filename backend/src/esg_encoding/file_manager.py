@@ -146,6 +146,7 @@ class FileManager:
                           framework: str = None, semi_industry: str = None,
                           gri_sector: Optional[str] = None,
                           gri_topic: Optional[str] = None,
+                          client_upload_key: Optional[str] = None,
                           user_id: Optional[int] = None) -> Dict[str, str]:
         """
         保存上传的文件
@@ -159,6 +160,7 @@ class FileManager:
             semi_industry: 子行业 (SASB)
             gri_sector: GRI 行业板块 slug (framework=GRI 时)
             gri_topic: GRI 主题 slug (framework=GRI 时)
+            client_upload_key: 前端上传占位行与后端真实记录对齐用的客户端唯一键
             user_id: 用户ID
 
         Returns:
@@ -217,6 +219,7 @@ class FileManager:
                 "semi_industry": semi_industry,
                 "gri_sector": gri_sector,
                 "gri_topic": gri_topic,
+                "client_upload_key": client_upload_key,
                 "user_id": user_id
             }
             

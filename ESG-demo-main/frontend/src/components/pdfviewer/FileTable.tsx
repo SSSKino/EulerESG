@@ -50,7 +50,7 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       const state = useFileStore.getState();
       const hasUnfinished = state.files.some((f) => f.status === "pending" || f.status === "partial");
       if (hasUnfinished && !state.loading) {
-        void state.loadFilesFromBackend();
+        void state.loadFilesFromBackend({ silent: true });
       }
     }, 4000);
     return () => clearInterval(timer);

@@ -1098,11 +1098,11 @@ useEffect(() => {
           <button
             type="button"
             onClick={() => setSidebarCollapsed(false)}
-            className="fixed left-4 top-24 z-30 w-11 h-11 bg-white rounded-full shadow-md border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+            className="fixed left-5 top-24 z-30 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
             aria-label={t("crossAnalysis.navigation")}
             title={t("crossAnalysis.navigation")}
           >
-            <PanelLeftOpen className="w-4 h-4" />
+            <PanelLeftOpen className="w-5 h-5" />
           </button>
         ) : null}
 
@@ -1113,10 +1113,10 @@ useEffect(() => {
                 <button
                   type="button"
                   onClick={() => setSidebarCollapsed(true)}
-                  className="absolute top-3 right-3 z-10 w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                  className="absolute top-3 left-3 z-10 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
                   aria-label={t("crossAnalysis.navigation")}
                 >
-                  <PanelLeftClose className="w-4 h-4 mx-auto" />
+                  <PanelLeftClose className="w-5 h-5" />
                 </button>
                 <Skeleton active paragraph={{ rows: 6 }} />
               </div>
@@ -1125,11 +1125,11 @@ useEffect(() => {
                 <button
                   type="button"
                   onClick={() => setSidebarCollapsed(true)}
-                  className="absolute top-3 right-3 z-10 w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                  className="absolute top-3 left-3 z-10 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
                   aria-label={t("crossAnalysis.navigation")}
                   title={t("crossAnalysis.navigation")}
                 >
-                  <PanelLeftClose className="w-4 h-4 mx-auto" />
+                  <PanelLeftClose className="w-5 h-5" />
                 </button>
                 <NewSidebar
                   primaryOptions={primaryOptions}

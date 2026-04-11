@@ -196,6 +196,7 @@ class MetricProcessor:
                 source=MetricSource(metric_data.get('source', 'custom')),
                 keywords=metric_data.get('keywords', []),
                 description=metric_data.get('description', ''),
+                definition=(metric_data.get('definition') or metric_data.get('Definition') or ''),
                 unit=metric_data.get('unit')
             )
             metrics.append(metric)
@@ -225,7 +226,8 @@ class MetricProcessor:
                 'category': ['Category', 'category', 'type', '类别', 'indicator_type'],
                 'source': ['source', 'standard', '来源', 'standard_source'],
                 'keywords': ['Topic', 'keywords', 'key_words', '关键词', 'key_terms'],
-                'description': ['Context', 'description', 'desc', '描述', 'definition'],
+                'description': ['Context', 'description', 'desc', '描述'],
+                'definition': ['definition', 'Definition', 'Definitions', '定义'],
                 'unit': ['Unit', 'unit', 'units', '单位', 'measurement_unit']
             }
             
@@ -296,6 +298,7 @@ class MetricProcessor:
                     
                     # 其他字段
                     description = str(row.get(actual_columns.get('description', ''), ''))
+                    definition = str(row.get(actual_columns.get('definition', ''), ''))
                     unit = str(row.get(actual_columns.get('unit', ''), ''))
                     
                     # 创建去重键（基于指标名称和代码）
@@ -317,6 +320,7 @@ class MetricProcessor:
                         source=source,
                         keywords=keywords,
                         description=description if description != 'nan' else '',
+                        definition=definition if definition != 'nan' else '',
                         unit=unit if unit != 'nan' else None
                     )
                     metrics.append(metric)
@@ -456,6 +460,7 @@ class MetricProcessor:
                     source=MetricSource.SASB,
                     keywords=keywords,
                     description=f"{topic}: {metric_name}" if topic else metric_name,
+                    definition=self._extract_definition_text(item),
                     unit=unit,
                     # Save original SASB fields for display - 兼容大小写
                     sasb_category=sasb_category,
@@ -528,6 +533,7 @@ class MetricProcessor:
                     source=MetricSource.GRI,
                     keywords=keywords,
                     description=f"{topic}: {metric_name}" if topic else metric_name,
+                    definition=self._extract_definition_text(item),
                     unit=None,
                     sasb_category="",
                     sasb_type=type_str if type_str else "",
@@ -617,6 +623,7 @@ class MetricProcessor:
                     source=MetricSource.CDP,
                     keywords=keywords,
                     description=f"{topic}: {metric_name_raw}" if topic else str(metric_name_raw),
+                    definition=self._extract_definition_text(item),
                     unit=unit,
                     sasb_category=sasb_category,
                     sasb_type=sasb_type,
@@ -706,6 +713,7 @@ class MetricProcessor:
                     source=MetricSource.TCFD,
                     keywords=keywords,
                     description=f"{topic}: {metric_name_raw}" if topic else str(metric_name_raw),
+                    definition=self._extract_definition_text(item),
                     unit=unit,
                     sasb_category=sasb_category,
                     sasb_type=sasb_type,
@@ -722,6 +730,20 @@ class MetricProcessor:
         except Exception as e:
             logger.error(f"Error loading TCFD metrics for {topic_slug}: {e}")
             raise RuntimeError(f"Failed to load TCFD metrics: {e}") from e
+
+
+    def _extract_definition_text(self, item: dict) -> str:
+        """Extract framework definition text exactly as provided without fallback to other fields."""
+        raw = item.get("definition")
+        if raw is None:
+            raw = item.get("Definition")
+        if raw is None:
+            return ""
+        if isinstance(raw, float):
+            if math.isnan(raw) or math.isinf(raw):
+                return ""
+        text = str(raw).strip()
+        return "" if text == "nan" else text
 
     def _determine_metric_category(self, topic: str) -> MetricCategory:
         """

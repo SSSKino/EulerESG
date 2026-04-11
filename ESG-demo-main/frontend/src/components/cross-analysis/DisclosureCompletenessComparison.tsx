@@ -188,7 +188,7 @@ export default function DisclosureCompletenessComparison(props: {
       const results = await Promise.all(
         fileIds.map(async (id) => {
           try {
-            const assessment = await apiService.getAssessmentByFile(id);
+            const assessment = await apiService.getAssessmentByFile(id, undefined, true);
 
             const actualFramework = safeTrim(
               (assessment as any)?.framework ??
@@ -212,6 +212,7 @@ export default function DisclosureCompletenessComparison(props: {
                   item?.disclosure_status ??
                     item?.disclosureStatus ??
                     item?.status ??
+                    item?.["Disclosure Status"] ??
                     item?.["Model Disclosure Status"]
                 );
 
@@ -296,7 +297,7 @@ export default function DisclosureCompletenessComparison(props: {
   useEffect(() => {
     if (!openingFile) return;
     setOpeningProgress(0);
-    void apiService.prefetchAssessmentByFile(openingFile.fileId);
+    void apiService.prefetchAssessmentByFile(openingFile.fileId, undefined, true);
     const timer = window.setInterval(() => {
       setOpeningProgress((prev) => {
         if (prev >= 100) {
@@ -447,7 +448,7 @@ export default function DisclosureCompletenessComparison(props: {
           );
         }
 
-        const rawValueText = isPartiallyDisclosed ? PARTIAL_VALUE_TEXT : toDisplayValue(item.value);
+        const rawValueText = isPartiallyDisclosed ? null : toDisplayValue(item.value);
         const valueNode = rawValueText ? (
           ctx ? (
             <Popover
@@ -536,30 +537,31 @@ export default function DisclosureCompletenessComparison(props: {
         />
       ) : null}
 
-      <div className="bg-white rounded-2xl shadow-sm px-2.5 py-4 md:px-3 md:py-4">
-        <div className="space-y-2">
-          <div className="flex items-center justify-end px-1">
-            <Select
-              value={sortMode}
-              onChange={(value) => setSortMode(value)}
-              size="small"
-              style={{ width: 160 }}
-              options={[
-                { value: "default", label: "Default order" },
-                { value: "report_asc", label: "Report A-Z" },
-                { value: "report_desc", label: "Report Z-A" },
-                { value: "disclosed_desc", label: "Disclosed first" },
-                { value: "not_disclosed_desc", label: "Not disclosed first" },
-              ]}
-            />
-          </div>
-
-          <div className="hidden md:grid md:grid-cols-[minmax(170px,0.92fr)_minmax(138px,0.76fr)_minmax(158px,0.84fr)_minmax(138px,0.76fr)_88px] gap-1.5 items-center px-1">
+      <div className="bg-white rounded-2xl shadow-sm px-2.5 py-4 md:px-4 md:py-4">
+        <div className="space-y-8">
+          <div className="hidden md:grid grid-cols-[minmax(260px,0.61fr)_minmax(260px,0.76fr)_minmax(400px,0.84fr)_minmax(200px,0.76fr)_150px] gap-8 items-center border-slate-200 px-2.5 mb-2">
             <div className="text-xl font-semibold text-slate-800">{t("crossAnalysis.table.report")}</div>
             <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.summary.not")}</div>
             <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.status.partial")}</div>
             <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.summary.disclosed")}</div>
-            <div />
+            <div className="text-xl flex justify-end">
+              <Select
+                value={sortMode}
+                onChange={(value) => setSortMode(value)}
+                size="middle"
+                bordered={false}
+                suffixIcon={null}
+                className="w-full text-center [&_.ant-select-selection-item]:text-center"
+                style={{ width: '100%', fontSize: '40px' }}
+                options={[
+                  { value: "default", label: "Default" },
+                  { value: "report_asc", label: "Report A-Z" },
+                  { value: "report_desc", label: "Report Z-A" },
+                  { value: "disclosed_desc", label: "Disclosed first" },
+                  { value: "not_disclosed_desc", label: "Not disclosed first" },
+                ]}
+              />
+            </div>
           </div>
 
           {orderedSummaryCards.map((p) => {
@@ -572,7 +574,7 @@ export default function DisclosureCompletenessComparison(props: {
             return (
               <div
                 key={p.fileId}
-                className="grid grid-cols-1 md:grid-cols-[minmax(170px,0.92fr)_minmax(138px,0.76fr)_minmax(158px,0.84fr)_minmax(138px,0.76fr)_88px] gap-1.5 items-center rounded-xl border border-slate-200 px-2.5 py-3"
+                className="grid grid-cols-1 md:grid-cols-[minmax(260px,0.61fr)_minmax(260px,0.76fr)_minmax(400px,0.84fr)_minmax(200px,0.76fr)_150px] gap-8 items-center rounded-xl border border-slate-200 px-2.5 mb-4 py-4.5"
               >
                 <button
                   type="button"
@@ -592,16 +594,16 @@ export default function DisclosureCompletenessComparison(props: {
                 ) : (
                   <>
                     <div className="text-center">
-                      <div className="text-[34px] font-semibold text-red-500 leading-none">{redPct}</div>
-                      <div className="mt-1 text-sm text-slate-500">{s.red}/{total}</div>
+                      <div className="text-[40px] font-semibold text-red-500 leading-none">{redPct}</div>
+                      <div className="mt-1 text-xl text-slate-500">{s.red}/{total}</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-[34px] font-semibold text-amber-500 leading-none">{yellowPct}</div>
-                      <div className="mt-1 text-sm text-slate-500">{s.yellow}/{total}</div>
+                      <div className="text-[40px] font-semibold text-amber-500 leading-none">{yellowPct}</div>
+                      <div className="mt-1 text-xl text-slate-500">{s.yellow}/{total}</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-[34px] font-semibold text-green-500 leading-none">{greenPct}</div>
-                      <div className="mt-1 text-sm text-slate-500">{s.green}/{total}</div>
+                      <div className="text-[40px] font-semibold text-green-500 leading-none">{greenPct}</div>
+                      <div className="mt-1 text-xl text-slate-500">{s.green}/{total}</div>
                     </div>
                     <div className="flex items-center justify-center">
                       <StatusDonut red={s.red} yellow={s.yellow} green={s.green} total={total} />
@@ -628,7 +630,7 @@ export default function DisclosureCompletenessComparison(props: {
               current: resultPage,
               pageSize: resultPageSize,
               showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "50", "100"],
+              pageSizeOptions: ["10", "20"],
               onChange: (page, pageSize) => {
                 setResultPage(page);
                 if (pageSize && pageSize !== resultPageSize) setResultPageSize(pageSize);

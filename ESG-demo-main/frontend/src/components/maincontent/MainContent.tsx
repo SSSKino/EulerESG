@@ -131,12 +131,13 @@ const MainContent = () => {
             isGRI ? "" : semiVals[0] ?? "",
             values.griSector,
             griTopics[0] ?? "",
-            scopeSlugs
+            scopeSlugs,
+            uploadFile.uid
           );
 
           store.removeFileByKey(uploadFile.uid);
           if (response?.file_id) {
-            apiService.prefetchAssessmentByFile(response.file_id, undefined);
+            apiService.prefetchAssessmentByFile(response.file_id, undefined, true);
           }
           successCount += 1;
         } catch (error: any) {

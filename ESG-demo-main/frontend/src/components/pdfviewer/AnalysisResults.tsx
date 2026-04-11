@@ -17,6 +17,7 @@ type AnalysisDataItem = {
   value?: string | number | null;
   page?: string | number | null;
   context?: string | null;
+  definition?: string | null;
 };
 
 interface AnalysisResultsProps {
@@ -168,6 +169,7 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
         item?.disclosure_status ??
           item?.disclosureStatus ??
           item?.status ??
+          item?.["Disclosure Status"] ??
           item?.["Model Disclosure Status"]
       );
 
@@ -175,9 +177,7 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
         item?.value,
         item?.Value,
         item?.data,
-        item?.Data,
-        item?.specific_data_found,
-        item?.specificDataFound
+        item?.Data
       );
 
       const page = pickValue(
@@ -193,6 +193,8 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
       const contextRaw = pickValue(
         item?.context,
         item?.Context,
+        item?.specific_data_found,
+        item?.specificDataFound,
         item?.evidence,
         item?.evidence_text,
         item?.evidenceText
@@ -203,7 +205,7 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
         metric_name,
         disclosure_status,
         reasoning: String(
-          pickValue(item?.reasoning, item?.Reasoning, item?.analysis, item?.Analysis) ?? ""
+          pickValue(item?.reasoning, item?.["LLM Analysis"], item?.Reasoning, item?.analysis, item?.Analysis) ?? ""
         ),
         unit: pickValue(item?.unit, item?.Unit) ?? "",
         category: pickValue(item?.category, item?.Category) ?? "",
@@ -212,6 +214,10 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
         value: value ?? null,
         page: page ?? null,
         context: extractContextText(contextRaw) || null,
+        definition:
+          typeof (item?.definition ?? item?.Definition) === "string"
+            ? String(item?.definition ?? item?.Definition).trim() || null
+            : null,
       };
     });
 
@@ -223,7 +229,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 }) => {
   const { t } = useT();
 
-  const PARTIAL_VALUE_TEXT = t("analysis.partialValueText");
   const files = useFileStore((state) => state.files);
   const currentFile =
     files.find(
@@ -240,10 +245,13 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   );
   const [loading, setLoading] = useState(() => !!fileId && !analysisDataCache.has(cacheKey));
   const [error, setError] = useState<string | null>(null);
+  const [refreshNonce, setRefreshNonce] = useState(0);
 
   useEffect(() => {
     const cached = analysisDataCache.get(cacheKey);
-    if (cached) {
+    const forceRefresh = refreshNonce > 0;
+
+    if (cached && !forceRefresh) {
       setAnalysisData(cached);
       setLoading(false);
       setError(null);
@@ -258,10 +266,16 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         return;
       }
 
-      setLoading(true);
+      if (!cached || forceRefresh) {
+        setLoading(true);
+      }
       setError(null);
       try {
-        const assessment = await apiService.getAssessmentByFile(currentFile.file_id, scopeKey);
+        const assessment = await apiService.getAssessmentByFile(
+          currentFile.file_id,
+          scopeKey,
+          forceRefresh
+        );
         const convertedData = convertAssessmentData(assessment);
         analysisDataCache.set(cacheKey, convertedData);
         setAnalysisData(convertedData);
@@ -291,7 +305,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     };
 
     void fetchAnalysisData();
-  }, [cacheKey, currentFile?.file_id, scopeKey, t]);
+  }, [cacheKey, currentFile?.file_id, refreshNonce, scopeKey, t]);
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "Quantitative":
@@ -346,6 +360,29 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         dataIndex: "metric_name",
         key: "metric_name",
         width: 200,
+        render: (_value: string, record: AnalysisDataItem) => {
+          const definitionText = (record.definition || "").trim();
+          const definitionContent = definitionText ? (
+            <div className="max-w-md p-2 text-sm whitespace-pre-wrap">{definitionText}</div>
+          ) : null;
+
+          return (
+            <div className="flex items-start gap-2 min-w-0">
+              <span className="min-w-0 whitespace-pre-wrap break-words leading-5">{record.metric_name}</span>
+              {definitionText && (
+                <Popover content={definitionContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
+                  <span
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none shrink-0"
+                    aria-label={t("analysis.columns.metric")}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    !
+                  </span>
+                </Popover>
+              )}
+            </div>
+          );
+        },
       },
       {
         title: t("analysis.columns.status"),
@@ -411,65 +448,37 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         // Keep more room for value text and evidence indicators.
         width: 420,
         render: (_value: string | number | null, record: AnalysisDataItem) => {
-          const isNotDisclosed = record.disclosure_status === "not_disclosed";
-          const isPartiallyDisclosed = record.disclosure_status === "partially_disclosed";
+          const status = record.disclosure_status;
+          const category = (record.category || "").trim();
+          const reasoningText = String(record.reasoning || "").trim();
+          const contextText = record.context ? String(record.context).trim() : "";
+          const hasContext = !!contextText;
+          const hasValue = !isEmptyValue(record.value);
+          const isDiscussionAndAnalysis = category === "Discussion and Analysis";
 
-          // If not disclosed, keep value empty and hide evidence/page/LLM hover indicators.
-          if (isNotDisclosed) {
-            return <span className="text-gray-400"></span>;
+          let displayValue = "";
+          if (status === "fully_disclosed") {
+            if (isDiscussionAndAnalysis) {
+              displayValue = reasoningText || t("analysis.noAnalysisText");
+            } else {
+              displayValue = hasValue
+                ? typeof record.value === "number"
+                  ? formatNumber(record.value)
+                  : String(record.value)
+                : t("analysis.summary.notSpecified");
+            }
+          } else {
+            displayValue = reasoningText || t("analysis.noAnalysisText");
           }
 
-          const evidenceText = record.context ? String(record.context).trim() : "";
-          const hasEvidence = !!evidenceText;
-
-          const empty = isEmptyValue(record.value);
-          const displayValue = isPartiallyDisclosed
-            ? PARTIAL_VALUE_TEXT
-            : empty
-              ? t("analysis.summary.notSpecified")
-              : typeof record.value === "number"
-                ? formatNumber(record.value)
-                : String(record.value);
-
-          const evidenceContent = (
+          const contextContent = (
             <div className="max-w-md p-2">
-              <div className="text-sm">
-                <div>
-                  <span className="font-semibold">{t("analysis.columns.metric")}:</span> {record.metric_name}
-                </div>
-                {!isEmptyValue(record.unit) && (
-                  <div>
-                    <span className="font-semibold">{t("analysis.columns.unit")}:</span> {record.unit}
-                  </div>
-                )}
-              </div>
-              {evidenceText ? (
-                <div className="mt-2 text-sm whitespace-pre-wrap">{evidenceText}</div>
+              <div className="text-xs font-semibold text-gray-700">{t("analysis.columns.context")}</div>
+              {hasContext ? (
+                <div className="mt-1 text-sm whitespace-pre-wrap">{contextText}</div>
               ) : (
-                <div className="mt-2 text-xs text-gray-500">{t("analysis.noEvidenceExcerpt")}</div>
+                <div className="mt-1 text-xs text-gray-500">{t("analysis.noEvidenceExcerpt")}</div>
               )}
-            </div>
-          );
-
-          // Hover content for the "!" icon. Requirements:
-          // - Do not use "LLM Analysis" as a title.
-          // - Include original context from the raw JSON when available.
-          const llmContent = (
-            <div className="max-w-md p-2">
-              {evidenceText && (
-                <div className="mb-3">
-                  <div className="text-xs font-semibold text-gray-700">{t("analysis.columns.context")}</div>
-                  <div className="mt-1 text-sm whitespace-pre-wrap">{evidenceText}</div>
-                </div>
-              )}
-              <div>
-                <div className="text-xs font-semibold text-gray-700">{t("analysis.analysisLabel")}</div>
-                {record.reasoning ? (
-                  <p className="mt-1 text-sm whitespace-pre-wrap">{record.reasoning}</p>
-                ) : (
-                  <p className="mt-1 text-sm text-gray-500">{t("analysis.noAnalysisText")}</p>
-                )}
-              </div>
             </div>
           );
 
@@ -480,32 +489,18 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 
           return (
             <div className="flex items-center gap-2 w-full">
-              {/* Left: value */}
-              <div className="min-w-0">
-                <Popover content={evidenceContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
+              <div className="min-w-0 whitespace-pre-wrap break-words">{displayValue}</div>
+
+              <div className="flex items-center gap-2 shrink-0 min-w-[56px] pr-3">
+                <Popover content={contextContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
                   <span
-                    className={
-                      hasEvidence ? "cursor-pointer underline decoration-dotted" : ""
-                    }
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
+                    aria-label={t("analysis.columns.context")}
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    {displayValue}
+                    !
                   </span>
                 </Popover>
-              </div>
-
-              {/* Right: hover (LLM) + page. Reserve space and avoid pushing too far right. */}
-              <div className="flex items-center gap-2 shrink-0 min-w-[56px] pr-3">
-                {(record.reasoning || record.reasoning === "") && (
-                  <Popover content={llmContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
-                    <span
-                      className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
-                      aria-label={t("analysis.llmAnalysis")}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      !
-                    </span>
-                  </Popover>
-                )}
 
                 {!isEmptyValue(record.page) && (
                   <span
@@ -600,7 +595,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           showIcon
           action={
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                analysisDataCache.delete(cacheKey);
+                setError(null);
+                setRefreshNonce((n) => n + 1);
+              }}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
               {t("common.retry")}
             </button>

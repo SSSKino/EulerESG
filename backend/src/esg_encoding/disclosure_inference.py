@@ -181,6 +181,7 @@ class DisclosureInferenceEngine:
                                 topic=(getattr(metric, 'sasb_topic', None) or ''),
                                 unit=getattr(metric, 'unit', ''),
                                 type=getattr(metric, 'sasb_type', ''),
+                                definition=(getattr(metric, 'definition', None) or ''),
                                 value=COMPLIANCE_VALUE_NA,
                                 page=None
                             )
@@ -199,6 +200,7 @@ class DisclosureInferenceEngine:
                             topic=(getattr(metric, 'sasb_topic', None) or ''),
                             unit=getattr(metric, 'unit', ''),
                             type=getattr(metric, 'sasb_type', ''),
+                            definition=(getattr(metric, 'definition', None) or ''),
                             value=COMPLIANCE_VALUE_NA,
                             page=None
                         )
@@ -212,12 +214,14 @@ class DisclosureInferenceEngine:
                         reasoning="No relevant metric content found",
                         evidence_segments=[],
                         improvement_suggestions=[],
-                        # SASB display fields
+                        # Framework display fields
                         category=getattr(metric, 'sasb_category', ''),
                         topic=(getattr(metric, 'sasb_topic', None) or ''),
                         unit=getattr(metric, 'unit', ''),
                         type=getattr(metric, 'sasb_type', ''),
+                        definition=(getattr(metric, 'definition', None) or ''),
                         value=COMPLIANCE_VALUE_NA,
+                        context=None,
                         page=None
                     )
                 metric_analyses.append(analysis)
@@ -335,6 +339,7 @@ class DisclosureInferenceEngine:
             topic=(getattr(metric, "sasb_topic", None) or "") if metric else "",
             unit=(getattr(metric, "unit", None) or "") if metric else "",
             type=getattr(metric, "sasb_type", "") if metric else "",
+            definition=(getattr(metric, "definition", None) or "") if metric else "",
             value=COMPLIANCE_VALUE_NA,
             page=None,
             context=None,
@@ -357,15 +362,21 @@ class DisclosureInferenceEngine:
             DisclosureAnalysis: Analysis result for this metric
         """
         # Get relevant segment content and tag information
+        # 优化点：不仅传命中的 segment，还补充前后相邻 + 同页相邻表格/正文，
+        # 以减少标题/定义/数值被切散时的误判。
         relevant_segments = []
         evidence_segment_ids = []
         segment_metadata = []
 
-        # Get top-N most relevant segments from combined results and add tag information.
-        # NOTE: 提高 value/page 命中率的关键之一是给 LLM 更多候选证据，但需要控制成本。
         TOP_EVIDENCE = 8
-        for result in retrieval_result.combined_results[:TOP_EVIDENCE]:
-            # Prefer segment from report_content; fallback to retrieval payload (more robust across caches)
+        MAX_EVIDENCE_WITH_CONTEXT = 14
+        contextual_results = self._augment_results_with_adjacent_segments(
+            report_content=report_content,
+            primary_results=retrieval_result.combined_results[:TOP_EVIDENCE],
+            max_items=MAX_EVIDENCE_WITH_CONTEXT,
+        )
+
+        for result, relation in contextual_results:
             segment = None
             try:
                 segment = self._get_segment_by_id(report_content, result.segment_id)
@@ -389,7 +400,7 @@ class DisclosureInferenceEngine:
                     "segment_id": result.segment_id,
                     "page_number": page_number,
                     "score": getattr(result, "score", 0),
-                    "retrieval_type": getattr(result, "retrieval_type", ""),
+                    "retrieval_type": f"{getattr(result, 'retrieval_type', '')}:{relation}",
                     "matched_keywords": getattr(result, "matched_keywords", None),
                 }
                 segment_metadata.append(metadata)
@@ -401,7 +412,7 @@ class DisclosureInferenceEngine:
             relevant_segments,
             segment_metadata,
             metric_unit=(getattr(metric, "unit", None) or "") if metric else "",
-            metric_description=(getattr(metric, "description", None) or "").strip()
+            metric_description=(getattr(metric, "definition", None) or "").strip()
             if metric
             else "",
         )
@@ -604,6 +615,7 @@ value and explain in "reasoning" / "specific_data_found".
                 topic=(getattr(metric, 'sasb_topic', None) or '') if metric else '',
                 unit=getattr(metric, 'unit', '') or '' if metric else '',
                 type=getattr(metric, 'sasb_type', '') if metric else '',
+                definition=(getattr(metric, 'definition', None) or '') if metric else '',
                 value=stored_value,
                 context=found_context,
                 page=found_page
@@ -722,6 +734,87 @@ Return JSON format:
 """
         return prompt
     
+    def _augment_results_with_adjacent_segments(
+        self,
+        report_content: ReportContent,
+        primary_results: List[RetrievalResult],
+        max_items: int = 14,
+    ) -> List[tuple[RetrievalResult, str]]:
+        """
+        为命中结果补充前后相邻 segment，以及同页最近的异类型 segment（表格/正文）。
+        """
+        if not primary_results:
+            return []
+
+        ordered_segments = list(getattr(report_content.document_content, 'segments', None) or [])
+        if not ordered_segments:
+            return [(r, 'primary') for r in primary_results[:max_items]]
+
+        id_to_index = {seg.segment_id: idx for idx, seg in enumerate(ordered_segments)}
+        id_to_segment = {seg.segment_id: seg for seg in ordered_segments}
+        primary_map = {r.segment_id: r for r in primary_results}
+        augmented: List[tuple[RetrievalResult, str]] = []
+        seen: set[str] = set()
+
+        def add_result(result: RetrievalResult, relation: str):
+            if result.segment_id in seen or len(augmented) >= max_items:
+                return
+            seen.add(result.segment_id)
+            augmented.append((result, relation))
+
+        def is_table_segment(seg) -> bool:
+            sid = getattr(seg, 'segment_id', '') or ''
+            content = getattr(seg, 'content', '') or ''
+            return '_T' in sid or content.startswith('**[表格')
+
+        def make_context_result(seg, base: RetrievalResult) -> RetrievalResult:
+            return RetrievalResult(
+                segment_id=seg.segment_id,
+                content=seg.content,
+                page_number=getattr(seg, 'page_number', None),
+                score=max(float(getattr(base, 'score', 0.0) or 0.0) * 0.92, 0.0),
+                retrieval_type=getattr(base, 'retrieval_type', 'context'),
+                matched_keywords=list(getattr(base, 'matched_keywords', None) or []),
+                metric_id=getattr(base, 'metric_id', ''),
+            )
+
+        for result in primary_results:
+            add_result(result, 'primary')
+            idx = id_to_index.get(result.segment_id)
+            if idx is None:
+                continue
+            base_seg = id_to_segment.get(result.segment_id)
+            if base_seg is None:
+                continue
+            page_no = getattr(base_seg, 'page_number', None)
+
+            # 前后 1 段
+            for offset, relation in [(-1, 'prev'), (1, 'next')]:
+                nidx = idx + offset
+                if 0 <= nidx < len(ordered_segments):
+                    nseg = ordered_segments[nidx]
+                    if getattr(nseg, 'page_number', None) == page_no:
+                        add_result(make_context_result(nseg, result), relation)
+
+            # 同页最近的异类型 segment（例如正文命中时补最近表格）
+            base_is_table = is_table_segment(base_seg)
+            for direction, relation in [(-1, 'same_page_adjacent'), (1, 'same_page_adjacent')]:
+                for step in range(1, 4):
+                    nidx = idx + direction * step
+                    if not (0 <= nidx < len(ordered_segments)):
+                        break
+                    nseg = ordered_segments[nidx]
+                    if getattr(nseg, 'page_number', None) != page_no:
+                        break
+                    if is_table_segment(nseg) != base_is_table:
+                        add_result(make_context_result(nseg, result), relation)
+                        break
+
+            if len(augmented) >= max_items:
+                break
+
+        return augmented[:max_items]
+
     def _classify_disclosure_status(self, llm_response: dict) -> DisclosureStatus:
         """
         Perform three-category classification based on LLM analysis results

@@ -220,7 +220,8 @@ class APIService {
     semiIndustry?: string,
     griSector?: string,
     griTopic?: string,
-    scopeSlugs?: string
+    scopeSlugs?: string,
+    clientUploadKey?: string
   ): Promise<UploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
@@ -230,6 +231,7 @@ class APIService {
     if (griSector) formData.append("griSector", griSector);
     if (griTopic) formData.append("griTopic", griTopic);
     if (scopeSlugs) formData.append("scopeSlugs", scopeSlugs);
+    if (clientUploadKey) formData.append("clientUploadKey", clientUploadKey);
     return this.fetchWithError(`${API_BASE_URL}/api/upload-report`, {
       method: "POST",
       body: formData,
@@ -309,12 +311,25 @@ class APIService {
   async getAssessmentByFile(fileId: string, scope?: string, forceRefresh = false) {
     const qs = scope ? `?scope=${encodeURIComponent(scope)}` : "";
     const cacheKey = this.assessmentCacheKey(fileId, scope);
-    if (!forceRefresh) {
+    if (forceRefresh) {
+      this.assessmentByFileCache.delete(cacheKey);
+    } else {
       const cached = this.assessmentByFileCache.get(cacheKey);
       if (cached) return cached;
     }
 
     const request = this.fetchWithError(`${API_BASE_URL}/api/assessment/${fileId}${qs}`)
+      .then((payload) => {
+        const analyses = Array.isArray((payload as any)?.metric_analyses)
+          ? (payload as any).metric_analyses
+          : [];
+        const status = String((payload as any)?.status ?? "").trim().toLowerCase();
+        const shouldCache = !(status === "not_analyzed" || (analyses.length === 0 && status !== "success"));
+        if (!shouldCache) {
+          this.assessmentByFileCache.delete(cacheKey);
+        }
+        return payload;
+      })
       .catch((error) => {
         this.assessmentByFileCache.delete(cacheKey);
         throw error;
@@ -324,9 +339,9 @@ class APIService {
     return request;
   }
 
-  prefetchAssessmentByFile(fileId?: string, scope?: string) {
+  prefetchAssessmentByFile(fileId?: string, scope?: string, forceRefresh = false) {
     if (!fileId) return;
-    void this.getAssessmentByFile(fileId, scope).catch(() => undefined);
+    void this.getAssessmentByFile(fileId, scope, forceRefresh).catch(() => undefined);
   }
 
   // 获取最新的评估结果

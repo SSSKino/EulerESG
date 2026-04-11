@@ -36,6 +36,7 @@ class ESGMetric(BaseModel):
     source: MetricSource = Field(..., description="Metric source")
     keywords: List[str] = Field(default_factory=list, description="Keywords list")
     description: str = Field(default="", description="Metric description")
+    definition: str = Field(default="", description="Metric definition from framework data")
     unit: Optional[str] = Field(default=None, description="Metric unit")
     created_at: datetime = Field(default_factory=datetime.now, description="Creation time")
     # Additional SASB fields for display
@@ -181,6 +182,7 @@ class DisclosureAnalysis(BaseModel):
     topic: str = Field(default="", description="SASB topic / theme (e.g. Energy Management, Data Privacy)")
     unit: str = Field(default="", description="Metric unit")
     type: str = Field(default="", description="Metric type")
+    definition: str = Field(default="", description="Metric definition from framework data")
     # NOTE:
     # - value/page/context 需要支持“有数值的量化披露”与“只有定性描述”的两类输出。
     # - value：有则仅为数字；无量化或未披露时用 "n/a"；理由与叙述放在 reasoning / context。
