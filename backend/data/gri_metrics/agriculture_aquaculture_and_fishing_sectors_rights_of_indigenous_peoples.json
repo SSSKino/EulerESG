@@ -1,6 +1,7 @@
 [
   {
-    "Metric": "Disclosure 3-3 Management of material topics\nAdditional sector recommendations\n• Describe the approach to engaging with Indigenous Peoples, including:\n- how the organization seeks to ensure meaningful engagement;\n- how the organization seeks to ensure indigenous women can participate\nsafely and equitably.",
+    "Standard": "GRI 3: Material Topics 2021",
+    "Metric": "Disclosure 3-3 Management of material topics Additional sector recommendations • Describe the approach to engaging with Indigenous Peoples, including: - how the organization seeks to ensure meaningful engagement; - how the organization seeks to ensure indigenous women can participate safely and equitably.",
     "Code": "13.14.1",
     "Topic": "Rights of Indigenous Peoples",
     "Type": "Management of the topic",
@@ -9,7 +10,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 411-1 Incidents of violations involving rights of Indigenous Peoples\nAdditional sector recommendations\n• Describe the identified incidents of violations involving the rights of Indigenous\nPeoples.",
+    "Standard": "GRI 411: Rights of Indigenous Peoples 2016",
+    "Metric": "Disclosure 411-1 Incidents of violations involving rights of Indigenous Peoples Additional sector recommendations • Describe the identified incidents of violations involving the rights of Indigenous Peoples.",
     "Code": "13.14.2",
     "Topic": "Rights of Indigenous Peoples",
     "Type": "Topic Standard disclosure",
@@ -18,6 +20,7 @@
     "Context": null
   },
   {
+    "Standard": "Operations where Indigenous Peoples may be affected: List the locations of operations where Indigenous Peoples are present or affected by activities of the organization.",
     "Metric": "",
     "Code": "13.14.3",
     "Topic": "Rights of Indigenous Peoples",
@@ -27,6 +30,7 @@
     "Context": null
   },
   {
+    "Standard": "Free, prior, and informed consent: Report if the organization has been involved in a process of seeking free, prior, and informed consent (FPIC)31 from Indigenous Peoples for any of the organization’s activities, including, in each case: • whether the process has been mutually accepted by the organization and the affected Indigenous Peoples; • how the organization ensured that the constituent elements of FPIC have been implemented as part of the process;32 • whether an agreement has been reached and, if so, whether the agreement is publicly available.",
     "Metric": "",
     "Code": "13.14.4",
     "Topic": "Rights of Indigenous Peoples",

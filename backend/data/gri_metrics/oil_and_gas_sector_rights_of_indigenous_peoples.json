@@ -1,5 +1,6 @@
 [
   {
+    "Standard": "GRI 3: Material Topics 2021",
     "Metric": "Disclosure 3-3 Management of material topics",
     "Code": "11.17.1",
     "Topic": "Rights of Indigenous Peoples",
@@ -9,6 +10,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 411: Rights of Indigenous Peoples 2016",
     "Metric": "Disclosure 411-1 Incidents of violations involving rights of indigenous peoples",
     "Code": "11.17.2",
     "Topic": "Rights of Indigenous Peoples",
@@ -27,7 +29,7 @@
     "Context": null
   },
   {
-    "Metric": "Free, prior, and informed consent:\nReport if the organization has been involved in a process of seeking free, prior and informed consent\n(FPIC) from Indigenous Peoples for any of the organization’s activities, including, in each case:\n• whether the process has been mutually accepted by the organization and the affected Indigenous\nPeoples;\n• whether an agreement has been reached, and if so, if the agreement is publicly available.",
+    "Metric": "Free, prior, and informed consent: Report if the organization has been involved in a process of seeking free, prior and informed consent (FPIC) from Indigenous Peoples for any of the organization’s activities, including, in each case: • whether the process has been mutually accepted by the organization and the affected Indigenous Peoples; • whether an agreement has been reached, and if so, if the agreement is publicly available.",
     "Code": "11.17.4",
     "Topic": "Rights of Indigenous Peoples",
     "Type": null,

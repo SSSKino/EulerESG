@@ -14,3 +14,4 @@ hf_cache/**
 .cache/**
 **/.env
 backend/config/.env
+.zip

@@ -1,5 +1,6 @@
 [
   {
+    "Standard": "GRI 3: Material Topics 2021",
     "Metric": "Disclosure 3-3 Management of material topics",
     "Code": "12.6.1",
     "Topic": "Waste",
@@ -9,6 +10,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 306: Waste 2020",
     "Metric": "Disclosure 306-1 Waste generation and significant waste-related impacts",
     "Code": "12.6.2",
     "Topic": "Waste",
@@ -18,6 +20,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 306: Waste 2020",
     "Metric": "Disclosure 306-2 Management of significant waste-related impacts",
     "Code": "12.6.3",
     "Topic": "Waste",
@@ -27,6 +30,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 306: Waste 2020",
     "Metric": "Disclosure 306-3 Waste generated",
     "Code": "12.6.4",
     "Topic": "Waste",
@@ -36,6 +40,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 306: Waste 2020",
     "Metric": "Disclosure 306-4 Waste diverted from disposal",
     "Code": "12.6.5",
     "Topic": "Waste",
@@ -45,6 +50,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 306: Waste 2020",
     "Metric": "Disclosure 306-5 Waste directed to disposal",
     "Code": "12.6.6",
     "Topic": "Waste",

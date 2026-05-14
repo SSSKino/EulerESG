@@ -220,8 +220,7 @@ class APIService {
     semiIndustry?: string,
     griSector?: string,
     griTopic?: string,
-    scopeSlugs?: string,
-    clientUploadKey?: string
+    scopeSlugs?: string
   ): Promise<UploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
@@ -231,7 +230,6 @@ class APIService {
     if (griSector) formData.append("griSector", griSector);
     if (griTopic) formData.append("griTopic", griTopic);
     if (scopeSlugs) formData.append("scopeSlugs", scopeSlugs);
-    if (clientUploadKey) formData.append("clientUploadKey", clientUploadKey);
     return this.fetchWithError(`${API_BASE_URL}/api/upload-report`, {
       method: "POST",
       body: formData,

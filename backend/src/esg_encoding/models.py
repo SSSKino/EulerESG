@@ -2,7 +2,9 @@
 Simplified data models for ESG report encoding
 """
 
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
+
+from .embedding_settings import get_configured_embedding_model_name
 from datetime import datetime
 from pydantic import BaseModel, Field
 from enum import Enum
@@ -97,6 +99,14 @@ class TextSegment(BaseModel):
     content: str = Field(..., description="Segment text content")
     page_number: int = Field(..., description="Page number")
     position_y: float = Field(..., description="Y coordinate position in page")
+    segment_type: str = Field(default="text", description="Segment type (text/table/table_row/table_cell/ocr_text)")
+    position_x: Optional[float] = Field(default=None, description="X coordinate position in page")
+    source_table_id: Optional[str] = Field(default=None, description="Related table ID if the segment comes from a table")
+    row_header: Optional[str] = Field(default=None, description="Structured table row header")
+    col_header: Optional[str] = Field(default=None, description="Structured table column header")
+    value_text: Optional[str] = Field(default=None, description="Structured table cell value text")
+    unit: Optional[str] = Field(default=None, description="Structured table unit")
+    structured_data: Optional[Dict[str, Any]] = Field(default=None, description="Structured evidence payload")
     
 
 class DocumentContent(BaseModel):
@@ -133,9 +143,19 @@ class ProcessingConfig(BaseModel):
     
     # Text extraction configuration
     min_text_length: int = Field(default=10, description="Minimum text length")
+    enable_ocr: bool = Field(default=False, description="Enable OCR fallback for low-text or image-heavy pages")
+    ocr_lang: Optional[str] = Field(default=None, description="OCR language, e.g. eng or chi_sim")
+    ocr_use_gpu: bool = Field(default=False, description="Reserved OCR GPU flag")
+    ocr_render_zoom: float = Field(default=2.0, description="Render zoom used before OCR")
+    ocr_page_text_threshold: int = Field(default=50, description="Trigger OCR when extracted text chars are below this threshold")
+    ocr_min_text_len: int = Field(default=12, description="Minimum OCR text length kept as a segment")
+    ocr_image_min_area: int = Field(default=50000, description="Minimum image area that can trigger OCR fallback")
+    ocr_max_images_per_page: int = Field(default=4, description="Maximum large images to consider per page when deciding OCR")
+    enable_ocr_table: bool = Field(default=False, description="Enable OCR fallback on image-heavy pages when table detection fails")
+    ocr_table_max_per_image: int = Field(default=2, description="Reserved OCR table fallback limit per image")
     
     # Embedding configuration
-    embedding_model: str = Field(default="BAAI/bge-m3", description="Embedding model name")
+    embedding_model: str = Field(default_factory=get_configured_embedding_model_name, description="Embedding model name")
     batch_size: int = Field(default=32, description="Batch size")
     max_length: int = Field(default=512, description="Maximum text length")
     

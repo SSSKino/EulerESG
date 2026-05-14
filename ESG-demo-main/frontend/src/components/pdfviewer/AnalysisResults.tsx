@@ -56,11 +56,32 @@ const normalizePage = (page: string | number | null | undefined): number | null 
   return Number.isFinite(n) ? n : null;
 };
 
+const EMPTY_VALUE_TOKENS = new Set(["", "-", "—", "n/a", "na", "null", "none", "not specified", "not available"]);
+
 const isEmptyValue = (value: unknown) => {
   if (value === null || value === undefined) return true;
-  if (typeof value === "number") return false; // 0 is valid
+  if (typeof value === "number") return !Number.isFinite(value);
+  const s = String(value).trim().toLowerCase();
+  return EMPTY_VALUE_TOKENS.has(s);
+};
+
+const normalizeCategoryLabel = (raw: unknown): string => {
+  const s = String(raw ?? "").trim();
+  if (!s) return "";
+  const lower = s.toLowerCase();
+  if (lower === "quantitative") return "Quantitative";
+  if (lower === "qualitative") return "Discussion and Analysis";
+  if (lower === "discussion and analysis" || lower === "discussion") return "Discussion and Analysis";
+  return s;
+};
+
+const formatDisplayValue = (value: unknown): string | null => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? formatNumber(value) : null;
+  }
   const s = String(value).trim();
-  return s.length === 0;
+  return isEmptyValue(s) ? null : s;
 };
 
 // Extract readable context text from various backend schemas.
@@ -77,6 +98,8 @@ const extractContextText = (raw: any): string => {
     const cand =
       o.context ??
       o.Context ??
+      o.specific_data_found ??
+      o.specificDataFound ??
       o.text ??
       o.Text ??
       o.excerpt ??
@@ -208,7 +231,7 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
           pickValue(item?.reasoning, item?.["LLM Analysis"], item?.Reasoning, item?.analysis, item?.Analysis) ?? ""
         ),
         unit: pickValue(item?.unit, item?.Unit) ?? "",
-        category: pickValue(item?.category, item?.Category) ?? "",
+        category: normalizeCategoryLabel(pickValue(item?.category, item?.Category) ?? ""),
         topic: pickValue(item?.topic, item?.Topic) ?? "",
         type: pickValue(item?.type, item?.Type) ?? "",
         value: value ?? null,
@@ -245,17 +268,13 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   );
   const [loading, setLoading] = useState(() => !!fileId && !analysisDataCache.has(cacheKey));
   const [error, setError] = useState<string | null>(null);
-  const [refreshNonce, setRefreshNonce] = useState(0);
 
   useEffect(() => {
     const cached = analysisDataCache.get(cacheKey);
-    const forceRefresh = refreshNonce > 0;
-
-    if (cached && !forceRefresh) {
+    if (cached) {
       setAnalysisData(cached);
       setLoading(false);
       setError(null);
-      return;
     }
 
     const fetchAnalysisData = async () => {
@@ -266,16 +285,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         return;
       }
 
-      if (!cached || forceRefresh) {
+      if (!cached) {
         setLoading(true);
       }
       setError(null);
       try {
-        const assessment = await apiService.getAssessmentByFile(
-          currentFile.file_id,
-          scopeKey,
-          forceRefresh
-        );
+        const assessment = await apiService.getAssessmentByFile(currentFile.file_id, scopeKey, false);
         const convertedData = convertAssessmentData(assessment);
         analysisDataCache.set(cacheKey, convertedData);
         setAnalysisData(convertedData);
@@ -305,7 +320,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     };
 
     void fetchAnalysisData();
-  }, [cacheKey, currentFile?.file_id, refreshNonce, scopeKey, t]);
+  }, [cacheKey, currentFile?.file_id, scopeKey, t]);
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "Quantitative":
@@ -367,18 +382,20 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           ) : null;
 
           return (
-            <div className="flex items-start gap-2 min-w-0">
-              <span className="min-w-0 whitespace-pre-wrap break-words leading-5">{record.metric_name}</span>
+            <div className="flex items-center gap-2 w-full">
+              <div className="min-w-0 flex-1 whitespace-normal break-words">{record.metric_name}</div>
               {definitionText && (
-                <Popover content={definitionContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
-                  <span
-                    className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none shrink-0"
-                    aria-label={t("analysis.columns.metric")}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    !
-                  </span>
-                </Popover>
+                <div className="shrink-0 self-center">
+                  <Popover content={definitionContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
+                    <span
+                      className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
+                      aria-label={t("analysis.columns.metric")}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      !
+                    </span>
+                  </Popover>
+                </div>
               )}
             </div>
           );
@@ -449,24 +466,18 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         width: 420,
         render: (_value: string | number | null, record: AnalysisDataItem) => {
           const status = record.disclosure_status;
-          const category = (record.category || "").trim();
+          const category = normalizeCategoryLabel(record.category);
           const reasoningText = String(record.reasoning || "").trim();
           const contextText = record.context ? String(record.context).trim() : "";
           const hasContext = !!contextText;
-          const hasValue = !isEmptyValue(record.value);
+          const formattedValue = formatDisplayValue(record.value);
           const isDiscussionAndAnalysis = category === "Discussion and Analysis";
 
           let displayValue = "";
           if (status === "fully_disclosed") {
-            if (isDiscussionAndAnalysis) {
-              displayValue = reasoningText || t("analysis.noAnalysisText");
-            } else {
-              displayValue = hasValue
-                ? typeof record.value === "number"
-                  ? formatNumber(record.value)
-                  : String(record.value)
-                : t("analysis.summary.notSpecified");
-            }
+            displayValue = isDiscussionAndAnalysis
+              ? reasoningText || t("analysis.noAnalysisText")
+              : formattedValue || t("analysis.summary.notSpecified");
           } else {
             displayValue = reasoningText || t("analysis.noAnalysisText");
           }
@@ -595,11 +606,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           showIcon
           action={
             <button
-              onClick={() => {
-                analysisDataCache.delete(cacheKey);
-                setError(null);
-                setRefreshNonce((n) => n + 1);
-              }}
+              onClick={() => window.location.reload()}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
               {t("common.retry")}
             </button>

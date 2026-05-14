@@ -30,8 +30,6 @@ export interface File {
   analysis_scope_key?: string;
   // Keep as string for AntD Table rendering, but accept backend numeric variants during mapping.
   pages?: string;
-  /** Exact client-side upload key used to reconcile the optimistic row with backend metadata. */
-  client_upload_key?: string;
   /** Epoch ms from upload_time (or client clock when queued); newest-first sorting. */
   uploadedAtMs?: number;
 }
@@ -95,65 +93,6 @@ function normalizeTotalPages(file: any): string {
   return String(val);
 }
 
-
-function normalizeMatchString(value: string | undefined | null): string {
-  return (value ?? "").toString().trim().toLowerCase();
-}
-
-function parseDisplaySizeToBytes(size: string | undefined | null): number {
-  if (!size) return 0;
-  const m = String(size).trim().match(/^([\d.]+)\s*(KB|MB|GB|B)$/i);
-  if (!m) return 0;
-  const value = Number(m[1]);
-  if (!Number.isFinite(value)) return 0;
-  const unit = m[2].toUpperCase();
-  if (unit == 'GB') return value * 1024 * 1024 * 1024;
-  if (unit == 'MB') return value * 1024 * 1024;
-  if (unit == 'KB') return value * 1024;
-  return value;
-}
-
-function sameLogicalUpload(frontendFile: File, backendFile: File): boolean {
-  if (frontendFile.file_id) return frontendFile.file_id === backendFile.file_id;
-
-  const frontClientKey = normalizeMatchString(frontendFile.client_upload_key);
-  const backClientKey = normalizeMatchString(backendFile.client_upload_key);
-  if (frontClientKey && backClientKey) {
-    return frontClientKey === backClientKey;
-  }
-
-  const sameName = normalizeMatchString(frontendFile.name) === normalizeMatchString(backendFile.name);
-  if (!sameName) return false;
-
-  const frontSizeBytes = parseDisplaySizeToBytes(frontendFile.size);
-  const backSizeBytes = parseDisplaySizeToBytes(backendFile.size);
-  if (frontSizeBytes > 0 && backSizeBytes > 0) {
-    const delta = Math.abs(frontSizeBytes - backSizeBytes);
-    if (delta > 2048) return false;
-  } else if (normalizeMatchString(frontendFile.size) !== normalizeMatchString(backendFile.size)) {
-    return false;
-  }
-
-  if (normalizeMatchString(frontendFile.framework) !== normalizeMatchString(backendFile.framework)) {
-    return false;
-  }
-  if (normalizeMatchString(frontendFile.industry) !== normalizeMatchString(backendFile.industry)) {
-    return false;
-  }
-  if (normalizeMatchString(frontendFile.semiIndustry) !== normalizeMatchString(backendFile.semiIndustry)) {
-    return false;
-  }
-
-  const frontMs = frontendFile.uploadedAtMs ?? 0;
-  const backMs = backendFile.uploadedAtMs ?? 0;
-  if (frontMs > 0 && backMs > 0) {
-    const TEN_MINUTES_MS = 10 * 60 * 1000;
-    return Math.abs(frontMs - backMs) <= TEN_MINUTES_MS;
-  }
-
-  return true;
-}
-
 function parseUploadTimeMs(raw: string | undefined | null): number {
   if (raw == null || raw === "") return 0;
   const ms = Date.parse(raw);
@@ -162,12 +101,15 @@ function parseUploadTimeMs(raw: string | undefined | null): number {
 
 function mapBackendReportStatus(file: any): "pending" | "ready" | "failed" | "partial" {
   const raw = file?.status;
-  if (raw === "failed") return "failed";
-  if (raw === "processed") return "ready";
   const partial = file?.scope_analysis_partial === true;
   const allDone = file?.scope_analysis_all_done === true;
+
+  if (raw === "failed") return "failed";
+  // Scope-derived progress is more precise than the coarse backend file status.
+  // A report may already be in the processed directory while only some scope outputs exist.
   if (partial) return "partial";
   if (allDone) return "ready";
+  if (raw === "processed") return "ready";
   return "pending";
 }
 
@@ -212,7 +154,7 @@ interface FileStore {
   ) => void;
   updateFilePages: (fileIdOrKey: string, pages: number) => void;
   setSelectedFileId: (fileId: string | null) => void;
-  loadFilesFromBackend: (options?: { silent?: boolean }) => Promise<void>;
+  loadFilesFromBackend: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   clearFiles: () => void;
 }
@@ -279,12 +221,9 @@ export const useFileStore = create<FileStore>()(
         set(() => ({
           selectedFileId: fileId,
         })),
-      loadFilesFromBackend: async (options) => {
-        const silent = options?.silent === true;
+      loadFilesFromBackend: async () => {
         try {
-          if (!silent) {
-            set({ loading: true });
-          }
+          set({ loading: true });
           console.log('Loading files from backend...');
           const response = await apiService.getFiles();
           console.log('Backend response:', response);
@@ -298,10 +237,6 @@ export const useFileStore = create<FileStore>()(
                 size: (typeof file.file_size === "number" && Number.isFinite(file.file_size)) ? `${(file.file_size / 1024).toFixed(2)} KB` : "-",
                 dateUploaded: file.upload_time?.split("T")?.[0] || "",
                 uploadedAtMs: parseUploadTimeMs(file.upload_time),
-                client_upload_key:
-                  typeof file.client_upload_key === "string" && file.client_upload_key.trim()
-                    ? file.client_upload_key.trim()
-                    : undefined,
                 type: file.original_name?.split('.')?.pop()?.toUpperCase() || '',
                 status: mapBackendReportStatus(file),
                 file_id: file.file_id,
@@ -338,33 +273,10 @@ export const useFileStore = create<FileStore>()(
             }
             console.log('Mapped files:', backendFiles);
             
-            // 合并现有的前端文件和后端文件
-            // 保留前端添加的文件（可能还在上传中），更新已有的后端文件
             set((state) => {
-              const existingFiles = state.files;
-              const backendFileIds = new Set(
-                backendFiles.map((f: File) => f.file_id).filter(Boolean) as string[],
-              );
-
-              // 保留前端临时文件，但如果后端已经返回了同一次上传的真实记录，则移除临时占位行
-              const frontendOnlyFiles = existingFiles.filter((f: File) => {
-                if (!f.file_id) {
-                  if (!(f.status === "pending" || f.status === "failed")) {
-                    return false;
-                  }
-                  const matchedBackendFile = backendFiles.find((bf: File) => sameLogicalUpload(f, bf));
-                  return !matchedBackendFile;
-                }
-                return !backendFileIds.has(f.file_id);
-              });
-
-              // 合并文件列表
-              const mergedFiles = [...backendFiles, ...frontendOnlyFiles];
-
-              // 检测是否有变化
               const hasChanges =
-                state.files.length !== mergedFiles.length ||
-                mergedFiles.some((newFile) => {
+                state.files.length !== backendFiles.length ||
+                backendFiles.some((newFile) => {
                   const existingFile = state.files.find((f) => f.key === newFile.key);
                   return !existingFile ||
                          existingFile.status !== newFile.status ||
@@ -372,26 +284,24 @@ export const useFileStore = create<FileStore>()(
                          existingFile.scope_analysis_completed !== newFile.scope_analysis_completed ||
                          existingFile.scope_analysis_total !== newFile.scope_analysis_total ||
                          existingFile.scope_analysis_partial !== newFile.scope_analysis_partial ||
-                         existingFile.analysis_scope_key !== newFile.analysis_scope_key;
+                         existingFile.analysis_scope_key !== newFile.analysis_scope_key ||
+                         existingFile.pages !== newFile.pages;
                 });
 
               if (hasChanges) {
                 console.log('🔄 File list updated - changes detected');
-                return {
-                  files: mergedFiles,
-                  lastRefresh: Date.now(),
-                };
               }
 
-              return state;
+              return {
+                files: backendFiles,
+                lastRefresh: Date.now()
+              };
             });
           }
         } catch (error) {
           console.error('Failed to load files from backend:', error);
         } finally {
-          if (!silent) {
-            set({ loading: false });
-          }
+          set({ loading: false });
         }
       }
     }),

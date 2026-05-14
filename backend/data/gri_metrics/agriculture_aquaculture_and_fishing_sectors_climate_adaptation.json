@@ -1,5 +1,6 @@
 [
   {
+    "Standard": "GRI 3: Material Topics 2021",
     "Metric": "Disclosure 3-3 Management of material topics",
     "Code": "13.2.1",
     "Topic": "Climate adaptation",
@@ -9,6 +10,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 102: Climate Change 2025",
     "Metric": "Disclosure 102-2 Climate change adaptation plan",
     "Code": "13.2.2",
     "Topic": "Climate adaptation",
@@ -18,6 +20,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 102: Climate Change 2026",
     "Metric": "Disclosure 102-3 Just transition",
     "Code": "13.2.3",
     "Topic": "Climate adaptation",

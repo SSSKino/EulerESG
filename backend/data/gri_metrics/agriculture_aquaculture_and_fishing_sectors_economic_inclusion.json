@@ -1,6 +1,7 @@
 [
   {
-    "Metric": "Disclosure 3-3 Management of material topics\nAdditional sector recommendations\n• Describe actions taken to support the economic inclusion of farmers and\nfishers, and their communities (e.g., direct support through investments,\npartnerships, or training) and the effectiveness of these actions (e.g.,\nincreased yields or productivity, number of farmers or fishers reached,\npercentage of products sourced from small producers).\n• Describe actions taken to identify and adjust the sourcing practices of the\norganization that cause or contribute to negative impacts on economic\ninclusion of farmers and fishers in the supply chain.36",
+    "Standard": "GRI 3: Material Topics 2021",
+    "Metric": "Disclosure 3-3 Management of material topics Additional sector recommendations • Describe actions taken to support the economic inclusion of farmers and fishers, and their communities (e.g., direct support through investments, partnerships, or training) and the effectiveness of these actions (e.g., increased yields or productivity, number of farmers or fishers reached, percentage of products sourced from small producers). • Describe actions taken to identify and adjust the sourcing practices of the organization that cause or contribute to negative impacts on economic inclusion of farmers and fishers in the supply chain.36",
     "Code": "13.22.1",
     "Topic": "Economic inclusion",
     "Type": "Management of the topic",
@@ -9,6 +10,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 201: Economic Performance 2016",
     "Metric": "Disclosure 201-1 Direct economic value generated and distributed",
     "Code": "13.22.2",
     "Topic": "Economic inclusion",
@@ -18,6 +20,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 203: Indirect Economic Impacts 2016",
     "Metric": "Disclosure 203-1 Infrastructure investments and services supported",
     "Code": "13.22.3",
     "Topic": "Economic inclusion",
@@ -27,6 +30,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 203: Indirect Economic Impacts 2017",
     "Metric": "Disclosure 203-2 Significant indirect economic impacts",
     "Code": "13.22.4",
     "Topic": "Economic inclusion",

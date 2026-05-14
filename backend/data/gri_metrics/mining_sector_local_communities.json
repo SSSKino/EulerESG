@@ -1,6 +1,7 @@
 [
   {
-    "Metric": "Disclosure 3-3 Management of material topics\nAdditional sector recommendations\n• Describe the approach to identifying stakeholders, including vulnerable\ngroups, within local communities.\n• Describe the approach to engaging with local communities at each phase of\nthe life of the mine, including:\n- how the organization seeks to ensure meaningful engagement;\n- how the organization supports safe and equitable gender participation.\n• Describe the approach to developing and implementing community\ndevelopment programs, including how engagement with local stakeholders,\nimpact assessments, and community needs assessments have informed the\nprograms.",
+    "Standard": "GRI 3: Material Topics 2021",
+    "Metric": "Disclosure 3-3 Management of material topics Additional sector recommendations • Describe the approach to identifying stakeholders, including vulnerable groups, within local communities. • Describe the approach to engaging with local communities at each phase of the life of the mine, including: - how the organization seeks to ensure meaningful engagement; - how the organization supports safe and equitable gender participation. • Describe the approach to developing and implementing community development programs, including how engagement with local stakeholders, impact assessments, and community needs assessments have informed the programs.",
     "Code": "14.10.1",
     "Topic": "Local communities",
     "Type": "Management of the topic",
@@ -9,7 +10,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 413-1 Operations with local community engagement, impact\nassessments, and development programs\nAdditional sector recommendations\n• Report any formal community development agreements made by the\norganization by mine site.",
+    "Standard": "GRI 413: Local Communities 2016",
+    "Metric": "Disclosure 413-1 Operations with local community engagement, impact assessments, and development programs Additional sector recommendations • Report any formal community development agreements made by the organization by mine site.",
     "Code": "14.10.2",
     "Topic": "Local communities",
     "Type": "Topic Standard disclosure",
@@ -18,7 +20,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 413-2 Operations with significant actual and potential negative impacts\non local communities\nAdditional sector recommendations\n• For each mine site, describe impacts on the health and safety of local\ncommunities.",
+    "Standard": "GRI 413: Local Communities 2017",
+    "Metric": "Disclosure 413-2 Operations with significant actual and potential negative impacts on local communities Additional sector recommendations • For each mine site, describe impacts on the health and safety of local communities.",
     "Code": "14.10.3",
     "Topic": "Local communities",
     "Type": "Topic Standard disclosure",
@@ -27,6 +30,7 @@
     "Context": null
   },
   {
+    "Standard": "Grievances from local communities: For each mine site, report: • the number and types of grievances from local communities during the reporting period; • the percentage of grievances that were addressed and resolved during the reporting period; • the percentage of grievances resolved through remediation during the reporting period.",
     "Metric": "",
     "Code": "14.10.4",
     "Topic": "Local communities",

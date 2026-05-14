@@ -1,5 +1,6 @@
 [
   {
+    "Standard": "GRI 3: Material Topics 2021",
     "Metric": "Disclosure 3-3 Management of material topics",
     "Code": "14.3.1",
     "Topic": "Air emissions",
@@ -9,7 +10,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 305-7 Nitrogen oxides (NO), sulfur oxides (SO), and other significant\nx x\nair emissions\nAdditional sector recommendations\n• For each mine site, report significant air emissions9 relevant for the site, in\nkilograms or multiples.",
+    "Standard": "GRI 305: Emissions 2016",
+    "Metric": "Disclosure 305-7 Nitrogen oxides (NO), sulfur oxides (SO), and other significant x x air emissions Additional sector recommendations • For each mine site, report significant air emissions9 relevant for the site, in kilograms or multiples.",
     "Code": "14.3.2",
     "Topic": "Air emissions",
     "Type": "Topic Standard disclosure",

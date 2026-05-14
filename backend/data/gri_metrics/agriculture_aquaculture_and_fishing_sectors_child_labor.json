@@ -1,5 +1,6 @@
 [
   {
+    "Standard": "GRI 3: Material Topics 2021",
     "Metric": "Disclosure 3-3 Management of material topics",
     "Code": "13.17.1",
     "Topic": "Child labor",
@@ -9,7 +10,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 408-1 Operations and suppliers at significant risk for incidents of child\nlabor",
+    "Standard": "GRI 408: Child Labor 2016",
+    "Metric": "Disclosure 408-1 Operations and suppliers at significant risk for incidents of child labor",
     "Code": "13.17.2",
     "Topic": "Child labor",
     "Type": "Topic Standard disclosure",

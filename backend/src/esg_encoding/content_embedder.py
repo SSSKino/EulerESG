@@ -7,10 +7,10 @@
 from typing import List
 import os
 import torch
-from sentence_transformers import SentenceTransformer
 from loguru import logger
 
-from .hf_cache import prefer_local_model
+from .shared_embedding_model import get_shared_embedding_model
+from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
 
 from .models import TextSegment, SegmentEmbedding, DocumentContent, ReportContent, ProcessingConfig
 from .exceptions import ContentEmbeddingError
@@ -28,8 +28,9 @@ class ContentEmbedder:
         self.config = config or ProcessingConfig()
         self.logger = logger.bind(component="ContentEmbedder")
         
-        # 设置设备
-        self.device = torch.device(self.config.device if torch.cuda.is_available() else "cpu")
+        # 设置设备：尊重 Docker/config 的 cuda 配置，不因 torch.cuda 检查而静默切到 CPU。
+        requested_device = os.getenv("LOCAL_EMBEDDINGS_DEVICE") or str(getattr(self.config, "device", "cuda") or "cuda")
+        self.device = torch.device(requested_device)
         
         # 加载模型
         self.model = None
@@ -37,99 +38,18 @@ class ContentEmbedder:
 
     def _load_model(self):
         """加载嵌入模型（优先本地 HF cache，缺失/损坏才允许远端下载）"""
-
-        def _cleanup_corrupt_snapshot(err: Exception, hf_home: str) -> bool:
-            """
-            If HF cache contains an incomplete snapshot (common after interrupted downloads),
-            sentence-transformers may crash with missing files like '1_Pooling/config.json'.
-
-            We try to locate the snapshot dir from the exception message and remove it,
-            so a subsequent remote load can re-download a clean snapshot.
-            """
-            import re
-            import shutil
-            from pathlib import Path
-
-            msg = str(err)
-
-            # Common pattern: "... No such file or directory: '/root/.cache/.../snapshots/<sha>/...'"
-            m = re.search(r"No such file or directory: '([^']+)'", msg)
-            if not m:
-                return False
-
-            missing_path = Path(m.group(1))
-            p = str(missing_path)
-
-            if "/snapshots/" not in p:
-                return False
-
-            prefix, rest = p.split("/snapshots/", 1)
-            sha = rest.split("/", 1)[0]
-            snap_dir = Path(prefix) / "snapshots" / sha
-
-            try:
-                hf_root = Path(hf_home).resolve()
-                snap_dir_resolved = snap_dir.resolve()
-            except Exception:
-                return False
-
-            # Only delete if it's under HF_HOME to avoid accidental removal.
-            if not str(snap_dir_resolved).startswith(str(hf_root)):
-                return False
-
-            try:
-                shutil.rmtree(snap_dir_resolved, ignore_errors=True)
-                return True
-            except Exception:
-                return False
-
         try:
-            repo_id = str(getattr(self.config, "embedding_model", "BAAI/bge-m3"))
+            repo_id = str(getattr(self.config, "embedding_model", "") or get_configured_embedding_model_name())
             hf_home = os.getenv("HF_HOME", "/root/.cache/huggingface")
+            explicit_path = get_configured_embedding_local_path()
 
-            explicit_path = os.getenv("LOCAL_EMBEDDINGS_MODEL_PATH") or None
-            allow_remote = os.getenv("HF_ALLOW_ONLINE", "1") != "0"
-
-            def _resolve_local() -> str | None:
-                ref = prefer_local_model(repo_id, explicit_local_path=explicit_path, hf_home=hf_home)
-                return ref.local_path
-
-            local_path = _resolve_local()
-            model_id = local_path or repo_id
-
-            if local_path:
-                # Ensure we don't accidentally hit the network when user has a staged cache volume.
-                os.environ.setdefault("HF_HUB_OFFLINE", "1")
-                os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
-                self.logger.info(f"加载嵌入模型（本地缓存）: {repo_id} -> {local_path}")
-            else:
-                self.logger.info(f"加载嵌入模型（远端/自动缓存）: {repo_id}")
-
-            try:
-                self.model = SentenceTransformer(model_id, device=self.device, cache_folder=hf_home)
-            except FileNotFoundError as e:
-                # If cache is corrupt/incomplete, clean the snapshot and retry.
-                cleaned = _cleanup_corrupt_snapshot(e, hf_home=hf_home)
-                if cleaned:
-                    self.logger.warning("检测到损坏的 HuggingFace 缓存快照，已清理；将重新解析本地缓存并重试。")
-                    # Try local again after cleanup.
-                    local_path2 = _resolve_local()
-                    if local_path2:
-                        os.environ.setdefault("HF_HUB_OFFLINE", "1")
-                        os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
-                        self.model = SentenceTransformer(local_path2, device=self.device, cache_folder=hf_home)
-                    elif allow_remote:
-                        # Only fall back to remote when local cache is missing or still broken.
-                        os.environ.pop("HF_HUB_OFFLINE", None)
-                        os.environ.pop("TRANSFORMERS_OFFLINE", None)
-                        self.model = SentenceTransformer(repo_id, device=self.device, cache_folder=hf_home)
-                    else:
-                        raise FileNotFoundError(
-                            f"本地缓存缺失/损坏且已禁用远端下载（HF_ALLOW_ONLINE=0）。请检查 {hf_home} 下是否包含 {repo_id} 的完整模型。"
-                        )
-                else:
-                    raise
-
+            self.model = get_shared_embedding_model(
+                repo_id,
+                device=str(self.device),
+                hf_home=hf_home,
+                explicit_local_path=explicit_path,
+                trust_remote_code=True,
+            )
             self.logger.info(f"模型加载成功，设备: {self.device}")
 
         except Exception as e:

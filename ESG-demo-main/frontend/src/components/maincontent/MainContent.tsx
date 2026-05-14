@@ -26,19 +26,8 @@ function normStrList(v: unknown): string[] {
   return [];
 }
 
-function formatScopeLabel(values: UploadOptions, semiVals: string[], griTopics: string[]) {
-  if (values.framework === "GRI") {
-    return [values.griSector, ...griTopics]
-      .filter(Boolean)
-      .map((s) => String(s).replace(/_/g, " "))
-      .join(" · ");
-  }
-  return semiVals.map((s) => s.replace(/_/g, " ")).join(" · ");
-}
-
 const MainContent = () => {
-  const { t, lang } = useT();
-  const locale = lang === "zh" ? "zh-CN" : "en-US";
+  const { t } = useT();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUploadFiles, setSelectedUploadFiles] = useState<UploadFile[]>([]);
@@ -56,7 +45,6 @@ const MainContent = () => {
       await form.validateFields();
       const queuedFiles = [...selectedUploadFiles];
       const values = form.getFieldsValue();
-      const now = new Date();
 
       if (!queuedFiles.length) {
         setIsModalOpen(false);
@@ -76,36 +64,6 @@ const MainContent = () => {
             ? JSON.stringify(semiVals)
             : undefined;
       const store = useFileStore.getState();
-
-      queuedFiles.forEach((uploadFile, index) => {
-        const fileExtension = uploadFile.name?.split(".").pop()?.toUpperCase() || t("upload.unknown");
-        const item = {
-          key: uploadFile.uid,
-          name: uploadFile.name || t("upload.unknownFile"),
-          size:
-            typeof uploadFile.size === "number"
-              ? `${(uploadFile.size / 1024).toFixed(2)} KB`
-              : t("upload.unknown"),
-          dateUploaded: now.toLocaleDateString(locale),
-          uploadedAtMs: now.getTime() + index,
-          type: fileExtension,
-          status: "pending" as const,
-          pages: "-",
-          industry:
-            isGRI
-              ? (values.griSector || "").replace(/_/g, " ")
-              : isCDP
-                ? "CDP"
-                : isTCFD
-                  ? "TCFD"
-                  : values.industry || "",
-          semiIndustry: formatScopeLabel(values, semiVals, griTopics),
-          framework: values.framework || "",
-          gri_sector: values.griSector ?? "",
-          gri_topic: griTopics[0] ?? "",
-        };
-        store.addFile(item);
-      });
 
       setIsModalOpen(false);
       setSelectedUploadFiles([]);
@@ -131,18 +89,15 @@ const MainContent = () => {
             isGRI ? "" : semiVals[0] ?? "",
             values.griSector,
             griTopics[0] ?? "",
-            scopeSlugs,
-            uploadFile.uid
+            scopeSlugs
           );
 
-          store.removeFileByKey(uploadFile.uid);
           if (response?.file_id) {
             apiService.prefetchAssessmentByFile(response.file_id, undefined, true);
           }
           successCount += 1;
         } catch (error: any) {
           failedCount += 1;
-          store.updateFileStatus(uploadFile.uid, "failed");
           console.error("Upload error:", error);
         }
       }

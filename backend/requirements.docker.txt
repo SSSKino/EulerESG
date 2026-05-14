@@ -1,6 +1,6 @@
---index-url https://pypi.org/simple
---extra-index-url https://download.pytorch.org/whl/cu121
---prefer-binary
+# --index-url https://pypi.org/simple
+# --extra-index-url https://download.pytorch.org/whl/cu121
+# --prefer-binary
 
 # Core web
 fastapi>=0.107.0
@@ -8,7 +8,7 @@ uvicorn[standard]==0.24.0
 pydantic==2.10.4
 python-dotenv==1.0.0
 aiofiles==23.2.0
-python-multipart==0.0.6
+python-multipart>=0.0.7
 httpx==0.27.0
 loguru==0.7.2
 regex
@@ -24,11 +24,10 @@ pandas==2.1.0
 scikit-learn==1.3.0
 scipy
 
-# ML (CUDA 12.1) - keep in sync
-torch==2.5.1+cu121
-torchvision==0.20.1+cu121
-transformers==4.45.2
-huggingface_hub==0.25.0
+# ML (CUDA 12.1)
+# torch==2.5.1+cu121
+# torchvision==0.20.1+cu121
+transformers>=4.51.0,<5
 sentence-transformers==2.7.0
 einops
 
@@ -37,7 +36,7 @@ pymupdf==1.23.0
 python-docx==1.1.0
 openpyxl==3.1.2
 
-# HippoRAG stack deps (explicit)
+# HippoRAG
 openai==1.92.0
 litellm==1.73.1
 gritlm==1.0.2
@@ -46,9 +45,9 @@ python-igraph==0.11.8
 tiktoken==0.7.0
 boto3
 
-# vLLM (Linux only)
-vllm==0.6.6.post1
+# vLLM (Linux)
+vllm==0.8.5
 
-# FlagEmbedding（BGE 系列/多路检索常用的依赖）
+# FlagEmbedding（BGE）
 FlagEmbedding>=1.2.11
 peft==0.17.1

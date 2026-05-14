@@ -10,6 +10,7 @@ import openai
 from loguru import logger
 import numpy as np
 
+from .shared_embedding_model import encode_query_texts
 from .models import (
     ProcessingConfig,
     ChatMessage,
@@ -295,7 +296,7 @@ class ESGChatbot:
         # 1) Semantic vector retrieval (preferred)
         if self._embedding_matrix is not None and self._embedding_matrix.size and self._embedder_model is not None:
             try:
-                q_vec = self._embedder_model.encode([query], normalize_embeddings=True, show_progress_bar=False)
+                q_vec = encode_query_texts(self._embedder_model, [query], normalize_embeddings=True, show_progress_bar=False)
                 q = np.asarray(q_vec[0], dtype=np.float32)
                 # Cosine similarity via dot product (matrix normalized in load_context)
                 sims = self._embedding_matrix @ q

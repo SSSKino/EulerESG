@@ -21,6 +21,8 @@ from dataclasses import replace
 import numpy as np
 from loguru import logger
 
+from .shared_embedding_model import encode_query_texts
+
 from .models import ProcessingConfig
 from .hipporag_settings import HippoRAGSettings
 from .hipporag_retriever import HippoRAGRetriever
@@ -66,7 +68,7 @@ def _get_query_embedding(chatbot, query: str, cache_size: int = 64) -> Optional[
         return cache[query]
 
     try:
-        q_vec = chatbot._embedder_model.encode([query], normalize_embeddings=True, show_progress_bar=False)
+        q_vec = encode_query_texts(chatbot._embedder_model, [query], normalize_embeddings=True, show_progress_bar=False)
         q = np.asarray(q_vec[0], dtype=np.float32)
         cache[query] = q
         cache.move_to_end(query)

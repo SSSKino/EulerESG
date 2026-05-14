@@ -42,15 +42,11 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
   const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
-    loadFilesFromBackend();
-  }, [loadFilesFromBackend]);
-
-  useEffect(() => {
     const timer = setInterval(() => {
       const state = useFileStore.getState();
       const hasUnfinished = state.files.some((f) => f.status === "pending" || f.status === "partial");
       if (hasUnfinished && !state.loading) {
-        void state.loadFilesFromBackend({ silent: true });
+        void state.loadFilesFromBackend();
       }
     }, 4000);
     return () => clearInterval(timer);

@@ -68,6 +68,92 @@ function pick(...vals: any[]) {
   return null;
 }
 
+const EMPTY_VALUE_TOKENS = new Set(["", "-", "—", "n/a", "na", "null", "none", "not specified", "not available"]);
+
+function isEmptyValue(value: unknown) {
+  if (value === null || value === undefined) return true;
+  if (typeof value === "number") return !Number.isFinite(value);
+  const s = String(value).trim().toLowerCase();
+  return EMPTY_VALUE_TOKENS.has(s);
+}
+
+function normalizeCategoryLabel(raw: unknown): string {
+  const s = String(raw ?? "").trim();
+  if (!s) return "";
+  const lower = s.toLowerCase();
+  if (lower === "quantitative") return "Quantitative";
+  if (lower === "qualitative") return "Discussion and Analysis";
+  if (lower === "discussion and analysis" || lower === "discussion") return "Discussion and Analysis";
+  return s;
+}
+
+function formatDisplayValue(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? toDisplayValue(value) : null;
+  }
+  const s = String(value).trim();
+  return isEmptyValue(s) ? null : s;
+}
+
+function extractContextText(raw: any): string {
+  if (raw === null || raw === undefined) return "";
+  if (typeof raw === "string") return raw.trim();
+
+  const pickTextFromObj = (o: any): string => {
+    if (!o || typeof o !== "object") return "";
+    const cand =
+      o.context ??
+      o.Context ??
+      o.specific_data_found ??
+      o.specificDataFound ??
+      o.text ??
+      o.Text ??
+      o.excerpt ??
+      o.Excerpt ??
+      o.evidence_text ??
+      o.evidenceText ??
+      o.evidence ??
+      o.snippet ??
+      o.Snippet;
+
+    if (typeof cand === "string") return cand.trim();
+    if (cand && typeof cand === "object") {
+      const nested = pickTextFromObj(cand);
+      if (nested) return nested;
+    }
+
+    try {
+      const shallow = {
+        context: o.context ?? o.Context,
+        text: o.text ?? o.Text,
+        excerpt: o.excerpt ?? o.Excerpt,
+        page: o.page ?? o.page_number ?? o.pageNumber,
+      };
+      const s = JSON.stringify(shallow);
+      return s === "{}" ? "" : s;
+    } catch {
+      return "";
+    }
+  };
+
+  if (Array.isArray(raw)) {
+    const parts = raw
+      .map((seg) => {
+        if (typeof seg === "string") return seg.trim();
+        return pickTextFromObj(seg);
+      })
+      .filter((s) => !!s);
+    return parts.join("\n\n");
+  }
+
+  if (typeof raw === "object") {
+    return pickTextFromObj(raw);
+  }
+
+  return String(raw).trim();
+}
+
 function normalizePage(page: string | number | null | undefined): number | null {
   if (page === null || page === undefined) return null;
   if (typeof page === "number") return Number.isFinite(page) ? page : null;
@@ -141,7 +227,6 @@ export default function DisclosureCompletenessComparison(props: {
 }) {
   const { t } = useT();
   const router = useRouter();
-  const PARTIAL_VALUE_TEXT = t("analysis.partialValueText");
   const { fileIds, reports } = props;
 
   const [resultPage, setResultPage] = useState(1);
@@ -188,7 +273,7 @@ export default function DisclosureCompletenessComparison(props: {
       const results = await Promise.all(
         fileIds.map(async (id) => {
           try {
-            const assessment = await apiService.getAssessmentByFile(id, undefined, true);
+            const assessment = await apiService.getAssessmentByFile(id, undefined, false);
 
             const actualFramework = safeTrim(
               (assessment as any)?.framework ??
@@ -220,9 +305,7 @@ export default function DisclosureCompletenessComparison(props: {
                   item?.value,
                   item?.Value,
                   item?.data,
-                  item?.Data,
-                  item?.specific_data_found,
-                  item?.specificDataFound
+                  item?.Data
                 );
 
                 const page = pick(
@@ -236,15 +319,17 @@ export default function DisclosureCompletenessComparison(props: {
                 );
 
                 const unit = pick(item?.unit, item?.Unit) ?? "";
-                const category = pick(item?.category, item?.Category) ?? "";
+                const category = normalizeCategoryLabel(pick(item?.category, item?.Category) ?? "");
                 const topic = pick(item?.topic, item?.Topic) ?? "";
                 const type = pick(item?.type, item?.Type) ?? "";
                 const reasoning = String(
-                  pick(item?.reasoning, item?.Reasoning, item?.analysis, item?.Analysis) ?? ""
-                );
-                const context = pick(
+                  pick(item?.reasoning, item?.["LLM Analysis"], item?.Reasoning, item?.analysis, item?.Analysis) ?? ""
+                ).trim();
+                const contextRaw = pick(
                   item?.context,
                   item?.Context,
+                  item?.specific_data_found,
+                  item?.specificDataFound,
                   item?.evidence,
                   item?.evidence_text,
                   item?.evidenceText
@@ -261,7 +346,7 @@ export default function DisclosureCompletenessComparison(props: {
                   category,
                   topic,
                   type,
-                  context: context == null ? null : String(context),
+                  context: extractContextText(contextRaw) || null,
                 };
               });
 
@@ -297,7 +382,7 @@ export default function DisclosureCompletenessComparison(props: {
   useEffect(() => {
     if (!openingFile) return;
     setOpeningProgress(0);
-    void apiService.prefetchAssessmentByFile(openingFile.fileId, undefined, true);
+    void apiService.prefetchAssessmentByFile(openingFile.fileId, undefined, false);
     const timer = window.setInterval(() => {
       setOpeningProgress((prev) => {
         if (prev >= 100) {
@@ -412,59 +497,33 @@ export default function DisclosureCompletenessComparison(props: {
         if (!item) return <span className="text-slate-400">—</span>;
 
         const status = item.disclosure_status;
-        const isNotDisclosed = status === "not_disclosed";
-        const isPartiallyDisclosed = status === "partially_disclosed";
+        const category = normalizeCategoryLabel(item.category);
         const page = normalizePage(item.page);
         const unit = safeTrim(item.unit);
         const ctx = safeTrim(item.context);
         const evidenceTitle = `${p.label} · ${row.metric_name}`;
+        const formattedValue = formatDisplayValue(item.value);
+        const reasoningText = safeTrim(item.reasoning);
+        const isDiscussionAndAnalysis = category === "Discussion and Analysis";
 
-        const reasoningNode = item.reasoning ? (
-          <Popover
-            content={<div className="max-w-[520px] whitespace-pre-wrap text-sm">{item.reasoning}</div>}
-            title={null}
-            trigger="hover"
-            mouseEnterDelay={0.2}
-            getPopupContainer={(trigger) => trigger.parentElement || document.body}
-          >
-            <span
-              className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
-              aria-label={t("analysis.analysisLabel")}
-              onClick={(e) => e.stopPropagation()}
-            >
-              !
-            </span>
-          </Popover>
-        ) : null;
-
-        if (isNotDisclosed) {
-          return (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                {statusTag(t, status)}
-                {reasoningNode}
-              </div>
-            </div>
-          );
+        let displayValue = "";
+        if (status === "fully_disclosed") {
+          displayValue = isDiscussionAndAnalysis
+            ? reasoningText || t("analysis.noAnalysisText")
+            : formattedValue || t("analysis.summary.notSpecified");
+        } else {
+          displayValue = reasoningText || t("analysis.noAnalysisText");
         }
 
-        const rawValueText = isPartiallyDisclosed ? null : toDisplayValue(item.value);
-        const valueNode = rawValueText ? (
-          ctx ? (
-            <Popover
-              content={ctx || t("analysis.noEvidenceExcerpt")}
-              title={null}
-              trigger="hover"
-              mouseEnterDelay={0.2}
-              getPopupContainer={(trigger) => trigger.parentElement || document.body}
-            >
-              <span className="cursor-pointer underline decoration-dotted">{rawValueText}</span>
-            </Popover>
-          ) : (
-            <span>{rawValueText}</span>
-          )
-        ) : (
-          <span className="text-slate-400">—</span>
+        const contextContent = (
+          <div className="max-w-[520px] p-2">
+            <div className="text-xs font-semibold text-gray-700">{t("analysis.columns.context")}</div>
+            {ctx ? (
+              <div className="mt-1 whitespace-pre-wrap text-sm">{ctx}</div>
+            ) : (
+              <div className="mt-1 text-xs text-gray-500">{t("analysis.noEvidenceExcerpt")}</div>
+            )}
+          </div>
         );
 
         const pageNode = page ? (
@@ -482,13 +541,27 @@ export default function DisclosureCompletenessComparison(props: {
 
         return (
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              {statusTag(t, status)}
-              {reasoningNode}
-            </div>
-            <div className="text-sm text-slate-900 flex items-baseline gap-2 flex-wrap">
-              <span className="font-medium">{valueNode}</span>
-              {!isPartiallyDisclosed && unit ? <span className="text-xs text-slate-500">{unit}</span> : null}
+            <div className="flex items-center gap-2">{statusTag(t, status)}</div>
+            <div className="text-sm text-slate-900 flex items-start gap-2 flex-wrap">
+              <span className="min-w-0 whitespace-pre-wrap break-words">{displayValue}</span>
+              <Popover
+                content={contextContent}
+                title={null}
+                trigger="hover"
+                mouseEnterDelay={0.2}
+                getPopupContainer={(trigger) => trigger.parentElement || document.body}
+              >
+                <span
+                  className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none shrink-0"
+                  aria-label={t("analysis.columns.context")}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  !
+                </span>
+              </Popover>
+              {status === "fully_disclosed" && !isDiscussionAndAnalysis && unit ? (
+                <span className="text-xs text-slate-500 shrink-0">{unit}</span>
+              ) : null}
               {pageNode}
             </div>
           </div>
@@ -497,7 +570,7 @@ export default function DisclosureCompletenessComparison(props: {
     }));
 
     return [...base, ...perCols];
-  }, [orderedPer, PARTIAL_VALUE_TEXT, t]);
+  }, [orderedPer, t]);
 
   if (!fileIds || fileIds.length < 2) {
     return (

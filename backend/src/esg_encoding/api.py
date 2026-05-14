@@ -18,7 +18,6 @@ from loguru import logger
 from dotenv import load_dotenv
 import time
 import threading
-import copy
 import asyncio
 import hashlib
 
@@ -131,43 +130,6 @@ system_components = {
     "current_gri_topic": None,   # GRI topic slug when framework is GRI
     "current_company": None  # Store company name
 }
-
-# Cache processed metric collections so upload/process analysis can reuse semantic expansions
-_processed_metric_collections_cache = {}
-_processed_metric_collections_lock = threading.Lock()
-
-def _metric_scope_cache_key(framework: str, params: dict) -> str:
-    fw = (framework or "").strip().upper()
-    safe = lambda v: str(v or "").strip().lower()
-    if fw == "SASB":
-        return f"SASB::{safe(params.get('semiIndustry'))}"
-    if fw == "GRI":
-        return f"GRI::{safe(params.get('griSector'))}::{safe(params.get('griTopic'))}"
-    if fw == "CDP":
-        return f"CDP::{safe(params.get('semiIndustry'))}"
-    if fw == "TCFD":
-        return f"TCFD::{safe(params.get('semiIndustry'))}"
-    return f"{fw}::{json.dumps(params or {}, ensure_ascii=False, sort_keys=True)}"
-
-def _ensure_processed_metric_collection(processor, collection, cache_key: str):
-    if collection is None:
-        return None
-    if getattr(collection, "semantic_expansions", None):
-        return collection
-
-    with _processed_metric_collections_lock:
-        cached = _processed_metric_collections_cache.get(cache_key)
-        if cached is not None:
-            logger.info(f"Reusing cached semantic expansions for {cache_key}")
-            return copy.deepcopy(cached)
-
-    logger.info(f"Processing semantic expansions for {cache_key}")
-    processed = processor.process_metric_collection(collection)
-
-    with _processed_metric_collections_lock:
-        _processed_metric_collections_cache[cache_key] = copy.deepcopy(processed)
-
-    return processed
 
 # -----------------------------
 # Cross-analysis Excel metrics job state
@@ -639,6 +601,19 @@ def _compliance_result_filename(report_name: str, llm_model: Optional[str]) -> s
 _SASB_EXPORT_METRIC_TYPE = "Sustainability Disclosure Topics & Metrics"
 
 
+def _canonical_metric_category(raw: Optional[str], fallback: str = "") -> str:
+    """Normalize category labels used across upload, assessment and cross-analysis."""
+    s = str(raw or "").strip()
+    if not s:
+        return str(fallback or "").strip()
+    lower = s.lower()
+    if lower == "quantitative":
+        return "Quantitative"
+    if lower in {"qualitative", "discussion and analysis", "discussion"}:
+        return "Discussion and Analysis"
+    return s
+
+
 def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
     """Canonical per-metric object for compliance JSON (SASB key order)."""
     disclosure_status = (
@@ -651,7 +626,7 @@ def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
     context = getattr(analysis, "context", None)
     reasoning = analysis.reasoning
     definition = getattr(analysis, "definition", "") or ""
-    category = getattr(analysis, "category", "") or ""
+    category = _canonical_metric_category(getattr(analysis, "category", "") or "")
     unit = getattr(analysis, "unit", "") or ""
     topic = getattr(analysis, "topic", "") or ""
     type_name = getattr(analysis, "type", "") or ""
@@ -691,36 +666,6 @@ def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
     }
 
 
-def _sync_metric_alias_fields(m: dict) -> None:
-    """Keep canonical/export keys and legacy keys in sync from one source of truth."""
-    metric = str(m.get("Metric") or m.get("metric_name") or m.get("metric") or "").strip()
-    category = str(m.get("Category") or m.get("category") or "").strip()
-    unit = str(m.get("Unit") or m.get("unit") or "").strip()
-    code = str(m.get("Code") or m.get("metric_code") or m.get("metric_id") or m.get("code") or "").strip()
-    topic = str(m.get("Topic") or m.get("topic") or "").strip()
-    typ = str(m.get("Type") or m.get("type") or "").strip()
-    definition = str(m.get("Definition") or m.get("definition") or "").strip()
-    value = m.get("Value") if "Value" in m else m.get("value")
-    page = m.get("Page") if "Page" in m else m.get("page")
-    context = m.get("Context") if "Context" in m else m.get("context")
-    disclosure_status = m.get("Disclosure Status") or m.get("disclosure_status") or m.get("Model Disclosure Status") or ""
-    llm_analysis = m.get("LLM Analysis") or m.get("reasoning") or m.get("Reasoning") or m.get("Analysis") or ""
-
-    m["Metric"] = metric
-    m["Category"] = category
-    m["Unit"] = unit
-    m["Code"] = code
-    m["Topic"] = topic
-    m["Type"] = typ
-    m["Definition"] = definition
-    m["Value"] = value
-    m["Page"] = page
-    m["Context"] = context
-    m["Disclosure Status"] = disclosure_status
-    m["LLM Analysis"] = llm_analysis
-    _sync_metric_alias_fields(m)
-
-
 def _normalize_non_sasb_compliance_metric_row(
     m: dict, framework: Optional[str]
 ) -> None:
@@ -744,8 +689,22 @@ def _normalize_non_sasb_compliance_metric_row(
 
     if not category:
         category = "Quantitative" if unit else "Discussion and Analysis"
+    category = _canonical_metric_category(category, "Discussion and Analysis")
     if context is None:
         context = ""
+
+    m["metric_name"] = metric
+    m["category"] = category
+    m["unit"] = unit
+    m["metric_code"] = code
+    m["topic"] = topic
+    m["type"] = typ
+    m["definition"] = definition
+    m["value"] = value
+    m["page"] = page
+    m["context"] = context
+    m["disclosure_status"] = disclosure_status
+    m["reasoning"] = llm_analysis
 
     m["Metric"] = metric
     m["Category"] = category
@@ -759,7 +718,6 @@ def _normalize_non_sasb_compliance_metric_row(
     m["Context"] = context
     m["Disclosure Status"] = disclosure_status
     m["LLM Analysis"] = llm_analysis
-    _sync_metric_alias_fields(m)
 
 
 def _apply_partial_disclosure_json_rules(metric_rows: Optional[List[dict]]) -> None:
@@ -850,6 +808,16 @@ def _resolve_compliance_json_path(
     return None
 
 
+def _prepare_metrics_for_retrieval(
+    processor: MetricProcessor,
+    metrics: MetricCollection,
+) -> MetricCollection:
+    """Ensure framework metrics are retrieval-ready before running dual-channel recall."""
+    if not getattr(metrics, "metrics", None):
+        return metrics
+    return processor.process_metric_collection(metrics)
+
+
 @app.get("/")
 async def root():
     """API root path"""
@@ -907,7 +875,6 @@ def _sync_upload_report_body(
     griSector: Optional[str],
     griTopic: Optional[str],
     scopeSlugs: Optional[str],
-    clientUploadKey: Optional[str],
     user_id: int,
 ) -> dict:
     """PDF encode + assessment off the event loop (keeps /api/files responsive)."""
@@ -922,7 +889,6 @@ def _sync_upload_report_body(
             semi_industry=semiIndustry,
             gri_sector=griSector,
             gri_topic=griTopic,
-            client_upload_key=clientUploadKey,
             user_id=user_id
         )
         logger.info(f"File saved at: {file_info['file_path']}")
@@ -1083,15 +1049,12 @@ def _sync_upload_report_body(
                         f"TCFD_{params['semiIndustry']}"
                     )
 
-                metrics_cache_key = _metric_scope_cache_key(fw, params)
-                processed_metrics = _ensure_processed_metric_collection(
-                    processor, metrics, metrics_cache_key
-                )
-                system_components["current_metrics"] = processed_metrics
-                logger.info(f"Loaded metrics for scope_key={scope_key} ({fw}) and enabled semantic expansions")
+                metrics = _prepare_metrics_for_retrieval(processor, metrics)
+                system_components["current_metrics"] = metrics
+                logger.info(f"Loaded metrics for scope_key={scope_key} ({fw})")
 
                 retrieval_results = dual_retriever.retrieve_for_collection(
-                    report_content, processed_metrics
+                    report_content, metrics
                 )
                 t_start = time.time()
                 assessment = disclosure_engine.analyze_compliance(
@@ -1282,7 +1245,6 @@ async def upload_report(
     griSector: Optional[str] = Form(None),
     griTopic: Optional[str] = Form(None),
     scopeSlugs: Optional[str] = Form(None),
-    clientUploadKey: Optional[str] = Form(None),
     user_id: int = Depends(get_current_user)
 ):
     """
@@ -1335,7 +1297,6 @@ async def upload_report(
             griSector,
             griTopic,
             scopeSlugs,
-            clientUploadKey,
             user_id,
         )
     except Exception as e:
@@ -1448,16 +1409,15 @@ async def analyze_compliance():
     
     try:
         # 执行双通道检索
+        processor = system_components["metric_processor"]
+        system_components["current_metrics"] = _prepare_metrics_for_retrieval(
+            processor,
+            system_components["current_metrics"],
+        )
         dual_retriever = system_components["dual_retriever"]
-        metric_processor = system_components["metric_processor"]
-        current_metrics = system_components["current_metrics"]
-        if current_metrics and not getattr(current_metrics, "semantic_expansions", None):
-            cache_key = f"runtime::{getattr(current_metrics, 'collection_name', 'metrics')}"
-            current_metrics = _ensure_processed_metric_collection(metric_processor, current_metrics, cache_key)
-            system_components["current_metrics"] = current_metrics
         retrieval_results = dual_retriever.retrieve_for_collection(
             system_components["current_report"],
-            current_metrics
+            system_components["current_metrics"]
         )
         
         # 执行披露推理
@@ -2393,7 +2353,17 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         a.setdefault("page", None)
         a.setdefault("value", None)
         a.setdefault("unit", a.get("Unit"))
-        a.setdefault("context", a.get("Context") or a.get("specific_data_found") or a.get("evidence") or "")
+        a.setdefault(
+            "context",
+            a.get("context")
+            or a.get("Context")
+            or a.get("specific_data_found")
+            or a.get("specificDataFound")
+            or a.get("evidence_text")
+            or a.get("evidenceText")
+            or a.get("evidence")
+            or "",
+        )
         a.setdefault("reasoning", a.get("LLM Analysis") or a.get("Reasoning") or a.get("Analysis") or "")
         a.setdefault("disclosure_status", a.get("Disclosure Status") or a.get("Model Disclosure Status") or a.get("status") or "")
         a.setdefault("evidence_segments", [])
@@ -2402,11 +2372,12 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         a.setdefault("metric_code", a.get("Code") or a.get("code") or a.get("metric_id") or "")
         a.setdefault("type", a.get("Type") or a.get("type") or "")
         a.setdefault("category", a.get("Category") or a.get("category") or "")
+        a["category"] = _canonical_metric_category(a.get("category") or a.get("Category") or "")
         a.setdefault("topic", a.get("Topic") or a.get("topic") or "")
         a.setdefault("definition", a.get("Definition") or a.get("definition") or "")
 
         a["Metric"] = a.get("Metric") or a.get("metric_name") or ""
-        a["Category"] = a.get("Category") or a.get("category") or ""
+        a["Category"] = _canonical_metric_category(a.get("Category") or a.get("category") or "")
         a["Unit"] = a.get("Unit") or a.get("unit") or ""
         a["Code"] = a.get("Code") or a.get("metric_code") or a.get("metric_id") or ""
         a["Topic"] = a.get("Topic") or a.get("topic") or ""
@@ -2417,7 +2388,6 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         a["Context"] = a.get("Context") or a.get("context") or ""
         a["Disclosure Status"] = a.get("Disclosure Status") or a.get("disclosure_status") or a.get("Model Disclosure Status") or ""
         a["LLM Analysis"] = a.get("LLM Analysis") or a.get("reasoning") or ""
-        _sync_metric_alias_fields(a)
 
         # --- UI/Output rules for disclosure statuses ---
         # 1) not_disclosed -> do not output any page/value
@@ -2441,9 +2411,13 @@ def _normalize_assessment_payload(payload: dict) -> dict:
                 if not s:
                     return False
                 s = s.replace(",", "")
-                # Accept common quantitative strings such as "45%", "123 tonnes", "56.7 m3", "1.2e3 kWh"
-                m = re.match(r'^[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?', s)
-                return m is not None
+                if s.endswith("%"):
+                    s = s[:-1].strip()
+                try:
+                    float(s)
+                    return True
+                except Exception:
+                    return False
             return False
 
         if status_norm == "not_disclosed":
@@ -2459,7 +2433,6 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         a["Context"] = a.get("context") or ""
         a["Disclosure Status"] = a.get("disclosure_status") or a.get("Disclosure Status") or ""
         a["LLM Analysis"] = a.get("reasoning") or a.get("LLM Analysis") or ""
-        _sync_metric_alias_fields(a)
         norm.append(a)
 
     payload["metric_analyses"] = norm
@@ -3168,12 +3141,8 @@ def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tup
         )
 
     def normalize_category_label(x: Optional[str]) -> str:
-        s = _normalize_nav_label(x, "General")
-        return (
-            s.replace("discussion and analysis", "Discussion and Analysis")
-             .replace("quantitative", "Quantitative")
-             .replace("qualitative", "Qualitative")
-        )
+        s = _canonical_metric_category(x, "General")
+        return s or "General"
 
     def strip_metric_prefix(name: str) -> str:
         s = str(name or "").strip()

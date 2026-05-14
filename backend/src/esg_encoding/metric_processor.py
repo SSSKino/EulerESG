@@ -10,20 +10,24 @@ Standards-Based Metric Extraction & Expansion 模块
 import json
 import uuid
 import math
+import re
+import os
 from typing import Dict, List, Optional, Union
+from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 from loguru import logger
 import openai
 import pandas as pd
 import torch
-from sentence_transformers import SentenceTransformer
 
 from .models import (
     ESGMetric, MetricCategory, MetricSource, SemanticExpansion, 
     MetricCollection, ProcessingConfig
 )
 from .exceptions import ESGEncodingError, ContentEmbeddingError
+from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
+from .embedding_settings import get_configured_embedding_local_path
 
 _SASB_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "sasb_metrics"
 _CDP_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "cdp_metrics"
@@ -118,9 +122,12 @@ class MetricProcessor:
             # 检查CUDA是否可用，如果不可用则使用CPU
             device = torch.device(self.config.device if torch.cuda.is_available() else "cpu")
             logger.info(f"正在加载嵌入模型: {self.config.embedding_model}")
-            self.embedding_model = SentenceTransformer(
+            self.embedding_model = get_shared_embedding_model(
                 self.config.embedding_model,
-                device=device
+                device=str(device),
+                hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
+                explicit_local_path=get_configured_embedding_local_path(),
+                trust_remote_code=True,
             )
             logger.info(f"嵌入模型加载成功，设备: {device}")
         except Exception as e:
@@ -788,41 +795,123 @@ class MetricProcessor:
         Returns:
             List[str]: 关键词列表
         """
-        keywords = []
-        
-        # 从指标名称提取关键词 - 兼容大小写字段名
-        # 确保值是字符串类型，处理可能的float/NaN值
-        metric_raw = sasb_item.get('Metric') or sasb_item.get('metric') or ''
-        if metric_raw is None:
-            metric = ''
-        elif isinstance(metric_raw, float):
-            if math.isnan(metric_raw) or math.isinf(metric_raw):
-                metric = ''
-            else:
-                metric = str(metric_raw).lower()
-        else:
-            metric = str(metric_raw).lower()
-        
-        topic_raw = sasb_item.get('Topic') or sasb_item.get('topic') or ''
-        if topic_raw is None:
-            topic = ''
-        elif isinstance(topic_raw, float):
-            if math.isnan(topic_raw) or math.isinf(topic_raw):
-                topic = ''
-            else:
-                topic = str(topic_raw).lower()
-        else:
-            topic = str(topic_raw).lower()
-        
-        # 简单的关键词提取（去除常见词汇）
-        stop_words = {'and', 'or', 'the', 'a', 'an', 'is', 'are', 'was', 'were', 'of', 'to', 'for', 'in', 'on', 'at', 'by'}
-        
-        for text in [metric, topic]:
-            words = [word.strip('().,;:') for word in text.split() if len(word.strip('().,;:')) > 2]
-            keywords.extend([word for word in words if word not in stop_words])
-        
-        # 去重并限制数量
-        return list(set(keywords))[:10]
+        metric = self._safe_metric_text(sasb_item.get('Metric') or sasb_item.get('metric') or '')
+        topic = self._safe_metric_text(sasb_item.get('Topic') or sasb_item.get('topic') or '')
+        code = self._safe_metric_text(sasb_item.get('Code') or sasb_item.get('code') or '')
+        unit = self._safe_metric_text(sasb_item.get('Unit') or sasb_item.get('unit') or '')
+        definition = self._extract_definition_text(sasb_item)
+        return self._build_retrieval_keywords_from_fields(
+            metric_name=metric,
+            metric_code=code,
+            topic=topic,
+            unit=unit,
+            definition=definition,
+        )
+
+    def _safe_metric_text(self, value: Union[str, float, int, None]) -> str:
+        """Safely convert framework field values to normalized text."""
+        if value is None:
+            return ""
+        if isinstance(value, float):
+            if math.isnan(value) or math.isinf(value):
+                return ""
+        text = str(value).strip()
+        return "" if text.lower() == "nan" else text
+
+    def _tokenize_retrieval_text(self, text: str) -> List[str]:
+        """Tokenize text for retrieval keywords while filtering common stop words."""
+        stop_words = {
+            'and', 'or', 'the', 'a', 'an', 'is', 'are', 'was', 'were', 'of', 'to', 'for', 'in',
+            'on', 'at', 'by', 'with', 'from', 'as', 'that', 'this', 'these', 'those', 'be', 'been',
+            'being', 'into', 'within', 'during', 'under', 'over', 'per', 'each', 'total', 'number'
+        }
+        if not text:
+            return []
+        parts = re.split(r'[^A-Za-z0-9%./+-]+', text.lower())
+        tokens: List[str] = []
+        for part in parts:
+            token = part.strip('().,;:[]{}')
+            if len(token) <= 2:
+                continue
+            if token in stop_words:
+                continue
+            tokens.append(token)
+        return tokens
+
+    def _extract_definition_keywords(self, definition: str, limit: int = 16) -> List[str]:
+        """Extract stable lexical hints from metric definitions for retrieval."""
+        if not definition:
+            return []
+        keywords: List[str] = []
+        for chunk in re.split(r'[\n;:,.]', definition):
+            chunk = chunk.strip()
+            if not chunk:
+                continue
+            lowered = chunk.lower()
+            if 3 <= len(lowered) <= 80:
+                keywords.append(lowered)
+            keywords.extend(self._tokenize_retrieval_text(chunk))
+        deduped = list(OrderedDict.fromkeys(k for k in keywords if k))
+        return deduped[:limit]
+
+    def _build_retrieval_keywords_from_fields(
+        self,
+        metric_name: str,
+        metric_code: str,
+        topic: str,
+        unit: str,
+        definition: str,
+    ) -> List[str]:
+        """Build lexical retrieval keywords from framework fields actually used by analysis."""
+        keywords: List[str] = []
+        exact_phrases = [metric_name, metric_code, topic, unit]
+        for phrase in exact_phrases:
+            phrase = self._safe_metric_text(phrase)
+            if not phrase:
+                continue
+            keywords.append(phrase.lower())
+            keywords.extend(self._tokenize_retrieval_text(phrase))
+        keywords.extend(self._extract_definition_keywords(definition))
+        deduped = list(OrderedDict.fromkeys(k for k in keywords if k))
+        return deduped[:32]
+
+    def _build_metric_retrieval_keywords(self, metric: ESGMetric) -> List[str]:
+        """Merge existing keywords with Metric / Code / Topic / Unit / definition lexical hints."""
+        keywords: List[str] = []
+        keywords.extend(metric.keywords or [])
+        keywords.extend(
+            self._build_retrieval_keywords_from_fields(
+                metric_name=metric.metric_name,
+                metric_code=metric.metric_code,
+                topic=metric.sasb_topic or '',
+                unit=metric.unit or '',
+                definition=metric.definition or '',
+            )
+        )
+        deduped = list(OrderedDict.fromkeys(k.strip() for k in keywords if str(k).strip()))
+        return deduped[:40]
+
+    def _build_semantic_query_text(self, metric: ESGMetric) -> str:
+        """Build a deterministic semantic query for semantic retrieval without mixing Code / Topic / Unit."""
+        parts = [f"Metric: {metric.metric_name}"]
+
+        description = self._safe_metric_text(metric.description)
+        if description:
+            parts.append(f"Description: {description}")
+
+        definition = self._safe_metric_text(metric.definition)
+        if definition:
+            parts.append(f"Definition: {definition}")
+
+        semantic_keywords = list(OrderedDict.fromkeys(
+            self._tokenize_retrieval_text(metric.metric_name)
+            + self._tokenize_retrieval_text(description)
+            + self._extract_definition_keywords(definition, limit=20)
+        ))
+        if semantic_keywords:
+            parts.append(f"Keywords: {', '.join(semantic_keywords[:24])}")
+
+        return "\n".join(parts)
     
     def generate_semantic_description(self, metric: ESGMetric) -> str:
         """
@@ -834,17 +923,28 @@ class MetricProcessor:
         Returns:
             str: 语义描述
         """
+        base_query = self._build_semantic_query_text(metric)
+        if not self.llm_client:
+            logger.info(f"LLM client unavailable, using deterministic semantic query for metric {metric.metric_id}")
+            return base_query
         try:
+            semantic_keywords = list(OrderedDict.fromkeys(
+                self._tokenize_retrieval_text(metric.metric_name)
+                + self._tokenize_retrieval_text(metric.description or "")
+                + self._extract_definition_keywords(metric.definition or "", limit=20)
+            ))
+
             prompt = f"""
-            请为以下ESG指标生成一个详细的语义描述，用于向量检索匹配：
+            请基于以下ESG指标信息生成一个详细的语义检索描述，用于在报告中召回最相关的披露证据。
+
+            注意：不要结合或引用指标代码、主题、单位，只围绕指标名称、已有描述和definition原文来组织语义描述与扩展。
 
             指标名称: {metric.metric_name}
-            指标代码: {metric.metric_code}
             类别: {metric.category}
             来源: {metric.source}
-            关键词: {', '.join(metric.keywords)}
+            关键词: {', '.join(semantic_keywords[:24])}
             描述: {metric.description}
-            单位: {metric.unit or '无'}
+            定义: {metric.definition or '无'}
 
             请生成一个100-200字的语义描述，包含：
             1. 指标的核心含义
@@ -852,9 +952,10 @@ class MetricProcessor:
             3. 可能的同义词或相关概念
             4. 在ESG报告中的典型表达方式
 
+            不要输出指标代码、主题名称、单位字段，不要单独总结单位、范围或主题限定。
             请用中文回复，不要包含任何格式标记。
             """
-            
+
             response = self.llm_client.chat.completions.create(
                 model=self.config.llm_model,
                 messages=[
@@ -864,14 +965,14 @@ class MetricProcessor:
                 max_tokens=300,
                 temperature=1 # CHANGE TO 1 FOR GPT-5
             )
-            
+
             description = response.choices[0].message.content.strip()
             logger.info(f"为指标 {metric.metric_id} 生成语义描述")
-            return description
-            
+            return f"{base_query}\n\n语义扩展:\n{description}" if description else base_query
+
         except Exception as e:
-            logger.error(f"LLM semantic description generation failed: {str(e)}")
-            raise RuntimeError(f"Failed to generate semantic description for metric {metric.metric_id}: {e}")
+            logger.warning(f"LLM semantic description generation failed, fallback to deterministic semantic query: {str(e)}")
+            return base_query
     
     def expand_metric_semantics(self, metric: ESGMetric) -> SemanticExpansion:
         """
@@ -888,13 +989,19 @@ class MetricProcessor:
             semantic_description = self.generate_semantic_description(metric)
             
             # 扩展关键词
-            expanded_keywords = self._expand_keywords(metric.keywords, semantic_description)
+            semantic_keyword_seed = list(OrderedDict.fromkeys(
+                self._tokenize_retrieval_text(metric.metric_name)
+                + self._tokenize_retrieval_text(metric.description or "")
+                + self._extract_definition_keywords(metric.definition or "", limit=20)
+            ))
+            expanded_keywords = self._expand_keywords(semantic_keyword_seed, semantic_description)
             
             # 生成嵌入向量
-            embedding = self.embedding_model.encode(
-                semantic_description, 
-                convert_to_tensor=False
-            ).tolist()
+            embedding = encode_query_texts(
+                self.embedding_model,
+                [semantic_description],
+                convert_to_tensor=False,
+            )[0].tolist()
             
             expansion = SemanticExpansion(
                 metric_id=metric.metric_id,
@@ -947,20 +1054,43 @@ class MetricProcessor:
         """
         try:
             logger.info(f"开始处理指标集合: {collection.collection_name}")
-            
+
             semantic_expansions = []
-            
+            enriched_metrics = []
+            existing_expansions = {
+                exp.metric_id: exp for exp in (collection.semantic_expansions or []) if exp.metric_id
+            }
+
             for metric in collection.metrics:
                 logger.info(f"正在处理指标: {metric.metric_name}")
-                expansion = self.expand_metric_semantics(metric)
+                enriched_metric = metric.copy(deep=True)
+                enriched_metric.keywords = self._build_metric_retrieval_keywords(enriched_metric)
+                enriched_metrics.append(enriched_metric)
+
+                existing_expansion = existing_expansions.get(enriched_metric.metric_id)
+                if existing_expansion and existing_expansion.embedding and existing_expansion.semantic_description:
+                    semantic_keyword_seed = list(OrderedDict.fromkeys(
+                        self._tokenize_retrieval_text(enriched_metric.metric_name)
+                        + self._tokenize_retrieval_text(enriched_metric.description or "")
+                        + self._extract_definition_keywords(enriched_metric.definition or "", limit=20)
+                    ))
+                    existing_expansion.expanded_keywords = self._expand_keywords(
+                        semantic_keyword_seed,
+                        existing_expansion.semantic_description,
+                    )
+                    semantic_expansions.append(existing_expansion)
+                    continue
+
+                expansion = self.expand_metric_semantics(enriched_metric)
                 semantic_expansions.append(expansion)
-            
+
             # 更新集合
+            collection.metrics = enriched_metrics
             collection.semantic_expansions = semantic_expansions
-            
+
             logger.info(f"成功处理 {len(semantic_expansions)} 个指标的语义扩展")
             return collection
-            
+
         except Exception as e:
             logger.error(f"处理指标集合失败: {str(e)}")
             raise ESGEncodingError(f"处理指标集合失败: {str(e)}")

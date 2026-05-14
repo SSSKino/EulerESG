@@ -1,5 +1,6 @@
 [
   {
+    "Standard": "GRI 3: Material Topics 2021",
     "Metric": "Disclosure 3-3 Management of material topics",
     "Code": "14.16.1",
     "Topic": "Occupational health and safety",
@@ -9,6 +10,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 403: Occupational Health and Safety 2018",
     "Metric": "Disclosure 403-1 Occupational health and safety management system",
     "Code": "14.16.2",
     "Topic": "Occupational health and safety",
@@ -18,7 +20,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 403-2 Hazard identification, risk assessment, and incident\ninvestigation\nAdditional sector recommendations\n• Report how the organization ensures the provision of gender-appropriate\npersonal protective equipment for workers.\n• Describe the processes used to identify work-related incidents due to sexual\nand gender-based violence, and to determine corrective actions.",
+    "Standard": "GRI 403: Occupational Health and Safety 2019",
+    "Metric": "Disclosure 403-2 Hazard identification, risk assessment, and incident investigation Additional sector recommendations • Report how the organization ensures the provision of gender-appropriate personal protective equipment for workers. • Describe the processes used to identify work-related incidents due to sexual and gender-based violence, and to determine corrective actions.",
     "Code": "14.16.3",
     "Topic": "Occupational health and safety",
     "Type": "Topic Standard disclosure",
@@ -27,6 +30,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 403: Occupational Health and Safety 2020",
     "Metric": "Disclosure 403-3 Occupational health services",
     "Code": "14.16.4",
     "Topic": "Occupational health and safety",
@@ -36,7 +40,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 403-4 Worker participation, consultation, and communication on\noccupational health and safety\nAdditional sector recommendations\n• Report how the organization seeks to ensure women’s participation in formal\njoint management-worker health and safety committees, and the percentage of\nwomen represented in these committees.",
+    "Standard": "GRI 403: Occupational Health and Safety 2021",
+    "Metric": "Disclosure 403-4 Worker participation, consultation, and communication on occupational health and safety Additional sector recommendations • Report how the organization seeks to ensure women’s participation in formal joint management-worker health and safety committees, and the percentage of women represented in these committees.",
     "Code": "14.16.5",
     "Topic": "Occupational health and safety",
     "Type": "Topic Standard disclosure",
@@ -45,6 +50,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 403: Occupational Health and Safety 2022",
     "Metric": "Disclosure 403-5 Worker training on occupational health and safety",
     "Code": "14.16.6",
     "Topic": "Occupational health and safety",
@@ -54,6 +60,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 403: Occupational Health and Safety 2023",
     "Metric": "Disclosure 403-6 Promotion of worker health",
     "Code": "14.16.7",
     "Topic": "Occupational health and safety",
@@ -63,7 +70,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 403-7 Prevention and mitigation of occupational health and safety\nimpacts directly linked by business relationships",
+    "Standard": "GRI 403: Occupational Health and Safety 2024",
+    "Metric": "Disclosure 403-7 Prevention and mitigation of occupational health and safety impacts directly linked by business relationships",
     "Code": "14.16.8",
     "Topic": "Occupational health and safety",
     "Type": "Topic Standard disclosure",
@@ -72,7 +80,8 @@
     "Context": null
   },
   {
-    "Metric": "Disclosure 403-8 Workers covered by an occupational health and safety\nmanagement system",
+    "Standard": "GRI 403: Occupational Health and Safety 2025",
+    "Metric": "Disclosure 403-8 Workers covered by an occupational health and safety management system",
     "Code": "14.16.9",
     "Topic": "Occupational health and safety",
     "Type": "Topic Standard disclosure",
@@ -81,6 +90,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 403: Occupational Health and Safety 2026",
     "Metric": "Disclosure 403-9 Work-related injuries",
     "Code": "14.16.10",
     "Topic": "Occupational health and safety",
@@ -90,6 +100,7 @@
     "Context": null
   },
   {
+    "Standard": "GRI 403: Occupational Health and Safety 2027",
     "Metric": "Disclosure 403-10 Work-related ill health",
     "Code": "14.16.11",
     "Topic": "Occupational health and safety",

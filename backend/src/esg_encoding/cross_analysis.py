@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import re
 import json
-import shutil
 from decimal import Decimal, InvalidOperation
 from dataclasses import dataclass
 from datetime import datetime
@@ -12,15 +11,15 @@ from typing import Dict, List, Optional, Tuple, Callable
 
 import numpy as np
 from loguru import logger
-from sentence_transformers import SentenceTransformer
 
 from dataclasses import replace
 
 from .file_manager import file_manager
-from .hf_cache import prefer_local_model
 from .hipporag_settings import HippoRAGSettings
 from .hipporag_retriever import HippoRAGRetriever
 from .flag_reranker import rerank_segment_ids
+from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
+from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
 from .models import ReportContent, DocumentContent, TextSegment, ProcessingConfig
 from .cross_analysis_models import (
     CrossAnalysisReport,
@@ -45,32 +44,9 @@ CROSS_CACHE_DIR: Path = UPLOADS_DIR / "outputs" / "cross_analysis"
 # Embedding model singleton
 # -------------------------
 
-_model: Optional[SentenceTransformer] = None
+_model = None
 _model_id: Optional[str] = None
 
-
-def _try_load_st(model_name_or_path: str, device: str, cache_folder: str) -> SentenceTransformer:
-    """Load SentenceTransformer with a defensive retry for half-downloaded HF snapshots."""
-    try:
-        return SentenceTransformer(model_name_or_path, device=device, cache_folder=cache_folder)
-    except FileNotFoundError as e:
-        # Common failure: HF cache snapshot missing a submodule config.json
-        msg = str(e)
-        if "snapshots" in msg:
-            try:
-                # best-effort remove the snapshot dir to avoid repeated crashes
-                p = Path(msg.split("'")[-2])
-                # .../snapshots/<sha>/... -> snapshots/<sha>
-                snap = p
-                while snap.name and snap.name != "snapshots" and snap.parent != snap:
-                    if snap.parent.name == "snapshots":
-                        break
-                    snap = snap.parent
-                if snap.parent.name == "snapshots":
-                    shutil.rmtree(str(snap), ignore_errors=True)
-            except Exception:
-                pass
-        raise
 
 # HippoRAG / hybrid retrieval singletons
 _hippo: Optional[HippoRAGRetriever] = None
@@ -377,26 +353,24 @@ def _get_device() -> str:
         return "cpu"
 
 
-def get_embedding_model() -> SentenceTransformer:
+def get_embedding_model():
     global _model, _model_id
     if _model is not None:
         return _model
 
-    repo_id = os.getenv("LOCAL_EMBEDDINGS_REPO_ID", "BAAI/bge-m3")
-    explicit_path = os.getenv("LOCAL_EMBEDDINGS_MODEL_PATH") or None
-    ref = prefer_local_model(repo_id, explicit_local_path=explicit_path)
-    model_id = ref.local_path or repo_id
-
+    repo_id = get_configured_embedding_model_name()
+    explicit_path = get_configured_embedding_local_path()
     cache_folder = os.getenv("HF_HOME", "/root/.cache/huggingface")
     device = _get_device()
-    logger.info(f"[CrossAnalysis] Loading embedding model: {repo_id} -> {model_id} (device={device})")
-    try:
-        _model = _try_load_st(model_id, device=device, cache_folder=cache_folder)
-    except FileNotFoundError as e:
-        # Local snapshot exists but broken -> retry with remote repo id (will re-download once)
-        logger.warning(f"[CrossAnalysis] local model broken, retry remote download. err={e}")
-        _model = _try_load_st(repo_id, device=device, cache_folder=cache_folder)
-    _model_id = model_id
+
+    _model = get_shared_embedding_model(
+        repo_id,
+        device=device,
+        hf_home=cache_folder,
+        explicit_local_path=explicit_path,
+        trust_remote_code=True,
+    )
+    _model_id = explicit_path or repo_id
     return _model
 
 
@@ -616,7 +590,7 @@ def embed_query_pack(query_pack: List[str]) -> np.ndarray:
     q = [q.strip() for q in query_pack if q and q.strip()]
     if not q:
         q = ["ESG disclosure"]
-    vecs = model.encode(q, show_progress_bar=False, normalize_embeddings=True)
+    vecs = encode_query_texts(model, q, model_name_or_path=_model_id, show_progress_bar=False, normalize_embeddings=True)
     vec = np.mean(vecs, axis=0).astype(np.float32)
     # already normalized, but normalize again defensively
     n = np.linalg.norm(vec)
@@ -659,7 +633,7 @@ def embed_query_pack_multi(query_pack: List[str], max_queries: int = 16) -> np.n
         if len(q2) >= max_queries:
             break
 
-    vecs = model.encode(q2, show_progress_bar=False, normalize_embeddings=True)
+    vecs = encode_query_texts(model, q2, model_name_or_path=_model_id, show_progress_bar=False, normalize_embeddings=True)
     return np.asarray(vecs, dtype=np.float32)
 
 

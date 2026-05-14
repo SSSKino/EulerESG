@@ -7,7 +7,8 @@ Why this exists:
   /root/.cache/huggingface/hub/models--BAAI--bge-m3/snapshots/<REVISION>
 
 Env:
-- LOCAL_EMBEDDINGS_MODEL_PATH: HF model id or local directory (preferred: local snapshot dir)
+- EMBEDDING_MODEL / LOCAL_EMBEDDINGS_MODEL_ID: HF model id
+- LOCAL_EMBEDDINGS_MODEL_PATH: optional local snapshot directory only
 - LOCAL_EMBEDDINGS_DEVICE: 'cuda' | 'cpu' (default: auto)
 """
 
@@ -26,6 +27,9 @@ except Exception:  # pragma: no cover
     torch = None
 
 from sentence_transformers import SentenceTransformer  # type: ignore
+
+from .shared_embedding_model import get_shared_embedding_model
+from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
 
 
 router = APIRouter()
@@ -51,14 +55,14 @@ async def get_local_embedder() -> SentenceTransformer:
         if _model is not None:
             return _model
 
-        model_path = os.getenv("LOCAL_EMBEDDINGS_MODEL_PATH", "BAAI/bge-m3")
+        model_path = get_configured_embedding_model_name()
         device = _default_device()
 
-        # trust_remote_code=True is required for some embedding repos;
-        # if you only load from a local snapshot you control, no network is needed.
-        _model = SentenceTransformer(
+        _model = get_shared_embedding_model(
             model_path,
             device=device,
+            hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
+            explicit_local_path=get_configured_embedding_local_path(),
             trust_remote_code=True,
         )
         return _model
@@ -99,6 +103,6 @@ async def embeddings(req: EmbeddingsRequest) -> Any:
     return {
         "object": "list",
         "data": data,
-        "model": req.model or "local-embeddings",
+        "model": req.model or get_configured_embedding_model_name(),
         "usage": {"prompt_tokens": 0, "total_tokens": 0},
     }

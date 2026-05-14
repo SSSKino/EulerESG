@@ -146,7 +146,6 @@ class FileManager:
                           framework: str = None, semi_industry: str = None,
                           gri_sector: Optional[str] = None,
                           gri_topic: Optional[str] = None,
-                          client_upload_key: Optional[str] = None,
                           user_id: Optional[int] = None) -> Dict[str, str]:
         """
         保存上传的文件
@@ -160,7 +159,6 @@ class FileManager:
             semi_industry: 子行业 (SASB)
             gri_sector: GRI 行业板块 slug (framework=GRI 时)
             gri_topic: GRI 主题 slug (framework=GRI 时)
-            client_upload_key: 前端上传占位行与后端真实记录对齐用的客户端唯一键
             user_id: 用户ID
 
         Returns:
@@ -219,7 +217,6 @@ class FileManager:
                 "semi_industry": semi_industry,
                 "gri_sector": gri_sector,
                 "gri_topic": gri_topic,
-                "client_upload_key": client_upload_key,
                 "user_id": user_id
             }
             
@@ -468,6 +465,14 @@ class FileManager:
                 "content": s.content,
                 "page_number": s.page_number,
                 "position_y": s.position_y,
+                "segment_type": getattr(s, "segment_type", "text"),
+                "position_x": getattr(s, "position_x", None),
+                "source_table_id": getattr(s, "source_table_id", None),
+                "row_header": getattr(s, "row_header", None),
+                "col_header": getattr(s, "col_header", None),
+                "value_text": getattr(s, "value_text", None),
+                "unit": getattr(s, "unit", None),
+                "structured_data": getattr(s, "structured_data", None),
             }
             for s in segments
         ]
@@ -533,6 +538,14 @@ class FileManager:
                             content=str(s.get("content") or ""),
                             page_number=int(s.get("page_number") or 1),
                             position_y=float(s.get("position_y") or 0.0),
+                            segment_type=str(s.get("segment_type") or "text"),
+                            position_x=float(s.get("position_x")) if s.get("position_x") is not None else None,
+                            source_table_id=(str(s.get("source_table_id")) if s.get("source_table_id") is not None else None),
+                            row_header=(str(s.get("row_header")) if s.get("row_header") is not None else None),
+                            col_header=(str(s.get("col_header")) if s.get("col_header") is not None else None),
+                            value_text=(str(s.get("value_text")) if s.get("value_text") is not None else None),
+                            unit=(str(s.get("unit")) if s.get("unit") is not None else None),
+                            structured_data=(s.get("structured_data") if isinstance(s.get("structured_data"), dict) else None),
                         )
                     )
                 except Exception:
