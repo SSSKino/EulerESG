@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sasb-ocr-extractor"
+version = "0.3.1"
+description = "Extract SASB Sustainability Disclosure Topics & Metrics JSON with pluggable OCR/VLM readers, local GPU strict mode."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "SASB OCR Extractor" }]
+dependencies = [
+  "PyYAML>=6.0",
+  "rich>=13.0",
+]
+
+[project.optional-dependencies]
+paddleocr-vl = [
+  "paddleocr[doc-parser]>=3.3.0",
+]
+
+[project.scripts]
+sasb-extract = "sasb_ocr_extractor.cli:main"
+sasb-extract-batch = "sasb_ocr_extractor.batch_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

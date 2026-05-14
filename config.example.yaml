@@ -1,0 +1,38 @@
+# No default OCR backend is selected. Choose one explicitly in config or CLI:
+#   reader: command
+#   reader: custom
+#   reader: paddleocr-vl
+reader: ""
+
+paddleocr:
+  pipeline_version: v1.5
+  model_name_or_path: null
+  use_cache: true
+  vl_rec_backend: null
+  vl_rec_server_url: null
+  extra_kwargs: {}
+
+command_reader:
+  # Strict mode: the command must write exactly this output file.
+  # No fallback file scanning and no JSON text scraping are used.
+  command: ""
+  output_markdown: "merged_ocr.md"
+  output_text: null
+  use_cache: true
+  timeout_seconds: null
+  env: {}
+
+custom_reader:
+  class_path: ""
+  options: {}
+
+extraction:
+  include_activity: true
+  split_multi_part_metrics: true
+  include_topic_summary: true
+  keep_table1_type: "Sustainability Disclosure Topics & Metrics"
+  activity_type: "Activity Metrics"
+
+output:
+  indent: 2
+  ensure_ascii: false
