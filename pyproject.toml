@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gri-definition-extractor"
+version = "0.3.1"
+description = "Minimal GRI sector extractor with direct Definition enrichment and one-command runner."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "PyMuPDF>=1.23",
+  "pypdf>=4.0",
+]
+
+[project.scripts]
+gri-extract = "gri_ocr_extractor.cli:main"
+gri-extract-batch = "gri_ocr_extractor.batch_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
