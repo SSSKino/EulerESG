@@ -102,7 +102,7 @@ function MultiSelectFilter({ ariaLabel, options, selected, onChange }: MultiFilt
           e.stopPropagation();
           setOpen((v) => !v);
         }}
-        className={`p-1 rounded hover:bg-slate-100 transition-colors ${selected.length ? "text-[#3B82F6]" : "text-[#CBD5E1]"}`}
+        className={`p-1 rounded hover:bg-[var(--brand-primary-soft)] transition-colors ${selected.length ? "text-[var(--brand-accent)]" : "text-[#CBD5E1]"}`}
       >
         <Filter className="w-3.5 h-3.5" />
       </button>
@@ -124,7 +124,7 @@ function MultiSelectFilter({ ariaLabel, options, selected, onChange }: MultiFilt
                         type="checkbox"
                         checked={selected.includes(opt)}
                         onChange={() => toggle(opt)}
-                        className="accent-blue-500 mt-0.5 shrink-0"
+                        className="mt-0.5 shrink-0 accent-[var(--brand-primary)]"
                       />
                       <span className="text-sm text-slate-700 break-words text-left leading-5">{opt}</span>
                     </label>
@@ -139,7 +139,7 @@ function MultiSelectFilter({ ariaLabel, options, selected, onChange }: MultiFilt
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="px-3 py-1.5 rounded-lg bg-[#3B82F6] text-white text-sm font-medium hover:bg-[#2563EB]"
+                  className="px-3 py-1.5 rounded-lg bg-[var(--brand-primary)] text-white text-sm font-medium hover:bg-[var(--brand-primary-hover)]"
                 >
                   {t("common.apply")}
                 </button>
@@ -185,7 +185,7 @@ function TextFilter({ ariaLabel, value, onChange }: TextFilterProps) {
           e.stopPropagation();
           setOpen((v) => !v);
         }}
-        className={`p-1 rounded hover:bg-slate-100 transition-colors ${value.trim() ? "text-[#3B82F6]" : "text-[#CBD5E1]"}`}
+        className={`p-1 rounded hover:bg-[var(--brand-primary-soft)] transition-colors ${value.trim() ? "text-[var(--brand-accent)]" : "text-[#CBD5E1]"}`}
       >
         <Filter className="w-3.5 h-3.5" />
       </button>
@@ -209,7 +209,7 @@ function TextFilter({ ariaLabel, value, onChange }: TextFilterProps) {
                   type="button"
                   aria-label={t("common.clear")}
                   onClick={() => onChange("")}
-                  className="p-2 rounded-lg hover:bg-slate-100 text-slate-500"
+                  className="p-2 rounded-lg hover:bg-[var(--brand-primary-soft)] text-slate-500"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -219,7 +219,7 @@ function TextFilter({ ariaLabel, value, onChange }: TextFilterProps) {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="px-3 py-1.5 rounded-lg bg-[#3B82F6] text-white text-sm font-medium hover:bg-[#2563EB]"
+                  className="px-3 py-1.5 rounded-lg bg-[var(--brand-primary)] text-white text-sm font-medium hover:bg-[var(--brand-primary-hover)]"
                 >
                   {t("common.apply")}
                 </button>
@@ -228,6 +228,36 @@ function TextFilter({ ariaLabel, value, onChange }: TextFilterProps) {
             document.body
           )
         : null}
+    </div>
+  );
+}
+
+const DETAIL_CLAMP_LEN = 140;
+
+function DetailCell({ text }: { text: string }) {
+  const { t } = useT();
+  const [expanded, setExpanded] = useState(false);
+  const trimmed = norm(text);
+  const needsClamp = trimmed.length > DETAIL_CLAMP_LEN;
+
+  if (!trimmed) {
+    return <span className="text-[var(--brand-subtle)]">—</span>;
+  }
+
+  return (
+    <div className="text-left">
+      <p className={`text-sm leading-relaxed text-[var(--brand-muted)] ${!expanded && needsClamp ? "line-clamp-2" : ""}`}>
+        {trimmed}
+      </p>
+      {needsClamp ? (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-1 text-xs font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
+        >
+          {expanded ? t("common.collapse") : t("common.showMore")}
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -291,13 +321,17 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-5 w-full overflow-visible">
-      <div className="w-full overflow-x-auto overflow-y-visible">
-        <table className="w-full table-fixed min-w-[1080px] overflow-visible">
+    <div className="app-card w-full overflow-hidden">
+      <div className="border-b border-black/6 px-5 py-4">
+        <h2 className="text-lg font-semibold text-[var(--brand-text)]">{t("crossAnalysis.results")}</h2>
+      </div>
+
+      <div className="cross-analysis-table w-full overflow-x-auto px-5 py-4">
+        <table className="w-full table-fixed">
           <thead>
-            <tr className="border-b border-[#E2E8F0]">
-              <th className="text-center py-2 px-2 text-sm font-semibold text-[#64748B] w-[11%] whitespace-nowrap overflow-visible">
-                <div className="flex items-center justify-center gap-1.5">
+            <tr className="border-b border-black/6">
+              <th className="w-[12%] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
+                <div className="flex items-center gap-1.5">
                   <span>{t("crossAnalysis.table.report")}</span>
                   <MultiSelectFilter
                     ariaLabel={t("crossAnalysis.table.filterReport")}
@@ -308,8 +342,8 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                 </div>
               </th>
 
-              <th className="text-center py-2 px-2 text-sm font-semibold text-[#64748B] w-[18%] whitespace-nowrap overflow-visible">
-                <div className="flex items-center justify-center gap-1.5">
+              <th className="w-[16%] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
+                <div className="flex items-center gap-1.5">
                   <span>{t("crossAnalysis.table.metric")}</span>
                   <MultiSelectFilter
                     ariaLabel={t("crossAnalysis.table.filterMetric")}
@@ -320,8 +354,8 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                 </div>
               </th>
 
-              <th className="text-center py-2 px-2 text-sm font-semibold text-[#64748B] w-[4%] whitespace-nowrap overflow-visible">
-                <div className="flex items-center justify-center gap-1.5">
+              <th className="w-[5%] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
+                <div className="flex items-center gap-1.5">
                   <span>{t("crossAnalysis.table.year")}</span>
                   <MultiSelectFilter
                     ariaLabel={t("crossAnalysis.table.filterYear")}
@@ -332,15 +366,15 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                 </div>
               </th>
 
-              <th className="text-center py-2 px-2 text-sm font-semibold text-[#64748B] w-[11%] whitespace-nowrap overflow-visible">
-                <div className="flex items-center justify-center gap-1.5">
+              <th className="w-[10%] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
+                <div className="flex items-center gap-1.5">
                   <span>{t("crossAnalysis.table.value")}</span>
                   <TextFilter ariaLabel={t("crossAnalysis.table.filterValue")} value={valueQuery} onChange={setValueQuery} />
                 </div>
               </th>
 
-              <th className="text-center py-2 px-2 text-sm font-semibold text-[#64748B] w-[10%] whitespace-nowrap overflow-visible">
-                <div className="flex items-center justify-center gap-1.5">
+              <th className="w-[9%] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
+                <div className="flex items-center gap-1.5">
                   <span>{t("crossAnalysis.table.unit")}</span>
                   <MultiSelectFilter
                     ariaLabel={t("crossAnalysis.table.filterUnit")}
@@ -351,14 +385,14 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
                 </div>
               </th>
 
-              <th className="text-center py-2 px-2 text-sm font-semibold text-[#64748B] w-[40%] whitespace-nowrap overflow-visible">
-                <div className="flex items-center justify-center gap-1.5">
+              <th className="w-[42%] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
+                <div className="flex items-center gap-1.5">
                   <span>{t("crossAnalysis.table.detail")}</span>
                   <TextFilter ariaLabel={t("crossAnalysis.table.filterDetail")} value={detailQuery} onChange={setDetailQuery} />
                 </div>
               </th>
 
-              <th className="text-center py-2 px-2 text-sm font-semibold text-[#64748B] w-[6%] whitespace-nowrap">
+              <th className="w-[6%] px-2 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
                 {t("crossAnalysis.table.evidence")}
               </th>
             </tr>
@@ -367,37 +401,39 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
           <tbody>
             {currentData.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-[#64748B]">
+                <td colSpan={7} className="py-10 text-center text-[var(--brand-subtle)]">
                   {t("common.noDataAvailable")}
                 </td>
               </tr>
             ) : (
-              currentData.map((row, index) => (
+              currentData.map((row) => (
                 <tr
                   key={row.id}
-                  className={`border-b border-[#E2E8F0] ${index % 2 === 0 ? "bg-white" : "bg-[#F8FAFC]"} hover:bg-[#F1F5F9] transition-colors`}
+                  className="border-b border-black/4 transition-colors hover:bg-[var(--brand-primary-soft)]/50"
                 >
-                  <td className="py-2 px-2 text-sm text-[#0F172A] break-words whitespace-normal text-center align-middle">{row.report}</td>
-                  <td className="py-2 px-2 text-sm text-[#0F172A] break-words whitespace-normal text-center align-middle">{row.metric}</td>
-                  <td className="py-2 px-2 text-sm text-[#0F172A] text-center align-middle">{row.year}</td>
-                  <td className="py-2 px-2 text-sm break-words whitespace-normal text-center align-middle">
+                  <td className="px-2 py-3 align-top text-sm font-medium text-[var(--brand-text)]">{row.report}</td>
+                  <td className="px-2 py-3 align-top text-sm text-[var(--brand-text)]">{row.metric}</td>
+                  <td className="px-2 py-3 align-top text-sm tabular-nums text-[var(--brand-muted)]">{row.year}</td>
+                  <td className="px-2 py-3 align-top text-sm">
                     {(row as DataRow).isNotDisclosed ? (
                       <span
-                        className="italic text-slate-400 font-normal inline-flex items-center gap-1 justify-center"
+                        className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600"
                         title={t("crossAnalysis.notDisclosed")}
                       >
                         N/D
-                        <span className="text-slate-400" aria-hidden>ⓘ</span>
                       </span>
                     ) : (
-                      <span className="font-bold text-[#0F172A]">{row.value}</span>
+                      <span className="font-semibold tabular-nums text-[var(--brand-text)]">{row.value}</span>
                     )}
                   </td>
-                  <td className="py-2 px-2 text-sm text-[#64748B] break-words whitespace-normal text-center align-middle">{row.unit}</td>
-                  <td className="py-2 px-2 text-sm text-[#64748B] break-words whitespace-normal text-center align-middle">{row.detail}</td>
-                  <td className="py-2 px-2 text-center align-middle">
+                  <td className="px-2 py-3 align-top text-sm text-[var(--brand-subtle)]">{row.unit || "—"}</td>
+                  <td className="px-2 py-3 align-top">
+                    <DetailCell text={row.detail} />
+                  </td>
+                  <td className="px-2 py-3 text-center align-top">
                     <button
-                      className="text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium"
+                      type="button"
+                      className="text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
                       onClick={() => onViewEvidence?.(row)}
                     >
                       {t("common.view")}
@@ -410,8 +446,8 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
         </table>
       </div>
 
-      <div className="flex items-center justify-between mt-5 pt-3 border-t border-[#E2E8F0]">
-        <p className="text-sm text-[#64748B]">
+      <div className="flex items-center justify-between border-t border-black/6 px-5 py-3">
+        <p className="text-sm text-[var(--brand-subtle)]">
           {filteredData.length === 0 ? (
             <>{t("common.showingZeroEntries")}</>
           ) : (
@@ -423,7 +459,7 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
           <button
             onClick={goToPreviousPage}
             disabled={currentPage === 1}
-            className={`p-2 rounded-lg border border-[#E2E8F0] ${currentPage === 1 ? "text-[#CBD5E1] cursor-not-allowed" : "text-[#64748B] hover:bg-[#F8FAFC]"}`}
+            className={`p-2 rounded-lg border border-[#E2E8F0] ${currentPage === 1 ? "text-[#CBD5E1] cursor-not-allowed" : "text-[var(--brand-subtle)] hover:bg-[var(--brand-primary-soft)]"}`}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -432,7 +468,7 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`px-2.5 py-1.5 rounded-lg text-sm font-medium ${currentPage === page ? "bg-[#3B82F6] text-white" : "text-[#64748B] hover:bg-[#F8FAFC]"}`}
+              className={`px-2.5 py-1.5 rounded-lg text-sm font-medium ${currentPage === page ? "bg-[var(--brand-primary)] text-white" : "text-[var(--brand-subtle)] hover:bg-[var(--brand-primary-soft)]"}`}
             >
               {page}
             </button>
@@ -441,7 +477,7 @@ export function NewDataTable({ data, onViewEvidence }: NewDataTableProps) {
           <button
             onClick={goToNextPage}
             disabled={currentPage === totalPages}
-            className={`p-2 rounded-lg border border-[#E2E8F0] ${currentPage === totalPages ? "text-[#CBD5E1] cursor-not-allowed" : "text-[#64748B] hover:bg-[#F8FAFC]"}`}
+            className={`p-2 rounded-lg border border-[#E2E8F0] ${currentPage === totalPages ? "text-[#CBD5E1] cursor-not-allowed" : "text-[var(--brand-subtle)] hover:bg-[var(--brand-primary-soft)]"}`}
           >
             <ChevronRight className="w-4 h-4" />
           </button>

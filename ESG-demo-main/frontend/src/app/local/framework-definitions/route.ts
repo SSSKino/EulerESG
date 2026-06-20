@@ -87,7 +87,7 @@ async function walkJsonFiles(dir: string, depth = 0): Promise<string[]> {
     return [];
   }
 
-  let entries: Awaited<ReturnType<typeof fs.readdir>> = [];
+  let entries: import("fs").Dirent[] = [];
   try {
     entries = await fs.readdir(dir, { withFileTypes: true });
   } catch {

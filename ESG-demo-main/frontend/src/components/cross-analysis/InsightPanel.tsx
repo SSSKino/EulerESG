@@ -18,12 +18,12 @@ export default function InsightPanel({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white/60 p-4 shadow-sm backdrop-blur">
-      <div className="text-sm font-semibold text-slate-900">{t("crossAnalysis.insight.title")}</div>
-      <div className="mt-1 text-xs text-slate-500">
+    <div className="app-card p-4">
+      <div className="text-sm font-semibold text-[var(--brand-text)]">{t("crossAnalysis.insight.title")}</div>
+      <div className="mt-1 text-xs text-[var(--brand-subtle)]">
         {t("crossAnalysis.insight.subtitle")}
       </div>
-      <div className="mt-3 text-sm leading-relaxed text-slate-700">
+      <div className="mt-3 text-sm leading-relaxed text-[var(--brand-muted)]">
         {compare?.insight || t("crossAnalysis.insight.empty")}
       </div>
     </div>

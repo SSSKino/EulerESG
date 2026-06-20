@@ -25,23 +25,23 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 ${className}`}
+      className={`app-card overflow-hidden transition-all duration-300 ${className}`}
     >
-      <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-100">
+      <div className="app-card-header flex items-center justify-between p-3">
         <div
-          className="flex items-center gap-2 cursor-pointer select-none flex-grow"
+          className="flex flex-grow cursor-pointer select-none items-center gap-2"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? (
-            <ChevronUp className="w-4 h-4 text-gray-500" />
+            <ChevronUp className="h-4 w-4 text-[var(--brand-subtle)]" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-500" />
+            <ChevronDown className="h-4 w-4 text-[var(--brand-subtle)]" />
           )}
-          <h3 className="text-md font-semibold text-gray-800 truncate">{title}</h3>
+          <h3 className="text-md truncate font-semibold text-[var(--brand-text)]">{title}</h3>
         </div>
         {headerActions && <div className="ml-2">{headerActions}</div>}
       </div>
-      {isOpen && <div className="p-4 h-full">{children}</div>}
+      {isOpen && <div className="h-full p-4">{children}</div>}
     </div>
   );
 };
@@ -111,21 +111,21 @@ const ChatView: React.FC<ChatViewProps> = ({
   return (
     <div className="flex flex-col gap-6">
       {/* Analysis: Summary always visible; Results table can be collapsed upward */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 w-full hover:shadow-lg">
-        <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-100">
-          <div className="flex items-center gap-2 select-none flex-grow">
-            <h3 className="text-md font-semibold text-gray-800 truncate">{t("chat.analysis")}</h3>
-</div>
+      <div className="app-card w-full overflow-hidden transition-all duration-300 hover:shadow-[0_12px_32px_rgb(0_0_0_/_0.08)]">
+        <div className="app-card-header flex items-center justify-between p-3">
+          <div className="flex flex-grow select-none items-center gap-2">
+            <h3 className="text-md truncate font-semibold text-[var(--brand-text)]">{t("chat.analysis")}</h3>
+          </div>
 
           <button
             onClick={() => setShowAnalysisTable((s) => !s)}
-            className="p-1 hover:bg-gray-200 rounded-md transition-colors"
+            className="rounded-lg p-1 transition-colors hover:bg-[var(--brand-primary-soft)]"
             title={showAnalysisTable ? t("chat.hideAnalysisResults") : t("chat.showAnalysisResults")}
           >
             {showAnalysisTable ? (
-              <ChevronUp className="w-4 h-4 text-gray-600" />
+              <ChevronUp className="h-4 w-4 text-[var(--brand-subtle)]" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-gray-600" />
+              <ChevronDown className="h-4 w-4 text-[var(--brand-subtle)]" />
             )}
           </button>
         </div>
@@ -145,7 +145,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         <CollapsibleSection
           title={activeFile?.name || t("chat.documentViewer")}
           defaultOpen={true}
-          className={`${pdfWidthClass} hover:shadow-lg`}
+          className={`${pdfWidthClass} hover:shadow-[0_12px_32px_rgb(0_0_0_/_0.08)]`}
           headerActions={
             <button
               onClick={(e) => {
@@ -153,10 +153,10 @@ const ChatView: React.FC<ChatViewProps> = ({
                 // Expand PDF to the right (AI shrinks)
                 setWidthMode((m) => (m === "aiShrunk" ? "balanced" : "aiShrunk"));
               }}
-              className="p-1 hover:bg-gray-200 rounded-md transition-colors"
+              className="rounded-lg p-1 transition-colors hover:bg-[var(--brand-primary-soft)]"
               title={widthMode === "aiShrunk" ? t("chat.restoreSplitView") : t("chat.expandPdfWidth")}
             >
-              <PanelLeft className="w-5 h-5 text-gray-600" />
+              <PanelLeft className="h-5 w-5 text-[var(--brand-subtle)]" />
             </button>
           }
         >
@@ -180,7 +180,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         <CollapsibleSection
           title={t("chat.aiAssistant")}
           defaultOpen={true}
-          className={`${aiWidthClass} hover:shadow-lg`}
+          className={`${aiWidthClass} hover:shadow-[0_12px_32px_rgb(0_0_0_/_0.08)]`}
           headerActions={
             <button
               onClick={(e) => {
@@ -188,10 +188,10 @@ const ChatView: React.FC<ChatViewProps> = ({
                 // Expand AI to the left (PDF shrinks)
                 setWidthMode((m) => (m === "pdfShrunk" ? "balanced" : "pdfShrunk"));
               }}
-              className="p-1 hover:bg-gray-200 rounded-md transition-colors"
+              className="rounded-lg p-1 transition-colors hover:bg-[var(--brand-primary-soft)]"
               title={widthMode === "pdfShrunk" ? t("chat.restoreSplitView") : t("chat.expandAiWidth")}
             >
-              <PanelLeft className="w-5 h-5 text-gray-600" />
+              <PanelLeft className="h-5 w-5 text-[var(--brand-subtle)]" />
             </button>
           }
         >

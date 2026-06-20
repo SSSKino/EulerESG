@@ -47,10 +47,29 @@ export function AntdRegistry({ children }: { children: React.ReactNode }) {
         locale={locale}
         theme={{
           token: {
-            colorBgContainer: "#fff",
-            borderRadiusLG: 8,
+            colorPrimary: "#1b6b4a",
+            colorInfo: "#2f7bbd",
+            colorBgLayout: "#f3efe6",
+            colorBgContainer: "#ffffff",
+            colorBorder: "rgba(0, 0, 0, 0.06)",
+            borderRadius: 12,
+            borderRadiusLG: 16,
+            boxShadow: "0 6px 24px rgba(0, 0, 0, 0.05)",
             fontFamily:
               "var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          },
+          components: {
+            Button: {
+              primaryShadow: "none",
+              controlHeight: 40,
+            },
+            Table: {
+              headerBg: "rgba(243, 239, 230, 0.65)",
+              borderColor: "rgba(0, 0, 0, 0.06)",
+            },
+            Breadcrumb: {
+              fontSize: 16,
+            },
           },
         }}>
         {children}

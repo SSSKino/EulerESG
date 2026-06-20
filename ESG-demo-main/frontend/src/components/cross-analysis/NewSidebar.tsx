@@ -67,8 +67,8 @@ export function NewSidebar({
   }, []);
 
   return (
-    <div className="w-[320px] bg-white rounded-2xl shadow-sm p-4 h-fit">
-      <h3 className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-4 pl-8">
+    <div className="app-sidebar-pod h-fit w-[320px] p-4">
+      <h3 className="mb-4 pl-8 text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
         {t("crossAnalysis.navigation")}
       </h3>
 
@@ -90,11 +90,11 @@ export function NewSidebar({
                 onClick={() => onTogglePrimary(primary)}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all ${
                   isActivePrimary
-                    ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A]"
-                    : "bg-transparent border border-transparent text-[#0F172A] hover:bg-slate-50"
+                    ? "app-nav-active"
+                    : "border border-transparent bg-transparent text-[var(--brand-text)] hover:bg-[var(--brand-primary-soft)]"
                 }`}
               >
-                <span className="text-sm font-medium truncate">{primary}</span>
+                <span className="line-clamp-2 block text-sm font-medium leading-snug break-words">{primary}</span>
                 {/* <ChevronRight
                   className={`w-4 h-4 text-[#64748B] transition-transform ${
                     isExpanded ? "rotate-90" : ""
@@ -124,12 +124,12 @@ export function NewSidebar({
                               }}
                               className={`flex-1 min-w-0 flex items-center text-left px-3 py-2 rounded-lg text-sm transition-all ${
                                 isSelectedSecondary
-                                  ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
-                                  : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
+                                  ? "app-nav-active font-medium"
+                                  : "border border-transparent bg-transparent text-[var(--brand-subtle)] hover:bg-[var(--brand-primary-soft)]"
                               }`}
                               title={secondary}
                             >
-                              <span className="truncate block w-full">{secondary}</span>
+                              <span className="line-clamp-2 block w-full break-words leading-snug">{secondary}</span>
                             </button>
 
                             {hasTertiaries ? (
@@ -139,7 +139,7 @@ export function NewSidebar({
                                   e.stopPropagation();
                                   toggleSecondaryExpand(primary, secondary);
                                 }}
-                                className="p-2 rounded-lg text-[#64748B] hover:bg-slate-50 shrink-0"
+                                className="shrink-0 rounded-lg p-2 text-[var(--brand-subtle)] hover:bg-[var(--brand-primary-soft)]"
                                 aria-label={secondary}
                               >
                                 <ChevronRight
@@ -160,14 +160,14 @@ export function NewSidebar({
                                       e.stopPropagation();
                                       onSelectTertiary(primary, secondary, metricName);
                                     }}
-                                    className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-all ${
+                                    className={`w-full rounded-md px-3 py-1.5 text-left text-xs transition-all ${
                                       isSelectedMetric
-                                        ? "bg-[#DBEAFE] border border-[#93C5FD] text-[#1E40AF] font-medium"
-                                        : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
+                                        ? "app-nav-active font-medium"
+                                        : "border border-transparent bg-transparent text-[var(--brand-subtle)] hover:bg-[var(--brand-primary-soft)]"
                                     }`}
                                     title={metricName}
                                   >
-                                    <span className="block truncate">{metricName}</span>
+                                    <span className="line-clamp-2 block break-words leading-snug">{metricName}</span>
                                   </button>
                                 );
                               })}
@@ -177,7 +177,7 @@ export function NewSidebar({
                       );
                     })
                   ) : (
-                    <div className="px-3 py-2 text-xs text-slate-400">{t("crossAnalysis.noSecondaryNav")}</div>
+                    <div className="px-3 py-2 text-xs text-[var(--brand-subtle)]">{t("crossAnalysis.noSecondaryNav")}</div>
                   )}
                 </div>
               )}
@@ -186,13 +186,13 @@ export function NewSidebar({
         })}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-slate-200">
+      <div className="mt-6 border-t border-black/8 pt-4">
         <button
           onClick={() => onSelectDisclosure?.()}
           className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all ${
             viewMode === "disclosure"
-              ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
-              : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
+              ? "app-nav-active font-medium"
+              : "border border-transparent bg-transparent text-[var(--brand-subtle)] hover:bg-[var(--brand-primary-soft)]"
           }`}
         >
           {t("crossAnalysis.disclosureCompleteness")}

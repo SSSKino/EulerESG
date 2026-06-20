@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Modal, Popover, Progress, Select, Spin, Table, Tag } from "antd";
+import { Alert, Modal, Popover, Progress, Select, Spin, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/navigation";
 import { useT } from "@/i18n/useT";
 
 import { apiService } from "@/lib/api";
-import type { CrossReportSummary } from "@/features/crossAnalysis/types";
+import { CHART_PALETTE } from "@/features/crossAnalysis/tokens";
 
 type DisclosureStatus = "fully_disclosed" | "partially_disclosed" | "not_disclosed";
 
@@ -168,9 +168,25 @@ function normalizePage(page: string | number | null | undefined): number | null 
 }
 
 function statusTag(t: (key: string, vars?: Record<string, any>) => string, status: DisclosureStatus) {
-  if (status === "fully_disclosed") return <Tag color="green">{t("analysis.summary.disclosed")}</Tag>;
-  if (status === "partially_disclosed") return <Tag color="gold">{t("analysis.status.partial")}</Tag>;
-  return <Tag color="red">{t("analysis.summary.not")}</Tag>;
+  if (status === "fully_disclosed") {
+    return (
+      <span className="inline-flex rounded-full bg-[var(--brand-primary-soft)] px-2.5 py-0.5 text-xs font-medium text-[var(--brand-primary)]">
+        {t("analysis.summary.disclosed")}
+      </span>
+    );
+  }
+  if (status === "partially_disclosed") {
+    return (
+      <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+        {t("analysis.status.partial")}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-600">
+      {t("analysis.summary.not")}
+    </span>
+  );
 }
 
 function toDisplayValue(v: any): string {
@@ -207,16 +223,16 @@ function openEvidence(fileId: string, page: number | null, title: string) {
   window.open(`/cross-analysis/evidence?${qs.toString()}`, "_blank", "noopener,noreferrer");
 }
 
-function StatusDonut({ red, yellow, green, total }: { red: number; yellow: number; green: number; total: number }) {
+function StatusDonut({ red, yellow, total }: { red: number; yellow: number; green: number; total: number }) {
   const redPct = total ? (red / total) * 100 : 0;
   const yellowPct = total ? (yellow / total) * 100 : 0;
   const donutStyle: React.CSSProperties = {
-    background: `conic-gradient(#ef4444 0% ${redPct}%, #f59e0b ${redPct}% ${redPct + yellowPct}%, #22c55e ${redPct + yellowPct}% 100%)`,
+    background: `conic-gradient(#dc2626 0% ${redPct}%, #d97706 ${redPct}% ${redPct + yellowPct}%, var(--brand-primary) ${redPct + yellowPct}% 100%)`,
   };
 
   return (
-    <div className="relative h-14 w-14 md:h-[62px] md:w-[62px] shrink-0 rounded-full" style={donutStyle} aria-hidden>
-      <div className="absolute inset-[9px] md:inset-[10px] rounded-full bg-white" />
+    <div className="relative h-12 w-12 shrink-0 rounded-full md:h-14 md:w-14" style={donutStyle} aria-hidden>
+      <div className="absolute inset-[8px] rounded-full bg-white md:inset-[9px]" />
     </div>
   );
 }
@@ -472,9 +488,9 @@ export default function DisclosureCompletenessComparison(props: {
         title: t("crossAnalysis.table.metric"),
         dataIndex: "metric_name",
         key: "metric_name",
-        width: 300,
-        fixed: "left",
-        render: (_: any, row: Row) => <div className="font-medium text-slate-900">{row.metric_name}</div>,
+        width: "22%",
+        ellipsis: true,
+        render: (_: any, row: Row) => <div className="font-medium text-[var(--brand-text)]">{row.metric_name}</div>,
       },
     ];
 
@@ -482,19 +498,19 @@ export default function DisclosureCompletenessComparison(props: {
       title: (
         <button
           type="button"
-          className="font-semibold text-slate-800 hover:text-blue-600 text-left"
+          className="text-left font-semibold text-[var(--brand-text)] hover:text-[var(--brand-primary)]"
           onClick={() => setOpeningFile({ fileId: p.fileId, label: p.label })}
         >
           {p.label}
         </button>
       ),
       key: p.fileId,
-      width: 280,
+      width: `${Math.floor(78 / Math.max(orderedPer.length, 1))}%`,
       render: (_: any, row: Row) => {
         const item = row.byReport[p.fileId];
-        if (p.loading) return <span className="text-slate-400">{t("common.loading")}</span>;
-        if (p.error) return <span className="text-red-500">{p.error}</span>;
-        if (!item) return <span className="text-slate-400">—</span>;
+        if (p.loading) return <span className="text-[var(--brand-subtle)]">{t("common.loading")}</span>;
+        if (p.error) return <span className="text-red-600">{p.error}</span>;
+        if (!item) return <span className="text-[var(--brand-subtle)]">—</span>;
 
         const status = item.disclosure_status;
         const category = normalizeCategoryLabel(item.category);
@@ -528,7 +544,7 @@ export default function DisclosureCompletenessComparison(props: {
 
         const pageNode = page ? (
           <button
-            className="text-blue-500 hover:underline text-xs"
+            className="text-xs text-[var(--brand-primary)] hover:underline"
             onClick={(e) => {
               e.stopPropagation();
               openEvidence(p.fileId, page, evidenceTitle);
@@ -542,7 +558,7 @@ export default function DisclosureCompletenessComparison(props: {
         return (
           <div className="space-y-2">
             <div className="flex items-center gap-2">{statusTag(t, status)}</div>
-            <div className="text-sm text-slate-900 flex items-start gap-2 flex-wrap">
+            <div className="flex flex-wrap items-start gap-2 text-sm text-[var(--brand-text)]">
               <span className="min-w-0 whitespace-pre-wrap break-words">{displayValue}</span>
               <Popover
                 content={contextContent}
@@ -552,7 +568,7 @@ export default function DisclosureCompletenessComparison(props: {
                 getPopupContainer={(trigger) => trigger.parentElement || document.body}
               >
                 <span
-                  className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none shrink-0"
+                  className="inline-flex h-4 w-4 shrink-0 cursor-pointer select-none items-center justify-center rounded-full border border-black/15 text-[11px] font-semibold leading-none text-[var(--brand-muted)]"
                   aria-label={t("analysis.columns.context")}
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -560,7 +576,7 @@ export default function DisclosureCompletenessComparison(props: {
                 </span>
               </Popover>
               {status === "fully_disclosed" && !isDiscussionAndAnalysis && unit ? (
-                <span className="text-xs text-slate-500 shrink-0">{unit}</span>
+                <span className="shrink-0 text-xs text-[var(--brand-subtle)]">{unit}</span>
               ) : null}
               {pageNode}
             </div>
@@ -574,18 +590,18 @@ export default function DisclosureCompletenessComparison(props: {
 
   if (!fileIds || fileIds.length < 2) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <div className="text-slate-900 font-semibold">{t("crossAnalysis.disclosureCompleteness")}</div>
-        <div className="text-slate-600 mt-1">{t("files.selectAtLeastTwoReports")}</div>
+      <div className="app-card p-6">
+        <div className="font-semibold text-[var(--brand-text)]">{t("crossAnalysis.disclosureCompleteness")}</div>
+        <div className="mt-1 text-[var(--brand-subtle)]">{t("files.selectAtLeastTwoReports")}</div>
       </div>
     );
   }
 
   if (anyLoading && per.every((p) => p.metrics.length === 0 && !p.error)) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-10 text-center">
+      <div className="app-card p-10 text-center">
         <Spin size="large" />
-        <div className="mt-4 text-slate-600">{t("crossAnalysis.disclosure.loading")}</div>
+        <div className="mt-4 text-[var(--brand-subtle)]">{t("crossAnalysis.disclosure.loading")}</div>
       </div>
     );
   }
@@ -596,7 +612,7 @@ export default function DisclosureCompletenessComparison(props: {
     <div className="space-y-4">
       <Modal open={!!openingFile} footer={null} closable={false} maskClosable={false} centered>
         <div className="py-3">
-          <div className="text-base font-semibold text-slate-900 mb-4">{openingFile?.label}</div>
+          <div className="mb-4 text-base font-semibold text-[var(--brand-text)]">{openingFile?.label}</div>
           <Progress percent={openingProgress} status="active" />
         </div>
       </Modal>
@@ -610,73 +626,75 @@ export default function DisclosureCompletenessComparison(props: {
         />
       ) : null}
 
-      <div className="bg-white rounded-2xl shadow-sm px-2.5 py-4 md:px-4 md:py-4">
-        <div className="space-y-8">
-          <div className="hidden md:grid grid-cols-[minmax(260px,0.61fr)_minmax(260px,0.76fr)_minmax(400px,0.84fr)_minmax(200px,0.76fr)_150px] gap-8 items-center border-slate-200 px-2.5 mb-2">
-            <div className="text-xl font-semibold text-slate-800">{t("crossAnalysis.table.report")}</div>
-            <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.summary.not")}</div>
-            <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.status.partial")}</div>
-            <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.summary.disclosed")}</div>
-            <div className="text-xl flex justify-end">
-              <Select
-                value={sortMode}
-                onChange={(value) => setSortMode(value)}
-                size="middle"
-                bordered={false}
-                suffixIcon={null}
-                className="w-full text-center [&_.ant-select-selection-item]:text-center"
-                style={{ width: '100%', fontSize: '40px' }}
-                options={[
-                  { value: "default", label: "Default" },
-                  { value: "report_asc", label: "Report A-Z" },
-                  { value: "report_desc", label: "Report Z-A" },
-                  { value: "disclosed_desc", label: "Disclosed first" },
-                  { value: "not_disclosed_desc", label: "Not disclosed first" },
-                ]}
-              />
-            </div>
-          </div>
+      <div className="app-card overflow-hidden p-4 md:p-6">
+        <div className="mb-4 flex flex-col gap-3 border-b border-black/6 pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <h3 className="text-lg font-semibold text-[var(--brand-text)]">{t("crossAnalysis.disclosureCompleteness")}</h3>
+          <Select
+            value={sortMode}
+            onChange={(value) => setSortMode(value)}
+            size="middle"
+            className="min-w-[180px]"
+            options={[
+              { value: "default", label: "Default" },
+              { value: "report_asc", label: "Report A-Z" },
+              { value: "report_desc", label: "Report Z-A" },
+              { value: "disclosed_desc", label: "Disclosed first" },
+              { value: "not_disclosed_desc", label: "Not disclosed first" },
+            ]}
+          />
+        </div>
 
-          {orderedSummaryCards.map((p) => {
+        <div className="hidden gap-3 border-b border-black/6 px-2 pb-3 text-xs font-semibold uppercase tracking-wide text-[var(--brand-subtle)] md:grid md:grid-cols-[1.2fr_repeat(3,1fr)_72px]">
+          <div>{t("crossAnalysis.table.report")}</div>
+          <div className="text-center">{t("analysis.summary.not")}</div>
+          <div className="text-center">{t("analysis.status.partial")}</div>
+          <div className="text-center">{t("analysis.summary.disclosed")}</div>
+          <div className="text-center">%</div>
+        </div>
+
+        <div className="space-y-3 pt-3">
+          {orderedSummaryCards.map((p, index) => {
             const s = p.summary;
             const total = s.total || 0;
             const redPct = total ? `${((s.red / total) * 100).toFixed(1)}%` : "0.0%";
             const yellowPct = total ? `${((s.yellow / total) * 100).toFixed(1)}%` : "0.0%";
             const greenPct = total ? `${((s.green / total) * 100).toFixed(1)}%` : "0.0%";
+            const accent = CHART_PALETTE[index % CHART_PALETTE.length];
 
             return (
               <div
                 key={p.fileId}
-                className="grid grid-cols-1 md:grid-cols-[minmax(260px,0.61fr)_minmax(260px,0.76fr)_minmax(400px,0.84fr)_minmax(200px,0.76fr)_150px] gap-8 items-center rounded-xl border border-slate-200 px-2.5 mb-4 py-4.5"
+                className="grid grid-cols-1 items-center gap-3 rounded-2xl border border-black/6 bg-[var(--brand-surface)]/45 px-3 py-4 md:grid-cols-[1.2fr_repeat(3,1fr)_72px] md:gap-4 md:px-4"
               >
                 <button
                   type="button"
                   onClick={() => setOpeningFile({ fileId: p.fileId, label: p.label })}
-                  className="min-w-0 text-left text-xl font-semibold text-slate-900 truncate pr-1 hover:text-blue-600"
+                  className="min-w-0 truncate text-left text-base font-semibold text-[var(--brand-text)] hover:text-[var(--brand-primary)]"
                   title={p.label}
                 >
+                  <span className="mr-2 inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: accent }} />
                   {p.label}
                 </button>
 
                 {p.loading ? (
-                  <div className="md:col-span-4 text-slate-500 text-sm">{t("common.loading")}</div>
+                  <div className="text-sm text-[var(--brand-subtle)] md:col-span-4">{t("common.loading")}</div>
                 ) : p.error ? (
-                  <div className="md:col-span-4 text-red-500 text-sm">{p.error}</div>
+                  <div className="text-sm text-red-600 md:col-span-4">{p.error}</div>
                 ) : total === 0 ? (
-                  <div className="md:col-span-4 text-slate-500 text-sm">{t("crossAnalysis.disclosure.noMetricsFound")}</div>
+                  <div className="text-sm text-[var(--brand-subtle)] md:col-span-4">{t("crossAnalysis.disclosure.noMetricsFound")}</div>
                 ) : (
                   <>
                     <div className="text-center">
-                      <div className="text-[40px] font-semibold text-red-500 leading-none">{redPct}</div>
-                      <div className="mt-1 text-xl text-slate-500">{s.red}/{total}</div>
+                      <div className="text-2xl font-bold leading-none text-red-600">{redPct}</div>
+                      <div className="mt-1 text-sm text-[var(--brand-subtle)]">{s.red}/{total}</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-[40px] font-semibold text-amber-500 leading-none">{yellowPct}</div>
-                      <div className="mt-1 text-xl text-slate-500">{s.yellow}/{total}</div>
+                      <div className="text-2xl font-bold leading-none text-amber-600">{yellowPct}</div>
+                      <div className="mt-1 text-sm text-[var(--brand-subtle)]">{s.yellow}/{total}</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-[40px] font-semibold text-green-500 leading-none">{greenPct}</div>
-                      <div className="mt-1 text-xl text-slate-500">{s.green}/{total}</div>
+                      <div className="text-2xl font-bold leading-none text-[var(--brand-primary)]">{greenPct}</div>
+                      <div className="mt-1 text-sm text-[var(--brand-subtle)]">{s.green}/{total}</div>
                     </div>
                     <div className="flex items-center justify-center">
                       <StatusDonut red={s.red} yellow={s.yellow} green={s.green} total={total} />
@@ -689,30 +707,27 @@ export default function DisclosureCompletenessComparison(props: {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm p-5">
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">{t("analysis.resultsTitle")}</h3>
+      <div className="app-card p-4 md:p-6">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-[var(--brand-text)]">{t("analysis.resultsTitle")}</h3>
         </div>
-        <div className="overflow-x-auto">
-          <Table
-            className="ca-table-wrap"
-            columns={columns}
-            dataSource={tableData}
-            rowKey="key"
-            pagination={{
-              current: resultPage,
-              pageSize: resultPageSize,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20"],
-              onChange: (page, pageSize) => {
-                setResultPage(page);
-                if (pageSize && pageSize !== resultPageSize) setResultPageSize(pageSize);
-              },
-            }}
-            scroll={{ x: 420 + orderedPer.length * 280 }}
-            tableLayout="fixed"
-          />
-        </div>
+        <Table
+          className="ca-table-wrap disclosure-results-table"
+          columns={columns}
+          dataSource={tableData}
+          rowKey="key"
+          pagination={{
+            current: resultPage,
+            pageSize: resultPageSize,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20"],
+            onChange: (page, pageSize) => {
+              setResultPage(page);
+              if (pageSize && pageSize !== resultPageSize) setResultPageSize(pageSize);
+            },
+          }}
+          tableLayout="fixed"
+        />
       </div>
     </div>
   );

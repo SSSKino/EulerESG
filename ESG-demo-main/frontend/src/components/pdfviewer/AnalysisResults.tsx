@@ -618,87 +618,89 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-gray-800 !my-0">
-        {currentFile?.name} ({currentFile?.framework})
-      </h1>
-      <h2 className="text-xl font-semibold text-gray-800 !my-0">
-        {industry && semiIndustry
-          ? `${industry} - ${semiIndustry}`
-          : t("analysis.industryAnalysis")}
-      </h2>
-      <div className="bg-white rounded-lg shadow-sm p-6 hover:scale-[1.02] hover:shadow-lg transition-transform duration-300">
-        <h3 className="text-xl font-semibold mb-6 text-gray-800">
+      <div>
+        <h1 className="!my-0 text-2xl font-semibold text-[var(--brand-text)]">
+          {currentFile?.name} ({currentFile?.framework})
+        </h1>
+        <p className="mt-2 text-base text-[var(--brand-muted)]">
+          {industry && semiIndustry
+            ? `${industry} - ${semiIndustry}`
+            : t("analysis.industryAnalysis")}
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-black/6 bg-[var(--brand-surface)]/55 p-5 md:p-6">
+        <h3 className="mb-5 text-lg font-semibold text-[var(--brand-text)]">
           {t("analysis.summaryTitle")}
         </h3>
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {summary.disclosure && (() => {
             const group = summary.disclosure;
             const total = group.red + group.yellow + group.green;
-            
-            // Only render if we have data
+
             if (total === 0) {
               return null;
             }
-            
+
             const redPct = ((group.red / total) * 100).toFixed(1);
             const yellowPct = ((group.yellow / total) * 100).toFixed(1);
             const greenPct = ((group.green / total) * 100).toFixed(1);
 
             return (
-              <div key="disclosure">
-                <div className="flex flex-wrap gap-4">
-                  {[
-                    {
-                      color: "text-red-500",
-                      value: group.red,
-                      percent: redPct,
-                      label: t("analysis.summary.not"),
-                    },
-                    {
-                      color: "text-yellow-500",
-                      value: group.yellow,
-                      percent: yellowPct,
-                      label: t("analysis.summary.partial"),
-                    },
-                    {
-                      color: "text-green-500",
-                      value: group.green,
-                      percent: greenPct,
-                      label: t("analysis.summary.disclosed"),
-                    },
-                  ].map((item) => (
-                    <div
-                      className="flex-1 min-w-[200px] flex flex-col items-center gap-2"
-                      key={item.label}>
-                      <div className={`text-4xl font-bold ${item.color}`}>
-                        {item.percent}%
-                      </div>
-                      <div className="text-lg text-gray-600">
-                        ({item.value}/{total})
-                      </div>
-                      <div className="mt-1 text-md text-center font-semibold">
-                        {item.label}
-                      </div>
+              <div key="disclosure" className="grid gap-4 md:grid-cols-3">
+                {[
+                  {
+                    color: "text-red-600",
+                    bg: "bg-red-50",
+                    value: group.red,
+                    percent: redPct,
+                    label: t("analysis.summary.not"),
+                  },
+                  {
+                    color: "text-amber-600",
+                    bg: "bg-amber-50",
+                    value: group.yellow,
+                    percent: yellowPct,
+                    label: t("analysis.summary.partial"),
+                  },
+                  {
+                    color: "text-[var(--brand-primary)]",
+                    bg: "bg-[var(--brand-primary-soft)]",
+                    value: group.green,
+                    percent: greenPct,
+                    label: t("analysis.summary.disclosed"),
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className={`flex flex-col items-center gap-1 rounded-2xl border border-black/5 ${item.bg} px-4 py-5`}
+                  >
+                    <div className={`text-3xl font-bold ${item.color}`}>{item.percent}%</div>
+                    <div className="text-sm text-[var(--brand-subtle)]">
+                      ({item.value}/{total})
                     </div>
-                  ))}
-                </div>
+                    <div className="mt-1 text-center text-sm font-semibold text-[var(--brand-text)]">
+                      {item.label}
+                    </div>
+                  </div>
+                ))}
               </div>
             );
           })()}
         </div>
       </div>
+
       {showTable && (
-        <div className="bg-white rounded-lg shadow-sm p-6 hover:scale-[1.01] hover:shadow-lg transition-transform duration-300">
-          <h3 className="text-xl font-semibold mb-6 text-gray-800">
+        <div>
+          <h3 className="mb-4 text-lg font-semibold text-[var(--brand-text)]">
             {t("analysis.resultsTitle")}
           </h3>
           <Table
             columns={columns}
             dataSource={data}
             className="w-full analysis-results-table"
-            scroll={{ y: 300 }}
             tableLayout="fixed"
-            pagination={false}
+            pagination={{ pageSize: 8, showSizeChanger: false }}
             rowKey="key"
           />
         </div>

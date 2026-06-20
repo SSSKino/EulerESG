@@ -11,17 +11,31 @@ export interface StoredAuth {
 }
 
 const isBrowser = typeof window !== "undefined";
+export const AUTH_CHANGE_EVENT = "euler-auth-change";
+
+function notifyAuthChange() {
+  if (!isBrowser) return;
+  window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+}
+
+export function subscribeAuthChange(listener: () => void) {
+  if (!isBrowser) return () => {};
+  window.addEventListener(AUTH_CHANGE_EVENT, listener);
+  return () => window.removeEventListener(AUTH_CHANGE_EVENT, listener);
+}
 
 export function saveAuth(auth: StoredAuth) {
   if (!isBrowser) return;
   localStorage.setItem(AUTH_TOKEN_KEY, auth.token);
   localStorage.setItem(AUTH_USER_KEY, JSON.stringify(auth));
+  notifyAuthChange();
 }
 
 export function clearAuth() {
   if (!isBrowser) return;
   localStorage.removeItem(AUTH_TOKEN_KEY);
   localStorage.removeItem(AUTH_USER_KEY);
+  notifyAuthChange();
 }
 
 export function getStoredAuth(): StoredAuth | null {

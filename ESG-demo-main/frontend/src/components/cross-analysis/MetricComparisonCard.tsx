@@ -28,7 +28,9 @@ export type MetricChart = {
 
 // Keep the same palette logic as the original grouped chart:
 // first report -> green; the rest -> a stable palette.
-const PALETTE = ["#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#06B6D4"];
+import { CHART_PALETTE } from "@/features/crossAnalysis/tokens";
+
+const PALETTE = [...CHART_PALETTE];
 
 function wrapAxisLabel(text: any, maxLen = 14): string {
   const s = String(text ?? "");
@@ -121,7 +123,7 @@ export function MetricComparisonCard({ chart }: { chart: MetricChart }) {
       yField: "value",
       colorField: "report",
       // @ant-design/plots supports color as function in 2.x
-      color: (datum: any) => colorMap[String(datum?.report ?? "")] || "#3B82F6",
+      color: (datum: any) => colorMap[String(datum?.report ?? "")] || "#1b6b4a",
       state: {
         active: {
           style: {
@@ -214,7 +216,7 @@ export function MetricComparisonCard({ chart }: { chart: MetricChart }) {
 
   if (!data.length) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-4 text-center text-[#64748B]">
+      <div className="app-card rounded-2xl p-4 text-center text-[var(--brand-subtle)]">
         {t("common.noDataAvailable")}
       </div>
     );

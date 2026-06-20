@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import { canCrossAnalyzeFiles } from "@/store/useFileStore";
-import MainContent from "../maincontent/MainContent";
+import MainContent from "@/components/dashboard/MainContent";
 import FileTable from "./FileTable";
 import LoadingModal from "./LoadingModal";
 import { useT } from "@/i18n/useT";
@@ -84,20 +84,21 @@ export default function PDFViewer() {
   };
 
   return (
-    <div className="w-full flex flex-col justify-start items-center mx-auto pt-1 bg-gray-50 min-h-screen">
-      <div className="w-[95%]">
+    <div className="app-page w-full">
+      <div className="app-content">
         <Breadcrumb
-          style={{ margin: 20 }}
+          style={{ margin: "0 0 1rem" }}
           items={[{ title: t("files.breadcrumbDashboard") }]}
-          className="mb-2 !text-lg"
+          className="!text-lg"
         />
 
         <MainContent />
-        <div className="flex items-center justify-end mb-4">
+        <div className="mb-4 flex items-center justify-end">
           <Tooltip title={crossAnalysisDisabledReason} placement="top">
             <span>
               <Button
                 type="primary"
+                className="!rounded-full !px-5"
                 disabled={selectedRows.length < 2 || !crossAnalysisAllowed}
                 onClick={handleCrossAnalyze}
               >

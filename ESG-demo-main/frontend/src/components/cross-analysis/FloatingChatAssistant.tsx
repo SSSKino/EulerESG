@@ -60,7 +60,7 @@ export default function FloatingChatAssistant() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 left-6 z-40 flex items-center gap-2 rounded-full bg-slate-700 px-4 py-3 text-white shadow-lg transition hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+        className="fixed bottom-20 left-6 z-40 flex items-center gap-2 rounded-full bg-[var(--brand-secondary)] px-5 py-3 text-white shadow-[0_8px_24px_rgb(0_0_0_/_0.12)] transition hover:bg-[var(--brand-secondary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:ring-offset-2"
         aria-label={t("crossAnalysis.floatingAssistant")}
       >
         <MessageCircle className="h-5 w-5" />
@@ -70,11 +70,15 @@ export default function FloatingChatAssistant() {
       <Drawer
         title={t("chat.aiAssistant")}
         placement="left"
-        width={400}
+        width={420}
         onClose={() => setOpen(false)}
         open={open}
         destroyOnClose={false}
-        styles={{ body: { padding: 0, display: "flex", flexDirection: "column", height: "calc(100% - 55px)" } }}
+        className="app-drawer"
+        styles={{
+          header: { borderBottom: "1px solid rgba(0,0,0,0.06)" },
+          body: { padding: 0, display: "flex", flexDirection: "column", height: "calc(100% - 55px)", background: "var(--brand-surface)" },
+        }}
       >
         <div className="flex h-full flex-col min-h-0">
           <ChatInterface

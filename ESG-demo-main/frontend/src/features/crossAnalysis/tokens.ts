@@ -1,24 +1,25 @@
-// src/features/crossAnalysis/tokens.ts
-// Visual tokens + interaction guidelines (keep consistent for "premium, warm, minimal" feel).
+// Visual tokens aligned with globals.css --brand-* variables.
 
 export const crossTokens = {
   color: {
-    bg: "#FBFAF7", // warm off-white
+    bg: "var(--brand-surface)",
     card: "#FFFFFF",
-    cardAlt: "#F7F5F0",
-    border: "rgba(20, 20, 20, 0.08)",
-    text: "rgba(20, 20, 20, 0.92)",
-    subtext: "rgba(20, 20, 20, 0.62)",
-    accent: "#2B6CB0", // low-saturation blue
-    accentSoft: "rgba(43, 108, 176, 0.10)",
+    cardAlt: "rgb(255 255 255 / 0.92)",
+    border: "rgb(0 0 0 / 0.06)",
+    text: "var(--brand-text)",
+    subtext: "var(--brand-subtle)",
+    accent: "var(--brand-accent)",
+    accentSoft: "var(--brand-accent-soft)",
+    primary: "var(--brand-primary)",
+    primarySoft: "var(--brand-primary-soft)",
   },
   radius: {
-    card: 14,
+    card: 16,
     pill: 999,
   },
   shadow: {
-    card: "0 8px 24px rgba(20, 20, 20, 0.06)",
-    subtle: "0 2px 10px rgba(20, 20, 20, 0.05)",
+    card: "0 8px 24px rgb(0 0 0 / 0.05)",
+    subtle: "0 2px 10px rgb(0 0 0 / 0.05)",
   },
   spacing: {
     xs: 8,
@@ -33,9 +34,20 @@ export const crossTokens = {
   },
 };
 
-// 禁用清单（强制）
-// - 企业培训PPT风（大色块标题、强分隔、密集说明）
-// - 土味渐变铺满背景
-// - 廉价 3D 图标、霓虹高饱和
-// - 重描边、强阴影、过度玻璃拟态
-// - 海报式卡片堆叠、到处大按钮
+/** Chart series colors — green-first palette aligned with Euler ESG brand. */
+export const CHART_PALETTE = [
+  "#1b6b4a",
+  "#3d8f6e",
+  "#6aaf8f",
+  "#5a9fd4",
+  "#8bb8dc",
+  "#c9a227",
+  "#8b6bae",
+  "#d4739a",
+] as const;
+
+export const DEFAULT_CHART_COLOR = CHART_PALETTE[0];
+
+export function chartColorAt(index: number): string {
+  return CHART_PALETTE[index % CHART_PALETTE.length];
+}

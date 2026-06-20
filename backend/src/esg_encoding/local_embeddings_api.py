@@ -28,6 +28,7 @@ except Exception:  # pragma: no cover
 
 from sentence_transformers import SentenceTransformer  # type: ignore
 
+from .hf_cache import get_hf_home
 from .shared_embedding_model import get_shared_embedding_model
 from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
 
@@ -61,7 +62,7 @@ async def get_local_embedder() -> SentenceTransformer:
         _model = get_shared_embedding_model(
             model_path,
             device=device,
-            hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
+            hf_home=get_hf_home(),
             explicit_local_path=get_configured_embedding_local_path(),
             trust_remote_code=True,
         )

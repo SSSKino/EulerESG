@@ -8,6 +8,10 @@ import { Input } from "@/components/ui/input";
 import { apiService } from "@/lib/api";
 import { getStoredAuth, isAuthenticated, saveAuth } from "@/lib/auth";
 import { useT } from "@/i18n/useT";
+import AuthCard from "@/components/auth/AuthCard";
+import AuthPageLayout from "@/components/auth/AuthPageLayout";
+import AuthSocialSection from "@/components/auth/AuthSocialSection";
+import AuthSubmitSection from "@/components/auth/AuthSubmitSection";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +21,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleSocialClick = (provider: "Google" | "Apple") => {
+    setError(t("auth.socialComingSoon", { provider }));
+  };
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -43,70 +51,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold text-gray-900">{t("auth.signIn")}</h1>
-          <p className="text-sm text-gray-500">{t("auth.signInSubtitle")}</p>
+    <AuthPageLayout>
+      <AuthCard>
+        <div className="mb-8 shrink-0">
+          <h1 className="text-4xl font-semibold tracking-tight text-[var(--brand-text)] md:text-5xl">
+            {t("auth.signInWelcome")}
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-[var(--brand-subtle)] md:text-base">
+            {t("auth.signInHelper")}
+          </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">{t("auth.email")}</label>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("auth.emailPlaceholder")}
-              required
-            />
+        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit}>
+          <div className="flex min-h-0 flex-1 flex-col space-y-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[var(--brand-text)]">{t("auth.email")}</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("auth.emailPlaceholder")}
+                required
+                className="h-11 rounded-xl border-black/10 bg-white/95"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[var(--brand-text)]">{t("auth.password")}</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t("auth.passwordPlaceholder")}
+                required
+                className="h-11 rounded-xl border-black/10 bg-white/95"
+              />
+            </div>
+
+            <div className="flex-1" />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">{t("auth.password")}</label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={t("auth.passwordPlaceholder")}
-              required
-            />
-          </div>
-
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-              {error}
-            </p>
-          )}
-
-          <Button
-            type="submit"
-            className="w-full text-white"
-            style={{
-              backgroundColor: "#2F7BBD",
-              borderColor: "#2F7BBD",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2667A1";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "#2667A1";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2F7BBD";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "#2F7BBD";
-            }}
-            disabled={loading}
-          >
-            {loading ? t("auth.signingIn") : t("auth.signIn")}
-          </Button>
+          <AuthSubmitSection error={error}>
+            <Button type="submit" className="brand-primary-button h-11 w-full rounded-xl text-base" disabled={loading}>
+              {loading ? t("auth.signingIn") : t("auth.signIn")}
+            </Button>
+          </AuthSubmitSection>
         </form>
 
-        <p className="text-sm text-gray-600 text-center">
-          {t("auth.noAccount")} {" "}
-          <Link href="/register" className="text-blue-600 hover:underline">
+        <AuthSocialSection mode="login" onSocialClick={handleSocialClick} />
+
+        <p className="mt-4 shrink-0 text-center text-sm text-[var(--brand-subtle)]">
+          {t("auth.noAccount")}{" "}
+          <Link href="/register" className="brand-link font-medium hover:underline">
             {t("auth.createOne")}
           </Link>
         </p>
-      </div>
-    </div>
+      </AuthCard>
+    </AuthPageLayout>
   );
 }

@@ -20,7 +20,7 @@ export default function CrossAnalysisEntryPage() {
   }, [qsString, router]);
 
   return (
-    <div className="min-h-[60vh] w-full flex items-center justify-center text-slate-500">
+    <div className="flex min-h-[60vh] w-full items-center justify-center text-[var(--brand-subtle)]">
       {t("crossAnalysis.title")}
     </div>
   );

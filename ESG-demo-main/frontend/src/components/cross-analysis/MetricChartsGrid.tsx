@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { DEFAULT_CHART_COLOR } from "@/features/crossAnalysis/tokens";
 import dynamic from "next/dynamic";
 import { Empty } from "antd";
 import { useT } from "@/i18n/useT";
@@ -80,9 +81,7 @@ function chunk<T>(arr: T[], size: number): T[][] {
 
 function getRowSpan(rowLength: number): string {
   if (rowLength <= 1) return "md:col-span-12";
-  if (rowLength === 2) return "md:col-span-6";
-  if (rowLength === 3) return "md:col-span-4";
-  return "md:col-span-3";
+  return "md:col-span-6";
 }
 
 function MetricChartsGridInner({
@@ -115,7 +114,7 @@ function MetricChartsGridInner({
 
   if (!normalizedCharts.length) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="app-card p-6">
         <Empty description={t("crossAnalysis.noComparableMetrics")} />
       </div>
     );
@@ -123,12 +122,12 @@ function MetricChartsGridInner({
 
   const colorDomain = Object.keys(companyColors);
   const colorRange = colorDomain.map((key) => companyColors[key]);
-  const rows = chunk(normalizedCharts, 4);
+  const rows = chunk(normalizedCharts, 2);
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-4">
       {rows.map((row, rowIndex) => (
-        <div key={`chart-row-${rowIndex}`} className="grid grid-cols-1 md:grid-cols-12 gap-2.5">
+        <div key={`chart-row-${rowIndex}`} className="grid grid-cols-1 gap-4 md:grid-cols-12">
           {row.map((chart) => {
             const percentChart = isPercentUnit(chart.unit);
 
@@ -149,12 +148,7 @@ function MetricChartsGridInner({
             });
 
             const rowSpanClass = getRowSpan(row.length);
-            const shouldSpanTwo =
-              row.length >= 3 &&
-              (chart.topic.length > 34 || data.length >= 4 || data.some((d) => String(d.company).length > 18));
-            const spanClass = shouldSpanTwo ? "md:col-span-6" : rowSpanClass;
-            const compactLabels = !shouldSpanTwo && row.length === 4;
-            const chartHeight = shouldSpanTwo || row.length < 4 ? 438 : 398;
+            const chartHeight = 268;
             const yValues = data.map((d) => Number(d.value)).filter((n) => Number.isFinite(n));
 
             const isPercent = isPercentUnit(chart.unit);
@@ -174,7 +168,7 @@ function MetricChartsGridInner({
                   nice: !isPercent,
                 },
               },
-              color: ({ colorKey }: any) => companyColors[String(colorKey)] || "#1677ff",
+              color: ({ colorKey }: any) => companyColors[String(colorKey)] || DEFAULT_CHART_COLOR,
               legend: false,
               animation: false,
               autoFit: true,
@@ -182,7 +176,7 @@ function MetricChartsGridInner({
               appendPadding: 0,
               margin: 0,
               inset: 5,
-              columnWidthRatio: data.length >= 4 ? 0.58 : data.length === 1 ? 0.44 : 0.54,
+              columnWidthRatio: data.length >= 4 ? 0.52 : data.length === 1 ? 0.28 : 0.42,
               columnStyle: { radius: [8, 8, 0, 0] },
               axis: {
                 x: {
@@ -191,8 +185,8 @@ function MetricChartsGridInner({
                   labelAutoRotate: false,
                   labelAutoWrap: false,
                   labelFill: "#64748B",
-                  labelFontSize: 13,
-                  labelFormatter: (value: any) => formatAxisLabel(value, compactLabels),
+                  labelFontSize: 12,
+                  labelFormatter: (value: any) => formatAxisLabel(value, false),
                 },
                 y: {
                   title: false,
@@ -232,16 +226,16 @@ function MetricChartsGridInner({
             };
 
             return (
-              <div key={chart.key} className={`${spanClass} bg-white rounded-2xl shadow-sm px-2 py-2 min-w-0`}>
-                <div className="mb-1 min-w-0 px-1">
-                  <div className="font-semibold text-slate-900 text-[15px] leading-snug break-words">{chart.topic}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">
+              <div key={chart.key} className={`${rowSpanClass} app-card min-w-0 px-4 py-3`}>
+                <div className="mb-2 min-w-0">
+                  <div className="line-clamp-2 text-sm font-semibold leading-snug text-[var(--brand-text)]">{chart.topic}</div>
+                  <div className="mt-1 text-xs text-[var(--brand-subtle)]">
                     {chart.unit ? `Unit: ${chart.unit}` : "Unit: —"}
                     {chart.yearInfo ? ` · ${chart.yearInfo}` : ""}
                   </div>
                 </div>
 
-                <div className="w-full min-h-[304px] pt-2">
+                <div className="w-full min-h-[220px]">
                   <Column {...config} />
                 </div>
               </div>

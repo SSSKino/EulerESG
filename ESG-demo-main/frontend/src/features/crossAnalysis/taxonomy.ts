@@ -1,6 +1,4 @@
-// src/features/crossAnalysis/taxonomy.ts
-// Cross Analysis (beta) taxonomy: drives navigation + semantic query packs.
-// 一级/二级/三级导航必须完整可见（UI 不做省略），并以此结构进行语义检索与指标抽取。
+// Cross Analysis taxonomy: navigation and semantic query packs.
 
 export type DimensionKey =
   | "environment"

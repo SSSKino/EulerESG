@@ -17,6 +17,9 @@ sys.path.insert(0, str(src_dir))
 # 切换工作目录到backend根目录
 os.chdir(backend_dir)
 
+# Ensure HF cache is writable on macOS/Linux dev machines (avoid /root on Mac).
+os.environ.setdefault("HF_HOME", str(Path.home() / ".cache" / "huggingface"))
+
 # 加载环境变量
 env_file = backend_dir / "config" / ".env"
 if env_file.exists():

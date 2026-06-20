@@ -1,10 +1,9 @@
 import React, { useRef } from "react";
-import { Layout, Upload } from "antd";
+import { Upload } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useT } from "@/i18n/useT";
 
-const { Content } = Layout;
 const { Dragger } = Upload;
 
 interface UploadAreaProps {
@@ -35,36 +34,14 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onBeforeUpload }) => {
   };
 
   return (
-    <Layout
-      style={{
-        margin: 12,
-        padding: "0 12px 12px",
-        background: "#fff",
-        borderRadius: 10,
-      }}
-    >
-      <Content
-        style={{
-          padding: 12,
-          margin: 0,
-          minHeight: 180,
-          background: "#fff",
-          borderRadius: 8,
-        }}
-      >
-        <Dragger
-          {...props}
-          style={{
-            padding: "20px 0",
-          }}
-        >
-          <p className="ant-upload-drag-icon">
-            <InboxOutlined />
-          </p>
-          <p className="ant-upload-text">{t("upload.draggerText")}</p>
-        </Dragger>
-      </Content>
-    </Layout>
+    <div className="app-card mb-4 overflow-hidden p-4 md:p-5">
+      <Dragger {...props} className="app-upload-dragger" style={{ padding: "28px 0" }}>
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined style={{ color: "var(--brand-primary)" }} />
+        </p>
+        <p className="ant-upload-text text-[var(--brand-text)]">{t("upload.draggerText")}</p>
+      </Dragger>
+    </div>
   );
 };
 

@@ -45,6 +45,19 @@
 
 :root {
   --radius: 0.625rem;
+  --brand-primary: #1b6b4a;
+  --brand-primary-hover: #15543a;
+  --brand-primary-soft: rgb(27 107 74 / 0.1);
+  --brand-secondary: #4f5645;
+  --brand-secondary-hover: #3f4537;
+  --brand-surface: #f3efe6;
+  --brand-text: #1c1c1c;
+  --brand-muted: #4a4a4a;
+  --brand-subtle: #6b6b6b;
+  --brand-accent: #2f7bbd;
+  --brand-accent-soft: rgb(47 123 189 / 0.1);
+  --brand-gradient-from: #1b6b4a;
+  --brand-gradient-to: #2f7bbd;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -136,7 +149,7 @@
     min-height: 100vh;
     margin: 0;
     padding: 0;
-    background: #f0f2f5;
+    background: var(--brand-surface);
     font-family: Inter, sans-serif;
   }
 }
@@ -161,6 +174,22 @@
   overflow-x: hidden !important;
 }
 
+.analysis-results-table .ant-table-thead > tr > th {
+  background: rgb(243 239 230 / 0.65) !important;
+  color: var(--brand-muted) !important;
+  font-weight: 600;
+}
+
+.disclosure-results-table .ant-table-content {
+  overflow-x: hidden !important;
+}
+
+.disclosure-results-table .ant-table-thead > tr > th {
+  background: rgb(243 239 230 / 0.65) !important;
+  color: var(--brand-muted) !important;
+  font-weight: 600;
+}
+
 /* Metric chart grid row: dynamic columns, but stack on small screens */
 .metric-grid-row {
   display: grid;
@@ -182,7 +211,7 @@
 
 .layout-placeholder {
   min-height: 100vh;
-  background: #f0f2f5;
+  background: var(--brand-surface);
   display: flex;
   flex-direction: column;
 }
@@ -193,7 +222,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #f0f2f5;
+  background: var(--brand-surface);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -247,4 +276,204 @@
 .ant-table-filter-dropdown,
 .cross-analysis-filter-pop {
   z-index: 2000 !important;
+}
+
+@layer components {
+  .brand-page {
+    background: var(--brand-surface);
+    color: var(--brand-text);
+  }
+
+  .brand-card {
+    border: 1px solid rgb(0 0 0 / 0.06);
+    background: rgb(255 255 255 / 0.8);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  }
+
+  .brand-primary-button {
+    background: var(--brand-secondary);
+    border-color: var(--brand-secondary);
+    color: white;
+  }
+
+  .brand-primary-button:hover {
+    background: var(--brand-secondary-hover);
+    border-color: var(--brand-secondary-hover);
+  }
+
+  .brand-link {
+    color: var(--brand-primary);
+  }
+
+  .brand-link:hover {
+    color: var(--brand-primary-hover);
+  }
+
+  .app-nav-pill {
+    height: 2.125rem;
+    padding-inline: 0.875rem;
+    border-radius: 9999px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .app-nav-pill--ghost {
+    border: 1px solid rgb(0 0 0 / 0.08);
+    background: rgb(255 255 255 / 0.88);
+    color: var(--brand-muted);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  }
+
+  .app-nav-pill--ghost:hover {
+    background: var(--brand-primary-soft);
+    color: var(--brand-primary);
+  }
+
+  .app-nav-pill--primary {
+    border: 1px solid var(--brand-secondary);
+    background: var(--brand-secondary);
+    color: #fff;
+  }
+
+  .app-nav-pill--primary:hover {
+    border-color: var(--brand-secondary-hover);
+    background: var(--brand-secondary-hover);
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    background: var(--brand-surface);
+    color: var(--brand-text);
+  }
+
+  .app-main {
+    flex: 1;
+  }
+
+  .app-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid rgb(0 0 0 / 0.06) !important;
+    background: color-mix(in srgb, var(--brand-surface) 92%, white) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 18px rgb(0 0 0 / 0.04) !important;
+  }
+
+  .app-page {
+    width: 100%;
+    min-height: calc(100vh - 4.25rem);
+    background: var(--brand-surface);
+  }
+
+  .app-content {
+    width: 100%;
+    max-width: min(100%, 1760px);
+    margin: 0 auto;
+    padding: 1.25rem clamp(0.75rem, 2vw, 2rem) 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .app-content {
+      padding: 1.5rem clamp(1rem, 2.5vw, 2.5rem) 2.5rem;
+    }
+  }
+
+  .app-card {
+    border: 1px solid rgb(0 0 0 / 0.05);
+    border-radius: 1.25rem;
+    background: #fff;
+    box-shadow: 0 6px 24px rgb(0 0 0 / 0.05);
+  }
+
+  .app-card-header {
+    border-bottom: 1px solid rgb(0 0 0 / 0.05);
+    background: rgb(255 255 255 / 0.96);
+  }
+
+  .app-sidebar-pod {
+    border: 1px solid rgb(0 0 0 / 0.05);
+    border-radius: 1.25rem;
+    background: #fff;
+    box-shadow: 0 6px 24px rgb(0 0 0 / 0.05);
+  }
+
+  .app-nav-active {
+    border: 1px solid rgb(27 107 74 / 0.14);
+    background: var(--brand-primary-soft);
+    color: var(--brand-primary);
+  }
+
+  .app-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    border: 1px solid rgb(0 0 0 / 0.08);
+    background: rgb(255 255 255 / 0.9);
+    padding: 0.35rem 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--brand-muted);
+  }
+
+  .dashboard-file-table .ant-table-content {
+    overflow-x: hidden !important;
+  }
+
+  .dashboard-file-table .ant-table {
+    background: transparent;
+    table-layout: fixed;
+  }
+
+  .dashboard-file-table .ant-table-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-file-table .ant-table-cell.dashboard-file-table-actions {
+    overflow: visible;
+    white-space: nowrap;
+  }
+
+  .dashboard-file-table .ant-table-thead > tr > th {
+    background: rgb(243 239 230 / 0.65) !important;
+    color: var(--brand-muted) !important;
+    font-weight: 600;
+    border-bottom: 1px solid rgb(0 0 0 / 0.06) !important;
+  }
+
+  .dashboard-file-table .ant-table-tbody > tr > td {
+    border-bottom: 1px solid rgb(0 0 0 / 0.04) !important;
+  }
+
+  .dashboard-file-table .ant-table-tbody > tr:hover > td {
+    background: rgb(27 107 74 / 0.04) !important;
+  }
+
+  .app-upload-dragger .ant-upload-drag {
+    border: 1.5px dashed rgb(27 107 74 / 0.22) !important;
+    border-radius: 1rem !important;
+    background: rgb(243 239 230 / 0.45) !important;
+  }
+
+  .app-upload-dragger .ant-upload-drag:hover {
+    border-color: var(--brand-primary) !important;
+    background: rgb(27 107 74 / 0.06) !important;
+  }
+
+  .cross-analysis-table table {
+    table-layout: fixed;
+  }
+
+  .cross-analysis-table td,
+  .cross-analysis-table th {
+    overflow-wrap: anywhere;
+  }
 }

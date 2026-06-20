@@ -42,8 +42,8 @@ export default function Nav({ className }: { className?: string }) {
 
   const handleLogout = () => {
     clearAuth();
-    clearFiles(); // 清空前一个用户的文件列表，避免账号切换时残留
-    router.push("/login");
+    clearFiles();
+    router.push("/");
   };
 
   return (
@@ -56,14 +56,14 @@ export default function Nav({ className }: { className?: string }) {
         aria-label={t("nav.goToAllFiles")}
       >
         <Image src={EulerLogo} alt="Euler Logo" className="w-8 sm:w-10 h-auto" />
-        <h1 className="!text-base sm:!text-xl font-semibold text-[#2274BC]">
+        <h1 className="!text-base sm:!text-xl font-semibold text-[var(--brand-primary)]">
           Euler ESG
         </h1>
       </button>
 
       <div className="flex items-center gap-3">
         <div className="hidden sm:flex items-center space-x-2">
-          <span className="text-[#2274BC]">{t("nav.welcome")}</span>
+          <span className="text-[var(--brand-primary)]">{t("nav.welcome")}</span>
           <span className="font-medium text-primary truncate max-w-[200px]">
             {displayName}
           </span>
@@ -75,24 +75,24 @@ export default function Nav({ className }: { className?: string }) {
             onClick={() => setLang("zh")}
             className={`px-3 h-8 rounded-full text-sm font-medium transition-colors ${
               lang === "zh"
-                ? "bg-[#2274BC] text-white"
+                ? "bg-[var(--brand-primary)] text-white"
                 : "text-[#0F172A] hover:bg-black/5"
             }`}
             aria-pressed={lang === "zh"}
           >
-            中文
+            {t("common.langZh")}
           </button>
           <button
             type="button"
             onClick={() => setLang("en")}
             className={`px-3 h-8 rounded-full text-sm font-medium transition-colors ${
               lang === "en"
-                ? "bg-[#2274BC] text-white"
+                ? "bg-[var(--brand-primary)] text-white"
                 : "text-[#0F172A] hover:bg-black/5"
             }`}
             aria-pressed={lang === "en"}
           >
-            EN
+            {t("common.langEn")}
           </button>
         </div>
 

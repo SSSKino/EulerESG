@@ -9,6 +9,7 @@ import os
 import torch
 from loguru import logger
 
+from .hf_cache import get_hf_home
 from .shared_embedding_model import get_shared_embedding_model
 from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
 
@@ -40,7 +41,7 @@ class ContentEmbedder:
         """加载嵌入模型（优先本地 HF cache，缺失/损坏才允许远端下载）"""
         try:
             repo_id = str(getattr(self.config, "embedding_model", "") or get_configured_embedding_model_name())
-            hf_home = os.getenv("HF_HOME", "/root/.cache/huggingface")
+            hf_home = get_hf_home()
             explicit_path = get_configured_embedding_local_path()
 
             self.model = get_shared_embedding_model(

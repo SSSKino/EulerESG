@@ -14,7 +14,9 @@ interface NewComparisonChartProps {
 }
 
 // 颜色数组，用于不同报告（蓝色、橙色、红色、紫色、粉色、青色）
-const COLORS = ["#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#06B6D4"];
+import { CHART_PALETTE } from "@/features/crossAnalysis/tokens";
+
+const COLORS = [...CHART_PALETTE];
 
 function wrapAxisLabel(text: any, maxLen = 14): string {
   const s = String(text ?? "");
@@ -156,7 +158,6 @@ export function NewComparisonChart({ data }: NewComparisonChartProps) {
     return {
       data: plotData,
 
-      // ✅ v2.x axis configuration (xAxis/yAxis is ignored in some versions of @ant-design/plots 2.x)
       axis: {
         x: {
           labelFill: "#64748B",
@@ -179,7 +180,6 @@ export function NewComparisonChart({ data }: NewComparisonChartProps) {
           },
         },
       },
-      // ✅ v2.x: force tooltip to be per-element instead of per-x "series" aggregation
       interaction: {
         tooltip: { series: false },
         elementHighlight: true,
@@ -351,7 +351,7 @@ export function NewComparisonChart({ data }: NewComparisonChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-[#64748B]">
+      <div className="app-card rounded-2xl p-6 text-center text-[var(--brand-subtle)]">
         {t("crossAnalysis.noComparableChartData")}
       </div>
     );

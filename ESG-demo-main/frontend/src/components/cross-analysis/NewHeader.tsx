@@ -1,5 +1,6 @@
 "use client";
 
+import { CHART_PALETTE } from "@/features/crossAnalysis/tokens";
 import { useMemo } from "react";
 import { useT } from "@/i18n/useT";
 
@@ -38,35 +39,35 @@ export function NewHeader({
     ? companyLegend
     : reports.map((label, index) => ({
         label,
-        color: ["#1677ff", "#52c41a", "#faad14", "#f5222d", "#722ed1", "#13c2c2", "#eb2f96", "#a0d911"][index % 8],
+        color: CHART_PALETTE[index % CHART_PALETTE.length],
       }));
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm px-6 py-5 w-full">
-      <div className="flex flex-col gap-4.5">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 min-w-0">
-          <h1 className="text-[29px] md:text-[31px] font-bold text-[#0F172A] leading-none">
+    <div className="app-card w-full px-6 py-4">
+      <div className="flex flex-col gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="text-2xl font-bold leading-tight text-[var(--brand-text)] md:text-[26px]">
             {title || t("crossAnalysis.title")}
           </h1>
           {contextLabel ? (
-            <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1 text-sm font-medium text-slate-600">
+            <span className="inline-flex items-center rounded-full border border-black/8 bg-[var(--brand-primary-soft)] px-3 py-0.5 text-xs font-medium text-[var(--brand-muted)]">
               {contextLabel}
             </span>
           ) : null}
         </div>
 
-        {dimension ? <p className="text-sm text-[#64748B]">{dimension}</p> : null}
+        {dimension ? <p className="text-sm text-[var(--brand-subtle)]">{dimension}</p> : null}
 
         {legendItems.length ? (
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 pt-1">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {legendItems.map((item) => (
-              <div key={item.label} className="inline-flex items-center gap-2.5 min-w-0 pr-2">
+              <div key={item.label} className="inline-flex min-w-0 items-center gap-2">
                 <span
-                  className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                  className="inline-block h-2 w-2 shrink-0 rounded-full"
                   style={{ backgroundColor: item.color }}
                   aria-hidden
                 />
-                <span className="text-[15px] font-medium text-[#334155] truncate">{item.label}</span>
+                <span className="truncate text-sm font-medium text-[var(--brand-muted)]">{item.label}</span>
               </div>
             ))}
           </div>

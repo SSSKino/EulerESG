@@ -42,7 +42,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
   return (
     <div className="p-3 h-full flex flex-col min-h-0">
       <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-semibold text-gray-800">{t("chat.title")}</h3>
+        <h3 className="text-lg font-semibold text-[var(--brand-text)]">{t("chat.title")}</h3>
         <Tooltip title={t("chat.clearTitle")}>
           <Popconfirm
             title={t("chat.clearTitle")}
@@ -54,28 +54,30 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
             <Button
               type="text"
               icon={<DeleteOutlined />}
-              className="text-gray-500 hover:text-red-500"
+              className="text-[var(--brand-subtle)] hover:text-red-500"
             />
           </Popconfirm>
         </Tooltip>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto mb-3 border rounded-lg p-3 bg-white">
+      <div className="app-card mb-3 flex-1 min-h-0 overflow-y-auto rounded-2xl p-3">
         {messages.length === 0 ? (
-          <p className="text-gray-500 text-center">{t("chat.empty")}</p>
+          <p className="text-center text-[var(--brand-subtle)]">{t("chat.empty")}</p>
         ) : (
           <>
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`mb-2 p-2 rounded-lg w-fit break-words whitespace-pre-wrap ${
-                  msg.isUser ? "bg-blue-100 ml-auto" : "bg-gray-100"
-                } max-w-[75%]`}
+                className={`mb-2 max-w-[75%] w-fit break-words whitespace-pre-wrap rounded-2xl p-3 ${
+                  msg.isUser
+                    ? "ml-auto bg-[var(--brand-primary)] text-white"
+                    : "bg-[var(--brand-primary-soft)] text-[var(--brand-text)]"
+                }`}
                 dangerouslySetInnerHTML={{ __html: formatMessage(msg.text) }}
               />
             ))}
             {isLoading && (
-              <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg w-fit">
+              <div className="flex w-fit items-center gap-2 rounded-2xl bg-[var(--brand-primary-soft)] p-3">
                 <LoadingOutlined className="animate-spin" />
                 <span>{t("chat.thinking")}</span>
               </div>
@@ -90,7 +92,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder={t("chat.placeholder")}
           autoSize={{ minRows: 1, maxRows: 4 }}
-          className="flex-1"
+          className="flex-1 !rounded-2xl"
           onPressEnter={(e) => {
             if (!e.shiftKey) {
               e.preventDefault();
@@ -98,7 +100,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
             }
           }}
         />
-        <Button type="primary" onClick={handleSendMessage}>
+        <Button type="primary" className="!rounded-full" onClick={handleSendMessage}>
           {t("chat.send")}
         </Button>
       </div>

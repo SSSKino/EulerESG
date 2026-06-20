@@ -30,9 +30,6 @@ export function tWithLang(lang: Lang, key: string, vars?: Record<string, any>) {
 export function useT() {
   const { lang } = useAppLang();
 
-  // IMPORTANT: memoize `t` so its identity stays stable across renders.
-  // If `t` changes every render, any useCallback/useEffect that depends on it
-  // can create an infinite re-fetch / re-render loop (e.g., Cross Analysis).
   const t = useCallback(
     (key: string, vars?: Record<string, any>) => tWithLang(lang, key, vars),
     [lang]

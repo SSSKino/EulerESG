@@ -5,6 +5,7 @@ import { DeleteOutlined, CommentOutlined, SyncOutlined } from "@ant-design/icons
 import { useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import { useT } from "@/i18n/useT";
+import { isUnknownPlaceholder } from "@/i18n/unknownValues";
 
 interface FileTableProps {
   onChatClick: (file: File) => void;
@@ -91,28 +92,33 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     return "default";
   };
 
-  const renderUnknown = (v: any) =>
-    v && v !== "Unknown" && v !== "未知" ? v : t("common.unknown");
+  const renderUnknown = (v: unknown) => (isUnknownPlaceholder(v) ? t("common.unknown") : v);
 
   const columns: ColumnsType<File> = [
-    { title: t("files.columns.name"), dataIndex: "name", key: "name" },
-    { title: t("files.columns.size"), dataIndex: "size", key: "size" },
+    { title: t("files.columns.name"), dataIndex: "name", key: "name", width: "16%", ellipsis: true },
+    { title: t("files.columns.size"), dataIndex: "size", key: "size", width: "6%", ellipsis: true },
     {
       title: t("files.columns.dateUploaded"),
       dataIndex: "dateUploaded",
       key: "dateUploaded",
-      render: (v: any) => (v && v !== "Unknown" && v !== "未知" ? v : t("common.unknown")),
+      width: "9%",
+      ellipsis: true,
+      render: (v: unknown) => (isUnknownPlaceholder(v) ? t("common.unknown") : v),
     },
     {
       title: t("files.columns.type"),
       dataIndex: "type",
       key: "type",
-      render: (v: any) => (v && v !== "Unknown" && v !== "未知" ? v : t("common.unknown")),
+      width: "5%",
+      ellipsis: true,
+      render: (v: unknown) => (isUnknownPlaceholder(v) ? t("common.unknown") : v),
     },
     {
       title: t("files.columns.pages"),
       dataIndex: "pages",
       key: "pages",
+      width: "5%",
+      ellipsis: true,
       render: (_: any, record: File) =>
         record.pages && record.pages !== "-" ? record.pages : t("common.na"),
     },
@@ -120,6 +126,8 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       title: t("files.columns.framework"),
       dataIndex: "framework",
       key: "framework",
+      width: "7%",
+      ellipsis: true,
       render: (v: string | undefined) => {
         const fw = (v || "").trim() || t("common.unknown");
         return <Tag color={frameworkTagColor(v)}>{fw}</Tag>;
@@ -129,6 +137,8 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       title: t("files.columns.industry"),
       dataIndex: "industry",
       key: "industry",
+      width: "10%",
+      ellipsis: true,
       render: (v: any, record: File) => {
         const fw = (record.framework || "").trim();
         if (fw === "CDP" || fw === "TCFD") {
@@ -141,6 +151,8 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       title: t("files.columns.subOption"),
       dataIndex: "semiIndustry",
       key: "semiIndustry",
+      width: "11%",
+      ellipsis: true,
       render: (v: any, record: File) => {
         const fw = (record.framework || "").trim();
         return fw === "CDP" || fw === "TCFD" ? t("common.na") : renderUnknown(v);
@@ -149,13 +161,18 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     {
       title: t("files.columns.status"),
       key: "status",
+      width: "8%",
+      ellipsis: true,
       render: (_: any, file: File) => <Tag color={statusColor(file.status)}>{statusText(file)}</Tag>,
     },
     {
       title: t("files.columns.actions"),
       key: "actions",
+      width: 148,
+      className: "dashboard-file-table-actions",
+      onCell: () => ({ className: "dashboard-file-table-actions" }),
       render: (_: any, file: File) => (
-        <Space>
+        <Space size={4}>
           <Button
             type="primary"
             size="small"
@@ -210,9 +227,9 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
   };
 
   return (
-    <div className="mt-4 bg-white rounded-lg shadow-sm">
-      <div className="p-3 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-700">{t("files.title")}</h3>
+    <div className="app-card mt-4 overflow-hidden">
+      <div className="app-card-header flex items-center justify-between p-4">
+        <h3 className="text-lg font-semibold text-[var(--brand-text)]">{t("files.title")}</h3>
         <div className="flex items-center space-x-2">
           {loading && <Badge status="processing" text={t("common.loading")} />}
           <Button
@@ -220,21 +237,21 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
             icon={<SyncOutlined spin={loading} />}
             onClick={() => loadFilesFromBackend()}
             disabled={loading}
+            className="!rounded-full"
           >
             {t("common.refresh")}
           </Button>
-          {lastUpdatedText && <span className="text-xs text-gray-500">{lastUpdatedText}</span>}
+          {lastUpdatedText && <span className="text-xs text-[var(--brand-subtle)]">{lastUpdatedText}</span>}
         </div>
       </div>
-      <div className="overflow-x-auto px-1 pb-2">
+      <div className="overflow-hidden px-2 pb-2 pt-1">
         {dataSource.length === 0 && !loading ? (
-          <div className="p-6 text-center text-gray-500">{t("common.noDataAvailable")}</div>
+          <div className="p-8 text-center text-[var(--brand-subtle)]">{t("common.noDataAvailable")}</div>
         ) : (
           <Table
             columns={columns}
             dataSource={dataSource}
             pagination={pagination}
-            scroll={{ x: "max-content", scrollToFirstRowOnChange: true }}
             size="small"
             className="w-full dashboard-file-table"
             rowKey={(record) => record.key}

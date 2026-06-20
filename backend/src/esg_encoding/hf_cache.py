@@ -20,9 +20,23 @@ from pathlib import Path
 from typing import Optional, Tuple, Iterable
 import json
 import os
+from pathlib import Path
 
 
-DEFAULT_HF_HOME = os.getenv("HF_HOME", "/root/.cache/huggingface")
+def get_hf_home() -> str:
+    """Resolve a writable HuggingFace cache directory for local dev and Docker."""
+    explicit = os.getenv("HF_HOME")
+    if explicit:
+        return explicit
+
+    docker_default = "/root/.cache/huggingface"
+    if Path("/root").exists() and os.access("/root", os.W_OK):
+        return docker_default
+
+    return str(Path.home() / ".cache" / "huggingface")
+
+
+DEFAULT_HF_HOME = get_hf_home()
 
 
 @dataclass(frozen=True)

@@ -126,16 +126,14 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="w-full flex flex-col justify-start items-center mx-auto pt-1 min-h-screen">
-      <div className="w-[95%]">
+    <div className="app-page w-full">
+      <div className="app-content">
         <Breadcrumb
-          style={{ margin: 20 }}
+          style={{ margin: "0 0 1rem" }}
           items={[
             {
               title: (
-                <a
-                  onClick={handleBackToList}
-                  className="text-blue-600 hover:text-blue-800 cursor-pointer">
+                <a onClick={handleBackToList} className="brand-link cursor-pointer hover:underline">
                   {t("files.breadcrumbDashboard")}
                 </a>
               ),
@@ -144,7 +142,7 @@ export default function ChatPage() {
               title: currentFile?.name || t("chat.breadcrumbChat"),
             },
           ]}
-          className="mb-2 !text-lg"
+          className="!text-lg"
         />
 
         <ChatView

@@ -13,7 +13,7 @@ except Exception:  # pragma: no cover
 from loguru import logger
 from sentence_transformers import SentenceTransformer
 
-from .hf_cache import prefer_local_model
+from .hf_cache import get_hf_home, prefer_local_model
 from .embedding_settings import (
     DEFAULT_EMBEDDING_MODEL_NAME,
     get_configured_embedding_local_path,
@@ -157,7 +157,7 @@ def resolve_embedding_model_path(
     repo_id = str(model_name_or_path or get_configured_embedding_model_name(DEFAULT_EMBEDDING_MODEL_NAME)).strip()
     if not repo_id:
         repo_id = DEFAULT_EMBEDDING_MODEL_NAME
-    hf_home = hf_home or os.getenv("HF_HOME", "/root/.cache/huggingface")
+    hf_home = hf_home or get_hf_home()
     explicit_local_path = explicit_local_path or get_configured_embedding_local_path()
     ref = prefer_local_model(repo_id, explicit_local_path=explicit_local_path, hf_home=hf_home)
     resolved_model = ref.local_path or repo_id

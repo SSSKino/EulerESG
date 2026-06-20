@@ -26,6 +26,7 @@ from .models import (
     MetricCollection, ProcessingConfig
 )
 from .exceptions import ESGEncodingError, ContentEmbeddingError
+from .hf_cache import get_hf_home
 from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
 from .embedding_settings import get_configured_embedding_local_path
 
@@ -125,7 +126,7 @@ class MetricProcessor:
             self.embedding_model = get_shared_embedding_model(
                 self.config.embedding_model,
                 device=str(device),
-                hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
+                hf_home=get_hf_home(),
                 explicit_local_path=get_configured_embedding_local_path(),
                 trust_remote_code=True,
             )

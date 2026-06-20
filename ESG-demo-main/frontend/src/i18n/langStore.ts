@@ -4,8 +4,7 @@ export type { Lang };
 
 const STORAGE_KEY = "app_lang";
 
-// IMPORTANT: default to zh for SSR/CSR consistency (avoid hydration mismatch)
-let currentLang: Lang = "zh";
+let currentLang: Lang = "en";
 let initialized = false;
 
 const listeners = new Set<() => void>();
@@ -45,7 +44,7 @@ export function initLang() {
     currentLang = stored;
     notify();
   } else if (!stored) {
-    // persist default (zh)
+    // persist default (en)
     writeStorageLang(currentLang);
   }
 

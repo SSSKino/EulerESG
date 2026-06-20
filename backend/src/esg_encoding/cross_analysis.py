@@ -18,6 +18,7 @@ from .file_manager import file_manager
 from .hipporag_settings import HippoRAGSettings
 from .hipporag_retriever import HippoRAGRetriever
 from .flag_reranker import rerank_segment_ids
+from .hf_cache import get_hf_home
 from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
 from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
 from .models import ReportContent, DocumentContent, TextSegment, ProcessingConfig
@@ -360,7 +361,7 @@ def get_embedding_model():
 
     repo_id = get_configured_embedding_model_name()
     explicit_path = get_configured_embedding_local_path()
-    cache_folder = os.getenv("HF_HOME", "/root/.cache/huggingface")
+    cache_folder = get_hf_home()
     device = _get_device()
 
     _model = get_shared_embedding_model(

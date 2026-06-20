@@ -9,7 +9,7 @@ from typing import Callable, Dict, List, Sequence, Tuple
 import numpy as np
 
 from .hipporag_settings import HippoRAGSettings
-from .hf_cache import prefer_local_model
+from .hf_cache import get_hf_home, prefer_local_model
 from .embedding_settings import get_configured_rerank_local_path, get_configured_rerank_model_dtype
 from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
 
@@ -155,7 +155,7 @@ class _DenseEmbeddingReranker:
         self.model = get_shared_embedding_model(
             model_name_or_path,
             device=device,
-            hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
+            hf_home=get_hf_home(),
             explicit_local_path=get_configured_rerank_local_path(),
             trust_remote_code=True,
             dtype_env_key="LOCAL_RERANKER_MODEL_DTYPE",

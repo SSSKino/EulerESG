@@ -5,13 +5,7 @@ import { Tabs, Select } from "antd";
 import dynamic from "next/dynamic";
 import type { CrossExtractedRecord } from "@/features/crossAnalysis/types";
 import { useT } from "@/i18n/useT";
-
-// NOTE:
-// AntV/G2-based charts may render as an empty box in Next.js when the plot
-// library is evaluated too early (SSR/hydration) or when the container size is
-// temporarily zero on first paint. We therefore:
-// 1) dynamically import the plot component with ssr:false, and
-// 2) delay the first render until after mount.
+import { CHART_PALETTE } from "@/features/crossAnalysis/tokens";
 
 const ColumnPlot = dynamic(async () => {
   const mod: any = await import("@ant-design/plots");
@@ -348,18 +342,7 @@ export default function IssueComparisonCharts({
           }
         : undefined;
 
-      const palette = [
-        "#1677ff",
-        "#52c41a",
-        "#faad14",
-        "#f5222d",
-        "#722ed1",
-        "#13c2c2",
-        "#eb2f96",
-        "#2f54eb",
-        "#a0d911",
-        "#fa541c",
-      ];
+      const palette = [...CHART_PALETTE];
 
       const companyOrder = uniq(
         (selectedCompanies.length ? selectedCompanies : filteredData.map((d) => d.companyKey))
@@ -479,7 +462,6 @@ export default function IssueComparisonCharts({
             },
           },
         },
-        // ✅ v2.x: ensure tooltip is element-based (not "series"/axis shared)
         interaction: {
           tooltip: { series: false },
         },
@@ -510,7 +492,6 @@ export default function IssueComparisonCharts({
                       plot?.render?.();
                       plot?.forceFit?.();
                     } catch {
-                      // no-op
                     }
                   }, 0);
                 }}

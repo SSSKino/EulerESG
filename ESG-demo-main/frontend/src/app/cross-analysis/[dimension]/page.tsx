@@ -3,13 +3,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { Button, Card, Empty, Modal, Space, Table, Tag, Typography, Skeleton, Grid } from "antd";
-import type { ColumnsType } from "antd/es/table";
+import { Button, Modal, Skeleton } from "antd";
 
 import { getStoredAuth } from "@/lib/auth";
 import type { CrossExtractedRecord, CrossReportSummary } from "@/features/crossAnalysis/types";
 import { normalizeCrossRecords } from "@/features/crossAnalysis/recordAdapter";
+import { DEFAULT_CHART_COLOR, chartColorAt } from "@/features/crossAnalysis/tokens";
 import { NewSidebar } from "@/components/cross-analysis/NewSidebar";
 import { NewHeader } from "@/components/cross-analysis/NewHeader";
 import { MetricChartsGrid, type MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
@@ -17,9 +16,6 @@ import { NewDataTable } from "@/components/cross-analysis/NewDataTable";
 import DisclosureCompletenessComparison from "@/components/cross-analysis/DisclosureCompletenessComparison";
 import FloatingChatAssistant from "@/components/cross-analysis/FloatingChatAssistant";
 import { useT } from "@/i18n/useT";
-
-const { Title } = Typography;
-const { useBreakpoint } = Grid;
 
 function safeTrim(v: any): string {
   if (v === null || v === undefined) return "";
@@ -98,31 +94,15 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-// NOTE: Cross Analysis no longer reads cross_analysis/output/all_records.json nor triggers
-// any re-extraction. It builds its dataset directly from per-report assessment outputs.
-
-type TableRow = CrossExtractedRecord;
-
 export default function CrossAnalysisDimensionPage() {
   const { t } = useT();
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
 
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
-
   const dimensionSlug = safeTrim((params as any)?.dimension || "");
 
-  // IMPORTANT:
-  // Next.js `useSearchParams()` may return a new object identity across renders.
-  // If we depend on that object in useMemo/useCallback, we can accidentally retrigger
-  // data loading (runExtract) on every render, which causes chart flicker.
-  // Therefore we only depend on the *string values* we actually use.
   const idsParam = searchParams.get("ids") || "";
-
-  // Cache commonly used query params as strings so hooks don't depend on the
-  // `useSearchParams()` object identity.
   const searchParamsStr = searchParams.toString();
   const primaryQ = safeTrim(searchParams.get("primary"));
   const secondaryQ = safeTrim(searchParams.get("secondary"));
@@ -220,20 +200,6 @@ export default function CrossAnalysisDimensionPage() {
   const [selectedTertiary, setSelectedTertiary] = useState<string | null>(null);
   const [expandedPrimaries, setExpandedPrimaries] = useState<Record<string, boolean>>({});
 
-  // Table filters (header filter dropdowns)
-  const [filterTopics, setFilterTopics] = useState<string[]>([]);
-  const [filterYears, setFilterYears] = useState<string[]>([]);
-  const [filterCompanies, setFilterCompanies] = useState<string[]>([]);
-  const [filterSubTopics, setFilterSubTopics] = useState<string[]>([]);
-
-  const clearTableFilters = useCallback(() => {
-    setFilterTopics([]);
-    setFilterSubTopics([]);
-    setFilterYears([]);
-    setFilterCompanies([]);
-  }, []);
-
-  // Resolve selectedPrimary / Secondaries / Tertiary (metric) from URL after data arrives.
   useEffect(() => {
     if (!primaryOptions.length) return;
 
@@ -292,39 +258,6 @@ export default function CrossAnalysisDimensionPage() {
     });
   }, [allRecords, selectedPrimary, selectedSecondaries, selectedTertiary, isSasbFramework]);
 
-  const topicOptions = useMemo(() => {
-    return uniqPreserveOrder(records.map((r) => safeTrim((r as any).topic)).filter(Boolean)).sort((a, b) => a.localeCompare(b));
-  }, [records]);
-
-  const yearOptions = useMemo(() => {
-    const xs = uniqPreserveOrder(records.map((r) => safeTrim((r as any).year)).filter(Boolean));
-    return xs.sort((a, b) => b.localeCompare(a));
-  }, [records]);
-
-  const companyOptions = useMemo(() => {
-    return uniqPreserveOrder(records.map((r) => safeTrim((r as any).name)).filter(Boolean)).sort((a, b) => a.localeCompare(b));
-  }, [records]);
-
-  const subTopicOptions = useMemo(() => {
-    return uniqPreserveOrder(records.map((r) => safeTrim((r as any).sub_topic)).filter(Boolean)).sort((a, b) => a.localeCompare(b));
-  }, [records]);
-
-  // When new data arrives, prune invalid selections so filters don't get "stuck".
-  useEffect(() => {
-    const topicSet = new Set(topicOptions);
-    const yearSet = new Set(yearOptions);
-    const compSet = new Set(companyOptions);
-    const subTopicSet = new Set(subTopicOptions);
-    setFilterTopics((prev) => prev.filter((v) => topicSet.has(v)));
-    setFilterYears((prev) => prev.filter((v) => yearSet.has(v)));
-    setFilterCompanies((prev) => prev.filter((v) => compSet.has(v)));
-    setFilterSubTopics((prev) => prev.filter((v) => subTopicSet.has(v)));
-  }, [topicOptions, yearOptions, companyOptions, subTopicOptions]);
-
-  // Note: we intentionally do NOT pre-filter the table dataset with these filter states.
-  // Ant Design Table will apply the filters internally, preventing double-filter issues.
-
-  // Load report display names
   useEffect(() => {
     if (ids.length < 2) return;
     let cancelled = false;
@@ -347,8 +280,6 @@ export default function CrossAnalysisDimensionPage() {
             }))
           );
         }
-      } finally {
-        // no-op
       }
     })();
     return () => {
@@ -450,396 +381,110 @@ export default function CrossAnalysisDimensionPage() {
     runExtract();
   }, [ids.join("|"), runExtract, canCompare]);
 
-  // Grouping by Secondary Navigation (this is the "active panel" selector)
-  const recordsBySecondaryAll = useMemo(() => {
-    const g: Record<string, CrossExtractedRecord[]> = {};
-    for (const r of records) {
-      const k = safeTrim((r as any).secondary_navigation) || "(unknown)";
-      (g[k] = g[k] || []).push(r);
-    }
-    for (const k of Object.keys(g)) {
-      g[k].sort((a, b) => {
-        const na = safeTrim((a as any).name);
-        const nb = safeTrim((b as any).name);
-        if (na !== nb) return na.localeCompare(nb);
-        const ta = safeTrim((a as any).topic);
-        const tb = safeTrim((b as any).topic);
-        if (ta !== tb) return ta.localeCompare(tb);
-        const sa = safeTrim((a as any).sub_topic);
-        const sb = safeTrim((b as any).sub_topic);
-        if (sa !== sb) return sa.localeCompare(sb);
-        const ya = safeTrim((a as any).year);
-        const yb = safeTrim((b as any).year);
-        return yb.localeCompare(ya);
-      });
-    }
-    return g;
-  }, [records]);
+  const [viewMode, setViewMode] = useState<"issue" | "disclosure">("issue");
 
-  // Table always renders all records under the current Primary + selected Secondary(ies).
-  // (If multiple secondaries are selected, the table shows their union.)
+  const buildNavUrl = useCallback(
+    (primary: string, secondaries: string[], metric?: string | null) => {
+      const next = new URLSearchParams(searchParamsStr);
+      if (primary) next.set("primary", primary);
+      else next.delete("primary");
+      if (secondaries && secondaries.length) next.set("secondary", secondaries.join(","));
+      else next.delete("secondary");
+      if (metric) next.set("metric", metric);
+      else next.delete("metric");
 
-  const secondaryLabels = useMemo(() => Object.keys(recordsBySecondaryAll), [recordsBySecondaryAll]);
-  const [activeSecondary, setActiveSecondary] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!secondaryLabels.length) {
-      setActiveSecondary(null);
-      return;
-    }
-    // Prefer first selected secondary.
-    const preferred = selectedSecondaries.find((s) => secondaryLabels.includes(s));
-    const next = preferred || secondaryLabels[0];
-    setActiveSecondary((prev) => (prev === next ? prev : next));
-  }, [secondaryLabels.join("|"), selectedSecondaries.join("|")]);
-
-  const activeRowsChart = useMemo(() => {
-    if (!activeSecondary) return [] as CrossExtractedRecord[];
-    return recordsBySecondaryAll[activeSecondary] || ([] as CrossExtractedRecord[]);
-  }, [activeSecondary, recordsBySecondaryAll]);
-
-  const tableRows = records;
-
-  const columns: ColumnsType<TableRow> = useMemo(() => {
-    const wrapCell = () => ({ style: { whiteSpace: "normal" as const, wordBreak: "break-word" as const } });
-
-    return [
-      {
-        title: t("crossAnalysis.table.report"),
-        dataIndex: "name",
-        key: "name",
-        width: isMobile ? 140 : 180,
-        onCell: wrapCell,
-        filters: companyOptions.map((v) => ({ text: v, value: v })),
-        filterSearch: true,
-        filterMultiple: true,
-        filteredValue: filterCompanies.length ? filterCompanies : null,
-        onFilter: (value, record) => safeTrim((record as any).name) === String(value),
-        render: (v: string) => <span className="text-slate-900">{v || "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.metric"),
-        dataIndex: "topic",
-        key: "topic",
-        width: isMobile ? 220 : 260,
-        onCell: wrapCell,
-        filters: topicOptions.map((v) => ({ text: v, value: v })),
-        filterSearch: true,
-        filterMultiple: true,
-        filteredValue: filterTopics.length ? filterTopics : null,
-        onFilter: (value, record) => safeTrim((record as any).topic) === String(value),
-        render: (_: string, record: any) => {
-          const t = safeTrim(record?.topic);
-          const st = safeTrim(record?.sub_topic);
-          // On mobile, show Sub-topic as a secondary line to avoid horizontal scrolling.
-          return isMobile ? (
-            <div className="space-y-1">
-              <div className="font-medium text-slate-900">{t || "—"}</div>
-              {st ? <div className="text-xs text-slate-600">{st}</div> : null}
-            </div>
-          ) : (
-            <span className="text-slate-900">{t || "—"}</span>
-          );
-        },
-      },
-      {
-        title: t("crossAnalysis.table.subTopic"),
-        dataIndex: "sub_topic",
-        key: "sub_topic",
-        width: 220,
-        onCell: wrapCell,
-        responsive: ["md"],
-        filters: subTopicOptions.map((v) => ({ text: v, value: v })),
-        filterSearch: true,
-        filterMultiple: true,
-        filteredValue: filterSubTopics.length ? filterSubTopics : null,
-        onFilter: (value, record) => safeTrim((record as any).sub_topic) === String(value),
-        render: (v: string) => <span className="text-slate-700">{v || "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.value"),
-        dataIndex: "data",
-        key: "data",
-        width: 110,
-        onCell: wrapCell,
-        render: (v: string) => <span className="font-medium text-slate-900">{v ?? "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.unit"),
-        dataIndex: "unit",
-        key: "unit",
-        width: 90,
-        onCell: wrapCell,
-        render: (v: string | null) => <span className="text-slate-600">{v || "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.year"),
-        dataIndex: "year",
-        key: "year",
-        width: 90,
-        onCell: wrapCell,
-        filters: yearOptions.map((v) => ({ text: v, value: v })),
-        filterSearch: true,
-        filterMultiple: true,
-        filteredValue: filterYears.length ? filterYears : null,
-        onFilter: (value, record) => safeTrim((record as any).year) === String(value),
-        render: (v: string) => <span className="text-slate-700">{v || "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.detail"),
-        dataIndex: "detail",
-        key: "detail",
-        onCell: wrapCell,
-        responsive: ["md"],
-        render: (v: string) => <span className="text-slate-700">{v || "—"}</span>,
-      },
-      {
-        title: "",
-        key: "evidence",
-        width: 110,
-        render: (_: any, record: any) => {
-          const rawId = safeTrim(record?.id) || safeTrim((record as any)?.file_id) || safeTrim(record?.name);
-          const fileId = rawId
-            ? (isUuid(rawId)
-                ? rawId
-                : reportKeyToFileId.get(normalizeReportKey(rawId)) || reportKeyToFileId.get(normalizeReportKey(record?.name)) || rawId)
-            : "";
-          const page = record?.page ? String(record.page) : "1";
-          const title = `${safeTrim(record?.name) || t("crossAnalysis.table.report")} · ${safeTrim(record?.topic) || t("crossAnalysis.evidence.defaultName")}`;
-          const qs = new URLSearchParams({
-            file_id: fileId,
-            page,
-            name: title,
-          }).toString();
-          const href = `/cross-analysis/evidence?${qs}`;
-          return fileId ? (
-            <Link href={href} target="_blank" rel="noopener noreferrer">
-              <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
-                {t("crossAnalysis.table.evidence")} <span aria-hidden className="text-slate-400">↗</span>
-              </span>
-            </Link>
-          ) : (
-            <span className="text-slate-300">—</span>
-          );
-        },
-      },
-    ];
-  }, [companyOptions, topicOptions, subTopicOptions, yearOptions, filterCompanies, filterTopics, filterSubTopics, filterYears, isMobile, reportKeyToFileId, t]);
-
-  const handleTableChange = useCallback((_: any, filters: any) => {
-    setFilterCompanies((filters?.name as string[]) || []);
-    setFilterTopics((filters?.topic as string[]) || []);
-    setFilterSubTopics((filters?.sub_topic as string[]) || []);
-    setFilterYears((filters?.year as string[]) || []);
-  }, []);
-
-  const tableExpandable = useMemo(() => {
-    if (!isMobile) return undefined;
-    return {
-      expandedRowRender: (record: any) => {
-        const detail = safeTrim(record?.detail);
-        const sub = safeTrim(record?.sub_topic);
-        return (
-          <div className="space-y-1 text-xs text-slate-700">
-            {sub ? (
-              <div>
-                <span className="font-semibold text-slate-900">{t("crossAnalysis.table.subTopic")}: </span>
-                {sub}
-              </div>
-            ) : null}
-            {detail ? (
-              <div>
-                <span className="font-semibold text-slate-900">{t("crossAnalysis.table.detail")}: </span>
-                {detail}
-              </div>
-            ) : (
-              <div className="text-slate-400">{t("crossAnalysis.noAdditionalDetail")}</div>
-            )}
-          </div>
-        );
-      },
-      rowExpandable: () => true,
-    } as const;
-  }, [isMobile, t]);
-
-  const onSelectPrimary = useCallback(
-    (primary: string, secondaryOverride?: string) => {
-      const sp = new URLSearchParams(searchParamsStr);
-      // Preserve framework/industry/semiIndustry when switching navigation
-      sp.set("primary", primary);
-      sp.delete("metric");
-
-      const secs = secondaryByPrimary.get(primary) || [];
-      const nextSecs = secondaryOverride && secs.includes(secondaryOverride)
-        ? [secondaryOverride]
-        : secs.length
-          ? [secs[0]]
-          : [];
-      if (nextSecs.length) sp.set("secondary", nextSecs.join(","));
-      else sp.delete("secondary");
-
-      clearTableFilters();
-      setSelectedTertiary(null);
-
-      const qs = sp.toString();
-      router.push(`/cross-analysis/${slugify(primary)}${qs ? `?${qs}` : ""}`);
-      setSelectedPrimary(primary);
-      setSelectedSecondaries(nextSecs);
-      if (nextSecs.length) setActiveSecondary(nextSecs[0]);
+      const slug = slugify(primary || "nav");
+      const qs = next.toString();
+      return qs ? `/cross-analysis/${slug}?${qs}` : `/cross-analysis/${slug}`;
     },
-    [searchParamsStr, router, secondaryByPrimary, clearTableFilters]
+    [searchParamsStr]
   );
 
-  const onToggleSecondary = useCallback(
-    (secondary: string, toggleMode: boolean) => {
-      if (!selectedPrimary) return;
-      const sp = new URLSearchParams(searchParamsStr);
-      // Preserve framework/industry/semiIndustry when switching navigation
-      sp.delete("metric");
+  const handleTogglePrimary = useCallback(
+    (primary: string) => {
+      setViewMode("issue");
+      setExpandedPrimaries((prev) => ({ ...prev, [primary]: safeTrim(selectedPrimary) === primary ? !prev?.[primary] : true }));
 
-      const secOptions = secondaryByPrimary.get(selectedPrimary) || [];
-      let next: string[] = [];
-
-      // Default click: single-select. Ctrl/Cmd click: toggle multi-select.
-      if (!toggleMode) {
-        next = [secondary];
-        // Changing the active secondary should not inherit stale header filters.
-        clearTableFilters();
-      } else {
-        const has = selectedSecondaries.includes(secondary);
-        next = has ? selectedSecondaries.filter((x) => x !== secondary) : [...selectedSecondaries, secondary];
-        if (!next.length && secOptions.length) next = [secOptions[0]];
-        // Stable ordering based on the primary's secondary order.
-        const order = new Map(secOptions.map((v, idx) => [v, idx] as const));
-        next.sort((a, b) => (order.get(a) ?? 1e9) - (order.get(b) ?? 1e9));
+      if (safeTrim(selectedPrimary) !== primary) {
+        const nextSecondaries: string[] = [];
+        setSelectedPrimary(primary);
+        setSelectedSecondaries(nextSecondaries);
+        setSelectedTertiary(null);
+        router.replace(buildNavUrl(primary, nextSecondaries, null));
       }
-
-      if (next.length) sp.set("secondary", next.join(","));
-      else sp.delete("secondary");
-
-      setSelectedTertiary(null);
-
-      const qs = sp.toString();
-      router.replace(`/cross-analysis/${slugify(selectedPrimary)}${qs ? `?${qs}` : ""}`);
-      setSelectedSecondaries(next);
-      setActiveSecondary(secondary);
     },
-    [selectedPrimary, selectedSecondaries, searchParamsStr, router, secondaryByPrimary, clearTableFilters]
+    [router, buildNavUrl, selectedPrimary]
   );
 
-  // 允许在没有 ids 的情况下也显示数据（从直接 JSON 文件加载）
-  const isReady = true;
+  const handleSelectSecondary = useCallback(
+    (primary: string, secondary: string) => {
+      setViewMode("issue");
+      setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
 
-// Cross Analysis navigation is fully data-driven:
-// Primary Navigation -> Secondary Navigation are extracted from all_records.json (and therefore reflect the real dataset).
-const [viewMode, setViewMode] = useState<"issue" | "disclosure">("issue");
+      const currentOrder = secondaryByPrimary.get(primary) || [];
+      const existing = safeTrim(selectedPrimary) === primary ? [...selectedSecondaries] : [];
+      const hasSecondary = existing.includes(secondary);
+      const nextSecondaries = hasSecondary ? existing.filter((x) => x !== secondary) : [...existing, secondary];
+      const order = new Map(currentOrder.map((v, idx) => [v, idx] as const));
+      nextSecondaries.sort((a, b) => (order.get(a) ?? 1e9) - (order.get(b) ?? 1e9));
 
-const buildNavUrl = useCallback(
-  (primary: string, secondaries: string[], metric?: string | null) => {
-    const next = new URLSearchParams(searchParamsStr);
-    // Preserve framework/industry/semiIndustry (and ids) when switching navigation
-    if (primary) next.set("primary", primary);
-    else next.delete("primary");
-    if (secondaries && secondaries.length) next.set("secondary", secondaries.join(","));
-    else next.delete("secondary");
-    if (metric) next.set("metric", metric);
-    else next.delete("metric");
-
-    const slug = slugify(primary || "nav");
-    const qs = next.toString();
-    return qs ? `/cross-analysis/${slug}?${qs}` : `/cross-analysis/${slug}`;
-  },
-  [searchParamsStr]
-);
-
-const handleTogglePrimary = useCallback(
-  (primary: string) => {
-    setViewMode("issue");
-    setExpandedPrimaries((prev) => ({ ...prev, [primary]: safeTrim(selectedPrimary) === primary ? !prev?.[primary] : true }));
-
-    if (safeTrim(selectedPrimary) !== primary) {
-      const nextSecondaries: string[] = [];
       setSelectedPrimary(primary);
       setSelectedSecondaries(nextSecondaries);
       setSelectedTertiary(null);
       router.replace(buildNavUrl(primary, nextSecondaries, null));
+    },
+    [router, buildNavUrl, selectedPrimary, selectedSecondaries, secondaryByPrimary]
+  );
+
+  const handleSelectTertiary = useCallback(
+    (primary: string, secondary: string, metricName: string) => {
+      setViewMode("issue");
+      setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
+
+      const isSameMetric =
+        safeTrim(selectedPrimary) === primary &&
+        selectedSecondaries.length === 1 &&
+        selectedSecondaries[0] === secondary &&
+        selectedTertiary === metricName;
+
+      const nextSecondaries = isSameMetric ? [] : [secondary];
+      const nextMetric = isSameMetric ? null : metricName;
+
+      setSelectedPrimary(primary);
+      setSelectedSecondaries(nextSecondaries);
+      setSelectedTertiary(nextMetric);
+      router.replace(buildNavUrl(primary, nextSecondaries, nextMetric));
+    },
+    [router, buildNavUrl, selectedPrimary, selectedSecondaries, selectedTertiary]
+  );
+
+  const handleSelectDisclosure = useCallback(() => {
+    setViewMode((prev) => (prev === "disclosure" ? "issue" : "disclosure"));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPrimary) return;
+
+    const pQ = primaryQ;
+    const sQ = secondaryQ;
+    const mQ = metricQ;
+    const desiredSlug = slugify(selectedPrimary);
+    const curSlug = dimensionSlug;
+    const desiredSecondaryStr = (selectedSecondaries || []).join(",");
+    const desiredMetric = selectedTertiary || "";
+
+    const needsUpdate =
+      pQ !== selectedPrimary ||
+      (desiredSecondaryStr ? sQ !== desiredSecondaryStr : !!sQ) ||
+      desiredMetric !== mQ ||
+      (curSlug && curSlug !== desiredSlug);
+
+    if (needsUpdate) {
+      router.replace(buildNavUrl(selectedPrimary, selectedSecondaries || [], selectedTertiary));
     }
-  },
-  [router, buildNavUrl, selectedPrimary]
-);
+  }, [selectedPrimary, (selectedSecondaries || []).join("|"), selectedTertiary, primaryQ, secondaryQ, metricQ, router, buildNavUrl, dimensionSlug]);
 
-const handleSelectSecondary = useCallback(
-  (primary: string, secondary: string) => {
-    setViewMode("issue");
-    setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
-
-    const currentOrder = secondaryByPrimary.get(primary) || [];
-    const existing = safeTrim(selectedPrimary) === primary ? [...selectedSecondaries] : [];
-    const hasSecondary = existing.includes(secondary);
-    const nextSecondaries = hasSecondary ? existing.filter((x) => x !== secondary) : [...existing, secondary];
-    const order = new Map(currentOrder.map((v, idx) => [v, idx] as const));
-    nextSecondaries.sort((a, b) => (order.get(a) ?? 1e9) - (order.get(b) ?? 1e9));
-
-    setSelectedPrimary(primary);
-    setSelectedSecondaries(nextSecondaries);
-    setSelectedTertiary(null);
-    router.replace(buildNavUrl(primary, nextSecondaries, null));
-  },
-  [router, buildNavUrl, selectedPrimary, selectedSecondaries, secondaryByPrimary]
-);
-
-const handleSelectTertiary = useCallback(
-  (primary: string, secondary: string, metricName: string) => {
-    setViewMode("issue");
-    setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
-
-    const isSameMetric =
-      safeTrim(selectedPrimary) === primary &&
-      selectedSecondaries.length === 1 &&
-      selectedSecondaries[0] === secondary &&
-      selectedTertiary === metricName;
-
-    const nextSecondaries = isSameMetric ? [] : [secondary];
-    const nextMetric = isSameMetric ? null : metricName;
-
-    setSelectedPrimary(primary);
-    setSelectedSecondaries(nextSecondaries);
-    setSelectedTertiary(nextMetric);
-    router.replace(buildNavUrl(primary, nextSecondaries, nextMetric));
-  },
-  [router, buildNavUrl, selectedPrimary, selectedSecondaries, selectedTertiary]
-);
-
-const handleSelectDisclosure = useCallback(() => {
-  setViewMode((prev) => (prev === "disclosure" ? "issue" : "disclosure"));
-}, []);
-
-// Normalize URL (slug + query) once selection is resolved from data/URL.
-useEffect(() => {
-  if (!selectedPrimary) return;
-
-  const pQ = primaryQ;
-  const sQ = secondaryQ;
-  const mQ = metricQ;
-  const desiredSlug = slugify(selectedPrimary);
-  const curSlug = dimensionSlug;
-  const desiredSecondaryStr = (selectedSecondaries || []).join(",");
-  const desiredMetric = selectedTertiary || "";
-
-  const needsUpdate =
-    pQ !== selectedPrimary ||
-    (desiredSecondaryStr ? sQ !== desiredSecondaryStr : !!sQ) ||
-    desiredMetric !== mQ ||
-    (curSlug && curSlug !== desiredSlug);
-
-  if (needsUpdate) {
-    router.replace(buildNavUrl(selectedPrimary, selectedSecondaries || [], selectedTertiary));
-  }
-}, [selectedPrimary, (selectedSecondaries || []).join("|"), selectedTertiary, primaryQ, secondaryQ, metricQ, router, buildNavUrl, dimensionSlug]);
-
-  // 生成新样式需要的表格数据
   const newTableData = useMemo(() => {
-    // 创建报告名称到 file_id 的映射
     const nameToFileIdMap = new Map<string, string>();
     reports.forEach((r) => {
       const fid = safeTrim((r as any).file_id);
@@ -961,19 +606,9 @@ useEffect(() => {
 
   // Assign a stable color per report slot (one bar per report; used by all charts)
   const companyColors = useMemo(() => {
-    const palette = [
-      "#1677ff",
-      "#52c41a",
-      "#faad14",
-      "#f5222d",
-      "#722ed1",
-      "#13c2c2",
-      "#eb2f96",
-      "#a0d911",
-    ];
     const map: Record<string, string> = {};
     reportChartSlots.forEach((slot, idx) => {
-      map[slot.fileId || slot.label] = palette[idx % palette.length];
+      map[slot.fileId || slot.label] = chartColorAt(idx);
     });
     return map;
   }, [reportChartSlots]);
@@ -981,7 +616,7 @@ useEffect(() => {
   const companyLegend = useMemo(() => {
     return reportChartSlots.map((slot) => ({
       label: slot.label,
-      color: companyColors[slot.fileId || slot.label] || "#1677ff",
+      color: companyColors[slot.fileId || slot.label] || DEFAULT_CHART_COLOR,
     }));
   }, [reportChartSlots, companyColors]);
 
@@ -1070,9 +705,9 @@ useEffect(() => {
   }, [records, reportChartSlots, t]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#FFFFFF] p-6 w-full">
+    <div className="app-page w-full p-4 md:p-6">
       {ids.length < 2 ? (
-        <div className="w-full flex flex-col items-center justify-center min-h-[50vh] text-slate-600">
+        <div className="flex min-h-[50vh] w-full flex-col items-center justify-center text-[var(--brand-subtle)]">
           <p className="text-base mb-2">{t("crossAnalysis.title")}</p>
           <p className="text-sm">{t("files.selectAtLeastTwoReports")}</p>
         </div>
@@ -1089,7 +724,7 @@ useEffect(() => {
               </Button>
             }
           >
-            <p className="text-slate-700">{t("crossAnalysis.sameScopeRequired")}</p>
+            <p className="text-[var(--brand-text)]">{t("crossAnalysis.sameScopeRequired")}</p>
           </Modal>
         </>
       ) : (
@@ -1098,7 +733,7 @@ useEffect(() => {
           <button
             type="button"
             onClick={() => setSidebarCollapsed(false)}
-            className="fixed left-5 top-24 z-30 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
+            className="fixed left-5 top-24 z-30 flex items-center justify-center rounded-full border border-black/8 bg-white/90 p-2 text-[var(--brand-subtle)] shadow-sm transition-colors hover:text-[var(--brand-text)]"
             aria-label={t("crossAnalysis.navigation")}
             title={t("crossAnalysis.navigation")}
           >
@@ -1113,7 +748,7 @@ useEffect(() => {
                 <button
                   type="button"
                   onClick={() => setSidebarCollapsed(true)}
-                  className="absolute top-3 left-3 z-10 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
+                  className="absolute top-3 left-3 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-black/8 bg-white text-[var(--brand-subtle)] shadow-sm transition-colors hover:bg-[var(--brand-primary-soft)] hover:text-[var(--brand-text)]"
                   aria-label={t("crossAnalysis.navigation")}
                 >
                   <PanelLeftClose className="w-5 h-5" />
@@ -1125,7 +760,7 @@ useEffect(() => {
                 <button
                   type="button"
                   onClick={() => setSidebarCollapsed(true)}
-                  className="absolute top-3 left-3 z-10 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
+                  className="absolute top-3 left-3 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-black/8 bg-white text-[var(--brand-subtle)] shadow-sm transition-colors hover:bg-[var(--brand-primary-soft)] hover:text-[var(--brand-text)]"
                   aria-label={t("crossAnalysis.navigation")}
                   title={t("crossAnalysis.navigation")}
                 >
@@ -1172,6 +807,13 @@ useEffect(() => {
               {/* Comparison Chart Card */}
               {recordsLoading ? (
                 <Skeleton active paragraph={{ rows: 8 }} />
+              ) : metricCharts.length > 0 ? (
+                <div className="space-y-3">
+                  <h2 className="px-1 text-sm font-semibold uppercase tracking-wide text-[var(--brand-subtle)]">
+                    {t("crossAnalysis.comparisonChartTitle")}
+                  </h2>
+                  <MetricChartsGrid charts={metricCharts} companyColors={companyColors} />
+                </div>
               ) : (
                 <MetricChartsGrid charts={metricCharts} companyColors={companyColors} />
               )}
@@ -1180,14 +822,13 @@ useEffect(() => {
               {recordsLoading ? (
                 <Skeleton active paragraph={{ rows: 10 }} />
               ) : recordsError ? (
-                <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-red-500">
+                <div className="app-card p-6 text-center text-red-500">
                   {recordsError}
                 </div>
               ) : newTableData.length > 0 ? (
                 <NewDataTable
                   data={newTableData}
                   onViewEvidence={(row) => {
-                    // 跳转到证据页面
                     if (row.fileId) {
                       const params = new URLSearchParams({
                         file_id: row.fileId,
@@ -1196,7 +837,6 @@ useEffect(() => {
                       if (row.page !== null && row.page !== undefined) {
                         params.set("page", String(row.page));
                       }
-                      // Open in a new tab (do not replace the current Cross Analysis view)
                       window.open(`/cross-analysis/evidence?${params.toString()}`, "_blank", "noopener,noreferrer");
                     } else {
                       console.warn("No file_id found for row:", row);
@@ -1204,7 +844,7 @@ useEffect(() => {
                   }}
                 />
               ) : (
-                <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-[#64748B]">
+                <div className="app-card rounded-2xl p-6 text-center text-[var(--brand-subtle)]">
                   {t("crossAnalysis.noRecordsFound")}
                 </div>
               )}
@@ -1214,7 +854,6 @@ useEffect(() => {
       </div>
       )}
 
-      {/* 悬浮 AI 助手：仅在对比分析主内容展示时显示 */}
       {canCompare && <FloatingChatAssistant />}
     </div>
   );
