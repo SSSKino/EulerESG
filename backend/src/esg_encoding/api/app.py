@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -18,10 +19,24 @@ from .routers import auth, chat, compliance, cross_analysis, excel_metrics, file
 
 load_dotenv()
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifecycle hooks.
+
+    FastAPI/Starlette 1.x removed the legacy add_event_handler API.
+    The lifespan protocol is compatible with current FastAPI and keeps
+    startup initialization in one place.
+    """
+    await system_service.startup_event()
+    yield
+
+
 app = FastAPI(
     title="ESG Analysis System API",
     description="Complete ESG report analysis and compliance assessment system",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 FRONTEND_ORIGINS_STR = os.getenv(
@@ -50,7 +65,6 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
-app.add_event_handler("startup", system_service.startup_event)
 app.add_exception_handler(InputError, error_handlers.input_error_handler)
 app.add_exception_handler(AccessError, error_handlers.access_error_handler)
 app.add_exception_handler(Exception, error_handlers.general_exception_handler)

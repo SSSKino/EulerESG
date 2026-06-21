@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from .metric_profile import MetricRetrievalProfile, best_alias_matches, build_metric_retrieval_profile, tokenize_metric_text
 from .scoring import *  # noqa: F401,F403
@@ -63,23 +63,36 @@ class KeywordRetriever:
         if not profile.exact_code_patterns:
             return []
         results: List[RetrievalResult] = []
-        for segment in report_content.document_content.segments:
+        segments = list(report_content.document_content.segments)
+        row_lookup = self._build_table_row_lookup(segments)
+        for segment in segments:
             content = getattr(segment, "content", "") or ""
             if not any(pattern.search(content) for pattern in profile.exact_code_patterns):
                 continue
-            score = self._score_exact_segment(segment, metric, profile, base=1.00)
+            evidence_segment, evidence_content, upgraded = self._upgrade_code_cell_to_table_row(segment, row_lookup)
+            score = self._score_exact_segment(evidence_segment, metric, profile, base=1.00)
+            evidence_seg_type = str(getattr(evidence_segment, "segment_type", "") or "").lower()
+            is_row_context = upgraded or evidence_seg_type == "table_row"
+            if is_row_context:
+                score = _clamp_score(score + 0.04)
             results.append(
                 RetrievalResult(
-                    segment_id=segment.segment_id,
-                    content=content,
-                    page_number=segment.page_number,
+                    segment_id=evidence_segment.segment_id,
+                    content=evidence_content,
+                    page_number=evidence_segment.page_number,
                     score=score,
-                    retrieval_type="exact_code",
+                    retrieval_type="exact_code+table_row_context" if is_row_context else "exact_code",
                     matched_keywords=[profile.metric_code],
                     metric_id=profile.metric_id or getattr(metric, "metric_id", ""),
                 )
             )
-        results.sort(key=lambda item: item.score, reverse=True)
+        deduped: Dict[str, RetrievalResult] = {}
+        for item in results:
+            prev = deduped.get(item.segment_id)
+            if prev is None or float(item.score or 0.0) > float(prev.score or 0.0):
+                deduped[item.segment_id] = item
+        results = list(deduped.values())
+        results.sort(key=lambda item: ("table_row_context" in item.retrieval_type, item.score), reverse=True)
         return results[:_internal_pool_size(self.config, metric, observed_matches=len(results), channel="keyword")]
 
     def search_exact_alias(
@@ -218,6 +231,52 @@ class KeywordRetriever:
         )
         score += _metric_evidence_quality_adjustment(metric, segment, profile.anchor_terms)
         return _clamp_score(score)
+
+    def _build_table_row_lookup(self, segments: Sequence[Any]) -> Dict[Tuple[str, int], Any]:
+        lookup: Dict[Tuple[str, int], Any] = {}
+        for segment in segments:
+            if str(getattr(segment, "segment_type", "") or "").lower() != "table_row":
+                continue
+            key = self._table_row_key(segment)
+            if key is not None:
+                lookup[key] = segment
+        return lookup
+
+    def _table_row_key(self, segment: Any) -> Optional[Tuple[str, int]]:
+        table_id = getattr(segment, "source_table_id", None)
+        row_index = None
+        structured = getattr(segment, "structured_data", None)
+        if isinstance(structured, dict):
+            table_id = table_id or structured.get("table_id") or structured.get("source_table_id")
+            row_index = structured.get("row_index", structured.get("row_idx"))
+        if table_id is None or row_index is None:
+            return None
+        try:
+            return str(table_id), int(row_index)
+        except Exception:
+            return None
+
+    def _upgrade_code_cell_to_table_row(self, segment: Any, row_lookup: Dict[Tuple[str, int], Any]) -> Tuple[Any, str, bool]:
+        """Return full table-row evidence when exact Code matched a cell.
+
+        Exact code search often first hits a `table_cell` containing only the
+        SASB code.  Evidence extraction needs the full row with Metric/Value/Unit,
+        so promote the result to the corresponding `table_row` whenever possible.
+        """
+        seg_type = str(getattr(segment, "segment_type", "") or "").lower()
+        content = getattr(segment, "content", "") or ""
+        if seg_type != "table_cell":
+            return segment, content, False
+        key = self._table_row_key(segment)
+        if key is not None and key in row_lookup:
+            row_segment = row_lookup[key]
+            return row_segment, getattr(row_segment, "content", "") or content, True
+        structured = getattr(segment, "structured_data", None)
+        if isinstance(structured, dict):
+            row_text = str(structured.get("row_text") or "").strip()
+            if row_text:
+                return segment, row_text, True
+        return segment, content, False
 
     def _query_tokens(self, profile: MetricRetrievalProfile) -> List[str]:
         tokens: List[str] = []

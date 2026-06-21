@@ -1,41 +1,77 @@
 services:
+  mineru-openai-server:
+    build:
+      context: ./backend/mineru
+      dockerfile: Dockerfile
+    image: mineru:cuda13
+    container_name: euleresg-mineru-openai-server
+    restart: unless-stopped
+    ports:
+      - "30000:30000"
+      - "7860:7860"
+      - "8002:8002"
+    environment:
+      MINERU_MODEL_SOURCE: local
+      MINERU_OPENAI_HOST: "0.0.0.0"
+      MINERU_OPENAI_PORT: "30000"
+      MINERU_GPU_MEMORY_UTILIZATION: "0.45"
+      HF_ENDPOINT: "https://hf-mirror.com"
+      HF_HUB_DISABLE_XET: "1"
+      HF_HUB_ENABLE_HF_TRANSFER: "0"
+      HF_HUB_DOWNLOAD_TIMEOUT: "1200"
+      HF_HUB_ETAG_TIMEOUT: "120"
+    volumes:
+      - ./uploads:/workspace/uploads
+      - hf_cache:/root/.cache/huggingface
+    gpus: all
+    shm_size: "32gb"
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+
   backend:
-    build: 
+    build:
       context: ./backend
     container_name: euleresg-backend-dev
     working_dir: /workspace/backend
     ports:
       - "8000:8000"
-
     env_file:
       - ./backend/config/.env
-
     environment:
       # 报告并发
       EXCEL_METRICS_REPORT_WORKERS: "11"
 
       # LLM 并发
       EXCEL_METRICS_LLM_CONCURRENCY: "46"
-
       EXCEL_METRICS_LLM_RETRY: "4"
       EXCEL_METRICS_LLM_RETRY_SLEEP: "0.8"
-    
+
       PYTHONPATH: /workspace/backend/src
       PYTHONUNBUFFERED: "1"
 
-      # Embedding/rerank model config: directly change the model path/model id here.
+      # Embedding/rerank model config: all local models use GPU.
       LOCAL_EMBEDDINGS_MODEL_PATH: "microsoft/harrier-oss-v1-0.6b"
       LOCAL_EMBEDDINGS_DEVICE: cuda
       LOCAL_EMBEDDINGS_MODEL_DTYPE: "float16"
 
-      # LOCAL_RERANKER_MODEL_PATH: "microsoft/harrier-oss-v1-0.6b"
       LOCAL_RERANKER_MODEL_PATH: "Qwen/Qwen3-Reranker-4B"
-      # LOCAL_RERANKER_MODEL_PATH: "Qwen/Qwen3-Reranker-8B"
       LOCAL_RERANKER_DEVICE: cuda
       LOCAL_RERANKER_MODEL_DTYPE: "float16"
       LOCAL_RERANKER_TOP_K: "98"
       LOCAL_RERANKER_BATCH_SIZE: "8"
-      # LOCAL_RERANKER_MAX_CHARS_PER_PASSAGE: "8196"
+      LOCAL_RERANKER_MAX_CHARS_PER_PASSAGE: "8192"
+
+      # MinerU client in backend -> GPU MinerU OpenAI-compatible server container.
+      MINERU_EXEC_MODE: local-cli
+      MINERU_BACKEND: vlm-http-client
+      MINERU_SERVER_URL: "http://mineru-openai-server:30000"
+      MINERU_METHOD: auto
+      MINERU_FORMULA: "true"
+      MINERU_TABLE: "true"
+      MINERU_IMAGE_ANALYSIS: "false"
+      MINERU_CLI_TIMEOUT: "0"
 
       # 热更新需要轮询
       WATCHFILES_FORCE_POLLING: "true"
@@ -47,12 +83,10 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: "0"
       HF_HUB_DOWNLOAD_TIMEOUT: "1200"
       HF_HUB_ETAG_TIMEOUT: "120"
-
     volumes:
       - ./backend:/workspace/backend
       - ./uploads:/workspace/uploads
       - hf_cache:/root/.cache/huggingface
-      
     command: >
       python -m uvicorn esg_encoding.api:app
       --host 0.0.0.0
@@ -61,9 +95,14 @@ services:
       --reload-dir src
       --reload-exclude outputs/*
       --reload-exclude logs/*
-
+    depends_on:
+      - mineru-openai-server
     gpus: all
-    shm_size: "16gb"
+    shm_size: "32gb"
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
 
   frontend:
     build:
@@ -74,31 +113,22 @@ services:
       - "3001:3001"
     depends_on:
       - backend
-
     volumes:
       - ./ESG-demo-main/frontend:/app
       - frontend_node:/app/node_modules
       - frontend_next:/app/.next
       - ./uploads:/app/uploads:ro
-
     environment:
       NEXT_TELEMETRY_DISABLED: "1"
-
-      # Frontend should proxy /api and /auth through Next rewrites to this backend URL
       BACKEND_URL: "http://backend:8000"
-
-      # 热更新需要轮询
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
       WATCHPACK_POLLING_INTERVAL: "4000"
       CHOKIDAR_INTERVAL: "4000"
-
       CROSS_ALL_RECORDS_PATH: /app/uploads/outputs/cross_analysis/output/all_records.json
-      
 
 volumes:
   hf_cache:
     name: hf_cache
   frontend_node:
   frontend_next:
-

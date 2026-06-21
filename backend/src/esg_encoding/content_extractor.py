@@ -28,6 +28,8 @@ import shutil
 import subprocess
 import time
 from datetime import datetime
+from html import unescape
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
@@ -35,6 +37,50 @@ from loguru import logger
 
 from .exceptions import ContentExtractionError
 from .models import DocumentContent, ProcessingConfig, TextSegment
+
+
+class _SimpleHTMLTableParser(HTMLParser):
+    """Small dependency-free HTML table parser for MinerU table output.
+
+    MinerU may return tables as Markdown, plain pipe tables or HTML.  The rest
+    of the retrieval stack needs stable table/table_row/table_cell chunks, so we
+    parse basic <table>/<tr>/<th>/<td> structure here instead of relying only on
+    Markdown table syntax.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.rows: List[List[str]] = []
+        self._row: Optional[List[str]] = None
+        self._cell: Optional[List[str]] = None
+        self._in_cell = False
+
+    def handle_starttag(self, tag: str, attrs) -> None:  # type: ignore[override]
+        tag = tag.lower()
+        if tag == "tr":
+            self._row = []
+        elif tag in {"td", "th"}:
+            self._cell = []
+            self._in_cell = True
+        elif tag == "br" and self._in_cell and self._cell is not None:
+            self._cell.append(" ")
+
+    def handle_data(self, data: str) -> None:  # type: ignore[override]
+        if self._in_cell and self._cell is not None:
+            self._cell.append(data)
+
+    def handle_endtag(self, tag: str) -> None:  # type: ignore[override]
+        tag = tag.lower()
+        if tag in {"td", "th"} and self._in_cell:
+            text = re.sub(r"\s+", " ", unescape("".join(self._cell or []))).strip()
+            if self._row is not None:
+                self._row.append(text)
+            self._cell = None
+            self._in_cell = False
+        elif tag == "tr":
+            if self._row is not None and any(str(c).strip() for c in self._row):
+                self.rows.append(self._row)
+            self._row = None
 
 
 class ContentExtractor:
@@ -324,6 +370,7 @@ class ContentExtractor:
                 table_index += 1
                 seq += 1
                 table_id = f"{document_id}_table_{table_index:04d}"
+                table_title = self._table_title_from_item(item)
                 table_segment = TextSegment(
                     segment_id=f"{document_id}_p{page}_s{seq}",
                     content=content,
@@ -332,10 +379,22 @@ class ContentExtractor:
                     position_x=float(item.get("x") or item.get("left") or 0.0),
                     segment_type="table",
                     source_table_id=table_id,
-                    structured_data={"source": "mineru_content_list", "table_id": table_id, "raw_type": item_type},
+                    structured_data={
+                        "source": "mineru_content_list",
+                        "table_id": table_id,
+                        "raw_type": item_type,
+                        "table_title": table_title,
+                    },
                 )
                 segments.append(table_segment)
-                row_cell_segments = self._table_segments_from_markdown(content, document_id, page, table_id, start_seq=seq)
+                row_cell_segments = self._table_segments_from_markdown(
+                    content,
+                    document_id,
+                    page,
+                    table_id,
+                    start_seq=seq,
+                    table_title=table_title,
+                )
                 if row_cell_segments:
                     segments.extend(row_cell_segments)
                     seq += len(row_cell_segments)
@@ -415,6 +474,19 @@ class ContentExtractor:
                 return text
         return ""
 
+    def _table_title_from_item(self, item: Dict[str, Any]) -> str:
+        """Extract a concise table title/caption without changing table content."""
+        for key in ("table_title", "title", "caption", "table_caption", "img_caption"):
+            value = item.get(key)
+            if value is None:
+                continue
+            if isinstance(value, list):
+                value = " ".join(str(x) for x in value if str(x).strip())
+            text = re.sub(r"\s+", " ", str(value or "")).strip()
+            if text:
+                return text[:240]
+        return ""
+
     def _page_number_from_item(self, item: Dict[str, Any]) -> int:
         for key in ("page_number", "page_no", "page", "page_id", "page_idx"):
             value = item.get(key)
@@ -435,6 +507,7 @@ class ContentExtractor:
         seq = 0
         table_index = 0
         current_page = 1
+        current_heading = ""
 
         for block in blocks:
             marker = self._page_marker(block)
@@ -459,10 +532,17 @@ class ContentExtractor:
                         position_x=0.0,
                         segment_type="table",
                         source_table_id=table_id,
-                        structured_data={"source": "mineru_markdown", "table_id": table_id},
+                        structured_data={"source": "mineru_markdown", "table_id": table_id, "table_title": current_heading},
                     )
                 )
-                table_segments = self._table_segments_from_markdown(block, document_id, current_page, table_id, start_seq=seq)
+                table_segments = self._table_segments_from_markdown(
+                    block,
+                    document_id,
+                    current_page,
+                    table_id,
+                    start_seq=seq,
+                    table_title=current_heading,
+                )
                 if table_segments:
                     segments.extend(table_segments)
                     seq += len(table_segments)
@@ -470,6 +550,8 @@ class ContentExtractor:
 
             segment_type = "heading" if re.match(r"^#{1,6}\s+", block) else "text"
             content = re.sub(r"^#{1,6}\s+", "", block).strip() if segment_type == "heading" else block
+            if segment_type == "heading":
+                current_heading = content
             if segment_type == "text" and len(content.strip()) < int(getattr(self.config, "min_text_length", 10) or 10):
                 continue
             seq += 1
@@ -492,13 +574,15 @@ class ContentExtractor:
         blocks: List[str] = []
         current: List[str] = []
         in_table = False
+        in_html_table = False
 
         def flush() -> None:
-            nonlocal current, in_table
+            nonlocal current, in_table, in_html_table
             if current:
                 blocks.append("\n".join(current).strip())
             current = []
             in_table = False
+            in_html_table = False
 
         for line in lines:
             stripped = line.strip()
@@ -507,7 +591,23 @@ class ContentExtractor:
                 blocks.append(stripped)
                 continue
 
-            table_line = "|" in stripped and bool(stripped)
+            lower = stripped.lower()
+            if "<table" in lower:
+                if current and not in_html_table:
+                    flush()
+                current.append(line)
+                in_html_table = True
+                if "</table" in lower:
+                    flush()
+                continue
+
+            if in_html_table:
+                current.append(line)
+                if "</table" in lower:
+                    flush()
+                continue
+
+            table_line = self._looks_like_table_line(stripped)
             if table_line:
                 if current and not in_table:
                     flush()
@@ -533,6 +633,19 @@ class ContentExtractor:
         flush()
         return [b for b in blocks if b]
 
+    def _looks_like_table_line(self, stripped: str) -> bool:
+        """Stricter table-line detector than a raw pipe check."""
+        if not stripped:
+            return False
+        if "<tr" in stripped.lower() or "<td" in stripped.lower() or "<th" in stripped.lower():
+            return True
+        if "|" not in stripped:
+            return False
+        # Standard Markdown / pipe tables should have at least two separators
+        # or start/end pipes.  Avoid treating normal prose containing one pipe
+        # character as a table block.
+        return stripped.count("|") >= 2 or (stripped.startswith("|") and "|" in stripped[1:])
+
     def _table_segments_from_markdown(
         self,
         table_md: str,
@@ -541,20 +654,25 @@ class ContentExtractor:
         table_id: str,
         *,
         start_seq: int = 0,
+        table_title: str = "",
     ) -> List[TextSegment]:
-        rows = self._parse_markdown_table_rows(table_md)
+        rows = self._parse_table_rows(table_md)
         if not rows:
             return []
 
-        headers = rows[0]
+        headers = self._normalise_table_row(rows[0])
         data_rows = rows[1:] if len(rows) > 1 else []
+        if not any(headers):
+            max_cols = max((len(r) for r in data_rows), default=0)
+            headers = [f"Column {i + 1}" for i in range(max_cols)]
         segments: List[TextSegment] = []
         seq = start_seq
 
         for r_idx, row in enumerate(data_rows, start=1):
+            row = self._normalise_table_row(row, width=max(len(headers), len(row)))
             seq += 1
-            row_header = row[0] if row else ""
-            row_text = " | ".join(row)
+            row_header = self._infer_row_header(headers, row)
+            row_text = self._format_table_row_context(headers, row, table_title=table_title, page=page)
             row_segment_id = f"{document_id}_p{page}_s{seq}"
             segments.append(
                 TextSegment(
@@ -569,6 +687,7 @@ class ContentExtractor:
                     structured_data={
                         "source": "mineru_table_parser",
                         "table_id": table_id,
+                        "table_title": table_title,
                         "row_index": r_idx,
                         "row_header": row_header,
                         "row_text": row_text,
@@ -581,10 +700,17 @@ class ContentExtractor:
                     continue
                 seq += 1
                 col_header = headers[c_idx] if c_idx < len(headers) else f"col_{c_idx + 1}"
+                cell_content_parts = []
+                if table_title:
+                    cell_content_parts.append(f"[Table Title] {table_title}")
+                if headers:
+                    cell_content_parts.append(f"[Column Headers] {' | '.join(headers)}")
+                cell_content_parts.append(f"[Row Context] {row_text}")
+                cell_content_parts.append(f"{col_header}: {value}")
                 segments.append(
                     TextSegment(
                         segment_id=f"{document_id}_p{page}_s{seq}",
-                        content=f"{row_header} | {col_header}: {value}" if row_header else f"{col_header}: {value}",
+                        content="\n".join(cell_content_parts),
                         page_number=page,
                         position_y=float(seq),
                         position_x=float(c_idx),
@@ -596,17 +722,75 @@ class ContentExtractor:
                         structured_data={
                             "source": "mineru_table_parser",
                             "table_id": table_id,
+                            "table_title": table_title,
                             "row_index": r_idx,
                             "col_index": c_idx,
                             "row_header": row_header,
                             "col_header": col_header,
                             "value_text": value,
                             "column_headers": headers,
+                            "row_text": row_text,
                             "row_segment_id": row_segment_id,
                         },
                     )
                 )
         return segments
+
+    def _parse_table_rows(self, table_text: str) -> List[List[str]]:
+        html_rows = self._parse_html_table_rows(table_text)
+        if html_rows:
+            return html_rows
+        return self._parse_markdown_table_rows(table_text)
+
+    def _parse_html_table_rows(self, table_html: str) -> List[List[str]]:
+        if not re.search(r"<\s*(table|tr|td|th)\b", table_html or "", flags=re.IGNORECASE):
+            return []
+        parser = _SimpleHTMLTableParser()
+        try:
+            parser.feed(table_html)
+            parser.close()
+        except Exception:
+            return []
+        rows = [self._normalise_table_row(row) for row in parser.rows if any(str(c).strip() for c in row)]
+        return rows
+
+    def _normalise_table_row(self, row: Sequence[Any], width: Optional[int] = None) -> List[str]:
+        cells = [re.sub(r"\s+", " ", unescape(str(cell or ""))).strip() for cell in row]
+        if width is not None and len(cells) < width:
+            cells.extend([""] * (width - len(cells)))
+        return cells
+
+    def _infer_row_header(self, headers: Sequence[str], row: Sequence[str]) -> str:
+        header_names = [str(h or "").strip().lower() for h in headers]
+        preferred_names = ("metric", "indicator", "disclosure", "topic", "code", "sasb code")
+        for preferred in preferred_names:
+            for idx, header in enumerate(header_names):
+                if preferred in header and idx < len(row) and str(row[idx]).strip():
+                    return str(row[idx]).strip()
+        for value in row:
+            if str(value).strip():
+                return str(value).strip()
+        return ""
+
+    def _format_table_row_context(self, headers: Sequence[str], row: Sequence[str], *, table_title: str = "", page: int = 1) -> str:
+        parts: List[str] = []
+        if table_title:
+            parts.append(f"[Table Title] {table_title}")
+        if headers:
+            parts.append(f"[Column Headers] {' | '.join(str(h or '').strip() for h in headers)}")
+        pairs: List[str] = []
+        for idx, value in enumerate(row):
+            value_text = str(value or "").strip()
+            if not value_text:
+                continue
+            header = str(headers[idx]).strip() if idx < len(headers) and str(headers[idx]).strip() else f"Column {idx + 1}"
+            pairs.append(f"{header}: {value_text}")
+        if pairs:
+            parts.append(" | ".join(pairs))
+        else:
+            parts.append(" | ".join(str(x or "").strip() for x in row if str(x or "").strip()))
+        parts.append(f"Page: {page}")
+        return "\n".join(p for p in parts if p)
 
     def _parse_markdown_table_rows(self, table_md: str) -> List[List[str]]:
         rows: List[List[str]] = []
@@ -624,11 +808,19 @@ class ContentExtractor:
         return rows
 
     def _looks_like_markdown_table(self, block: str) -> bool:
+        if re.search(r"<\s*(table|tr|td|th)\b", block or "", flags=re.IGNORECASE):
+            return bool(self._parse_html_table_rows(block))
         lines = [ln for ln in block.splitlines() if ln.strip()]
         if len(lines) < 2:
             return False
-        pipe_lines = [ln for ln in lines if "|" in ln]
-        return len(pipe_lines) >= 2
+        pipe_lines = [ln for ln in lines if self._looks_like_table_line(ln.strip())]
+        if len(pipe_lines) < 2:
+            return False
+        parsed = self._parse_markdown_table_rows("\n".join(pipe_lines))
+        if len(parsed) < 2:
+            return False
+        widths = [len(row) for row in parsed if row]
+        return bool(widths and max(widths) >= 2 and widths.count(widths[0]) >= 2)
 
     def _page_marker(self, block: str) -> Optional[int]:
         patterns = [

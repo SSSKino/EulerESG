@@ -10,15 +10,10 @@ import os
 import re
 import math
 import threading
-import numpy as np
 from typing import Dict, List, Optional, Union, Tuple
 from loguru import logger
-import torch
-from sklearn.metrics.pairwise import cosine_similarity
 
-from .reranker import get_reranker
 from .hipporag.settings import HippoRAGSettings
-from ..shared_embedding_model import encode_query_texts, get_shared_embedding_model
 from ..embedding_settings import get_configured_rerank_model_name
 
 from ..models import (
