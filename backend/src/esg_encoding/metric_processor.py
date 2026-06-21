@@ -27,7 +27,6 @@ from .models import (
 )
 from .exceptions import ESGEncodingError, ContentEmbeddingError
 from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
-from .embedding_settings import get_configured_embedding_local_path
 
 _SASB_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "sasb_metrics"
 _CDP_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "cdp_metrics"
@@ -126,7 +125,6 @@ class MetricProcessor:
                 self.config.embedding_model,
                 device=str(device),
                 hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
-                explicit_local_path=get_configured_embedding_local_path(),
                 trust_remote_code=True,
             )
             logger.info(f"嵌入模型加载成功，设备: {device}")

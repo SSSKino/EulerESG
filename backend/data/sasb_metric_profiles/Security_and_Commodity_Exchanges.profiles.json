@@ -1,0 +1,1585 @@
+{
+  "profiles": [
+    {
+      "metric_id": "FN-EX-410a.1.01",
+      "metric_code": "FN-EX-410a.1",
+      "metric": "(1) Number of (a) halts related to public release of information",
+      "topic": "Promoting Transparent & Efficient Capital Markets",
+      "unit": "Number",
+      "definition": "FN-EX-410a.1. (1) Number and (2) average duration of (a) halts related to public\nrelease of information and (b) pauses related to volatility\n1   The entity shall disclose the (1) number and (2) average duration in minutes of (a) halts related to public release\n    of information and (b) pauses related to volatility.\n\n2   Trading halts are defined as temporary market trading suspensions of a security by the entity for reasons which\n    may include anticipation of a news announcement, correction of an order imbalance or compliance with regulatory\n    directives.\n\n3   Trading may be suspended to permit market participants to digest information or developments that may have a\n    significant effect on trading activity, such as:\n\n    3.1    changes related to the financial health of a listed entity;\n\n    3.2    major corporate transactions, including restructurings or mergers;\n\n    3.3    significant positive or negative information about a listed entity’s products;\n\n    3.4    changes in a listed entity’s key management individuals;\n\n    3.5    legal or regulatory developments that affect a listed entity’s ability to conduct business;\n\n    3.6    releases of information by a listed entity that did not notify the exchange of the release in advance; or\n\n    3.7    announcements of unsolicited tender offers made by an entity for a listed entity whose stock now is subject\n           to the trading halt.\n\n4   A trading pause is defined as temporary, short-term trading suspension (for example, for only a few minutes) of a\n    security by the entity because of extreme volatility or erratic trading.\n\n5   The scope of the disclosure excludes trading halts and pauses disclosed in metric FN-EX-550a.1, suspensions of\n    trading of individual securities by the jurisdictional legal or regulatory authorities (for example, failure of an entity\n    to file periodic reports) and market-wide trading suspension mechanisms required by the authorities (for example,\n    in response to market-wide volatility).\n\n6   The entity may summarise the disclosure in this table format:\n\n    Table 3. Market Suspension Trading Halts and Duration\n\n                                              NUMBER                                     DURATION\n     Halt\n\n     Pause",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of (a) halts related to public release of information",
+        "Number of (a) halts related to public release of information",
+        "FN-EX-410a.1 (1) Number of (a) halts related to public release of information"
+      ],
+      "bm25_terms": [
+        "FN-EX-410a.1",
+        "halts",
+        "public",
+        "release",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-EX-410a.1 (1) Number of (a) halts related to public release of information with unit Number related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-410a.1 (1) Number of (a) halts related to public release of information, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-410a.1 (1) Number of (a) halts related to public release of information with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.1 (1) Number of (a) halts related to public release of information related to Promoting Transparent & Efficient Capital Markets.",
+        "Find numeric table rows or performance metrics reporting FN-EX-410a.1 (1) Number of (a) halts related to public release of information for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-410a.1",
+        "Number of (a) halts related to public release of information",
+        "halts",
+        "public",
+        "release",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Average duration of (a) halts related to public release of information",
+        "Number of (b) pauses related to volatility",
+        "Average duration of (b) pauses related to volatility"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information",
+          "difference": "This profile is only for \"(1) Number of (a) halts related to public release of information\"; do not treat evidence for \"(2) Average duration of (a) halts related to public release of information\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-410a.1 (1) Number of (b) pauses related to volatility",
+          "difference": "This profile is only for \"(1) Number of (a) halts related to public release of information\"; do not treat evidence for \"(1) Number of (b) pauses related to volatility\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility",
+          "difference": "This profile is only for \"(1) Number of (a) halts related to public release of information\"; do not treat evidence for \"(2) Average duration of (b) pauses related to volatility\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-410a.1.02",
+      "metric_code": "FN-EX-410a.1",
+      "metric": "(2) Average duration of (a) halts related to public release of information",
+      "topic": "Promoting Transparent & Efficient Capital Markets",
+      "unit": "Minutes",
+      "definition": "FN-EX-410a.1. (1) Number and (2) average duration of (a) halts related to public\nrelease of information and (b) pauses related to volatility\n1   The entity shall disclose the (1) number and (2) average duration in minutes of (a) halts related to public release\n    of information and (b) pauses related to volatility.\n\n2   Trading halts are defined as temporary market trading suspensions of a security by the entity for reasons which\n    may include anticipation of a news announcement, correction of an order imbalance or compliance with regulatory\n    directives.\n\n3   Trading may be suspended to permit market participants to digest information or developments that may have a\n    significant effect on trading activity, such as:\n\n    3.1    changes related to the financial health of a listed entity;\n\n    3.2    major corporate transactions, including restructurings or mergers;\n\n    3.3    significant positive or negative information about a listed entity’s products;\n\n    3.4    changes in a listed entity’s key management individuals;\n\n    3.5    legal or regulatory developments that affect a listed entity’s ability to conduct business;\n\n    3.6    releases of information by a listed entity that did not notify the exchange of the release in advance; or\n\n    3.7    announcements of unsolicited tender offers made by an entity for a listed entity whose stock now is subject\n           to the trading halt.\n\n4   A trading pause is defined as temporary, short-term trading suspension (for example, for only a few minutes) of a\n    security by the entity because of extreme volatility or erratic trading.\n\n5   The scope of the disclosure excludes trading halts and pauses disclosed in metric FN-EX-550a.1, suspensions of\n    trading of individual securities by the jurisdictional legal or regulatory authorities (for example, failure of an entity\n    to file periodic reports) and market-wide trading suspension mechanisms required by the authorities (for example,\n    in response to market-wide volatility).\n\n6   The entity may summarise the disclosure in this table format:\n\n    Table 3. Market Suspension Trading Halts and Duration\n\n                                              NUMBER                                     DURATION\n     Halt\n\n     Pause",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Average duration of (a) halts related to public release of information",
+        "Average duration of (a) halts related to public release of information",
+        "FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information"
+      ],
+      "bm25_terms": [
+        "FN-EX-410a.1",
+        "duration",
+        "halts",
+        "public",
+        "release",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Minutes"
+      ],
+      "dense_query": "Find disclosures for FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information with unit Minutes related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information with unit Minutes.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information related to Promoting Transparent & Efficient Capital Markets.",
+        "Find numeric table rows or performance metrics reporting FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-410a.1",
+        "Average duration of (a) halts related to public release of information",
+        "duration",
+        "halts",
+        "public",
+        "release",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Minutes"
+      ],
+      "negative_anchor_terms": [
+        "Number of (a) halts related to public release of information",
+        "Number of (b) pauses related to volatility",
+        "Average duration of (b) pauses related to volatility"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-410a.1 (1) Number of (a) halts related to public release of information",
+          "difference": "This profile is only for \"(2) Average duration of (a) halts related to public release of information\"; do not treat evidence for \"(1) Number of (a) halts related to public release of information\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-410a.1 (1) Number of (b) pauses related to volatility",
+          "difference": "This profile is only for \"(2) Average duration of (a) halts related to public release of information\"; do not treat evidence for \"(1) Number of (b) pauses related to volatility\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility",
+          "difference": "This profile is only for \"(2) Average duration of (a) halts related to public release of information\"; do not treat evidence for \"(2) Average duration of (b) pauses related to volatility\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Minutes"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-410a.1.03",
+      "metric_code": "FN-EX-410a.1",
+      "metric": "(1) Number of (b) pauses related to volatility",
+      "topic": "Promoting Transparent & Efficient Capital Markets",
+      "unit": "Number",
+      "definition": "FN-EX-410a.1. (1) Number and (2) average duration of (a) halts related to public\nrelease of information and (b) pauses related to volatility\n1   The entity shall disclose the (1) number and (2) average duration in minutes of (a) halts related to public release\n    of information and (b) pauses related to volatility.\n\n2   Trading halts are defined as temporary market trading suspensions of a security by the entity for reasons which\n    may include anticipation of a news announcement, correction of an order imbalance or compliance with regulatory\n    directives.\n\n3   Trading may be suspended to permit market participants to digest information or developments that may have a\n    significant effect on trading activity, such as:\n\n    3.1    changes related to the financial health of a listed entity;\n\n    3.2    major corporate transactions, including restructurings or mergers;\n\n    3.3    significant positive or negative information about a listed entity’s products;\n\n    3.4    changes in a listed entity’s key management individuals;\n\n    3.5    legal or regulatory developments that affect a listed entity’s ability to conduct business;\n\n    3.6    releases of information by a listed entity that did not notify the exchange of the release in advance; or\n\n    3.7    announcements of unsolicited tender offers made by an entity for a listed entity whose stock now is subject\n           to the trading halt.\n\n4   A trading pause is defined as temporary, short-term trading suspension (for example, for only a few minutes) of a\n    security by the entity because of extreme volatility or erratic trading.\n\n5   The scope of the disclosure excludes trading halts and pauses disclosed in metric FN-EX-550a.1, suspensions of\n    trading of individual securities by the jurisdictional legal or regulatory authorities (for example, failure of an entity\n    to file periodic reports) and market-wide trading suspension mechanisms required by the authorities (for example,\n    in response to market-wide volatility).\n\n6   The entity may summarise the disclosure in this table format:\n\n    Table 3. Market Suspension Trading Halts and Duration\n\n                                              NUMBER                                     DURATION\n     Halt\n\n     Pause",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of (b) pauses related to volatility",
+        "Number of (b) pauses related to volatility",
+        "FN-EX-410a.1 (1) Number of (b) pauses related to volatility"
+      ],
+      "bm25_terms": [
+        "FN-EX-410a.1",
+        "pauses",
+        "volatility",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-EX-410a.1 (1) Number of (b) pauses related to volatility with unit Number related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-410a.1 (1) Number of (b) pauses related to volatility, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-410a.1 (1) Number of (b) pauses related to volatility with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.1 (1) Number of (b) pauses related to volatility related to Promoting Transparent & Efficient Capital Markets.",
+        "Find numeric table rows or performance metrics reporting FN-EX-410a.1 (1) Number of (b) pauses related to volatility for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-410a.1",
+        "Number of (b) pauses related to volatility",
+        "pauses",
+        "volatility",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Number of (a) halts related to public release of information",
+        "Average duration of (a) halts related to public release of information",
+        "Average duration of (b) pauses related to volatility"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-410a.1 (1) Number of (a) halts related to public release of information",
+          "difference": "This profile is only for \"(1) Number of (b) pauses related to volatility\"; do not treat evidence for \"(1) Number of (a) halts related to public release of information\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information",
+          "difference": "This profile is only for \"(1) Number of (b) pauses related to volatility\"; do not treat evidence for \"(2) Average duration of (a) halts related to public release of information\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility",
+          "difference": "This profile is only for \"(1) Number of (b) pauses related to volatility\"; do not treat evidence for \"(2) Average duration of (b) pauses related to volatility\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-410a.1.04",
+      "metric_code": "FN-EX-410a.1",
+      "metric": "(2) Average duration of (b) pauses related to volatility",
+      "topic": "Promoting Transparent & Efficient Capital Markets",
+      "unit": "Minutes",
+      "definition": "FN-EX-410a.1. (1) Number and (2) average duration of (a) halts related to public\nrelease of information and (b) pauses related to volatility\n1   The entity shall disclose the (1) number and (2) average duration in minutes of (a) halts related to public release\n    of information and (b) pauses related to volatility.\n\n2   Trading halts are defined as temporary market trading suspensions of a security by the entity for reasons which\n    may include anticipation of a news announcement, correction of an order imbalance or compliance with regulatory\n    directives.\n\n3   Trading may be suspended to permit market participants to digest information or developments that may have a\n    significant effect on trading activity, such as:\n\n    3.1    changes related to the financial health of a listed entity;\n\n    3.2    major corporate transactions, including restructurings or mergers;\n\n    3.3    significant positive or negative information about a listed entity’s products;\n\n    3.4    changes in a listed entity’s key management individuals;\n\n    3.5    legal or regulatory developments that affect a listed entity’s ability to conduct business;\n\n    3.6    releases of information by a listed entity that did not notify the exchange of the release in advance; or\n\n    3.7    announcements of unsolicited tender offers made by an entity for a listed entity whose stock now is subject\n           to the trading halt.\n\n4   A trading pause is defined as temporary, short-term trading suspension (for example, for only a few minutes) of a\n    security by the entity because of extreme volatility or erratic trading.\n\n5   The scope of the disclosure excludes trading halts and pauses disclosed in metric FN-EX-550a.1, suspensions of\n    trading of individual securities by the jurisdictional legal or regulatory authorities (for example, failure of an entity\n    to file periodic reports) and market-wide trading suspension mechanisms required by the authorities (for example,\n    in response to market-wide volatility).\n\n6   The entity may summarise the disclosure in this table format:\n\n    Table 3. Market Suspension Trading Halts and Duration\n\n                                              NUMBER                                     DURATION\n     Halt\n\n     Pause",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Average duration of (b) pauses related to volatility",
+        "Average duration of (b) pauses related to volatility",
+        "FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility"
+      ],
+      "bm25_terms": [
+        "FN-EX-410a.1",
+        "duration",
+        "pauses",
+        "volatility",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Minutes"
+      ],
+      "dense_query": "Find disclosures for FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility with unit Minutes related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility with unit Minutes.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility related to Promoting Transparent & Efficient Capital Markets.",
+        "Find numeric table rows or performance metrics reporting FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-410a.1",
+        "Average duration of (b) pauses related to volatility",
+        "duration",
+        "pauses",
+        "volatility",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Minutes"
+      ],
+      "negative_anchor_terms": [
+        "Number of (a) halts related to public release of information",
+        "Average duration of (a) halts related to public release of information",
+        "Number of (b) pauses related to volatility"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-410a.1 (1) Number of (a) halts related to public release of information",
+          "difference": "This profile is only for \"(2) Average duration of (b) pauses related to volatility\"; do not treat evidence for \"(1) Number of (a) halts related to public release of information\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information",
+          "difference": "This profile is only for \"(2) Average duration of (b) pauses related to volatility\"; do not treat evidence for \"(2) Average duration of (a) halts related to public release of information\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-410a.1 (1) Number of (b) pauses related to volatility",
+          "difference": "This profile is only for \"(2) Average duration of (b) pauses related to volatility\"; do not treat evidence for \"(1) Number of (b) pauses related to volatility\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Minutes"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-410a.2",
+      "metric_code": "FN-EX-410a.2",
+      "metric": "Percentage of trades generated from automated trading systems",
+      "topic": "Promoting Transparent & Efficient Capital Markets",
+      "unit": "Percentage (%)",
+      "definition": "FN-EX-410a.2. Percentage of trades generated from automated trading systems\n1   The entity shall disclose the percentage of its total trades generated by automated or algorithmic trading systems.\n\n    1.1     Automated or algorithmic trading is defined as the use of electronic platforms for entering trading orders\n            with an automated algorithm that executes pre-programmed trading instructions.\n\n            1.1.1   This includes high-frequency trading.\n\n            1.1.2   This excludes programme trading.\n\n2   The percentage of trades shall be calculated as the volume of trades executed (bought, sold and sold short) by an\n    automated algorithm divided by the total volume of trades.\n\n3   The scope of the disclosure includes trades occurring on public exchanges, in dark pools or through other trading\n    systems.\n\nNote to FN-EX-410a.2\n\n1   The entity shall identify risks associated with automated or algorithmic trading occurring on its exchanges or in\n    dark pools that it operates, such as regulatory, reputational or volatility risks, as well as risks to capital\n    expenditures (for example, the risk that data centres could become stranded assets if the need for latency\n    declines).\n\n2   The entity shall identify opportunities associated with automated or algorithmic trading occurring on its exchanges\n    or in dark pools that it operates, such as increased trading volume, revenue from co-location facilities and sales of\n    trading software.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Percentage of trades generated from automated trading systems",
+        "Percent of trades generated from automated trading systems",
+        "FN-EX-410a.2 Percentage of trades generated from automated trading systems"
+      ],
+      "bm25_terms": [
+        "FN-EX-410a.2",
+        "trades",
+        "generated",
+        "automated",
+        "trading",
+        "systems",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "%",
+        "Percentage (%)",
+        "percent",
+        "percentage"
+      ],
+      "dense_query": "Find disclosures for FN-EX-410a.2 Percentage of trades generated from automated trading systems with unit Percentage (%) related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-410a.2 Percentage of trades generated from automated trading systems, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-410a.2 Percentage of trades generated from automated trading systems with unit Percentage (%).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.2 Percentage of trades generated from automated trading systems related to Promoting Transparent & Efficient Capital Markets.",
+        "Find numeric table rows or performance metrics reporting FN-EX-410a.2 Percentage of trades generated from automated trading systems for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-410a.2",
+        "Percentage of trades generated from automated trading systems",
+        "trades",
+        "generated",
+        "automated",
+        "trading",
+        "systems",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets",
+        "Percentage (%)",
+        "%",
+        "percent",
+        "percentage"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "percentage",
+        "expected_units": [
+          "Percentage (%)",
+          "%",
+          "percent",
+          "percentage"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-410a.3",
+      "metric_code": "FN-EX-410a.3",
+      "metric": "Description of alert policy regarding timing and nature of public release of information",
+      "topic": "Promoting Transparent & Efficient Capital Markets",
+      "unit": "n/a",
+      "definition": "FN-EX-410a.3. Description of alert policy regarding timing and nature of public\nrelease of information\n1   The entity shall describe its alert policy relating to listed entities’ public release of information or developments\n    that may (positively or negatively) affect a listed entity’s stock price, such as:\n\n    1.1   changes related to the financial health of a listed entity;\n\n    1.2   major corporate transactions, including restructurings or mergers;\n\n    1.3   significant positive or negative information about a listed entity’s products;\n\n    1.4   changes in a listed entity’s key management individuals; or\n\n    1.5   legal or regulatory developments that affect a listed entity’s ability to conduct business.\n\n2   Relevant aspects of an alert policy to describe include:\n\n    2.1   timing of release of information in relation to market hours;\n\n    2.2   newspaper agencies and wire services, such as a specification of which outlets should be notified; or\n\n    2.3   the mechanisms of alert to the exchange (for example, by telephone, fax or email) and for public disclosure\n          (for example, website, social media or press release).\n\n3   The entity shall describe its provisions for halting, delaying or pausing trading when necessary to ensure fair,\n    complete and transparent access to information.\n\n    3.1   The number and duration of halts and pauses shall be disclosed in FN-EX-410a.1.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "qualitative",
+      "aliases": [
+        "Description of alert policy regarding timing and nature of public release of information",
+        "FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information"
+      ],
+      "bm25_terms": [
+        "FN-EX-410a.3",
+        "Description",
+        "alert",
+        "policy",
+        "regarding",
+        "timing",
+        "nature",
+        "public",
+        "release",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets"
+      ],
+      "dense_query": "Find disclosures for FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information related to Promoting Transparent & Efficient Capital Markets.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information."
+      ],
+      "anchor_terms": [
+        "FN-EX-410a.3",
+        "Description of alert policy regarding timing and nature of public release of information",
+        "Description",
+        "alert",
+        "policy",
+        "regarding",
+        "timing",
+        "nature",
+        "public",
+        "release",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "paragraph",
+        "list-item",
+        "table-row",
+        "table",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-410a.4",
+      "metric_code": "FN-EX-410a.4",
+      "metric": "Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+      "topic": "Promoting Transparent & Efficient Capital Markets",
+      "unit": "n/a",
+      "definition": "FN-EX-410a.4. Description of policy to encourage or require listed entities to\npublicly disclose environmental, social, and governance (ESG) information\n1   The entity shall describe its policies for entities listed on its exchanges related to environmental, social and\n    governance (ESG) information, including:\n\n    1.1   whether policies are rules-based (in which entities must meet specific structural or performance criteria) or\n          if they are disclosure-based (in which entities must disclose specific information); and\n\n    1.2   whether rules or disclosures are a requirement of listing (or continued listing), or whether compliance is\n          voluntary for listed entities (recommended or encouraged by the entity).\n\n2   The scope shall be limited to rules, requirements and disclosures that are incremental to initial public offering\n    (IPO) or continued listing criteria defining size, distribution and other financial or legal minimum characteristics.\n\n3   Governance information may include rules and disclosures related to board structure and independence,\n    committees of the board, and codes of conduct or ethics.\n\n4   Environmental information may include issues relating to the quality and functioning of the natural environment\n    and natural systems, which may include greenhouse gas (GHG) emissions, biodiversity loss, climate change, air\n    quality, energy and water efficiency, waste management, land use and other ecological impacts.\n\n5   Social information may include issues relating to the rights, well-being and interests of people and communities,\n    including human rights; labour standards in the supply chain; child, slave and bonded labour; worker health and\n    safety; employee diversity and inclusion; and access and affordability.\n\n6   Examples of encouraging entities to meet ESG rules or disclosure standards may include:\n\n    6.1   promoting and facilitating transfer of information among regulators, investors and entities; and\n\n    6.2   participation in disclosure programmes such as the Sustainable Stock Exchange Initiative.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "qualitative",
+      "aliases": [
+        "Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+        "FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information"
+      ],
+      "bm25_terms": [
+        "FN-EX-410a.4",
+        "Description",
+        "policy",
+        "encourage",
+        "require",
+        "listed",
+        "publicly",
+        "environmental",
+        "social",
+        "governance",
+        "ESG",
+        "Promoting",
+        "Transparent",
+        "Efficient",
+        "Capital",
+        "Markets"
+      ],
+      "dense_query": "Find disclosures for FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information related to Promoting Transparent & Efficient Capital Markets.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information."
+      ],
+      "anchor_terms": [
+        "FN-EX-410a.4",
+        "Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+        "Description",
+        "policy",
+        "encourage",
+        "require",
+        "listed",
+        "publicly",
+        "environmental",
+        "social",
+        "governance",
+        "ESG",
+        "Promoting",
+        "Transparent"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "paragraph",
+        "list-item",
+        "table-row",
+        "table",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-510a.1",
+      "metric_code": "FN-EX-510a.1",
+      "metric": "Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+      "topic": "Managing Conflicts of Interest",
+      "unit": "Presentation currency",
+      "definition": "FN-EX-510a.1. Total amount of monetary losses as a result of legal proceedings\nassociated with fraud, insider trading, antitrust, anti-competitive behaviour,\nmarket manipulation, malpractice, or other related financial industry laws or\nregulations\n1   The entity shall disclose the total amount of monetary losses incurred during the reporting period resulting from\n    legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market\n    manipulation, malpractice or other related financial industry laws or regulations.\n\n2   The legal proceedings shall include any adjudicative proceeding involving the entity, whether before a court, a\n    regulator, an arbitrator or otherwise.\n\n3   The losses shall include all monetary liabilities to the opposing party or to others (whether as the result of\n    settlement, verdict after trial or otherwise), including fines and other monetary liabilities incurred during the\n    reporting period as a result of civil actions (for example, civil judgements or settlements), regulatory proceedings\n    (for example, penalties, disgorgement or restitution) and criminal actions (for example, criminal judgements,\n    penalties or restitution) brought by any entity (for example, governmental, business or individual).\n\n4   The scope of monetary losses shall exclude legal and other fees and expenses incurred by the entity in its\n    defence.\n\n5   The scope of the disclosure shall include legal proceedings associated with the enforcement of applicable\n    jurisdictional laws or regulations.\n\n6   The disclosure also shall include enforcements related to activities adjudicated by jurisdictional legal or regulatory\n    authorities with mandates broader than the financial industry.\n\n7   The entity shall disclose the relevant jurisdictional regulatory authority or authorities involved.\n\nNote to FN-EX-510a.1\n\n1   The entity shall briefly describe the nature (for example, judgement or order issued after trial, settlement, guilty\n    plea, deferred prosecution agreement or non-prosecution agreement) and context (for example, fraud, antitrust,\n    market manipulation) of all monetary losses resulting from legal proceedings.\n\n2   The entity shall describe any corrective actions implemented in response to the legal proceedings. This may\n    include specific changes in operations, management, processes, products, business partners, training or\n    technology.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+        "Monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+        "FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations"
+      ],
+      "bm25_terms": [
+        "FN-EX-510a.1",
+        "legal proceedings",
+        "monetary losses",
+        "monetary",
+        "losses",
+        "legal",
+        "proceedings",
+        "fraud",
+        "insider",
+        "trading",
+        "antitrust",
+        "anti-competitive",
+        "behaviour",
+        "market",
+        "manipulation",
+        "malpractice",
+        "other",
+        "financial",
+        "industry",
+        "laws",
+        "regulations",
+        "Presentation",
+        "currency",
+        "reporting currency"
+      ],
+      "dense_query": "Find disclosures for FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations with unit Presentation currency related to Managing Conflicts of Interest.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations related to Managing Conflicts of Interest.",
+        "Find numeric table rows or performance metrics reporting FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-510a.1",
+        "Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+        "legal proceedings",
+        "monetary losses",
+        "monetary",
+        "losses",
+        "legal",
+        "proceedings",
+        "fraud",
+        "insider",
+        "trading",
+        "antitrust",
+        "anti-competitive",
+        "behaviour",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "operating expenses",
+        "revenue",
+        "capital expenditure",
+        "fines unrelated to this topic"
+      ],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-510a.2",
+      "metric_code": "FN-EX-510a.2",
+      "metric": "Discussion of processes for identifying and assessing conflicts of interest",
+      "topic": "Managing Conflicts of Interest",
+      "unit": "n/a",
+      "definition": "FN-EX-510a.2. Discussion of processes for identifying and assessing conflicts of\ninterest\n1   The entity shall describe its processes for identifying and assessing conflicts of interest, such as the use of\n    corporate policies, monitoring procedures, dedicated personnel or board oversight.\n\n2   The entity may describe efforts to minimise conflicts of interest including:\n\n    2.1   education, interpretation or guidance on regulatory compliance for broker-dealer members;\n\n    2.2   technical mechanisms to enforce compliance; and\n\n    2.3   delegating some self-regulatory powers to an applicable jurisdictional legal or regulatory authority or a\n          qualified independent third-party organisation.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "qualitative",
+      "aliases": [
+        "Discussion of processes for identifying and assessing conflicts of interest",
+        "FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest"
+      ],
+      "bm25_terms": [
+        "FN-EX-510a.2",
+        "Discussion",
+        "processes",
+        "identifying",
+        "assessing",
+        "conflicts",
+        "interest",
+        "Managing"
+      ],
+      "dense_query": "Find disclosures for FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest related to Managing Conflicts of Interest.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest related to Managing Conflicts of Interest.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest."
+      ],
+      "anchor_terms": [
+        "FN-EX-510a.2",
+        "Discussion of processes for identifying and assessing conflicts of interest",
+        "Discussion",
+        "processes",
+        "identifying",
+        "assessing",
+        "conflicts",
+        "interest",
+        "Managing"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "paragraph",
+        "list-item",
+        "table-row",
+        "table",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-550a.1.01",
+      "metric_code": "FN-EX-550a.1",
+      "metric": "(1) Number of significant market disruptions",
+      "topic": "Managing Business Continuity & Technology Risks",
+      "unit": "Number",
+      "definition": "FN-EX-550a.1. (1) Number of significant market disruptions and (2) duration of\ndowntime\n1   The entity shall disclose the (1) number and (2) duration in hours of significant market disruptions.\n\n    1.1   A significant market disruption is defined as an event in which the exchange ceases to function according to\n          its typical manner and causes, or threatens to cause, steep market declines.\n\n2   The scope of the disclosure excludes trading halts and pauses disclosed in metric FN-EX-410a.1, suspensions of\n    trading of individual securities by the applicable jurisdictional legal or regulatory authorities (for example, the\n    failure of an entity to file periodic reports), or market-wide trading suspension mechanisms required by the\n    authorities (for example, in response to market-wide volatility).\n\nNote to FN-EX-550a.1\n\n1   The entity shall characterise the type of disruption, which may include member actions (for example, ‘flash\n    crashes’ from algorithmic trading), technology-related disruption (for example, cyber-attack or computer failure),\n    power losses, or high-risk, low-probability incidents (for example, terrorism, extreme environmental events or other\n    physical threats).\n\n    1.1   Disruptions shall be limited to those specifically targeted towards or specifically affecting the entity, and\n          shall exclude general economic, political or environmental events. For example, a cyber-attack that targets\n          the entity’s exchange would be in the scope of the disclosure, but a cyber-attack on the jurisdictional\n          government would not, despite the potential for the latter to have market effects.\n\n2   The entity shall describe the extent of disruptions in the context of the aspects, features or services of the entity\n    that were affected.\n\n3   The entity shall describe the root cause of each disruption and any corrective actions implemented in response to\n    each incident.\n\n    3.1   Corrective actions include specific changes in operations, management processes, products, business\n          partners, training or technology.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of significant market disruptions",
+        "Number of significant market disruptions",
+        "FN-EX-550a.1 (1) Number of significant market disruptions"
+      ],
+      "bm25_terms": [
+        "FN-EX-550a.1",
+        "significant",
+        "market",
+        "disruptions",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-EX-550a.1 (1) Number of significant market disruptions with unit Number related to Managing Business Continuity & Technology Risks.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-550a.1 (1) Number of significant market disruptions, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-550a.1 (1) Number of significant market disruptions with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.1 (1) Number of significant market disruptions related to Managing Business Continuity & Technology Risks.",
+        "Find numeric table rows or performance metrics reporting FN-EX-550a.1 (1) Number of significant market disruptions for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-550a.1",
+        "Number of significant market disruptions",
+        "significant",
+        "market",
+        "disruptions",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Duration of downtime"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-550a.1 (2) Duration of downtime",
+          "difference": "This profile is only for \"(1) Number of significant market disruptions\"; do not treat evidence for \"(2) Duration of downtime\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-550a.1.02",
+      "metric_code": "FN-EX-550a.1",
+      "metric": "(2) Duration of downtime",
+      "topic": "Managing Business Continuity & Technology Risks",
+      "unit": "Hours (h)",
+      "definition": "FN-EX-550a.1. (1) Number of significant market disruptions and (2) duration of\ndowntime\n1   The entity shall disclose the (1) number and (2) duration in hours of significant market disruptions.\n\n    1.1   A significant market disruption is defined as an event in which the exchange ceases to function according to\n          its typical manner and causes, or threatens to cause, steep market declines.\n\n2   The scope of the disclosure excludes trading halts and pauses disclosed in metric FN-EX-410a.1, suspensions of\n    trading of individual securities by the applicable jurisdictional legal or regulatory authorities (for example, the\n    failure of an entity to file periodic reports), or market-wide trading suspension mechanisms required by the\n    authorities (for example, in response to market-wide volatility).\n\nNote to FN-EX-550a.1\n\n1   The entity shall characterise the type of disruption, which may include member actions (for example, ‘flash\n    crashes’ from algorithmic trading), technology-related disruption (for example, cyber-attack or computer failure),\n    power losses, or high-risk, low-probability incidents (for example, terrorism, extreme environmental events or other\n    physical threats).\n\n    1.1   Disruptions shall be limited to those specifically targeted towards or specifically affecting the entity, and\n          shall exclude general economic, political or environmental events. For example, a cyber-attack that targets\n          the entity’s exchange would be in the scope of the disclosure, but a cyber-attack on the jurisdictional\n          government would not, despite the potential for the latter to have market effects.\n\n2   The entity shall describe the extent of disruptions in the context of the aspects, features or services of the entity\n    that were affected.\n\n3   The entity shall describe the root cause of each disruption and any corrective actions implemented in response to\n    each incident.\n\n    3.1   Corrective actions include specific changes in operations, management processes, products, business\n          partners, training or technology.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Duration of downtime",
+        "Duration of downtime",
+        "FN-EX-550a.1 (2) Duration of downtime"
+      ],
+      "bm25_terms": [
+        "FN-EX-550a.1",
+        "Duration",
+        "downtime",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Hours",
+        "Hours (h)"
+      ],
+      "dense_query": "Find disclosures for FN-EX-550a.1 (2) Duration of downtime with unit Hours (h) related to Managing Business Continuity & Technology Risks.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-550a.1 (2) Duration of downtime, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-550a.1 (2) Duration of downtime with unit Hours (h).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.1 (2) Duration of downtime related to Managing Business Continuity & Technology Risks.",
+        "Find numeric table rows or performance metrics reporting FN-EX-550a.1 (2) Duration of downtime for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-550a.1",
+        "Duration of downtime",
+        "Duration",
+        "downtime",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Hours (h)"
+      ],
+      "negative_anchor_terms": [
+        "Number of significant market disruptions"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-550a.1 (1) Number of significant market disruptions",
+          "difference": "This profile is only for \"(2) Duration of downtime\"; do not treat evidence for \"(1) Number of significant market disruptions\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Hours (h)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-550a.2.01",
+      "metric_code": "FN-EX-550a.2",
+      "metric": "(1) Number of data breaches",
+      "topic": "Managing Business Continuity & Technology Risks",
+      "unit": "Number",
+      "definition": "FN-EX-550a.2. (1) Number of data breaches, (2) percentage that are personal data\nbreaches, (3) number of customers affected\n1   The entity shall disclose (1) the total number of data breaches identified during the reporting period.\n\n    1.1   A data breach is defined as an unauthorised occurrence on, or conducted through, an entity’s information\n          systems that jeopardises the confidentiality, integrity or availability of an entity’s information systems or any\n          information contained therein.\n\n          1.1.1   Information systems are defined as information resources, owned or used by the entity, including\n                  physical or virtual infrastructure controlled by such information resources, or components thereof,\n                  organised for the collection, processing, maintenance, use, sharing, dissemination or disposition of\n                  an entity’s information to maintain or support operations.\n\n    1.2   The scope of the disclosure excludes occurrences in which an entity has reasonable and supportable belief\n          that the occurrence (i) does not pose a risk of damage to the entity’s business performance or prospects,\n          (ii) does not pose a risk of damage to the interests of its customers and (iii) does not pose a risk of\n          economic or social disadvantage to individuals.\n\n2   An entity shall disclose (2) the percentage of data breaches that were personal data breaches.\n\n    2.1   A personal data breach is defined as a data breach resulting in the accidental or unauthorised destruction,\n          loss, alteration, disclosure of, or access to, personal data transmitted, stored or otherwise processed.\n\n    2.2   Personal data is defined as any information that relates to an identified or identifiable living individual.\n          Various pieces of information, which collected together can lead to the identification of a particular person,\n          also constitute personal data.\n\n          2.2.1   The entity may define personal data based on applicable jurisdictional laws or regulations. In such\n                  cases, the entity shall disclose the applicable jurisdictional standard or definition used.\n\n    2.3   The scope of the disclosure shall include incidents during which encrypted data was acquired with an\n          encryption key that also was acquired, as well as whether a reasonable belief exists that encrypted data\n          could be converted readily to plaintext.\n\n          2.3.1   Encryption is defined as the process of transforming plaintext into ciphertext.\n\n3   The entity shall disclose (3) the total number of unique customers affected by personal data breaches.\n\n    3.1   Accounts that the entity cannot verify as belonging to the same customer shall be disclosed separately.\n\n4   The entity may delay disclosure if a law enforcement agency has determined that notification impedes a criminal\n    investigation, and may be delayed until the law enforcement agency determines that such notification does not\n    compromise the investigation.\n\nNote to FN-EX-550a.2\n\n1   The entity shall describe any corrective actions taken in response to data breaches, such as changes in\n    operations, management, processes, products, business partners, training or technology.\n\n2   All disclosure shall be sufficient such that it is specific to the risks the entity faces, but disclosure itself would not\n    compromise the entity’s ability to maintain data privacy and security.\n\n3   The entity may disclose its policy for disclosing data breaches to affected customers in a timely manner.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of data breaches",
+        "Number of data breaches",
+        "FN-EX-550a.2 (1) Number of data breaches"
+      ],
+      "bm25_terms": [
+        "FN-EX-550a.2",
+        "data breach",
+        "breaches",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-EX-550a.2 (1) Number of data breaches with unit Number related to Managing Business Continuity & Technology Risks.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-550a.2 (1) Number of data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-550a.2 (1) Number of data breaches with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.2 (1) Number of data breaches related to Managing Business Continuity & Technology Risks.",
+        "Find numeric table rows or performance metrics reporting FN-EX-550a.2 (1) Number of data breaches for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-550a.2",
+        "Number of data breaches",
+        "data breach",
+        "breaches",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Percentage of data breaches that were personal data breaches",
+        "Number of unique customers affected by personal data breaches",
+        "cybersecurity policy",
+        "data security risk description",
+        "privacy policy only"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches",
+          "difference": "This profile is only for \"(1) Number of data breaches\"; do not treat evidence for \"(2) Percentage of data breaches that were personal data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches",
+          "difference": "This profile is only for \"(1) Number of data breaches\"; do not treat evidence for \"(3) Number of unique customers affected by personal data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-550a.2.02",
+      "metric_code": "FN-EX-550a.2",
+      "metric": "(2) Percentage of data breaches that were personal data breaches",
+      "topic": "Managing Business Continuity & Technology Risks",
+      "unit": "Percentage (%)",
+      "definition": "FN-EX-550a.2. (1) Number of data breaches, (2) percentage that are personal data\nbreaches, (3) number of customers affected\n1   The entity shall disclose (1) the total number of data breaches identified during the reporting period.\n\n    1.1   A data breach is defined as an unauthorised occurrence on, or conducted through, an entity’s information\n          systems that jeopardises the confidentiality, integrity or availability of an entity’s information systems or any\n          information contained therein.\n\n          1.1.1   Information systems are defined as information resources, owned or used by the entity, including\n                  physical or virtual infrastructure controlled by such information resources, or components thereof,\n                  organised for the collection, processing, maintenance, use, sharing, dissemination or disposition of\n                  an entity’s information to maintain or support operations.\n\n    1.2   The scope of the disclosure excludes occurrences in which an entity has reasonable and supportable belief\n          that the occurrence (i) does not pose a risk of damage to the entity’s business performance or prospects,\n          (ii) does not pose a risk of damage to the interests of its customers and (iii) does not pose a risk of\n          economic or social disadvantage to individuals.\n\n2   An entity shall disclose (2) the percentage of data breaches that were personal data breaches.\n\n    2.1   A personal data breach is defined as a data breach resulting in the accidental or unauthorised destruction,\n          loss, alteration, disclosure of, or access to, personal data transmitted, stored or otherwise processed.\n\n    2.2   Personal data is defined as any information that relates to an identified or identifiable living individual.\n          Various pieces of information, which collected together can lead to the identification of a particular person,\n          also constitute personal data.\n\n          2.2.1   The entity may define personal data based on applicable jurisdictional laws or regulations. In such\n                  cases, the entity shall disclose the applicable jurisdictional standard or definition used.\n\n    2.3   The scope of the disclosure shall include incidents during which encrypted data was acquired with an\n          encryption key that also was acquired, as well as whether a reasonable belief exists that encrypted data\n          could be converted readily to plaintext.\n\n          2.3.1   Encryption is defined as the process of transforming plaintext into ciphertext.\n\n3   The entity shall disclose (3) the total number of unique customers affected by personal data breaches.\n\n    3.1   Accounts that the entity cannot verify as belonging to the same customer shall be disclosed separately.\n\n4   The entity may delay disclosure if a law enforcement agency has determined that notification impedes a criminal\n    investigation, and may be delayed until the law enforcement agency determines that such notification does not\n    compromise the investigation.\n\nNote to FN-EX-550a.2\n\n1   The entity shall describe any corrective actions taken in response to data breaches, such as changes in\n    operations, management, processes, products, business partners, training or technology.\n\n2   All disclosure shall be sufficient such that it is specific to the risks the entity faces, but disclosure itself would not\n    compromise the entity’s ability to maintain data privacy and security.\n\n3   The entity may disclose its policy for disclosing data breaches to affected customers in a timely manner.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Percentage of data breaches that were personal data breaches",
+        "Percentage of data breaches that were personal data breaches",
+        "FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches"
+      ],
+      "bm25_terms": [
+        "FN-EX-550a.2",
+        "data breach",
+        "personal data",
+        "breaches",
+        "personal",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "%",
+        "Percentage (%)",
+        "percent",
+        "percentage"
+      ],
+      "dense_query": "Find disclosures for FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches with unit Percentage (%) related to Managing Business Continuity & Technology Risks.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches with unit Percentage (%).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches related to Managing Business Continuity & Technology Risks.",
+        "Find numeric table rows or performance metrics reporting FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-550a.2",
+        "Percentage of data breaches that were personal data breaches",
+        "data breach",
+        "personal data",
+        "breaches",
+        "personal",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Percentage (%)",
+        "%",
+        "percent",
+        "percentage"
+      ],
+      "negative_anchor_terms": [
+        "Number of data breaches",
+        "Number of unique customers affected by personal data breaches",
+        "cybersecurity policy",
+        "data security risk description",
+        "privacy policy only"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-550a.2 (1) Number of data breaches",
+          "difference": "This profile is only for \"(2) Percentage of data breaches that were personal data breaches\"; do not treat evidence for \"(1) Number of data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches",
+          "difference": "This profile is only for \"(2) Percentage of data breaches that were personal data breaches\"; do not treat evidence for \"(3) Number of unique customers affected by personal data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "percentage",
+        "expected_units": [
+          "Percentage (%)",
+          "%",
+          "percent",
+          "percentage"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-550a.2.03",
+      "metric_code": "FN-EX-550a.2",
+      "metric": "(3) Number of unique customers affected by personal data breaches",
+      "topic": "Managing Business Continuity & Technology Risks",
+      "unit": "Number",
+      "definition": "FN-EX-550a.2. (1) Number of data breaches, (2) percentage that are personal data\nbreaches, (3) number of customers affected\n1   The entity shall disclose (1) the total number of data breaches identified during the reporting period.\n\n    1.1   A data breach is defined as an unauthorised occurrence on, or conducted through, an entity’s information\n          systems that jeopardises the confidentiality, integrity or availability of an entity’s information systems or any\n          information contained therein.\n\n          1.1.1   Information systems are defined as information resources, owned or used by the entity, including\n                  physical or virtual infrastructure controlled by such information resources, or components thereof,\n                  organised for the collection, processing, maintenance, use, sharing, dissemination or disposition of\n                  an entity’s information to maintain or support operations.\n\n    1.2   The scope of the disclosure excludes occurrences in which an entity has reasonable and supportable belief\n          that the occurrence (i) does not pose a risk of damage to the entity’s business performance or prospects,\n          (ii) does not pose a risk of damage to the interests of its customers and (iii) does not pose a risk of\n          economic or social disadvantage to individuals.\n\n2   An entity shall disclose (2) the percentage of data breaches that were personal data breaches.\n\n    2.1   A personal data breach is defined as a data breach resulting in the accidental or unauthorised destruction,\n          loss, alteration, disclosure of, or access to, personal data transmitted, stored or otherwise processed.\n\n    2.2   Personal data is defined as any information that relates to an identified or identifiable living individual.\n          Various pieces of information, which collected together can lead to the identification of a particular person,\n          also constitute personal data.\n\n          2.2.1   The entity may define personal data based on applicable jurisdictional laws or regulations. In such\n                  cases, the entity shall disclose the applicable jurisdictional standard or definition used.\n\n    2.3   The scope of the disclosure shall include incidents during which encrypted data was acquired with an\n          encryption key that also was acquired, as well as whether a reasonable belief exists that encrypted data\n          could be converted readily to plaintext.\n\n          2.3.1   Encryption is defined as the process of transforming plaintext into ciphertext.\n\n3   The entity shall disclose (3) the total number of unique customers affected by personal data breaches.\n\n    3.1   Accounts that the entity cannot verify as belonging to the same customer shall be disclosed separately.\n\n4   The entity may delay disclosure if a law enforcement agency has determined that notification impedes a criminal\n    investigation, and may be delayed until the law enforcement agency determines that such notification does not\n    compromise the investigation.\n\nNote to FN-EX-550a.2\n\n1   The entity shall describe any corrective actions taken in response to data breaches, such as changes in\n    operations, management, processes, products, business partners, training or technology.\n\n2   All disclosure shall be sufficient such that it is specific to the risks the entity faces, but disclosure itself would not\n    compromise the entity’s ability to maintain data privacy and security.\n\n3   The entity may disclose its policy for disclosing data breaches to affected customers in a timely manner.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(3) Number of unique customers affected by personal data breaches",
+        "Number of unique customers affected by personal data breaches",
+        "FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches"
+      ],
+      "bm25_terms": [
+        "FN-EX-550a.2",
+        "data breach",
+        "personal data",
+        "unique",
+        "customers",
+        "affected",
+        "personal",
+        "breaches",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches with unit Number related to Managing Business Continuity & Technology Risks.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches related to Managing Business Continuity & Technology Risks.",
+        "Find numeric table rows or performance metrics reporting FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-550a.2",
+        "Number of unique customers affected by personal data breaches",
+        "data breach",
+        "personal data",
+        "unique",
+        "customers",
+        "affected",
+        "personal",
+        "breaches",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Technology",
+        "Risks",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Number of data breaches",
+        "Percentage of data breaches that were personal data breaches",
+        "cybersecurity policy",
+        "data security risk description",
+        "privacy policy only"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-EX-550a.2 (1) Number of data breaches",
+          "difference": "This profile is only for \"(3) Number of unique customers affected by personal data breaches\"; do not treat evidence for \"(1) Number of data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches",
+          "difference": "This profile is only for \"(3) Number of unique customers affected by personal data breaches\"; do not treat evidence for \"(2) Percentage of data breaches that were personal data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-550a.3",
+      "metric_code": "FN-EX-550a.3",
+      "metric": "Description of efforts to prevent technology errors, security breaches, and market disruptions",
+      "topic": "Managing Business Continuity & Technology Risks",
+      "unit": "n/a",
+      "definition": "FN-EX-550a.3. Description of efforts to prevent technology errors, security\nbreaches, and market disruptions\n1   The entity shall describe its policies and practices to ensure the confidentiality, integrity and availability of data\n    across its data platforms.\n\n    1.1   The scope of data includes information provided to and held by third parties, for example, regulators.\n\n    1.2   Data platforms may include:\n\n          1.2.1    trading services and technologies, such as software, data feeds and member services (for example,\n                   messaging or information services); and\n\n          1.2.2    IT infrastructure, such as co-location facilities and low-latency connectivity equipment.\n\n2   All disclosure shall be sufficient such that it is specific to the risks that the entity faces, but disclosure itself would\n    not compromise the entity’s ability to maintain data privacy and security.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "qualitative",
+      "aliases": [
+        "Description of efforts to prevent technology errors, security breaches, and market disruptions",
+        "FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions"
+      ],
+      "bm25_terms": [
+        "FN-EX-550a.3",
+        "Description",
+        "efforts",
+        "prevent",
+        "technology",
+        "errors",
+        "security",
+        "breaches",
+        "market",
+        "disruptions",
+        "Managing",
+        "Business",
+        "Continuity",
+        "Risks"
+      ],
+      "dense_query": "Find disclosures for FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions related to Managing Business Continuity & Technology Risks.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions related to Managing Business Continuity & Technology Risks.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions."
+      ],
+      "anchor_terms": [
+        "FN-EX-550a.3",
+        "Description of efforts to prevent technology errors, security breaches, and market disruptions",
+        "Description",
+        "efforts",
+        "prevent",
+        "technology",
+        "errors",
+        "security",
+        "breaches",
+        "market",
+        "disruptions",
+        "Managing",
+        "Business",
+        "Continuity"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "paragraph",
+        "list-item",
+        "table-row",
+        "table",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-000.A",
+      "metric_code": "FN-EX-000.A",
+      "metric": "Average daily number of trades executed, by product or asset class",
+      "topic": "",
+      "unit": "Number",
+      "definition": "Average daily number of trades executed, by product or asset class",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Average daily number of trades executed, by product or asset class",
+        "FN-EX-000.A Average daily number of trades executed, by product or asset class"
+      ],
+      "bm25_terms": [
+        "FN-EX-000.A",
+        "daily",
+        "trades",
+        "executed",
+        "product",
+        "asset",
+        "class",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-EX-000.A Average daily number of trades executed, by product or asset class with unit Number.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-000.A Average daily number of trades executed, by product or asset class, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-000.A Average daily number of trades executed, by product or asset class with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-000.A Average daily number of trades executed, by product or asset class.",
+        "Find numeric table rows or performance metrics reporting FN-EX-000.A Average daily number of trades executed, by product or asset class for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-000.A",
+        "Average daily number of trades executed, by product or asset class",
+        "daily",
+        "trades",
+        "executed",
+        "product",
+        "asset",
+        "class",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-EX-000.B",
+      "metric_code": "FN-EX-000.B",
+      "metric": "Average daily volume traded, by product or asset class",
+      "topic": "",
+      "unit": "Presentation currency",
+      "definition": "Average daily volume traded, by product or asset class",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Average daily volume traded, by product or asset class",
+        "FN-EX-000.B Average daily volume traded, by product or asset class"
+      ],
+      "bm25_terms": [
+        "FN-EX-000.B",
+        "daily",
+        "volume",
+        "traded",
+        "product",
+        "asset",
+        "class",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for FN-EX-000.B Average daily volume traded, by product or asset class with unit Presentation currency.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-EX-000.B Average daily volume traded, by product or asset class, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-EX-000.B Average daily volume traded, by product or asset class with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-000.B Average daily volume traded, by product or asset class.",
+        "Find numeric table rows or performance metrics reporting FN-EX-000.B Average daily volume traded, by product or asset class for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-EX-000.B",
+        "Average daily volume traded, by product or asset class",
+        "daily",
+        "volume",
+        "traded",
+        "product",
+        "asset",
+        "class",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    }
+  ]
+}

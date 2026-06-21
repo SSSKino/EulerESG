@@ -1,0 +1,2964 @@
+{
+  "profiles": [
+    {
+      "metric_id": "FN-CB-230a.1.01",
+      "metric_code": "FN-CB-230a.1",
+      "metric": "(1) Number of data breaches",
+      "topic": "Data Security",
+      "unit": "Number",
+      "definition": "FN-CB-230a.1. (1) Number of data breaches, (2) percentage that are personal data\nbreaches, (3) number of account holders affected\n1 The entity shall disclose (1) the total number of data breaches identified during the reporting period.\n\n1.1 A data breach is defined as an unauthorised occurrence on, or conducted through, an entity’s information\nsystems that jeopardises the confidentiality, integrity or availability of an entity’s information systems or any\ninformation contained therein.\n\n1.1.1 Information systems are defined as information resources, owned or used by the entity, including\nphysical or virtual infrastructure controlled by such information resources, or components thereof,\norganised for the collection, processing, maintenance, use, sharing, dissemination or disposition of\nan entity’s information to maintain or support operations.\n\n1.2 The scope of the disclosure excludes occurrences in which an entity has reasonable and supportable belief\nthat the occurrence (i) does not pose a risk of damage to the entity’s business performance or prospects\nand (ii) does not pose a risk of economic or social disadvantage to individuals.\n\n2 The entity shall disclose (2) the percentage of data breaches that were personal data breaches.\n\n2.1 A personal data breach is defined as a data breach resulting in the accidental or unauthorised destruction,\nloss, alteration, disclosure of, or access to, personal data transmitted, stored or otherwise processed.\n\n2.2 Personal data is defined as any information that relates to an identified or identifiable living individual.\nVarious pieces of information, which collected together can lead to the identification of a particular person,\nalso constitute personal data.\n\n2.2.1 The entity may define personal data based on applicable jurisdictional laws or regulations. In such\ncases, the entity shall disclose the applicable jurisdictional standard or definition used.\n\n2.3 The scope of the disclosure shall include incidents during which encrypted data was acquired with an\nencryption key that also was acquired, as well as whether a reasonable belief exists that encrypted data\ncould be converted readily to plaintext.\n\n2.3.1 Encryption is defined as the process of transforming plaintext into ciphertext.\n\n3 The entity shall disclose (3) the total number of unique account holders affected by personal data breaches.\n\n3.1 Accounts that the entity cannot verify as belonging to the same account holder shall be disclosed\nseparately.\n\n4 The entity may delay disclosure if a law enforcement agency has determined that notification impedes a criminal\ninvestigation, and may be delayed until the law enforcement agency determines that such notification does not\ncompromise the investigation.\n\nNote to FN-CB-230a.1\n\n1 The entity shall describe any corrective actions taken in response to data breaches, such as changes in\noperations, management, processes, products, business partners, training or technology.\n\n2 All disclosure shall be sufficient such that it is specific to the risks the entity faces, but disclosure itself would not\ncompromise the entity’s ability to maintain data privacy and security.\n\n3 The entity may disclose its policy for disclosing data breaches to affected account holders in a timely manner.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of data breaches",
+        "Number of data breaches",
+        "FN-CB-230a.1 (1) Number of data breaches"
+      ],
+      "bm25_terms": [
+        "FN-CB-230a.1",
+        "data breach",
+        "breaches",
+        "Security",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-230a.1 (1) Number of data breaches with unit Number related to Data Security.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-230a.1 (1) Number of data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-230a.1 (1) Number of data breaches with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-230a.1 (1) Number of data breaches related to Data Security.",
+        "Find numeric table rows or performance metrics reporting FN-CB-230a.1 (1) Number of data breaches for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-230a.1",
+        "Number of data breaches",
+        "data breach",
+        "breaches",
+        "Security",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "percentage that are personal data breaches",
+        "number of account holders affected",
+        "cybersecurity policy",
+        "data security risk description",
+        "privacy policy only"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-230a.1 (2) percentage that are personal data breaches",
+          "difference": "This profile is only for \"(1) Number of data breaches\"; do not treat evidence for \"(2) percentage that are personal data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-230a.1 (3) number of account holders affected",
+          "difference": "This profile is only for \"(1) Number of data breaches\"; do not treat evidence for \"(3) number of account holders affected\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-230a.1.02",
+      "metric_code": "FN-CB-230a.1",
+      "metric": "(2) percentage that are personal data breaches",
+      "topic": "Data Security",
+      "unit": "Percentage (%)",
+      "definition": "FN-CB-230a.1. (1) Number of data breaches, (2) percentage that are personal data\nbreaches, (3) number of account holders affected\n1 The entity shall disclose (1) the total number of data breaches identified during the reporting period.\n\n1.1 A data breach is defined as an unauthorised occurrence on, or conducted through, an entity’s information\nsystems that jeopardises the confidentiality, integrity or availability of an entity’s information systems or any\ninformation contained therein.\n\n1.1.1 Information systems are defined as information resources, owned or used by the entity, including\nphysical or virtual infrastructure controlled by such information resources, or components thereof,\norganised for the collection, processing, maintenance, use, sharing, dissemination or disposition of\nan entity’s information to maintain or support operations.\n\n1.2 The scope of the disclosure excludes occurrences in which an entity has reasonable and supportable belief\nthat the occurrence (i) does not pose a risk of damage to the entity’s business performance or prospects\nand (ii) does not pose a risk of economic or social disadvantage to individuals.\n\n2 The entity shall disclose (2) the percentage of data breaches that were personal data breaches.\n\n2.1 A personal data breach is defined as a data breach resulting in the accidental or unauthorised destruction,\nloss, alteration, disclosure of, or access to, personal data transmitted, stored or otherwise processed.\n\n2.2 Personal data is defined as any information that relates to an identified or identifiable living individual.\nVarious pieces of information, which collected together can lead to the identification of a particular person,\nalso constitute personal data.\n\n2.2.1 The entity may define personal data based on applicable jurisdictional laws or regulations. In such\ncases, the entity shall disclose the applicable jurisdictional standard or definition used.\n\n2.3 The scope of the disclosure shall include incidents during which encrypted data was acquired with an\nencryption key that also was acquired, as well as whether a reasonable belief exists that encrypted data\ncould be converted readily to plaintext.\n\n2.3.1 Encryption is defined as the process of transforming plaintext into ciphertext.\n\n3 The entity shall disclose (3) the total number of unique account holders affected by personal data breaches.\n\n3.1 Accounts that the entity cannot verify as belonging to the same account holder shall be disclosed\nseparately.\n\n4 The entity may delay disclosure if a law enforcement agency has determined that notification impedes a criminal\ninvestigation, and may be delayed until the law enforcement agency determines that such notification does not\ncompromise the investigation.\n\nNote to FN-CB-230a.1\n\n1 The entity shall describe any corrective actions taken in response to data breaches, such as changes in\noperations, management, processes, products, business partners, training or technology.\n\n2 All disclosure shall be sufficient such that it is specific to the risks the entity faces, but disclosure itself would not\ncompromise the entity’s ability to maintain data privacy and security.\n\n3 The entity may disclose its policy for disclosing data breaches to affected account holders in a timely manner.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) percentage that are personal data breaches",
+        "percentage that are personal data breaches",
+        "FN-CB-230a.1 (2) percentage that are personal data breaches"
+      ],
+      "bm25_terms": [
+        "FN-CB-230a.1",
+        "data breach",
+        "personal data",
+        "personal",
+        "breaches",
+        "Security",
+        "%",
+        "Percentage (%)",
+        "percent",
+        "percentage"
+      ],
+      "dense_query": "Find disclosures for FN-CB-230a.1 (2) percentage that are personal data breaches with unit Percentage (%) related to Data Security.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-230a.1 (2) percentage that are personal data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-230a.1 (2) percentage that are personal data breaches with unit Percentage (%).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-230a.1 (2) percentage that are personal data breaches related to Data Security.",
+        "Find numeric table rows or performance metrics reporting FN-CB-230a.1 (2) percentage that are personal data breaches for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-230a.1",
+        "percentage that are personal data breaches",
+        "data breach",
+        "personal data",
+        "personal",
+        "breaches",
+        "Security",
+        "Percentage (%)",
+        "%",
+        "percent",
+        "percentage"
+      ],
+      "negative_anchor_terms": [
+        "Number of data breaches",
+        "number of account holders affected",
+        "cybersecurity policy",
+        "data security risk description",
+        "privacy policy only"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-230a.1 (1) Number of data breaches",
+          "difference": "This profile is only for \"(2) percentage that are personal data breaches\"; do not treat evidence for \"(1) Number of data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-230a.1 (3) number of account holders affected",
+          "difference": "This profile is only for \"(2) percentage that are personal data breaches\"; do not treat evidence for \"(3) number of account holders affected\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "percentage",
+        "expected_units": [
+          "Percentage (%)",
+          "%",
+          "percent",
+          "percentage"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-230a.1.03",
+      "metric_code": "FN-CB-230a.1",
+      "metric": "(3) number of account holders affected",
+      "topic": "Data Security",
+      "unit": "Number",
+      "definition": "FN-CB-230a.1. (1) Number of data breaches, (2) percentage that are personal data\nbreaches, (3) number of account holders affected\n1 The entity shall disclose (1) the total number of data breaches identified during the reporting period.\n\n1.1 A data breach is defined as an unauthorised occurrence on, or conducted through, an entity’s information\nsystems that jeopardises the confidentiality, integrity or availability of an entity’s information systems or any\ninformation contained therein.\n\n1.1.1 Information systems are defined as information resources, owned or used by the entity, including\nphysical or virtual infrastructure controlled by such information resources, or components thereof,\norganised for the collection, processing, maintenance, use, sharing, dissemination or disposition of\nan entity’s information to maintain or support operations.\n\n1.2 The scope of the disclosure excludes occurrences in which an entity has reasonable and supportable belief\nthat the occurrence (i) does not pose a risk of damage to the entity’s business performance or prospects\nand (ii) does not pose a risk of economic or social disadvantage to individuals.\n\n2 The entity shall disclose (2) the percentage of data breaches that were personal data breaches.\n\n2.1 A personal data breach is defined as a data breach resulting in the accidental or unauthorised destruction,\nloss, alteration, disclosure of, or access to, personal data transmitted, stored or otherwise processed.\n\n2.2 Personal data is defined as any information that relates to an identified or identifiable living individual.\nVarious pieces of information, which collected together can lead to the identification of a particular person,\nalso constitute personal data.\n\n2.2.1 The entity may define personal data based on applicable jurisdictional laws or regulations. In such\ncases, the entity shall disclose the applicable jurisdictional standard or definition used.\n\n2.3 The scope of the disclosure shall include incidents during which encrypted data was acquired with an\nencryption key that also was acquired, as well as whether a reasonable belief exists that encrypted data\ncould be converted readily to plaintext.\n\n2.3.1 Encryption is defined as the process of transforming plaintext into ciphertext.\n\n3 The entity shall disclose (3) the total number of unique account holders affected by personal data breaches.\n\n3.1 Accounts that the entity cannot verify as belonging to the same account holder shall be disclosed\nseparately.\n\n4 The entity may delay disclosure if a law enforcement agency has determined that notification impedes a criminal\ninvestigation, and may be delayed until the law enforcement agency determines that such notification does not\ncompromise the investigation.\n\nNote to FN-CB-230a.1\n\n1 The entity shall describe any corrective actions taken in response to data breaches, such as changes in\noperations, management, processes, products, business partners, training or technology.\n\n2 All disclosure shall be sufficient such that it is specific to the risks the entity faces, but disclosure itself would not\ncompromise the entity’s ability to maintain data privacy and security.\n\n3 The entity may disclose its policy for disclosing data breaches to affected account holders in a timely manner.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(3) number of account holders affected",
+        "number of account holders affected",
+        "FN-CB-230a.1 (3) number of account holders affected"
+      ],
+      "bm25_terms": [
+        "FN-CB-230a.1",
+        "account",
+        "holders",
+        "affected",
+        "Security",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-230a.1 (3) number of account holders affected with unit Number related to Data Security.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-230a.1 (3) number of account holders affected, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-230a.1 (3) number of account holders affected with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-230a.1 (3) number of account holders affected related to Data Security.",
+        "Find numeric table rows or performance metrics reporting FN-CB-230a.1 (3) number of account holders affected for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-230a.1",
+        "number of account holders affected",
+        "account",
+        "holders",
+        "affected",
+        "Security",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Number of data breaches",
+        "percentage that are personal data breaches"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-230a.1 (1) Number of data breaches",
+          "difference": "This profile is only for \"(3) number of account holders affected\"; do not treat evidence for \"(1) Number of data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-230a.1 (2) percentage that are personal data breaches",
+          "difference": "This profile is only for \"(3) number of account holders affected\"; do not treat evidence for \"(2) percentage that are personal data breaches\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-230a.2",
+      "metric_code": "FN-CB-230a.2",
+      "metric": "Description of approach to identifying and addressing data security risks",
+      "topic": "Data Security",
+      "unit": "n/a",
+      "definition": "FN-CB-230a.2. Description of approach to identifying and addressing data\nsecurity risks\n1 The entity shall describe its approach to identifying information system vulnerabilities that may pose a data\nsecurity risk.\n\n1.1 Vulnerability is defined as a weakness in an information system, implementation, system security procedure\nor internal control that could be exploited.\n\n1.2 Data security risk is defined as the risk of any circumstance or event with the potential to affect\norganisational operations (including mission, functions, image or reputation), assets, individuals, or other\norganisations or governments through an information system via unauthorised access, destruction,\ndisclosure, modification of information or denial of service.\n\n2 The entity shall describe its approach to managing identified data security risks and vulnerabilities, which may\ninclude operational procedures, management processes, structure of products, selection of business partners,\nemployee training and use of technology.\n\n3 The entity shall discuss observed trends in type, frequency and origination of attacks on its data security and\ninformation systems.\n\n4 The entity shall describe its policies and procedures for disclosing data breaches to its customers in a timely\nmanner.\n\n5 The entity’s disclosure shall include a discussion of data and system security efforts that relate to new and\nemerging cyber threats and attack vectors facing the financial services industry.\n\n5.1 Emerging cyber threats may include cyber threats arising from the use of near-field communication\npayment systems, mobile banking and web-based banking.\n\n5.2 Attack vectors may include ransomware, loan stacking schemes, money mule schemes and remote access\nattacks.\n\n6 The entity shall describe the regulatory environment in which it operates related to data security.\n\n6.1 The discussion shall include data security policies and procedures the entity adopted for regulatory\ncompliance or voluntarily as an industry best practice.\n\n7 The entity shall describe the degree to which its approach aligns with an external standard or framework or\napplicable jurisdictional legal or regulatory framework for managing data security, such as:\n\n7.1 the ISO/IEC 2700 series;\n\n7.2 the National Institute of Standards and Technology (NIST), Framework for Improving Critical Infrastructure\nCybersecurity, 2018;\n\n7.3 the New York State Department of Financial Services 23 NYCRR 500, Cybersecurity Requirements for\nFinancial Services Companies; and\n\n7.4 the Office of the Comptroller of the Currency (OCC) Bulletin 2013-29, Third-Party Relationships: Risk\nManagement Guidance, 2013.\n\n8 All disclosure shall be sufficient such that it is specific to the risks the entity faces, but disclosure itself would not\ncompromise the entity’s ability to maintain data privacy and security.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "qualitative",
+      "aliases": [
+        "Description of approach to identifying and addressing data security risks",
+        "FN-CB-230a.2 Description of approach to identifying and addressing data security risks"
+      ],
+      "bm25_terms": [
+        "FN-CB-230a.2",
+        "Description",
+        "approach",
+        "identifying",
+        "addressing",
+        "security",
+        "risks"
+      ],
+      "dense_query": "Find disclosures for FN-CB-230a.2 Description of approach to identifying and addressing data security risks related to Data Security.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-230a.2 Description of approach to identifying and addressing data security risks, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-230a.2 Description of approach to identifying and addressing data security risks.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-230a.2 Description of approach to identifying and addressing data security risks related to Data Security.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-CB-230a.2 Description of approach to identifying and addressing data security risks."
+      ],
+      "anchor_terms": [
+        "FN-CB-230a.2",
+        "Description of approach to identifying and addressing data security risks",
+        "Description",
+        "approach",
+        "identifying",
+        "addressing",
+        "security",
+        "risks"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "paragraph",
+        "list-item",
+        "table-row",
+        "table",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-240a.1.01",
+      "metric_code": "FN-CB-240a.1",
+      "metric": "(1) Number of loans outstanding that qualify for programmes designed to promote small business and community development",
+      "topic": "Financial Inclusion & Capacity Building",
+      "unit": "Number",
+      "definition": "FN-CB-240a.1. (1) Number and (2) amount of loans outstanding that qualify for\nprogrammes designed to promote small business and community development\n1 The entity shall disclose (1) the total number of loans outstanding that qualify for programmes designed to\npromote small business and community development, and (2) the total amount outstanding on these loans.\n\n1.1 Loans that qualify for programmes designed to promote small business and community development are\ndefined in accordance with applicable jurisdictional laws or regulations. The entity shall disclose the\njurisdictional standards or definitions used.\n\n2 The scope of community development loans includes loans primarily funding community services for low- or\nmoderate-income individuals, and the development, revitalisation or stabilisation of low- or moderate-income\nregions.\n\n3 The scope of community development loans includes loans related to microfinance lenders, social banks or\ncommunity development finance institutions (CDFIs).\n\n4 The scope of small business loans includes loans to farms.\n\n5 The scope of the disclosure excludes loans for personal expenditures or residential property.\n\nNote to FN-CB-240a.1\n\n1 The entity shall provide a description of its short- and long-term strategy or plan to expand its portfolio of qualified\nloans promoting small business and community development.\n\n2 The entity shall include a discussion of its examination results for compliance with applicable jurisdictional laws or\nregulations related to the disclosure.\n\n3 The entity shall describe how its examination results are integrated into its short- and long-term financial inclusion\nand capacity building strategy.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of loans outstanding that qualify for programmes designed to promote small business and community development",
+        "Number of loans outstanding that qualify for programmes designed to promote small business and community development",
+        "FN-CB-240a.1 (1) Number of loans outstanding that qualify for programmes designed to promote small business and community development"
+      ],
+      "bm25_terms": [
+        "FN-CB-240a.1",
+        "loans",
+        "outstanding",
+        "qualify",
+        "programmes",
+        "designed",
+        "promote",
+        "small",
+        "business",
+        "community",
+        "development",
+        "Financial",
+        "Inclusion",
+        "Capacity",
+        "Building",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-240a.1 (1) Number of loans outstanding that qualify for programmes designed to promote small business and community development with unit Number related to Financial Inclusion & Capacity Building.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-240a.1 (1) Number of loans outstanding that qualify for programmes designed to promote small business and community development, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-240a.1 (1) Number of loans outstanding that qualify for programmes designed to promote small business and community development with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-240a.1 (1) Number of loans outstanding that qualify for programmes designed to promote small business and community development related to Financial Inclusion & Capacity Building.",
+        "Find numeric table rows or performance metrics reporting FN-CB-240a.1 (1) Number of loans outstanding that qualify for programmes designed to promote small business and community development for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-240a.1",
+        "Number of loans outstanding that qualify for programmes designed to promote small business and community development",
+        "loans",
+        "outstanding",
+        "qualify",
+        "programmes",
+        "designed",
+        "promote",
+        "small",
+        "business",
+        "community",
+        "development",
+        "Financial",
+        "Inclusion",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Amount of loans outstanding that qualify for programmes designed to promote small business and community development"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-240a.1 (2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development",
+          "difference": "This profile is only for \"(1) Number of loans outstanding that qualify for programmes designed to promote small business and community development\"; do not treat evidence for \"(2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-240a.1.02",
+      "metric_code": "FN-CB-240a.1",
+      "metric": "(2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development",
+      "topic": "Financial Inclusion & Capacity Building",
+      "unit": "Presentation currency",
+      "definition": "FN-CB-240a.1. (1) Number and (2) amount of loans outstanding that qualify for\nprogrammes designed to promote small business and community development\n1 The entity shall disclose (1) the total number of loans outstanding that qualify for programmes designed to\npromote small business and community development, and (2) the total amount outstanding on these loans.\n\n1.1 Loans that qualify for programmes designed to promote small business and community development are\ndefined in accordance with applicable jurisdictional laws or regulations. The entity shall disclose the\njurisdictional standards or definitions used.\n\n2 The scope of community development loans includes loans primarily funding community services for low- or\nmoderate-income individuals, and the development, revitalisation or stabilisation of low- or moderate-income\nregions.\n\n3 The scope of community development loans includes loans related to microfinance lenders, social banks or\ncommunity development finance institutions (CDFIs).\n\n4 The scope of small business loans includes loans to farms.\n\n5 The scope of the disclosure excludes loans for personal expenditures or residential property.\n\nNote to FN-CB-240a.1\n\n1 The entity shall provide a description of its short- and long-term strategy or plan to expand its portfolio of qualified\nloans promoting small business and community development.\n\n2 The entity shall include a discussion of its examination results for compliance with applicable jurisdictional laws or\nregulations related to the disclosure.\n\n3 The entity shall describe how its examination results are integrated into its short- and long-term financial inclusion\nand capacity building strategy.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development",
+        "Amount of loans outstanding that qualify for programmes designed to promote small business and community development",
+        "FN-CB-240a.1 (2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development"
+      ],
+      "bm25_terms": [
+        "FN-CB-240a.1",
+        "loans",
+        "outstanding",
+        "qualify",
+        "programmes",
+        "designed",
+        "promote",
+        "small",
+        "business",
+        "community",
+        "development",
+        "Financial",
+        "Inclusion",
+        "Capacity",
+        "Building",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for FN-CB-240a.1 (2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development with unit Presentation currency related to Financial Inclusion & Capacity Building.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-240a.1 (2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-240a.1 (2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-240a.1 (2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development related to Financial Inclusion & Capacity Building.",
+        "Find numeric table rows or performance metrics reporting FN-CB-240a.1 (2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-240a.1",
+        "Amount of loans outstanding that qualify for programmes designed to promote small business and community development",
+        "loans",
+        "outstanding",
+        "qualify",
+        "programmes",
+        "designed",
+        "promote",
+        "small",
+        "business",
+        "community",
+        "development",
+        "Financial",
+        "Inclusion",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "Number of loans outstanding that qualify for programmes designed to promote small business and community development"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-240a.1 (1) Number of loans outstanding that qualify for programmes designed to promote small business and community development",
+          "difference": "This profile is only for \"(2) Amount of loans outstanding that qualify for programmes designed to promote small business and community development\"; do not treat evidence for \"(1) Number of loans outstanding that qualify for programmes designed to promote small business and community development\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-240a.2.01",
+      "metric_code": "FN-CB-240a.2",
+      "metric": "(1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+      "topic": "Financial Inclusion & Capacity Building",
+      "unit": "Number",
+      "definition": "FN-CB-240a.2. (1) Number and (2) amount of past due and nonaccrual loans or\nloans subject to forbearance that qualify for programmes designed to promote\nsmall business and community development\n1 The entity shall disclose (1) the total number of past due and nonaccrual loans or, alternatively, the total number\nof loans subject to forbearance that qualify for programmes designed to promote small business and community\ndevelopment, and (2) the total amount outstanding on these loans.\n\n1.1 Loans that qualify for programmes designed to promote small business and community development are\ndefined in accordance with applicable jurisdictional laws or regulations. The entity shall disclose the\njurisdictional standards or definitions used.\n\n2 The scope of community development loans includes loans primarily funding community services targeted to low-\nor moderate-income individuals, and the development, revitalisation or stabilisation of low- or moderate-income\nregions.\n\n3 The scope of community development loans includes loans related to microfinance lenders, social banks or\ncommunity development finance institutions (CDFIs).\n\n4 The scope of small business loans includes loans to farms.\n\n5 The scope of the disclosure excludes loans for personal expenditures or residential property.\n\n6 The scope of disclosure includes loans originated and purchased by the entity.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+        "Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+        "FN-CB-240a.2 (1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development"
+      ],
+      "bm25_terms": [
+        "FN-CB-240a.2",
+        "past",
+        "due",
+        "nonaccrual",
+        "loans",
+        "subject",
+        "forbearance",
+        "qualify",
+        "programmes",
+        "designed",
+        "promote",
+        "small",
+        "business",
+        "community",
+        "development",
+        "Financial",
+        "Inclusion",
+        "Capacity",
+        "Building",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-240a.2 (1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development with unit Number related to Financial Inclusion & Capacity Building.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-240a.2 (1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-240a.2 (1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-240a.2 (1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development related to Financial Inclusion & Capacity Building.",
+        "Find numeric table rows or performance metrics reporting FN-CB-240a.2 (1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-240a.2",
+        "Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+        "past",
+        "due",
+        "nonaccrual",
+        "loans",
+        "subject",
+        "forbearance",
+        "qualify",
+        "programmes",
+        "designed",
+        "promote",
+        "small",
+        "business",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-240a.2 (2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+          "difference": "This profile is only for \"(1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development\"; do not treat evidence for \"(2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-240a.2.02",
+      "metric_code": "FN-CB-240a.2",
+      "metric": "(2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+      "topic": "Financial Inclusion & Capacity Building",
+      "unit": "Presentation currency",
+      "definition": "FN-CB-240a.2. (1) Number and (2) amount of past due and nonaccrual loans or\nloans subject to forbearance that qualify for programmes designed to promote\nsmall business and community development\n1 The entity shall disclose (1) the total number of past due and nonaccrual loans or, alternatively, the total number\nof loans subject to forbearance that qualify for programmes designed to promote small business and community\ndevelopment, and (2) the total amount outstanding on these loans.\n\n1.1 Loans that qualify for programmes designed to promote small business and community development are\ndefined in accordance with applicable jurisdictional laws or regulations. The entity shall disclose the\njurisdictional standards or definitions used.\n\n2 The scope of community development loans includes loans primarily funding community services targeted to low-\nor moderate-income individuals, and the development, revitalisation or stabilisation of low- or moderate-income\nregions.\n\n3 The scope of community development loans includes loans related to microfinance lenders, social banks or\ncommunity development finance institutions (CDFIs).\n\n4 The scope of small business loans includes loans to farms.\n\n5 The scope of the disclosure excludes loans for personal expenditures or residential property.\n\n6 The scope of disclosure includes loans originated and purchased by the entity.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+        "Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+        "FN-CB-240a.2 (2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development"
+      ],
+      "bm25_terms": [
+        "FN-CB-240a.2",
+        "past",
+        "due",
+        "nonaccrual",
+        "loans",
+        "subject",
+        "forbearance",
+        "qualify",
+        "programmes",
+        "designed",
+        "promote",
+        "small",
+        "business",
+        "community",
+        "development",
+        "Financial",
+        "Inclusion",
+        "Capacity",
+        "Building",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount"
+      ],
+      "dense_query": "Find disclosures for FN-CB-240a.2 (2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development with unit Presentation currency related to Financial Inclusion & Capacity Building.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-240a.2 (2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-240a.2 (2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-240a.2 (2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development related to Financial Inclusion & Capacity Building.",
+        "Find numeric table rows or performance metrics reporting FN-CB-240a.2 (2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-240a.2",
+        "Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+        "past",
+        "due",
+        "nonaccrual",
+        "loans",
+        "subject",
+        "forbearance",
+        "qualify",
+        "programmes",
+        "designed",
+        "promote",
+        "small",
+        "business",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-240a.2 (1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development",
+          "difference": "This profile is only for \"(2) Amount of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development\"; do not treat evidence for \"(1) Number of past due and nonaccrual loans or loans subject to forbearance that qualify for programmes designed to promote small business and community development\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-240a.3",
+      "metric_code": "FN-CB-240a.3",
+      "metric": "Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers",
+      "topic": "Financial Inclusion & Capacity Building",
+      "unit": "Number",
+      "definition": "FN-CB-240a.3. Number of no-cost retail checking accounts provided to previously\nunbanked or underbanked customers\n1 The entity shall disclose the total number of no-cost checking accounts held by unbanked or underbanked\ncustomers as of the end of the reporting period.\n\n1.1 No-cost checking accounts are defined as bank accounts providing core services without extra fees,\nmonthly or annual maintenance fees, or minimum average balance requirements.\n\n1.1.1 Core services may include access to a debit card, access to internet and mobile banking, or access\nto deposits and withdrawals.\n\n1.2 Unbanked customers are defined as individuals and families who have rarely, if ever, held a checking\naccount, a savings account, or other type of transaction or cheque cashing account at an insured\ndepository institution.\n\n1.3 A household is categorised as underbanked if it had a checking or savings account and used one of these\nproducts or services from an alternative financial services (AFS) provider in the past 12 months: money\norders, cheque cashing, international remittances, payday loans, refund anticipation loans, rent-to-own\nservices, pawn shop loans or auto title loans.\n\n2 The entity may also disclose the number of no-cost checking accounts opened and closed during the reporting\nperiod by unbanked and underbanked customers.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers",
+        "Count of no-cost retail checking accounts provided to previously unbanked or underbanked customers",
+        "FN-CB-240a.3 Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers"
+      ],
+      "bm25_terms": [
+        "FN-CB-240a.3",
+        "no-cost",
+        "retail",
+        "checking",
+        "accounts",
+        "provided",
+        "previously",
+        "unbanked",
+        "underbanked",
+        "customers",
+        "Financial",
+        "Inclusion",
+        "Capacity",
+        "Building",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-240a.3 Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers with unit Number related to Financial Inclusion & Capacity Building.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-240a.3 Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-240a.3 Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-240a.3 Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers related to Financial Inclusion & Capacity Building.",
+        "Find numeric table rows or performance metrics reporting FN-CB-240a.3 Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-240a.3",
+        "Number of no-cost retail checking accounts provided to previously unbanked or underbanked customers",
+        "no-cost",
+        "retail",
+        "checking",
+        "accounts",
+        "provided",
+        "previously",
+        "unbanked",
+        "underbanked",
+        "customers",
+        "Financial",
+        "Inclusion",
+        "Capacity",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-240a.4",
+      "metric_code": "FN-CB-240a.4",
+      "metric": "Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers",
+      "topic": "Financial Inclusion & Capacity Building",
+      "unit": "Number",
+      "definition": "FN-CB-240a.4. Number of participants in financial literacy initiatives for unbanked,\nunderbanked, or underserved customers\n1 The entity shall disclose the number of individuals that participated in financial literacy initiatives for unbanked,\nunderbanked or underserved customers.\n\n1.1 The scope of financial literacy initiatives may include educational programmes, workshops, seminars,\ncourses, counselling and community partnerships.\n\n1.2 Unbanked customers are those in households without a checking or savings account who may rely on\nalternative financial services (AFS), such as payday loans, non-bank money orders, non-bank cheque\ncashing services, non-bank remittances, rent-to-own services, pawn shops or refund anticipation loans.\n\n1.3 Underbanked customers are in households that have a checking or a savings account but may still use AFS\nregularly.\n\n1.4 Underserved customers include those who are unbanked, underbanked or otherwise have limited access to\nmainstream financial services, often because of limited or no credit history.\n\n2 The entity shall calculate the total number of unique individuals who are documented to have participated in at\nleast one initiative conducted by the entity during the reporting period.\n\n2.1 The disclosure shall include participants in ongoing programmes for which active participation can be\ndocumented during the reporting period.\n\n3 The scope of the disclosure shall include both individual retail customers and relevant commercial customers (for\nexample, small and medium-sized enterprises and minority owned business).\n\n4 The scope of the disclosure shall include financial literacy initiatives provided by the entity directly as well as by\nthird parties that have a contractual agreement with the entity to provide such initiatives.\n\nNote to FN-CB-240a.4\n\n1 The entity shall describe its initiatives, programmes or financial services focused on enhancing the financial\nliteracy of unbanked, underbanked or underserved customers.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers",
+        "Count of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers",
+        "FN-CB-240a.4 Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers"
+      ],
+      "bm25_terms": [
+        "FN-CB-240a.4",
+        "participants",
+        "financial",
+        "literacy",
+        "initiatives",
+        "unbanked",
+        "underbanked",
+        "underserved",
+        "customers",
+        "Inclusion",
+        "Capacity",
+        "Building",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-240a.4 Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers with unit Number related to Financial Inclusion & Capacity Building.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-240a.4 Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-240a.4 Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-240a.4 Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers related to Financial Inclusion & Capacity Building.",
+        "Find numeric table rows or performance metrics reporting FN-CB-240a.4 Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-240a.4",
+        "Number of participants in financial literacy initiatives for unbanked, underbanked, or underserved customers",
+        "participants",
+        "financial",
+        "literacy",
+        "initiatives",
+        "unbanked",
+        "underbanked",
+        "underserved",
+        "customers",
+        "Inclusion",
+        "Capacity",
+        "Building",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-410a.2",
+      "metric_code": "FN-CB-410a.2",
+      "metric": "Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis",
+      "topic": "Incorporation of Environmental, Social, and Governance Factors in Credit Analysis",
+      "unit": "n/a",
+      "definition": "FN-CB-410a.2. Description of approach to incorporation of environmental, social\nand governance (ESG) factors in credit analysis\n1 The entity shall describe its approach to the incorporation of environmental, social and governance (ESG) factors\nin its credit analysis.\n\n1.1 The definition of incorporation of ESG factors is aligned with that of the Global Sustainable Investment\nAlliance (GSIA) and includes the use of ESG information in the investment decision-making processes.\n\n1.2 Examples of ESG factors and issues are provided in the PRI Reporting Framework—Main definitions 2018,\nsection ‘ESG issues’.\n\n1.3 Credit analysis is defined as a method to calculate the creditworthiness of a business or organisation to\nhonour debt obligations. This method seeks to identify the appropriate level of default risk associated with\nfinancing such business, organisation or project.\n\n2 The scope of disclosure shall include commercial and industrial lending as well as project finance.\n\n3 The entity shall describe the policies that determine its approach to the incorporation of ESG factors in its credit\nanalysis.\n\n4 The entity shall discuss how it incorporates ESG factors when estimating credit losses over the contractual term\nof the entity’s financial assets.\n\n5 The entity shall describe its approach to implementation of the aspects of the entity’s ESG incorporation\npractices.\n\n5.1 The description shall include:\n\n5.1.1 Parties responsible for the day-to-day incorporation of ESG factors\n\n5.1.2 Roles and responsibilities of employees involved\n\n5.1.3 Approach to ESG-related research\n\n5.1.4 Approach to incorporating ESG factors into assessing creditworthiness of borrowers\n\n6 The entity shall describe its oversight and accountability approach to the incorporation of ESG factors.\n\n6.1 The description shall include:\n\n6.1.1 Formal oversight individuals or bodies involved\n\n6.1.2 Roles and responsibilities of employees involved\n\n6.1.3 Criteria used in assessing the quality of ESG incorporation\n\n7 The entity shall discuss whether it conducts scenario analysis or modelling in which the risk profile of future ESG\ntrends is calculated at the portfolio level of commercial and industrial credit exposure.\n\n7.1 ESG trends may include climate change, natural resource constraints, human capital risks and\nopportunities, and cybersecurity risks.\n\n8 The entity shall discuss ESG trends it considers apply broadly in terms of their effect on sectors and industries, as\nwell as the trends it deems as sector- or industry-specific.\n\n8.1 The entity may further provide the discussion in the context of geographical exposure of its commercial and\nindustrial credit portfolio.\n\n9 The entity shall describe significant concentrations of credit exposure to ESG factors, which may include carbon-\nrelated assets, water-stressed regions and cybersecurity risks.\n\n10 The entity shall describe how ESG factors are incorporated in the assessment of and influence the entity’s views\non:\n\n10.1 Traditional macroeconomic factors such as the economic conditions, central bank monetary policy, industry\ntrends, and geopolitical risks that affect creditworthiness of borrowers\n\n10.2 Traditional microeconomic factors such as supply and demand for products or services that affect financial\nconditions and operational results of borrowers as well as their creditworthiness\n\n10.3 Overall creditworthiness of a borrower\n\n10.4 Maturity or tenor of a loan\n\n10.5 Expected loss, including probability of default, exposure at default and loss given default\n\n10.6 Value of posted collateral\n\n11 The entity may disclose additional quantitative measures related to its approach to the incorporation of ESG\nfactors in credit analysis, such as:\n\n11.1 Number of commercial and industrial loans and project finance screened according to the Equator\nPrinciples (EP III) (or equivalent) by EP Category\n\n11.2 Number of loans for which a review of environmental or social risks was performed, for example, by the\nentity’s Environmental and Social Risk Management (ESRM) group",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis",
+        "FN-CB-410a.2 Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis"
+      ],
+      "bm25_terms": [
+        "FN-CB-410a.2",
+        "Description",
+        "approach",
+        "incorporation",
+        "environmental",
+        "social",
+        "governance",
+        "ESG",
+        "factors",
+        "credit",
+        "analysis"
+      ],
+      "dense_query": "Find disclosures for FN-CB-410a.2 Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis related to Incorporation of Environmental, Social, and Governance Factors in Credit Analysis.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-410a.2 Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-410a.2 Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-410a.2 Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis related to Incorporation of Environmental, Social, and Governance Factors in Credit Analysis.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-CB-410a.2 Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis."
+      ],
+      "anchor_terms": [
+        "FN-CB-410a.2",
+        "Description of approach to incorporation of environmental, social and governance (ESG) factors in credit analysis",
+        "Description",
+        "approach",
+        "incorporation",
+        "environmental",
+        "social",
+        "governance",
+        "ESG",
+        "factors",
+        "credit",
+        "analysis"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-410b.1.01",
+      "metric_code": "FN-CB-410b.1",
+      "metric": "Absolute gross financed emissions, disaggregated by (1) Scope 1",
+      "topic": "Financed Emissions",
+      "unit": "Metric tonnes (t) CO₂-e",
+      "definition": "FN-CB-410b.1. Absolute gross financed emissions, disaggregated by (1) Scope 1,\n(2) Scope 2 and (3) Scope 3\n1 The entity shall disclose its absolute gross financed emissions (as defined in Appendix A of IFRS S2\nClimate-related Disclosures), disaggregated by Scope 1, Scope 2 and Scope 3 greenhouse gas emissions for\neach industry by asset class.\n\n1.1 In preparing this disclosure, the entity shall apply the requirements for measuring greenhouse gas\nemissions in accordance with paragraph 29(a) of IFRS S2 and the corresponding requirements in\nparagraphs B62–B62A of IFRS S2 for entities with commercial banking activities.\n\n1.2 For the purpose of this disclosure, the entity is permitted to exclude greenhouse gas emissions attributable\nto derivatives. If the entity applies this relief, the entity shall explain what it has treated as a derivative to\nenable users of general purpose financial reports to understand how it applied the relief. For example, the\nentity could explain that, in applying the relief, it treated as derivatives items that meet the definition of a\nderivative in accordance with the requirements of IFRS Accounting Standards or other applicable generally\naccepted accounting principles or practices (GAAP) used in preparing its related financial statements.\n\n1.3 In applying paragraphs B62–B62A of IFRS S2, the entity shall apply the principles of aggregation and\ndisaggregation from paragraphs B29–B30 of IFRS S1 General Requirements for Disclosure of\nSustainability-related Financial Information.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Absolute gross financed emissions, disaggregated by (1) Scope 1",
+        "Absolute gross financed emissions, disaggregated by Scope 1",
+        "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (1) Scope 1"
+      ],
+      "bm25_terms": [
+        "FN-CB-410b.1",
+        "Scope 1",
+        "CO₂-e",
+        "Absolute",
+        "financed",
+        "emissions",
+        "disaggregated",
+        "Scope",
+        "tonnes",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e",
+        "CO2",
+        "equivalent"
+      ],
+      "dense_query": "Find disclosures for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (1) Scope 1 with unit Metric tonnes (t) CO₂-e related to Financed Emissions.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (1) Scope 1, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (1) Scope 1 with unit Metric tonnes (t) CO₂-e.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (1) Scope 1 related to Financed Emissions.",
+        "Find numeric table rows or performance metrics reporting FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (1) Scope 1 for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-410b.1",
+        "Absolute gross financed emissions, disaggregated by (1) Scope 1",
+        "Scope 1",
+        "Absolute",
+        "financed",
+        "emissions",
+        "disaggregated",
+        "Scope",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e",
+        "tonnes CO2 equivalent"
+      ],
+      "negative_anchor_terms": [
+        "Absolute gross financed emissions, disaggregated by (2) Scope 2",
+        "Absolute gross financed emissions, disaggregated by (3) Scope 3",
+        "Scope 2",
+        "Scope 3",
+        "emissions intensity",
+        "market-based emissions",
+        "location-based emissions"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (2) Scope 2",
+          "difference": "This profile is only for \"Absolute gross financed emissions, disaggregated by (1) Scope 1\"; do not treat evidence for \"Absolute gross financed emissions, disaggregated by (2) Scope 2\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (3) Scope 3",
+          "difference": "This profile is only for \"Absolute gross financed emissions, disaggregated by (1) Scope 1\"; do not treat evidence for \"Absolute gross financed emissions, disaggregated by (3) Scope 3\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "Scope 2 or Scope 3 emissions metrics",
+          "difference": "This metric concerns Scope 1 direct greenhouse gas emissions only; Scope 2 purchased energy emissions and Scope 3 value-chain emissions are different metrics."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "Metric tonnes (t)",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-410b.1.02",
+      "metric_code": "FN-CB-410b.1",
+      "metric": "Absolute gross financed emissions, disaggregated by (2) Scope 2",
+      "topic": "Financed Emissions",
+      "unit": "Metric tonnes (t) CO₂-e",
+      "definition": "FN-CB-410b.1. Absolute gross financed emissions, disaggregated by (1) Scope 1,\n(2) Scope 2 and (3) Scope 3\n1 The entity shall disclose its absolute gross financed emissions (as defined in Appendix A of IFRS S2\nClimate-related Disclosures), disaggregated by Scope 1, Scope 2 and Scope 3 greenhouse gas emissions for\neach industry by asset class.\n\n1.1 In preparing this disclosure, the entity shall apply the requirements for measuring greenhouse gas\nemissions in accordance with paragraph 29(a) of IFRS S2 and the corresponding requirements in\nparagraphs B62–B62A of IFRS S2 for entities with commercial banking activities.\n\n1.2 For the purpose of this disclosure, the entity is permitted to exclude greenhouse gas emissions attributable\nto derivatives. If the entity applies this relief, the entity shall explain what it has treated as a derivative to\nenable users of general purpose financial reports to understand how it applied the relief. For example, the\nentity could explain that, in applying the relief, it treated as derivatives items that meet the definition of a\nderivative in accordance with the requirements of IFRS Accounting Standards or other applicable generally\naccepted accounting principles or practices (GAAP) used in preparing its related financial statements.\n\n1.3 In applying paragraphs B62–B62A of IFRS S2, the entity shall apply the principles of aggregation and\ndisaggregation from paragraphs B29–B30 of IFRS S1 General Requirements for Disclosure of\nSustainability-related Financial Information.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Absolute gross financed emissions, disaggregated by (2) Scope 2",
+        "Absolute gross financed emissions, disaggregated by Scope 2",
+        "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (2) Scope 2"
+      ],
+      "bm25_terms": [
+        "FN-CB-410b.1",
+        "Scope 2",
+        "CO₂-e",
+        "Absolute",
+        "financed",
+        "emissions",
+        "disaggregated",
+        "Scope",
+        "tonnes",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e",
+        "CO2",
+        "equivalent"
+      ],
+      "dense_query": "Find disclosures for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (2) Scope 2 with unit Metric tonnes (t) CO₂-e related to Financed Emissions.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (2) Scope 2, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (2) Scope 2 with unit Metric tonnes (t) CO₂-e.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (2) Scope 2 related to Financed Emissions.",
+        "Find numeric table rows or performance metrics reporting FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (2) Scope 2 for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-410b.1",
+        "Absolute gross financed emissions, disaggregated by (2) Scope 2",
+        "Scope 2",
+        "Absolute",
+        "financed",
+        "emissions",
+        "disaggregated",
+        "Scope",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e",
+        "tonnes CO2 equivalent"
+      ],
+      "negative_anchor_terms": [
+        "Absolute gross financed emissions, disaggregated by (1) Scope 1",
+        "Absolute gross financed emissions, disaggregated by (3) Scope 3",
+        "Scope 1",
+        "Scope 3",
+        "gross global Scope 1 emissions"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (1) Scope 1",
+          "difference": "This profile is only for \"Absolute gross financed emissions, disaggregated by (2) Scope 2\"; do not treat evidence for \"Absolute gross financed emissions, disaggregated by (1) Scope 1\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (3) Scope 3",
+          "difference": "This profile is only for \"Absolute gross financed emissions, disaggregated by (2) Scope 2\"; do not treat evidence for \"Absolute gross financed emissions, disaggregated by (3) Scope 3\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "Metric tonnes (t)",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-410b.1.03",
+      "metric_code": "FN-CB-410b.1",
+      "metric": "Absolute gross financed emissions, disaggregated by (3) Scope 3",
+      "topic": "Financed Emissions",
+      "unit": "Metric tonnes (t) CO₂-e",
+      "definition": "FN-CB-410b.1. Absolute gross financed emissions, disaggregated by (1) Scope 1,\n(2) Scope 2 and (3) Scope 3\n1 The entity shall disclose its absolute gross financed emissions (as defined in Appendix A of IFRS S2\nClimate-related Disclosures), disaggregated by Scope 1, Scope 2 and Scope 3 greenhouse gas emissions for\neach industry by asset class.\n\n1.1 In preparing this disclosure, the entity shall apply the requirements for measuring greenhouse gas\nemissions in accordance with paragraph 29(a) of IFRS S2 and the corresponding requirements in\nparagraphs B62–B62A of IFRS S2 for entities with commercial banking activities.\n\n1.2 For the purpose of this disclosure, the entity is permitted to exclude greenhouse gas emissions attributable\nto derivatives. If the entity applies this relief, the entity shall explain what it has treated as a derivative to\nenable users of general purpose financial reports to understand how it applied the relief. For example, the\nentity could explain that, in applying the relief, it treated as derivatives items that meet the definition of a\nderivative in accordance with the requirements of IFRS Accounting Standards or other applicable generally\naccepted accounting principles or practices (GAAP) used in preparing its related financial statements.\n\n1.3 In applying paragraphs B62–B62A of IFRS S2, the entity shall apply the principles of aggregation and\ndisaggregation from paragraphs B29–B30 of IFRS S1 General Requirements for Disclosure of\nSustainability-related Financial Information.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Absolute gross financed emissions, disaggregated by (3) Scope 3",
+        "Absolute gross financed emissions, disaggregated by Scope 3",
+        "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (3) Scope 3"
+      ],
+      "bm25_terms": [
+        "FN-CB-410b.1",
+        "Scope 3",
+        "CO₂-e",
+        "Absolute",
+        "financed",
+        "emissions",
+        "disaggregated",
+        "Scope",
+        "tonnes",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e",
+        "CO2",
+        "equivalent"
+      ],
+      "dense_query": "Find disclosures for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (3) Scope 3 with unit Metric tonnes (t) CO₂-e related to Financed Emissions.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (3) Scope 3, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (3) Scope 3 with unit Metric tonnes (t) CO₂-e.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (3) Scope 3 related to Financed Emissions.",
+        "Find numeric table rows or performance metrics reporting FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (3) Scope 3 for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-410b.1",
+        "Absolute gross financed emissions, disaggregated by (3) Scope 3",
+        "Scope 3",
+        "Absolute",
+        "financed",
+        "emissions",
+        "disaggregated",
+        "Scope",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e",
+        "tonnes CO2 equivalent"
+      ],
+      "negative_anchor_terms": [
+        "Absolute gross financed emissions, disaggregated by (1) Scope 1",
+        "Absolute gross financed emissions, disaggregated by (2) Scope 2",
+        "Scope 1",
+        "Scope 2",
+        "operational emissions"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (1) Scope 1",
+          "difference": "This profile is only for \"Absolute gross financed emissions, disaggregated by (3) Scope 3\"; do not treat evidence for \"Absolute gross financed emissions, disaggregated by (1) Scope 1\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-410b.1 Absolute gross financed emissions, disaggregated by (2) Scope 2",
+          "difference": "This profile is only for \"Absolute gross financed emissions, disaggregated by (3) Scope 3\"; do not treat evidence for \"Absolute gross financed emissions, disaggregated by (2) Scope 2\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "Metric tonnes (t)",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-410b.2",
+      "metric_code": "FN-CB-410b.2",
+      "metric": "Gross exposure for each industry by asset class",
+      "topic": "Financed Emissions",
+      "unit": "Presentation currency",
+      "definition": "FN-CB-410b.2. Gross exposure for each industry by asset class\n1 The entity shall disclose the gross exposure for each industry by asset class, expressed in the presentation\ncurrency of the entity’s financial statements.\n\n1.1 In preparing this disclosure, the entity shall apply the requirements in paragraphs B62–B62A of IFRS S2\nClimate-related Disclosures for entities with commercial banking activities.\n\n1.2 In applying paragraphs B62–B62A of IFRS S2, the entity shall apply the principles of aggregation and\ndisaggregation from paragraphs B29–B30 of IFRS S1 General Requirements for Disclosure of\nSustainability-related Financial Information.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Gross exposure for each industry by asset class",
+        "FN-CB-410b.2 Gross exposure for each industry by asset class"
+      ],
+      "bm25_terms": [
+        "FN-CB-410b.2",
+        "exposure",
+        "industry",
+        "asset",
+        "class",
+        "Financed",
+        "Emissions",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for FN-CB-410b.2 Gross exposure for each industry by asset class with unit Presentation currency related to Financed Emissions.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-410b.2 Gross exposure for each industry by asset class, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-410b.2 Gross exposure for each industry by asset class with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-410b.2 Gross exposure for each industry by asset class related to Financed Emissions.",
+        "Find numeric table rows or performance metrics reporting FN-CB-410b.2 Gross exposure for each industry by asset class for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-410b.2",
+        "Gross exposure for each industry by asset class",
+        "exposure",
+        "industry",
+        "asset",
+        "class",
+        "Financed",
+        "Emissions",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-410b.3",
+      "metric_code": "FN-CB-410b.3",
+      "metric": "Percentage of gross exposure included in the financed emissions calculation",
+      "topic": "Financed Emissions",
+      "unit": "Percentage %",
+      "definition": "FN-CB-410b.3. Percentage of gross exposure included in the financed emissions\ncalculation\n1 The entity shall disclose the percentage of the entity’s gross exposure included in the financed emissions\ncalculation.\n\n1.1 In preparing this disclosure, the entity shall apply the corresponding requirements in paragraphs B62–B62A\nof IFRS S2 Climate-related Disclosures for entities with commercial banking activities.\n\n1.2 In applying paragraphs B62–B62A of IFRS S2, the entity shall apply the principles of aggregation and\ndisaggregation from paragraphs B29–B30 of IFRS S1 General Requirements for Disclosure of\nSustainability-related Financial Information.\n\n2 If the percentage of the entity’s gross exposure included in the financed emissions calculation is less than 100%,\nthe entity shall disclose information that explains the exclusions, including the type of assets excluded.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Percentage of gross exposure included in the financed emissions calculation",
+        "Percent of gross exposure included in the financed emissions calculation",
+        "FN-CB-410b.3 Percentage of gross exposure included in the financed emissions calculation"
+      ],
+      "bm25_terms": [
+        "FN-CB-410b.3",
+        "exposure",
+        "included",
+        "financed",
+        "emissions",
+        "calculation",
+        "%",
+        "Percentage %",
+        "percent",
+        "percentage"
+      ],
+      "dense_query": "Find disclosures for FN-CB-410b.3 Percentage of gross exposure included in the financed emissions calculation with unit Percentage % related to Financed Emissions.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-410b.3 Percentage of gross exposure included in the financed emissions calculation, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-410b.3 Percentage of gross exposure included in the financed emissions calculation with unit Percentage %.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-410b.3 Percentage of gross exposure included in the financed emissions calculation related to Financed Emissions.",
+        "Find numeric table rows or performance metrics reporting FN-CB-410b.3 Percentage of gross exposure included in the financed emissions calculation for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-410b.3",
+        "Percentage of gross exposure included in the financed emissions calculation",
+        "exposure",
+        "included",
+        "financed",
+        "emissions",
+        "calculation",
+        "Percentage %",
+        "%",
+        "percent",
+        "percentage"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "percentage",
+        "expected_units": [
+          "Percentage %",
+          "%",
+          "percent",
+          "percentage"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-410b.4",
+      "metric_code": "FN-CB-410b.4",
+      "metric": "Description of the methodology used to calculate financed emissions",
+      "topic": "Financed Emissions",
+      "unit": "n/a",
+      "definition": "FN-CB-410b.4. Description of the methodology used to calculate financed\nemissions\n1 The entity shall disclose the methodology the entity used to calculate its financed emissions, including the method\nof allocation the entity used to attribute its share of emissions in relation to the size of its gross exposure.\n\n1.1 In preparing this disclosure, the entity shall apply the requirements for measuring greenhouse gas\nemissions in accordance with paragraph 29(a) of IFRS S2 Climate-related Disclosures and the\ncorresponding requirements in paragraphs B62–B62A of IFRS S2 for entities with commercial banking\nactivities.\n\n1.2 In applying paragraphs B62–B62A of IFRS S2, the entity shall apply the principle of estimation from\nparagraph 78 of IFRS S1 General Requirements for Disclosure of Sustainability‑related Financial\nInformation.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Description of the methodology used to calculate financed emissions",
+        "FN-CB-410b.4 Description of the methodology used to calculate financed emissions"
+      ],
+      "bm25_terms": [
+        "FN-CB-410b.4",
+        "Description",
+        "methodology",
+        "calculate",
+        "financed",
+        "emissions"
+      ],
+      "dense_query": "Find disclosures for FN-CB-410b.4 Description of the methodology used to calculate financed emissions related to Financed Emissions.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-410b.4 Description of the methodology used to calculate financed emissions, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-410b.4 Description of the methodology used to calculate financed emissions.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-410b.4 Description of the methodology used to calculate financed emissions related to Financed Emissions.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-CB-410b.4 Description of the methodology used to calculate financed emissions."
+      ],
+      "anchor_terms": [
+        "FN-CB-410b.4",
+        "Description of the methodology used to calculate financed emissions",
+        "Description",
+        "methodology",
+        "calculate",
+        "financed",
+        "emissions"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-510a.1",
+      "metric_code": "FN-CB-510a.1",
+      "metric": "Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4",
+      "topic": "Business Ethics",
+      "unit": "Presentation currency",
+      "definition": "FN-CB-510a.1. Total amount of monetary losses as a result of legal proceedings\nassociated with fraud, insider trading, antitrust, anti-competitive behaviour,\nmarket manipulation, malpractice, or other related financial industry laws or\nregulations\n1 The entity shall disclose the total amount of monetary losses incurred during the reporting period resulting from\nlegal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market\nmanipulation, malpractice or other related financial industry laws or regulations.\n\n2 The legal proceedings shall include any adjudicative proceeding involving the entity, whether before a court, a\nregulator, an arbitrator or otherwise.\n\n3 The losses shall include all monetary liabilities to the opposing party or to others (whether as the result of\nsettlement, verdict after trial or otherwise), including fines and other monetary liabilities incurred during the\nreporting period as a result of civil actions (for example, civil judgements or settlements), regulatory proceedings\n(for example, penalties, disgorgement or restitution) and criminal actions (for example, criminal judgements,\npenalties or restitution) brought by any entity (for example, governmental, business or individual).\n\n4 The scope of monetary losses shall exclude legal and other fees and expenses incurred by the entity in its\ndefence.\n\n5 The scope of the disclosure shall include legal proceedings associated with the enforcement of applicable\njurisdictional laws or regulations.\n\n6 The disclosure also shall include enforcements related to activities adjudicated by applicable jurisdictional\nregulators with mandates broader than the financial industry.\n\n7 The entity shall disclose the relevant jurisdictional regulatory authority or authorities used in its calculation.\n\nNote to FN-CB-510a.1\n\n1 The entity shall briefly describe the nature (for example, judgement or order issued after trial, settlement, guilty\nplea, deferred prosecution agreement or non-prosecution agreement) and context (for example, fraud, antitrust or\nmarket manipulation) of all monetary losses resulting from legal proceedings.\n\n2 The entity shall describe any corrective actions implemented in response to the legal proceedings. This may\ninclude specific changes in operations, management, processes, products, business partners, training or\ntechnology.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4",
+        "Monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4",
+        "FN-CB-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4"
+      ],
+      "bm25_terms": [
+        "FN-CB-510a.1",
+        "legal proceedings",
+        "monetary losses",
+        "monetary",
+        "losses",
+        "legal",
+        "proceedings",
+        "fraud",
+        "insider",
+        "trading",
+        "antitrust",
+        "anticompetitive",
+        "behaviour",
+        "market",
+        "manipulation",
+        "malpractice",
+        "other",
+        "financial",
+        "industry",
+        "laws",
+        "regulations",
+        "Presentation",
+        "currency",
+        "reporting currency"
+      ],
+      "dense_query": "Find disclosures for FN-CB-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4 with unit Presentation currency related to Business Ethics.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4 with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4 related to Business Ethics.",
+        "Find numeric table rows or performance metrics reporting FN-CB-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4 for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-510a.1",
+        "Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anticompetitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations 4",
+        "legal proceedings",
+        "monetary losses",
+        "monetary",
+        "losses",
+        "legal",
+        "proceedings",
+        "fraud",
+        "insider",
+        "trading",
+        "antitrust",
+        "anticompetitive",
+        "behaviour",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "operating expenses",
+        "revenue",
+        "capital expenditure",
+        "fines unrelated to this topic"
+      ],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-510a.2",
+      "metric_code": "FN-CB-510a.2",
+      "metric": "Description of whistleblower policies and procedures",
+      "topic": "Business Ethics",
+      "unit": "n/a",
+      "definition": "FN-CB-510a.2. Description of whistleblower policies and procedures\n1 The entity shall describe the processes and policies that are set out in its whistleblower programme, including\ninternal compliance programmes; whistleblower hotline details (for example, whether it is managed by an\nindependent third party); reference to, and publication of, the hotline number (for example, within corporate\ncompliance manuals or codes of ethics); whistleblower incentives for reporting violations; and methods for\nsubmitting tips.\n\n2 The disclosure shall identify the applicable jurisdictional whistleblower laws or regulations with which the entity\nmust comply.\n\n3 The disclosure shall include a discussion of any violations of whistleblower regulations and any corrective actions\nthe entity has implemented in response to violations.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "qualitative",
+      "aliases": [
+        "Description of whistleblower policies and procedures",
+        "FN-CB-510a.2 Description of whistleblower policies and procedures"
+      ],
+      "bm25_terms": [
+        "FN-CB-510a.2",
+        "Description",
+        "whistleblower",
+        "policies",
+        "procedures",
+        "Business",
+        "Ethics"
+      ],
+      "dense_query": "Find disclosures for FN-CB-510a.2 Description of whistleblower policies and procedures related to Business Ethics.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-510a.2 Description of whistleblower policies and procedures, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-510a.2 Description of whistleblower policies and procedures.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-510a.2 Description of whistleblower policies and procedures related to Business Ethics.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-CB-510a.2 Description of whistleblower policies and procedures."
+      ],
+      "anchor_terms": [
+        "FN-CB-510a.2",
+        "Description of whistleblower policies and procedures",
+        "Description",
+        "whistleblower",
+        "policies",
+        "procedures",
+        "Business",
+        "Ethics"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "paragraph",
+        "list-item",
+        "table-row",
+        "table",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-550a.1",
+      "metric_code": "FN-CB-550a.1",
+      "metric": "Global Systemically Important Bank (GSIB) score, by category",
+      "topic": "Systemic Risk Management",
+      "unit": "Basis points (bps)",
+      "definition": "FN-CB-550a.1. Global Systemically Important Bank (G-SIB) score, by category\n1 The entity shall disclose its Globally Systematically Important Bank (G-SIB) score for these categories: (1) size,\n(2) cross-jurisdictional activity, (3) interconnectedness, (4) substitutability, (5) complexity and (6) overall score.\n\n2 The G-SIB scores are defined by, and shall be calculated according to, the methodology established by the latest\nversion of the Bank of International Settlements’ (BIS) Basel Committee on Banking Supervision’s Global\nsystematically important banks: updated assessment methodology and the higher loss absorbency requirement\n(BCBS assessment methodology).\n\n2.1 The set of indicators used in the calculation of the G-SIB score is outlined by the BCBS assessment\nmethodology in the reporting instructions and the reporting template.\n\n2.1.1 The entity shall refer to the reporting instructions and the reporting template for the relevant\nreporting period.\n\n2.2 The G-SIB score calculation is provided by the technical summary of the BCBS assessment methodology.\nThe BCBS assessment methodology further provides:\n\n2.2.1 denominators used for score calculation for the relevant reporting period; and\n\n2.2.2 the cut-off score used to identify G-SIBs, and bucket thresholds used to allocate G-SIBs to buckets\nfor the purposes of calculating the specific higher loss absorbency (HLA) requirements for each\ninstitution.\n\n3 The entity shall disclose the latest available G-SIB score at the time of reporting.\n\n4 The entity shall consider the above references used to determine the G-SIB score to be normative references,\nmeaning that any future updates made to them shall be considered updates to this guidance.\n\nNote to FN-CB-550a.1\n\n1 The entity shall describe whether it obtains the score from the relevant supervisory authority after reporting the\nindicators used to calculate the G-SIB score, or whether it calculates the score internally using the BCBS\nassessment methodology.\n\n2 The entity shall describe whether its applicable jurisdictional legal or regulatory authority requires the entity to\nreport the data required for the G-SIB calculation, or whether the entity chooses to report the data voluntarily.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Global Systemically Important Bank (GSIB) score, by category",
+        "FN-CB-550a.1 Global Systemically Important Bank (GSIB) score, by category"
+      ],
+      "bm25_terms": [
+        "FN-CB-550a.1",
+        "Systemically",
+        "Important",
+        "Bank",
+        "GSIB",
+        "score",
+        "category",
+        "Systemic",
+        "Risk",
+        "Management",
+        "Basis",
+        "points",
+        "bps",
+        "Basis points (bps)"
+      ],
+      "dense_query": "Find disclosures for FN-CB-550a.1 Global Systemically Important Bank (GSIB) score, by category with unit Basis points (bps) related to Systemic Risk Management.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-550a.1 Global Systemically Important Bank (GSIB) score, by category, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-550a.1 Global Systemically Important Bank (GSIB) score, by category with unit Basis points (bps).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-550a.1 Global Systemically Important Bank (GSIB) score, by category related to Systemic Risk Management.",
+        "Find numeric table rows or performance metrics reporting FN-CB-550a.1 Global Systemically Important Bank (GSIB) score, by category for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-550a.1",
+        "Global Systemically Important Bank (GSIB) score, by category",
+        "Systemically",
+        "Important",
+        "Bank",
+        "GSIB",
+        "score",
+        "category",
+        "Systemic",
+        "Risk",
+        "Management",
+        "Basis points (bps)"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "unknown",
+        "expected_units": [
+          "Basis points (bps)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": ""
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-550a.2",
+      "metric_code": "FN-CB-550a.2",
+      "metric": "Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities",
+      "topic": "Systemic Risk Management",
+      "unit": "n/a",
+      "definition": "FN-CB-550a.2. Description of approach to integrate results of mandatory and\nvoluntary stress tests into capital adequacy planning, long-term corporate\nstrategy, and other business activities\n1 The entity shall discuss how results of mandatory and voluntary stress tests and capital planning reports for\nprudential regulatory purposes inform the entity’s decisions and are integrated into capital planning, long-term\ncorporate strategy and other business activities.\n\n2 The entity shall discuss how the stress test results inform its approach with respect to its environmental, social\nand governance (ESG) strategy.\n\n3 The entity may disclose the results of its stress tests along with this discussion.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities",
+        "FN-CB-550a.2 Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities"
+      ],
+      "bm25_terms": [
+        "FN-CB-550a.2",
+        "Description",
+        "approach",
+        "integrate",
+        "results",
+        "mandatory",
+        "voluntary",
+        "stress",
+        "tests",
+        "capital",
+        "adequacy",
+        "planning",
+        "long-term",
+        "corporate",
+        "strategy",
+        "other",
+        "business",
+        "activities",
+        "Systemic",
+        "Risk",
+        "Management"
+      ],
+      "dense_query": "Find disclosures for FN-CB-550a.2 Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities related to Systemic Risk Management.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-550a.2 Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-550a.2 Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-550a.2 Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities related to Systemic Risk Management.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for FN-CB-550a.2 Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities."
+      ],
+      "anchor_terms": [
+        "FN-CB-550a.2",
+        "Description of approach to integrate results of mandatory and voluntary stress tests into capital adequacy planning, long-term corporate strategy, and other business activities",
+        "Description",
+        "approach",
+        "integrate",
+        "results",
+        "mandatory",
+        "voluntary",
+        "stress",
+        "tests",
+        "capital",
+        "adequacy",
+        "planning",
+        "long-term"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.A.01",
+      "metric_code": "FN-CB-000.A",
+      "metric": "(1) Number of checking and savings accounts by segment: (a) personal",
+      "topic": "",
+      "unit": "Number",
+      "definition": "(1) Number and (2) value of checking and savings accounts\nby segment: (a) personal and (b) small business",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of checking and savings accounts by segment: (a) personal",
+        "Number of checking and savings accounts by segment: (a) personal",
+        "FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.A",
+        "checking",
+        "savings",
+        "accounts",
+        "segment",
+        "personal",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal with unit Number.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.A",
+        "Number of checking and savings accounts by segment: (a) personal",
+        "checking",
+        "savings",
+        "accounts",
+        "segment",
+        "personal",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Number of checking and savings accounts by segment: (b) small business",
+        "Value of checking and savings accounts by segment: (a) personal",
+        "Value of checking and savings accounts by segment: (b) small business"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business",
+          "difference": "This profile is only for \"(1) Number of checking and savings accounts by segment: (a) personal\"; do not treat evidence for \"(1) Number of checking and savings accounts by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal",
+          "difference": "This profile is only for \"(1) Number of checking and savings accounts by segment: (a) personal\"; do not treat evidence for \"(2) Value of checking and savings accounts by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.A (2) Value of  checking and savings accounts by segment: (b) small business",
+          "difference": "This profile is only for \"(1) Number of checking and savings accounts by segment: (a) personal\"; do not treat evidence for \"(2) Value of  checking and savings accounts by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.A.02",
+      "metric_code": "FN-CB-000.A",
+      "metric": "(1) Number of checking and savings accounts by segment: (b) small business",
+      "topic": "",
+      "unit": "Number",
+      "definition": "(1) Number and (2) value of checking and savings accounts\nby segment: (a) personal and (b) small business",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of checking and savings accounts by segment: (b) small business",
+        "Number of checking and savings accounts by segment: (b) small business",
+        "FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.A",
+        "checking",
+        "savings",
+        "accounts",
+        "segment",
+        "small",
+        "business",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business with unit Number.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.A",
+        "Number of checking and savings accounts by segment: (b) small business",
+        "checking",
+        "savings",
+        "accounts",
+        "segment",
+        "small",
+        "business",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Number of checking and savings accounts by segment: (a) personal",
+        "Value of checking and savings accounts by segment: (a) personal",
+        "Value of checking and savings accounts by segment: (b) small business"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal",
+          "difference": "This profile is only for \"(1) Number of checking and savings accounts by segment: (b) small business\"; do not treat evidence for \"(1) Number of checking and savings accounts by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal",
+          "difference": "This profile is only for \"(1) Number of checking and savings accounts by segment: (b) small business\"; do not treat evidence for \"(2) Value of checking and savings accounts by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.A (2) Value of  checking and savings accounts by segment: (b) small business",
+          "difference": "This profile is only for \"(1) Number of checking and savings accounts by segment: (b) small business\"; do not treat evidence for \"(2) Value of  checking and savings accounts by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.A.03",
+      "metric_code": "FN-CB-000.A",
+      "metric": "(2) Value of checking and savings accounts by segment: (a) personal",
+      "topic": "",
+      "unit": "Presentation currency",
+      "definition": "(1) Number and (2) value of checking and savings accounts\nby segment: (a) personal and (b) small business",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Value of checking and savings accounts by segment: (a) personal",
+        "Value of checking and savings accounts by segment: (a) personal",
+        "FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.A",
+        "checking",
+        "savings",
+        "accounts",
+        "segment",
+        "personal",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal with unit Presentation currency.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.A",
+        "Value of checking and savings accounts by segment: (a) personal",
+        "checking",
+        "savings",
+        "accounts",
+        "segment",
+        "personal",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "Number of checking and savings accounts by segment: (a) personal",
+        "Number of checking and savings accounts by segment: (b) small business",
+        "Value of checking and savings accounts by segment: (b) small business"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal",
+          "difference": "This profile is only for \"(2) Value of checking and savings accounts by segment: (a) personal\"; do not treat evidence for \"(1) Number of checking and savings accounts by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business",
+          "difference": "This profile is only for \"(2) Value of checking and savings accounts by segment: (a) personal\"; do not treat evidence for \"(1) Number of checking and savings accounts by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.A (2) Value of  checking and savings accounts by segment: (b) small business",
+          "difference": "This profile is only for \"(2) Value of checking and savings accounts by segment: (a) personal\"; do not treat evidence for \"(2) Value of  checking and savings accounts by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.A.04",
+      "metric_code": "FN-CB-000.A",
+      "metric": "(2) Value of  checking and savings accounts by segment: (b) small business",
+      "topic": "",
+      "unit": "Presentation currency",
+      "definition": "(1) Number and (2) value of checking and savings accounts\nby segment: (a) personal and (b) small business",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Value of checking and savings accounts by segment: (b) small business",
+        "Value of checking and savings accounts by segment: (b) small business",
+        "FN-CB-000.A (2) Value of checking and savings accounts by segment: (b) small business"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.A",
+        "checking",
+        "savings",
+        "accounts",
+        "segment",
+        "small",
+        "business",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.A (2) Value of  checking and savings accounts by segment: (b) small business with unit Presentation currency.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.A (2) Value of  checking and savings accounts by segment: (b) small business, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.A (2) Value of  checking and savings accounts by segment: (b) small business with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.A (2) Value of  checking and savings accounts by segment: (b) small business.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.A (2) Value of  checking and savings accounts by segment: (b) small business for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.A",
+        "Value of checking and savings accounts by segment: (b) small business",
+        "checking",
+        "savings",
+        "accounts",
+        "segment",
+        "small",
+        "business",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "Number of checking and savings accounts by segment: (a) personal",
+        "Number of checking and savings accounts by segment: (b) small business",
+        "Value of checking and savings accounts by segment: (a) personal"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.A (1) Number of checking and savings accounts by segment: (a) personal",
+          "difference": "This profile is only for \"(2) Value of  checking and savings accounts by segment: (b) small business\"; do not treat evidence for \"(1) Number of checking and savings accounts by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.A (1) Number of checking and savings accounts by segment: (b) small business",
+          "difference": "This profile is only for \"(2) Value of  checking and savings accounts by segment: (b) small business\"; do not treat evidence for \"(1) Number of checking and savings accounts by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.A (2) Value of checking and savings accounts by segment: (a) personal",
+          "difference": "This profile is only for \"(2) Value of  checking and savings accounts by segment: (b) small business\"; do not treat evidence for \"(2) Value of checking and savings accounts by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.B.01",
+      "metric_code": "FN-CB-000.B",
+      "metric": "(1) Number of loans by segment: (a) personal",
+      "topic": "",
+      "unit": "Number",
+      "definition": "(1) Number and (2) value of loans by segment: (a) personal,\n(b) small business, and (c) corporate\n\nNote to FN-CB-000.B – Mortgage loans as well as revolving credit loans shall be excluded from the scope of the disclosure.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of loans by segment: (a) personal",
+        "Number of loans by segment: (a) personal",
+        "FN-CB-000.B (1) Number of loans by segment: (a) personal"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.B",
+        "loans",
+        "segment",
+        "personal",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.B (1) Number of loans by segment: (a) personal with unit Number.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.B (1) Number of loans by segment: (a) personal, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.B (1) Number of loans by segment: (a) personal with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.B (1) Number of loans by segment: (a) personal.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.B (1) Number of loans by segment: (a) personal for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.B",
+        "Number of loans by segment: (a) personal",
+        "loans",
+        "segment",
+        "personal",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Number of loans by segment: (b) small business",
+        "Number of loans by segment: (c) corporate",
+        "Value of loans by segment: (a) personal",
+        "Value of loans by segment: (b) small business",
+        "Value of loans by segment: (c) corporate"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (a) personal\"; do not treat evidence for \"(1) Number of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (c) corporate",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (a) personal\"; do not treat evidence for \"(1) Number of loans by segment: (c) corporate\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (a) personal\"; do not treat evidence for \"(2) Value of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (a) personal\"; do not treat evidence for \"(2) Value of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.B.02",
+      "metric_code": "FN-CB-000.B",
+      "metric": "(1) Number of loans by segment: (b) small business",
+      "topic": "",
+      "unit": "Number",
+      "definition": "(1) Number and (2) value of loans by segment: (a) personal,\n(b) small business, and (c) corporate\n\nNote to FN-CB-000.B – Mortgage loans as well as revolving credit loans shall be excluded from the scope of the disclosure.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of loans by segment: (b) small business",
+        "Number of loans by segment: (b) small business",
+        "FN-CB-000.B (1) Number of loans by segment: (b) small business"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.B",
+        "loans",
+        "segment",
+        "small",
+        "business",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.B (1) Number of loans by segment: (b) small business with unit Number.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.B (1) Number of loans by segment: (b) small business, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.B (1) Number of loans by segment: (b) small business with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.B (1) Number of loans by segment: (b) small business.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.B (1) Number of loans by segment: (b) small business for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.B",
+        "Number of loans by segment: (b) small business",
+        "loans",
+        "segment",
+        "small",
+        "business",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Number of loans by segment: (a) personal",
+        "Number of loans by segment: (c) corporate",
+        "Value of loans by segment: (a) personal",
+        "Value of loans by segment: (b) small business",
+        "Value of loans by segment: (c) corporate"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (b) small business\"; do not treat evidence for \"(1) Number of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (c) corporate",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (b) small business\"; do not treat evidence for \"(1) Number of loans by segment: (c) corporate\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (b) small business\"; do not treat evidence for \"(2) Value of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (b) small business\"; do not treat evidence for \"(2) Value of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.B.03",
+      "metric_code": "FN-CB-000.B",
+      "metric": "(1) Number of loans by segment: (c) corporate",
+      "topic": "",
+      "unit": "Number",
+      "definition": "(1) Number and (2) value of loans by segment: (a) personal,\n(b) small business, and (c) corporate\n\nNote to FN-CB-000.B – Mortgage loans as well as revolving credit loans shall be excluded from the scope of the disclosure.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(1) Number of loans by segment: (c) corporate",
+        "Number of loans by segment: (c) corporate",
+        "FN-CB-000.B (1) Number of loans by segment: (c) corporate"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.B",
+        "loans",
+        "segment",
+        "corporate",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.B (1) Number of loans by segment: (c) corporate with unit Number.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.B (1) Number of loans by segment: (c) corporate, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.B (1) Number of loans by segment: (c) corporate with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.B (1) Number of loans by segment: (c) corporate.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.B (1) Number of loans by segment: (c) corporate for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.B",
+        "Number of loans by segment: (c) corporate",
+        "loans",
+        "segment",
+        "corporate",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Number of loans by segment: (a) personal",
+        "Number of loans by segment: (b) small business",
+        "Value of loans by segment: (a) personal",
+        "Value of loans by segment: (b) small business",
+        "Value of loans by segment: (c) corporate"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (c) corporate\"; do not treat evidence for \"(1) Number of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (c) corporate\"; do not treat evidence for \"(1) Number of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (c) corporate\"; do not treat evidence for \"(2) Value of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(1) Number of loans by segment: (c) corporate\"; do not treat evidence for \"(2) Value of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.B.04",
+      "metric_code": "FN-CB-000.B",
+      "metric": "(2) Value of loans by segment: (a) personal",
+      "topic": "",
+      "unit": "Presentation currency",
+      "definition": "(1) Number and (2) value of loans by segment: (a) personal,\n(b) small business, and (c) corporate\n\nNote to FN-CB-000.B – Mortgage loans as well as revolving credit loans shall be excluded from the scope of the disclosure.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Value of loans by segment: (a) personal",
+        "Value of loans by segment: (a) personal",
+        "FN-CB-000.B (2) Value of loans by segment: (a) personal"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.B",
+        "loans",
+        "segment",
+        "personal",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.B (2) Value of loans by segment: (a) personal with unit Presentation currency.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.B (2) Value of loans by segment: (a) personal, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.B (2) Value of loans by segment: (a) personal with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.B (2) Value of loans by segment: (a) personal.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.B (2) Value of loans by segment: (a) personal for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.B",
+        "Value of loans by segment: (a) personal",
+        "loans",
+        "segment",
+        "personal",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "Number of loans by segment: (a) personal",
+        "Number of loans by segment: (b) small business",
+        "Number of loans by segment: (c) corporate",
+        "Value of loans by segment: (b) small business",
+        "Value of loans by segment: (c) corporate"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (a) personal\"; do not treat evidence for \"(1) Number of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (a) personal\"; do not treat evidence for \"(1) Number of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (c) corporate",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (a) personal\"; do not treat evidence for \"(1) Number of loans by segment: (c) corporate\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (a) personal\"; do not treat evidence for \"(2) Value of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.B.05",
+      "metric_code": "FN-CB-000.B",
+      "metric": "(2) Value of loans by segment: (b) small business",
+      "topic": "",
+      "unit": "Presentation currency",
+      "definition": "(1) Number and (2) value of loans by segment: (a) personal,\n(b) small business, and (c) corporate\n\nNote to FN-CB-000.B – Mortgage loans as well as revolving credit loans shall be excluded from the scope of the disclosure.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Value of loans by segment: (b) small business",
+        "Value of loans by segment: (b) small business",
+        "FN-CB-000.B (2) Value of loans by segment: (b) small business"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.B",
+        "loans",
+        "segment",
+        "small",
+        "business",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.B (2) Value of loans by segment: (b) small business with unit Presentation currency.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.B (2) Value of loans by segment: (b) small business, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.B (2) Value of loans by segment: (b) small business with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.B (2) Value of loans by segment: (b) small business.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.B (2) Value of loans by segment: (b) small business for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.B",
+        "Value of loans by segment: (b) small business",
+        "loans",
+        "segment",
+        "small",
+        "business",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "Number of loans by segment: (a) personal",
+        "Number of loans by segment: (b) small business",
+        "Number of loans by segment: (c) corporate",
+        "Value of loans by segment: (a) personal",
+        "Value of loans by segment: (c) corporate"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (b) small business\"; do not treat evidence for \"(1) Number of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (b) small business\"; do not treat evidence for \"(1) Number of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (c) corporate",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (b) small business\"; do not treat evidence for \"(1) Number of loans by segment: (c) corporate\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (b) small business\"; do not treat evidence for \"(2) Value of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "FN-CB-000.B.06",
+      "metric_code": "FN-CB-000.B",
+      "metric": "(2) Value of loans by segment: (c) corporate",
+      "topic": "",
+      "unit": "Presentation currency",
+      "definition": "(1) Number and (2) value of loans by segment: (a) personal,\n(b) small business, and (c) corporate\n\nNote to FN-CB-000.B – Mortgage loans as well as revolving credit loans shall be excluded from the scope of the disclosure.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "(2) Value of loans by segment: (c) corporate",
+        "Value of loans by segment: (c) corporate",
+        "FN-CB-000.B (2) Value of loans by segment: (c) corporate"
+      ],
+      "bm25_terms": [
+        "FN-CB-000.B",
+        "loans",
+        "segment",
+        "corporate",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for FN-CB-000.B (2) Value of loans by segment: (c) corporate with unit Presentation currency.",
+      "dense_queries": [
+        "Retrieve exact report evidence for FN-CB-000.B (2) Value of loans by segment: (c) corporate, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches FN-CB-000.B (2) Value of loans by segment: (c) corporate with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CB-000.B (2) Value of loans by segment: (c) corporate.",
+        "Find numeric table rows or performance metrics reporting FN-CB-000.B (2) Value of loans by segment: (c) corporate for the reporting period."
+      ],
+      "anchor_terms": [
+        "FN-CB-000.B",
+        "Value of loans by segment: (c) corporate",
+        "loans",
+        "segment",
+        "corporate",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [
+        "Number of loans by segment: (a) personal",
+        "Number of loans by segment: (b) small business",
+        "Number of loans by segment: (c) corporate",
+        "Value of loans by segment: (a) personal",
+        "Value of loans by segment: (b) small business"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (c) corporate\"; do not treat evidence for \"(1) Number of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (b) small business",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (c) corporate\"; do not treat evidence for \"(1) Number of loans by segment: (b) small business\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (1) Number of loans by segment: (c) corporate",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (c) corporate\"; do not treat evidence for \"(1) Number of loans by segment: (c) corporate\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "FN-CB-000.B (2) Value of loans by segment: (a) personal",
+          "difference": "This profile is only for \"(2) Value of loans by segment: (c) corporate\"; do not treat evidence for \"(2) Value of loans by segment: (a) personal\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    }
+  ]
+}

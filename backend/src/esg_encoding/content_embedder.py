@@ -10,7 +10,7 @@ import torch
 from loguru import logger
 
 from .shared_embedding_model import get_shared_embedding_model
-from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
+from .embedding_settings import get_configured_embedding_model_name
 
 from .models import TextSegment, SegmentEmbedding, DocumentContent, ReportContent, ProcessingConfig
 from .exceptions import ContentEmbeddingError
@@ -41,13 +41,10 @@ class ContentEmbedder:
         try:
             repo_id = str(getattr(self.config, "embedding_model", "") or get_configured_embedding_model_name())
             hf_home = os.getenv("HF_HOME", "/root/.cache/huggingface")
-            explicit_path = get_configured_embedding_local_path()
-
             self.model = get_shared_embedding_model(
                 repo_id,
                 device=str(self.device),
                 hf_home=hf_home,
-                explicit_local_path=explicit_path,
                 trust_remote_code=True,
             )
             self.logger.info(f"模型加载成功，设备: {self.device}")

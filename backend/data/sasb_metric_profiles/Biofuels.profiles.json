@@ -1,0 +1,2842 @@
+{
+  "profiles": [
+    {
+      "metric_id": "RR-BI-120a.1.01",
+      "metric_code": "RR-BI-120a.1",
+      "metric": "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+      "topic": "Air Quality",
+      "unit": "Metric tonnes (t)",
+      "definition": "RR-BI-120a.1. Air emissions of the following pollutants: (1) NOx (excluding N2O),\n(2) SOx, (3) volatile organic compounds (VOCs), (4) particulate matter (PM10), and\n(5) hazardous air pollutants (HAPs)\n1\nThe entity shall disclose its emissions of air pollutants, in metric tonnes per pollutant, released into the\natmosphere.\n1.1\nThe scope of the disclosure includes air pollutants associated with the entity’s direct air emissions resulting\nfrom all the entity’s activities and sources of emissions, which may include stationary or mobile sources,\nproduction facilities, office buildings and transportation fleets.\n2\nThe entity shall disclose its emissions of (1) oxides of nitrogen (NOx), reported as NOx.\n2.1\nThe scope of NOx includes NO and NO2 but excludes N2O.\n3\nThe entity shall disclose its emissions of (2) oxides of sulphur (SOx), reported as SOx.\n3.1\nThe scope of SOx includes SO2 and SO3.\n4\nThe entity shall disclose its emissions of (3) non-methane volatile organic compounds (VOCs).\n4.1\nVOCs are defined as any compound of carbon, excluding carbon monoxide, carbon dioxide, carbonic acid,\nmetallic carbides or carbonates, ammonium carbonate, and methane, that participates in atmospheric\nphotochemical reactions, except those designated under applicable jurisdictional laws or regulations as\nhaving negligible photochemical reactivity.\n4.2\nIf applicable regulatory definitions of VOCs conflict with this definition, the entity may define VOCs in\naccordance with the applicable jurisdictional legal or regulatory definition. In this case, the entity shall\nidentify the source of the definition.\n5\nThe entity shall disclose its emissions of (4) particulate matter (PM10), reported as PM10.\n5.1\nPM10 is defined as any airborne finely divided solid or liquid material with an aerodynamic diameter less\nthan or equal to a nominal 10 micrometres.\n6\nThe entity shall disclose its emissions of (5) hazardous air pollutants (HAPs).\n6.1\nHAPs are defined as those pollutants known or suspected to cause cancer or other serious health effects,\nsuch as reproductive effects or birth defects, or adverse environmental effects.\n7\nThe entity may discuss the calculation method for its emissions disclosure, such as whether data is from\ncontinuous emissions monitoring systems (CEMS), engineering calculations or mass balance calculations.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "Air emissions of the following pollutants: NOx (excluding N2O)",
+        "RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)"
+      ],
+      "bm25_terms": [
+        "RR-BI-120a.1",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "NOx",
+        "excluding",
+        "N2O",
+        "Quality",
+        "tonnes",
+        "Metric tonnes (t)",
+        "CO₂-e",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "dense_query": "Find disclosures for RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O), including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) with unit Metric tonnes (t).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) related to Air Quality.",
+        "Find numeric table rows or performance metrics reporting RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-120a.1",
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "NOx",
+        "excluding",
+        "N2O",
+        "Quality",
+        "Metric tonnes (t)",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "negative_anchor_terms": [
+        "Air emissions of the following pollutants: (2) SOx",
+        "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "Air emissions of the following pollutants: (4) particulate matter (PM10)",
+        "Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (1) NOx (excluding N2O)\"; do not treat evidence for \"Air emissions of the following pollutants: (2) SOx\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (1) NOx (excluding N2O)\"; do not treat evidence for \"Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (1) NOx (excluding N2O)\"; do not treat evidence for \"Air emissions of the following pollutants: (4) particulate matter (PM10)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (1) NOx (excluding N2O)\"; do not treat evidence for \"Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t)",
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-120a.1.02",
+      "metric_code": "RR-BI-120a.1",
+      "metric": "Air emissions of the following pollutants: (2) SOx",
+      "topic": "Air Quality",
+      "unit": "Metric tonnes (t)",
+      "definition": "RR-BI-120a.1. Air emissions of the following pollutants: (1) NOx (excluding N2O),\n(2) SOx, (3) volatile organic compounds (VOCs), (4) particulate matter (PM10), and\n(5) hazardous air pollutants (HAPs)\n1\nThe entity shall disclose its emissions of air pollutants, in metric tonnes per pollutant, released into the\natmosphere.\n1.1\nThe scope of the disclosure includes air pollutants associated with the entity’s direct air emissions resulting\nfrom all the entity’s activities and sources of emissions, which may include stationary or mobile sources,\nproduction facilities, office buildings and transportation fleets.\n2\nThe entity shall disclose its emissions of (1) oxides of nitrogen (NOx), reported as NOx.\n2.1\nThe scope of NOx includes NO and NO2 but excludes N2O.\n3\nThe entity shall disclose its emissions of (2) oxides of sulphur (SOx), reported as SOx.\n3.1\nThe scope of SOx includes SO2 and SO3.\n4\nThe entity shall disclose its emissions of (3) non-methane volatile organic compounds (VOCs).\n4.1\nVOCs are defined as any compound of carbon, excluding carbon monoxide, carbon dioxide, carbonic acid,\nmetallic carbides or carbonates, ammonium carbonate, and methane, that participates in atmospheric\nphotochemical reactions, except those designated under applicable jurisdictional laws or regulations as\nhaving negligible photochemical reactivity.\n4.2\nIf applicable regulatory definitions of VOCs conflict with this definition, the entity may define VOCs in\naccordance with the applicable jurisdictional legal or regulatory definition. In this case, the entity shall\nidentify the source of the definition.\n5\nThe entity shall disclose its emissions of (4) particulate matter (PM10), reported as PM10.\n5.1\nPM10 is defined as any airborne finely divided solid or liquid material with an aerodynamic diameter less\nthan or equal to a nominal 10 micrometres.\n6\nThe entity shall disclose its emissions of (5) hazardous air pollutants (HAPs).\n6.1\nHAPs are defined as those pollutants known or suspected to cause cancer or other serious health effects,\nsuch as reproductive effects or birth defects, or adverse environmental effects.\n7\nThe entity may discuss the calculation method for its emissions disclosure, such as whether data is from\ncontinuous emissions monitoring systems (CEMS), engineering calculations or mass balance calculations.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Air emissions of the following pollutants: (2) SOx",
+        "Air emissions of the following pollutants: SOx",
+        "RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx"
+      ],
+      "bm25_terms": [
+        "RR-BI-120a.1",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "SOx",
+        "Quality",
+        "tonnes",
+        "Metric tonnes (t)",
+        "CO₂-e",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "dense_query": "Find disclosures for RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx with unit Metric tonnes (t) related to Air Quality.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx with unit Metric tonnes (t).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx related to Air Quality.",
+        "Find numeric table rows or performance metrics reporting RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-120a.1",
+        "Air emissions of the following pollutants: (2) SOx",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "SOx",
+        "Quality",
+        "Metric tonnes (t)",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "negative_anchor_terms": [
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "Air emissions of the following pollutants: (4) particulate matter (PM10)",
+        "Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (2) SOx\"; do not treat evidence for \"Air emissions of the following pollutants: (1) NOx (excluding N2O)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (2) SOx\"; do not treat evidence for \"Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (2) SOx\"; do not treat evidence for \"Air emissions of the following pollutants: (4) particulate matter (PM10)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (2) SOx\"; do not treat evidence for \"Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t)",
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-120a.1.03",
+      "metric_code": "RR-BI-120a.1",
+      "metric": "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+      "topic": "Air Quality",
+      "unit": "Metric tonnes (t)",
+      "definition": "RR-BI-120a.1. Air emissions of the following pollutants: (1) NOx (excluding N2O),\n(2) SOx, (3) volatile organic compounds (VOCs), (4) particulate matter (PM10), and\n(5) hazardous air pollutants (HAPs)\n1\nThe entity shall disclose its emissions of air pollutants, in metric tonnes per pollutant, released into the\natmosphere.\n1.1\nThe scope of the disclosure includes air pollutants associated with the entity’s direct air emissions resulting\nfrom all the entity’s activities and sources of emissions, which may include stationary or mobile sources,\nproduction facilities, office buildings and transportation fleets.\n2\nThe entity shall disclose its emissions of (1) oxides of nitrogen (NOx), reported as NOx.\n2.1\nThe scope of NOx includes NO and NO2 but excludes N2O.\n3\nThe entity shall disclose its emissions of (2) oxides of sulphur (SOx), reported as SOx.\n3.1\nThe scope of SOx includes SO2 and SO3.\n4\nThe entity shall disclose its emissions of (3) non-methane volatile organic compounds (VOCs).\n4.1\nVOCs are defined as any compound of carbon, excluding carbon monoxide, carbon dioxide, carbonic acid,\nmetallic carbides or carbonates, ammonium carbonate, and methane, that participates in atmospheric\nphotochemical reactions, except those designated under applicable jurisdictional laws or regulations as\nhaving negligible photochemical reactivity.\n4.2\nIf applicable regulatory definitions of VOCs conflict with this definition, the entity may define VOCs in\naccordance with the applicable jurisdictional legal or regulatory definition. In this case, the entity shall\nidentify the source of the definition.\n5\nThe entity shall disclose its emissions of (4) particulate matter (PM10), reported as PM10.\n5.1\nPM10 is defined as any airborne finely divided solid or liquid material with an aerodynamic diameter less\nthan or equal to a nominal 10 micrometres.\n6\nThe entity shall disclose its emissions of (5) hazardous air pollutants (HAPs).\n6.1\nHAPs are defined as those pollutants known or suspected to cause cancer or other serious health effects,\nsuch as reproductive effects or birth defects, or adverse environmental effects.\n7\nThe entity may discuss the calculation method for its emissions disclosure, such as whether data is from\ncontinuous emissions monitoring systems (CEMS), engineering calculations or mass balance calculations.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "Air emissions of the following pollutants: volatile organic compounds (VOCs)",
+        "RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)"
+      ],
+      "bm25_terms": [
+        "RR-BI-120a.1",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "volatile",
+        "organic",
+        "compounds",
+        "VOCs",
+        "Quality",
+        "tonnes",
+        "Metric tonnes (t)",
+        "CO₂-e",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "dense_query": "Find disclosures for RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs), including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs) with unit Metric tonnes (t).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs) related to Air Quality.",
+        "Find numeric table rows or performance metrics reporting RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs) for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-120a.1",
+        "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "volatile",
+        "organic",
+        "compounds",
+        "VOCs",
+        "Quality",
+        "Metric tonnes (t)",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "negative_anchor_terms": [
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "Air emissions of the following pollutants: (2) SOx",
+        "Air emissions of the following pollutants: (4) particulate matter (PM10)",
+        "Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)\"; do not treat evidence for \"Air emissions of the following pollutants: (1) NOx (excluding N2O)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)\"; do not treat evidence for \"Air emissions of the following pollutants: (2) SOx\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)\"; do not treat evidence for \"Air emissions of the following pollutants: (4) particulate matter (PM10)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)\"; do not treat evidence for \"Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t)",
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-120a.1.04",
+      "metric_code": "RR-BI-120a.1",
+      "metric": "Air emissions of the following pollutants: (4) particulate matter (PM10)",
+      "topic": "Air Quality",
+      "unit": "Metric tonnes (t)",
+      "definition": "RR-BI-120a.1. Air emissions of the following pollutants: (1) NOx (excluding N2O),\n(2) SOx, (3) volatile organic compounds (VOCs), (4) particulate matter (PM10), and\n(5) hazardous air pollutants (HAPs)\n1\nThe entity shall disclose its emissions of air pollutants, in metric tonnes per pollutant, released into the\natmosphere.\n1.1\nThe scope of the disclosure includes air pollutants associated with the entity’s direct air emissions resulting\nfrom all the entity’s activities and sources of emissions, which may include stationary or mobile sources,\nproduction facilities, office buildings and transportation fleets.\n2\nThe entity shall disclose its emissions of (1) oxides of nitrogen (NOx), reported as NOx.\n2.1\nThe scope of NOx includes NO and NO2 but excludes N2O.\n3\nThe entity shall disclose its emissions of (2) oxides of sulphur (SOx), reported as SOx.\n3.1\nThe scope of SOx includes SO2 and SO3.\n4\nThe entity shall disclose its emissions of (3) non-methane volatile organic compounds (VOCs).\n4.1\nVOCs are defined as any compound of carbon, excluding carbon monoxide, carbon dioxide, carbonic acid,\nmetallic carbides or carbonates, ammonium carbonate, and methane, that participates in atmospheric\nphotochemical reactions, except those designated under applicable jurisdictional laws or regulations as\nhaving negligible photochemical reactivity.\n4.2\nIf applicable regulatory definitions of VOCs conflict with this definition, the entity may define VOCs in\naccordance with the applicable jurisdictional legal or regulatory definition. In this case, the entity shall\nidentify the source of the definition.\n5\nThe entity shall disclose its emissions of (4) particulate matter (PM10), reported as PM10.\n5.1\nPM10 is defined as any airborne finely divided solid or liquid material with an aerodynamic diameter less\nthan or equal to a nominal 10 micrometres.\n6\nThe entity shall disclose its emissions of (5) hazardous air pollutants (HAPs).\n6.1\nHAPs are defined as those pollutants known or suspected to cause cancer or other serious health effects,\nsuch as reproductive effects or birth defects, or adverse environmental effects.\n7\nThe entity may discuss the calculation method for its emissions disclosure, such as whether data is from\ncontinuous emissions monitoring systems (CEMS), engineering calculations or mass balance calculations.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Air emissions of the following pollutants: (4) particulate matter (PM10)",
+        "Air emissions of the following pollutants: particulate matter (PM10)",
+        "RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10)"
+      ],
+      "bm25_terms": [
+        "RR-BI-120a.1",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "particulate",
+        "matter",
+        "PM10",
+        "Quality",
+        "tonnes",
+        "Metric tonnes (t)",
+        "CO₂-e",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "dense_query": "Find disclosures for RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10), including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10) with unit Metric tonnes (t).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10) related to Air Quality.",
+        "Find numeric table rows or performance metrics reporting RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10) for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-120a.1",
+        "Air emissions of the following pollutants: (4) particulate matter (PM10)",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "particulate",
+        "matter",
+        "PM10",
+        "Quality",
+        "Metric tonnes (t)",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "negative_anchor_terms": [
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "Air emissions of the following pollutants: (2) SOx",
+        "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (4) particulate matter (PM10)\"; do not treat evidence for \"Air emissions of the following pollutants: (1) NOx (excluding N2O)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (4) particulate matter (PM10)\"; do not treat evidence for \"Air emissions of the following pollutants: (2) SOx\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (4) particulate matter (PM10)\"; do not treat evidence for \"Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (4) particulate matter (PM10)\"; do not treat evidence for \"Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t)",
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-120a.1.05",
+      "metric_code": "RR-BI-120a.1",
+      "metric": "Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+      "topic": "Air Quality",
+      "unit": "Metric tonnes (t)",
+      "definition": "RR-BI-120a.1. Air emissions of the following pollutants: (1) NOx (excluding N2O),\n(2) SOx, (3) volatile organic compounds (VOCs), (4) particulate matter (PM10), and\n(5) hazardous air pollutants (HAPs)\n1\nThe entity shall disclose its emissions of air pollutants, in metric tonnes per pollutant, released into the\natmosphere.\n1.1\nThe scope of the disclosure includes air pollutants associated with the entity’s direct air emissions resulting\nfrom all the entity’s activities and sources of emissions, which may include stationary or mobile sources,\nproduction facilities, office buildings and transportation fleets.\n2\nThe entity shall disclose its emissions of (1) oxides of nitrogen (NOx), reported as NOx.\n2.1\nThe scope of NOx includes NO and NO2 but excludes N2O.\n3\nThe entity shall disclose its emissions of (2) oxides of sulphur (SOx), reported as SOx.\n3.1\nThe scope of SOx includes SO2 and SO3.\n4\nThe entity shall disclose its emissions of (3) non-methane volatile organic compounds (VOCs).\n4.1\nVOCs are defined as any compound of carbon, excluding carbon monoxide, carbon dioxide, carbonic acid,\nmetallic carbides or carbonates, ammonium carbonate, and methane, that participates in atmospheric\nphotochemical reactions, except those designated under applicable jurisdictional laws or regulations as\nhaving negligible photochemical reactivity.\n4.2\nIf applicable regulatory definitions of VOCs conflict with this definition, the entity may define VOCs in\naccordance with the applicable jurisdictional legal or regulatory definition. In this case, the entity shall\nidentify the source of the definition.\n5\nThe entity shall disclose its emissions of (4) particulate matter (PM10), reported as PM10.\n5.1\nPM10 is defined as any airborne finely divided solid or liquid material with an aerodynamic diameter less\nthan or equal to a nominal 10 micrometres.\n6\nThe entity shall disclose its emissions of (5) hazardous air pollutants (HAPs).\n6.1\nHAPs are defined as those pollutants known or suspected to cause cancer or other serious health effects,\nsuch as reproductive effects or birth defects, or adverse environmental effects.\n7\nThe entity may discuss the calculation method for its emissions disclosure, such as whether data is from\ncontinuous emissions monitoring systems (CEMS), engineering calculations or mass balance calculations.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+        "Air emissions of the following pollutants: hazardous air pollutants (HAPs)",
+        "RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)"
+      ],
+      "bm25_terms": [
+        "RR-BI-120a.1",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "hazardous",
+        "HAPs",
+        "Quality",
+        "tonnes",
+        "Metric tonnes (t)",
+        "CO₂-e",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "dense_query": "Find disclosures for RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs), including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs) with unit Metric tonnes (t).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs) related to Air Quality.",
+        "Find numeric table rows or performance metrics reporting RR-BI-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs) for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-120a.1",
+        "Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+        "Air emissions",
+        "Air",
+        "emissions",
+        "pollutants",
+        "hazardous",
+        "HAPs",
+        "Quality",
+        "Metric tonnes (t)",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "negative_anchor_terms": [
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "Air emissions of the following pollutants: (2) SOx",
+        "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "Air emissions of the following pollutants: (4) particulate matter (PM10)"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)\"; do not treat evidence for \"Air emissions of the following pollutants: (1) NOx (excluding N2O)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (2) SOx",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)\"; do not treat evidence for \"Air emissions of the following pollutants: (2) SOx\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)\"; do not treat evidence for \"Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM10)",
+          "difference": "This profile is only for \"Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)\"; do not treat evidence for \"Air emissions of the following pollutants: (4) particulate matter (PM10)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t)",
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-120a.2",
+      "metric_code": "RR-BI-120a.2",
+      "metric": "Number of incidents of non-compliance associated with air quality permits, standards, and regulations",
+      "topic": "Air Quality",
+      "unit": "Number",
+      "definition": "RR-BI-120a.2. Number of incidents of non-compliance associated with air quality\npermits, standards, and regulations\n1\nThe entity shall disclose the total number of instances of air emissions non-compliance, including violations of a\ntechnology-based standard and exceedances of a quality-based standard.\n2\nThe scope of the disclosure includes incidents governed by jurisdictional air emissions statutory permits and\nregulations including applicable jurisdictional air quality laws or regulations.\n3\nAn incident of non-compliance shall be disclosed regardless of whether it resulted in an enforcement action (for\nexample, a fine or warning letter).\n4\nAll violations regardless of their measurement method or frequency, shall be disclosed. These include violations\nfor:\n4.1\ncontinuous emissions, with limitations, standards and prohibitions that are generally expressed as\nmaximum daily, weekly and monthly averages;\n4.2\nnon-continuous emissions, with limitations that are generally expressed in terms of frequency, total mass,\nmaximum rate of discharge and mass or concentrations of specified pollutants;\n4.3\nfalse or inaccurate reporting; and\n4.4\nfailure to obtain permits.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Number of incidents of non-compliance associated with air quality permits, standards, and regulations",
+        "Count of incidents of non-compliance associated with air quality permits, standards, and regulations",
+        "RR-BI-120a.2 Number of incidents of non-compliance associated with air quality permits, standards, and regulations"
+      ],
+      "bm25_terms": [
+        "RR-BI-120a.2",
+        "incidents",
+        "non-compliance",
+        "air",
+        "quality",
+        "permits",
+        "standards",
+        "regulations",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for RR-BI-120a.2 Number of incidents of non-compliance associated with air quality permits, standards, and regulations with unit Number related to Air Quality.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-120a.2 Number of incidents of non-compliance associated with air quality permits, standards, and regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-120a.2 Number of incidents of non-compliance associated with air quality permits, standards, and regulations with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-120a.2 Number of incidents of non-compliance associated with air quality permits, standards, and regulations related to Air Quality.",
+        "Find numeric table rows or performance metrics reporting RR-BI-120a.2 Number of incidents of non-compliance associated with air quality permits, standards, and regulations for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-120a.2",
+        "Number of incidents of non-compliance associated with air quality permits, standards, and regulations",
+        "incidents",
+        "non-compliance",
+        "air",
+        "quality",
+        "permits",
+        "standards",
+        "regulations",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-140a.1.01",
+      "metric_code": "RR-BI-140a.1",
+      "metric": "Total water withdrawn",
+      "topic": "Water Management in Manufacturing",
+      "unit": "Thousand cubic metres (m³)",
+      "definition": "RR-BI-140a.1. (1) Total water withdrawn, (2) total water consumed; percentage of\neach in regions with High or Extremely High Baseline Water Stress\n1\nThe entity shall disclose the amount of water, in thousands of cubic metres, withdrawn from all sources.\n1.1\nWater sources include surface water (including water from wetlands, rivers, lakes and oceans),\ngroundwater, rainwater collected directly and stored by the entity, and water and wastewater obtained from\nmunicipal water supplies, water utilities or other entities.\n2\nThe entity may disclose portions of its supply by source if, for example, significant portions of withdrawals are from\nnon-freshwater sources.\n2.1\nFresh water may be defined according to the local laws and regulations where the entity operates. If no\nlegal definition exists, fresh water shall be considered to be water that has less than 1,000 parts per million\nof dissolved solids.\n2.2\nWater obtained from a water utility in compliance with jurisdictional drinking water regulations can be\nassumed to meet the definition of fresh water.\n3\nThe entity shall disclose the amount of water, in thousands of cubic metres, consumed in its operations.\n3.1\nWater consumption is defined as:\n3.1.1\nWater that evaporates during withdrawal, use and discharge\n3.1.2\nWater that is directly or indirectly incorporated into the product or service\n3.1.3\nWater that does not otherwise return to the same catchment area from which it was withdrawn,\nsuch as water returned to another catchment area or the sea\n4\nThe entity shall analyse all its operations for water risks and identify activities that withdraw and consume water in\nlocations with High (40–80%) or Extremely High (>80%) Baseline Water Stress as classified by the World\nResources Institute’s (WRI) Water Risk Atlas tool, Aqueduct.\n5\nThe entity shall disclose water withdrawn in locations with High or Extremely High Baseline Water Stress as a\npercentage of the total water withdrawn.\n6\nThe entity shall disclose water consumed in locations with High or Extremely High Baseline Water Stress as a\npercentage of the total water consumed.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Total water withdrawn",
+        "Water withdrawal",
+        "RR-BI-140a.1 Total water withdrawn"
+      ],
+      "bm25_terms": [
+        "RR-BI-140a.1",
+        "water withdrawn",
+        "water",
+        "withdrawn",
+        "Management",
+        "Manufacturing",
+        "Thousand",
+        "cubic",
+        "metres",
+        "thousand m3",
+        "m3",
+        "meters"
+      ],
+      "dense_query": "Find disclosures for RR-BI-140a.1 Total water withdrawn with unit Thousand cubic metres (m³) related to Water Management in Manufacturing.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-140a.1 Total water withdrawn, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-140a.1 Total water withdrawn with unit Thousand cubic metres (m³).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-140a.1 Total water withdrawn related to Water Management in Manufacturing.",
+        "Find numeric table rows or performance metrics reporting RR-BI-140a.1 Total water withdrawn for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-140a.1",
+        "Total water withdrawn",
+        "water withdrawn",
+        "water",
+        "withdrawn",
+        "Management",
+        "Manufacturing",
+        "Thousand cubic metres (m³)",
+        "thousand m3",
+        "thousand cubic meters",
+        "thousand cubic metres"
+      ],
+      "negative_anchor_terms": [
+        "Total water consumed",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "water consumed",
+        "water discharged",
+        "water recycled"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-140a.1 Total water consumed",
+          "difference": "This profile is only for \"Total water withdrawn\"; do not treat evidence for \"Total water consumed\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+          "difference": "This profile is only for \"Total water withdrawn\"; do not treat evidence for \"Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+          "difference": "This profile is only for \"Total water withdrawn\"; do not treat evidence for \"Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "water consumed",
+          "difference": "Water withdrawn is the water taken from sources; water consumed is the portion not returned to the same catchment."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Thousand cubic metres (m³)",
+          "thousand m3",
+          "thousand cubic meters",
+          "thousand cubic metres"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-140a.1.02",
+      "metric_code": "RR-BI-140a.1",
+      "metric": "Total water consumed",
+      "topic": "Water Management in Manufacturing",
+      "unit": "Thousand cubic metres (m³)",
+      "definition": "RR-BI-140a.1. (1) Total water withdrawn, (2) total water consumed; percentage of\neach in regions with High or Extremely High Baseline Water Stress\n1\nThe entity shall disclose the amount of water, in thousands of cubic metres, withdrawn from all sources.\n1.1\nWater sources include surface water (including water from wetlands, rivers, lakes and oceans),\ngroundwater, rainwater collected directly and stored by the entity, and water and wastewater obtained from\nmunicipal water supplies, water utilities or other entities.\n2\nThe entity may disclose portions of its supply by source if, for example, significant portions of withdrawals are from\nnon-freshwater sources.\n2.1\nFresh water may be defined according to the local laws and regulations where the entity operates. If no\nlegal definition exists, fresh water shall be considered to be water that has less than 1,000 parts per million\nof dissolved solids.\n2.2\nWater obtained from a water utility in compliance with jurisdictional drinking water regulations can be\nassumed to meet the definition of fresh water.\n3\nThe entity shall disclose the amount of water, in thousands of cubic metres, consumed in its operations.\n3.1\nWater consumption is defined as:\n3.1.1\nWater that evaporates during withdrawal, use and discharge\n3.1.2\nWater that is directly or indirectly incorporated into the product or service\n3.1.3\nWater that does not otherwise return to the same catchment area from which it was withdrawn,\nsuch as water returned to another catchment area or the sea\n4\nThe entity shall analyse all its operations for water risks and identify activities that withdraw and consume water in\nlocations with High (40–80%) or Extremely High (>80%) Baseline Water Stress as classified by the World\nResources Institute’s (WRI) Water Risk Atlas tool, Aqueduct.\n5\nThe entity shall disclose water withdrawn in locations with High or Extremely High Baseline Water Stress as a\npercentage of the total water withdrawn.\n6\nThe entity shall disclose water consumed in locations with High or Extremely High Baseline Water Stress as a\npercentage of the total water consumed.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Total water consumed",
+        "Water consumption",
+        "RR-BI-140a.1 Total water consumed"
+      ],
+      "bm25_terms": [
+        "RR-BI-140a.1",
+        "water consumed",
+        "water",
+        "consumed",
+        "Management",
+        "Manufacturing",
+        "Thousand",
+        "cubic",
+        "metres",
+        "thousand m3",
+        "m3",
+        "meters"
+      ],
+      "dense_query": "Find disclosures for RR-BI-140a.1 Total water consumed with unit Thousand cubic metres (m³) related to Water Management in Manufacturing.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-140a.1 Total water consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-140a.1 Total water consumed with unit Thousand cubic metres (m³).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-140a.1 Total water consumed related to Water Management in Manufacturing.",
+        "Find numeric table rows or performance metrics reporting RR-BI-140a.1 Total water consumed for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-140a.1",
+        "Total water consumed",
+        "water consumed",
+        "water",
+        "consumed",
+        "Management",
+        "Manufacturing",
+        "Thousand cubic metres (m³)",
+        "thousand m3",
+        "thousand cubic meters",
+        "thousand cubic metres"
+      ],
+      "negative_anchor_terms": [
+        "Total water withdrawn",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "water withdrawn",
+        "water discharged",
+        "water recycled"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-140a.1 Total water withdrawn",
+          "difference": "This profile is only for \"Total water consumed\"; do not treat evidence for \"Total water withdrawn\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+          "difference": "This profile is only for \"Total water consumed\"; do not treat evidence for \"Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+          "difference": "This profile is only for \"Total water consumed\"; do not treat evidence for \"Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "water withdrawn",
+          "difference": "Water consumed is the portion not returned to the same catchment; water withdrawn is total water taken from sources."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Thousand cubic metres (m³)",
+          "thousand m3",
+          "thousand cubic meters",
+          "thousand cubic metres"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-140a.1.03",
+      "metric_code": "RR-BI-140a.1",
+      "metric": "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+      "topic": "Water Management in Manufacturing",
+      "unit": "Percentage (%)",
+      "definition": "RR-BI-140a.1. (1) Total water withdrawn, (2) total water consumed; percentage of\neach in regions with High or Extremely High Baseline Water Stress\n1\nThe entity shall disclose the amount of water, in thousands of cubic metres, withdrawn from all sources.\n1.1\nWater sources include surface water (including water from wetlands, rivers, lakes and oceans),\ngroundwater, rainwater collected directly and stored by the entity, and water and wastewater obtained from\nmunicipal water supplies, water utilities or other entities.\n2\nThe entity may disclose portions of its supply by source if, for example, significant portions of withdrawals are from\nnon-freshwater sources.\n2.1\nFresh water may be defined according to the local laws and regulations where the entity operates. If no\nlegal definition exists, fresh water shall be considered to be water that has less than 1,000 parts per million\nof dissolved solids.\n2.2\nWater obtained from a water utility in compliance with jurisdictional drinking water regulations can be\nassumed to meet the definition of fresh water.\n3\nThe entity shall disclose the amount of water, in thousands of cubic metres, consumed in its operations.\n3.1\nWater consumption is defined as:\n3.1.1\nWater that evaporates during withdrawal, use and discharge\n3.1.2\nWater that is directly or indirectly incorporated into the product or service\n3.1.3\nWater that does not otherwise return to the same catchment area from which it was withdrawn,\nsuch as water returned to another catchment area or the sea\n4\nThe entity shall analyse all its operations for water risks and identify activities that withdraw and consume water in\nlocations with High (40–80%) or Extremely High (>80%) Baseline Water Stress as classified by the World\nResources Institute’s (WRI) Water Risk Atlas tool, Aqueduct.\n5\nThe entity shall disclose water withdrawn in locations with High or Extremely High Baseline Water Stress as a\npercentage of the total water withdrawn.\n6\nThe entity shall disclose water consumed in locations with High or Extremely High Baseline Water Stress as a\npercentage of the total water consumed.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percent of the total water withdrawn",
+        "RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn"
+      ],
+      "bm25_terms": [
+        "RR-BI-140a.1",
+        "Water withdrawn",
+        "Baseline Water Stress",
+        "Water",
+        "withdrawn",
+        "locations",
+        "High",
+        "Extremely",
+        "Baseline",
+        "Stress",
+        "Management",
+        "Manufacturing",
+        "%",
+        "Percentage (%)",
+        "percent",
+        "percentage"
+      ],
+      "dense_query": "Find disclosures for RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn with unit Percentage (%) related to Water Management in Manufacturing.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn with unit Percentage (%).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn related to Water Management in Manufacturing.",
+        "Find numeric table rows or performance metrics reporting RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-140a.1",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "Water withdrawn",
+        "Baseline Water Stress",
+        "Water",
+        "withdrawn",
+        "locations",
+        "High",
+        "Extremely",
+        "Baseline",
+        "Stress",
+        "Management",
+        "Manufacturing",
+        "Percentage (%)",
+        "%",
+        "percent",
+        "percentage"
+      ],
+      "negative_anchor_terms": [
+        "Total water withdrawn",
+        "Total water consumed",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "water consumed",
+        "water discharged",
+        "water recycled"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-140a.1 Total water withdrawn",
+          "difference": "This profile is only for \"Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn\"; do not treat evidence for \"Total water withdrawn\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-140a.1 Total water consumed",
+          "difference": "This profile is only for \"Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn\"; do not treat evidence for \"Total water consumed\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+          "difference": "This profile is only for \"Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn\"; do not treat evidence for \"Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "water consumed",
+          "difference": "Water withdrawn is the water taken from sources; water consumed is the portion not returned to the same catchment."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "percentage",
+        "expected_units": [
+          "Percentage (%)",
+          "%",
+          "percent",
+          "percentage"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-140a.1.04",
+      "metric_code": "RR-BI-140a.1",
+      "metric": "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+      "topic": "Water Management in Manufacturing",
+      "unit": "Percentage (%)",
+      "definition": "RR-BI-140a.1. (1) Total water withdrawn, (2) total water consumed; percentage of\neach in regions with High or Extremely High Baseline Water Stress\n1\nThe entity shall disclose the amount of water, in thousands of cubic metres, withdrawn from all sources.\n1.1\nWater sources include surface water (including water from wetlands, rivers, lakes and oceans),\ngroundwater, rainwater collected directly and stored by the entity, and water and wastewater obtained from\nmunicipal water supplies, water utilities or other entities.\n2\nThe entity may disclose portions of its supply by source if, for example, significant portions of withdrawals are from\nnon-freshwater sources.\n2.1\nFresh water may be defined according to the local laws and regulations where the entity operates. If no\nlegal definition exists, fresh water shall be considered to be water that has less than 1,000 parts per million\nof dissolved solids.\n2.2\nWater obtained from a water utility in compliance with jurisdictional drinking water regulations can be\nassumed to meet the definition of fresh water.\n3\nThe entity shall disclose the amount of water, in thousands of cubic metres, consumed in its operations.\n3.1\nWater consumption is defined as:\n3.1.1\nWater that evaporates during withdrawal, use and discharge\n3.1.2\nWater that is directly or indirectly incorporated into the product or service\n3.1.3\nWater that does not otherwise return to the same catchment area from which it was withdrawn,\nsuch as water returned to another catchment area or the sea\n4\nThe entity shall analyse all its operations for water risks and identify activities that withdraw and consume water in\nlocations with High (40–80%) or Extremely High (>80%) Baseline Water Stress as classified by the World\nResources Institute’s (WRI) Water Risk Atlas tool, Aqueduct.\n5\nThe entity shall disclose water withdrawn in locations with High or Extremely High Baseline Water Stress as a\npercentage of the total water withdrawn.\n6\nThe entity shall disclose water consumed in locations with High or Extremely High Baseline Water Stress as a\npercentage of the total water consumed.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percent of the total water consumed",
+        "RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed"
+      ],
+      "bm25_terms": [
+        "RR-BI-140a.1",
+        "Water consumed",
+        "Baseline Water Stress",
+        "Water",
+        "consumed",
+        "locations",
+        "High",
+        "Extremely",
+        "Baseline",
+        "Stress",
+        "Management",
+        "Manufacturing",
+        "%",
+        "Percentage (%)",
+        "percent",
+        "percentage"
+      ],
+      "dense_query": "Find disclosures for RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed with unit Percentage (%) related to Water Management in Manufacturing.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed with unit Percentage (%).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed related to Water Management in Manufacturing.",
+        "Find numeric table rows or performance metrics reporting RR-BI-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-140a.1",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "Water consumed",
+        "Baseline Water Stress",
+        "Water",
+        "consumed",
+        "locations",
+        "High",
+        "Extremely",
+        "Baseline",
+        "Stress",
+        "Management",
+        "Manufacturing",
+        "Percentage (%)",
+        "%",
+        "percent",
+        "percentage"
+      ],
+      "negative_anchor_terms": [
+        "Total water withdrawn",
+        "Total water consumed",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "water withdrawn",
+        "water discharged",
+        "water recycled"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-140a.1 Total water withdrawn",
+          "difference": "This profile is only for \"Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed\"; do not treat evidence for \"Total water withdrawn\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-140a.1 Total water consumed",
+          "difference": "This profile is only for \"Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed\"; do not treat evidence for \"Total water consumed\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+          "difference": "This profile is only for \"Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed\"; do not treat evidence for \"Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "water withdrawn",
+          "difference": "Water consumed is the portion not returned to the same catchment; water withdrawn is total water taken from sources."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "percentage",
+        "expected_units": [
+          "Percentage (%)",
+          "%",
+          "percent",
+          "percentage"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-140a.2",
+      "metric_code": "RR-BI-140a.2",
+      "metric": "Description of water management risks and discussion of strategies and practices to mitigate those risks",
+      "topic": "Water Management in Manufacturing",
+      "unit": "n/a",
+      "definition": "RR-BI-140a.2. Description of water management risks and discussion of strategies\nand practices to mitigate those risks\n1\nThe entity shall describe its water management risks associated with water withdrawals, water consumption and\ndischarge of water or wastewater.\n1.1\nRisks associated with water withdrawals and water consumption include risks to the availability of\nadequate, clean water resources, which include:\n1.1.1\nEnvironmental constraints—such as operating in water-stressed regions, drought, concerns of\naquatic impingement or entrainment, interannual or seasonal variability, and risks from the impact of\nclimate change\n1.1.2\nRegulatory and financial constraints—such as volatility in water costs, stakeholder perceptions and\nconcerns related to water withdrawals (for example, those from local communities, non-\ngovernmental organisations and regulatory agencies), direct competition with and impact from the\nactions of other users (for example, commercial and municipal users), restrictions to withdrawals\nbecause of regulations, and constraints on the entity’s ability to obtain and retain water rights or\npermits\n1.2\nRisks associated with the discharge of water or wastewater include the ability to obtain rights or permits\nrelated to discharges, regulatory compliance related to discharges, restrictions to discharges, the ability to\nmaintain control over the temperature of water discharges, liabilities, reputational risks and increased\noperating costs because of regulation, stakeholder perceptions and concerns related to water discharges\n(for example, those from local communities, non-governmental organisations and regulatory agencies).\n2\nThe entity may describe water management risks in the context of:\n2.1\nHow risks may vary by withdrawal source, including surface water (including water from wetlands, rivers,\nlakes and oceans), groundwater, rainwater collected directly and stored by the entity, and water and\nwastewater obtained from municipal water supplies, water utilities or other entities; and\n2.2\nHow risks may vary by discharge destinations, including surface water, groundwater or wastewater utilities.\n3\nThe entity may discuss the potential effects that water management risks may have on its operations and the time\nline over which such risks are expected to manifest.\n3.1\nEffects include those associated with costs, revenue, liabilities, continuity of operations and reputation.\n4\nThe entity shall discuss its short- and long-term strategies or plans to mitigate water management risks, which\ninclude:\n4.1\nThe scope of its strategy, plans, goals or targets, such as how they relate to various business units,\ngeographies or water-consuming operational processes.\n4.2\nAny water management goals or targets it has prioritised, and an analysis of performance against those\ngoals or targets.\n4.2.1\nGoals and targets include those associated with reducing water withdrawals, reducing water\nconsumption, reducing water discharges, reducing aquatic impingements, improving the quality of\nwater discharges and regulatory compliance.\n4.3\nThe activities and investments required to achieve the plans, goals or targets, and any risks or limiting\nfactors that might affect achievement of the plans or targets.\n4.4\nDisclosure of strategies, plans, goals or targets shall be limited to activities that were ongoing (active) or\nreached completion during the reporting period.\n5\nFor water management targets, the entity shall additionally disclose:\n5.1\nWhether the target is absolute or intensity-based, and the metric denominator if it is an intensity-based\ntarget.\n5.2\nThe time lines for the water management activities, including the start year, the target year and the base\nyear.\n5.3\nThe mechanism(s) for achieving the target, including:\n5.3.1\nEfficiency efforts, such as the use of water recycling or closed-loop systems;\n5.3.2\nProduct innovations, such as redesigning products or services to require less water;\n5.3.3\nProcess and equipment innovations, such as those that enable the reduction of aquatic\nimpingements or entrainments;\n5.3.4\nUse of tools and technologies (for example, the World Wildlife Fund Water Risk Filter, the Global\nWater Tool and Water Footprint Network Footprint Assessment Tool) to analyse water use, risks\nand opportunities; and\n5.3.5\nCollaborations or programmes in place with the community or other organisations\n5.4\nThe percentage reduction or improvement from the base year, in which the base year is the first year\nagainst which water management targets are evaluated towards the achievement of the target.\n6\nThe entity shall discuss whether its water management practices result in any additional lifecycle impacts or trade-\noffs in its organisation, including trade-offs in land use, energy production and greenhouse gas (GHG) emissions,\nand why the entity chose these practices despite lifecycle trade-offs.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "RR-BI-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks"
+      ],
+      "bm25_terms": [
+        "RR-BI-140a.2",
+        "Description",
+        "water",
+        "management",
+        "risks",
+        "discussion",
+        "strategies",
+        "practices",
+        "mitigate",
+        "those",
+        "Manufacturing"
+      ],
+      "dense_query": "Find disclosures for RR-BI-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks related to Water Management in Manufacturing.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks related to Water Management in Manufacturing.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for RR-BI-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks."
+      ],
+      "anchor_terms": [
+        "RR-BI-140a.2",
+        "Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "Description",
+        "water",
+        "management",
+        "risks",
+        "discussion",
+        "strategies",
+        "practices",
+        "mitigate",
+        "those",
+        "Manufacturing"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-140a.3",
+      "metric_code": "RR-BI-140a.3",
+      "metric": "Number of incidents of non-compliance associated with water quality permits, standards and regulations",
+      "topic": "Water Management in Manufacturing",
+      "unit": "Number",
+      "definition": "RR-BI-140a.3. Number of incidents of non-compliance associated with water\nquality permits, standards and regulations\n1\nThe entity shall disclose the total number of incidents of non-compliance, including violations of a technology-\nbased standard and exceedances of quantity or quality-based standards.\n2\nThe scope of disclosure includes incidents governed by applicable jurisdictional statutory permits and regulations,\nwhich include the discharge of a hazardous substance, violation of pre-treatment requirements or total maximum\ndaily load (TMDL) exceedances.\n3\nThe scope of disclosure shall only include incidents of non-compliance that resulted in a formal enforcement\naction(s).\n3.1\nFormal enforcement actions are defined as governmental recognised actions that address a violation or\nthreatened violation of water quantity or quality laws, regulations, policies or orders, and can result in\nadministrative penalty orders, administrative orders and judicial actions, among others.\n4\nViolations shall be disclosed, regardless of their measurement methodology or frequency. These include\nviolations for:\n4.1\nContinuous discharges, limitations, standards and prohibitions that are generally expressed as maximum\ndaily, weekly and monthly averages; and\n4.2\nNon-continuous discharges, limitations that are generally expressed in terms of frequency, total mass,\nmaximum rate of discharge and mass or concentration of specified pollutants.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Number of incidents of non-compliance associated with water quality permits, standards and regulations",
+        "Count of incidents of non-compliance associated with water quality permits, standards and regulations",
+        "RR-BI-140a.3 Number of incidents of non-compliance associated with water quality permits, standards and regulations"
+      ],
+      "bm25_terms": [
+        "RR-BI-140a.3",
+        "incidents",
+        "non-compliance",
+        "water",
+        "quality",
+        "permits",
+        "standards",
+        "regulations",
+        "Management",
+        "Manufacturing",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for RR-BI-140a.3 Number of incidents of non-compliance associated with water quality permits, standards and regulations with unit Number related to Water Management in Manufacturing.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-140a.3 Number of incidents of non-compliance associated with water quality permits, standards and regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-140a.3 Number of incidents of non-compliance associated with water quality permits, standards and regulations with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-140a.3 Number of incidents of non-compliance associated with water quality permits, standards and regulations related to Water Management in Manufacturing.",
+        "Find numeric table rows or performance metrics reporting RR-BI-140a.3 Number of incidents of non-compliance associated with water quality permits, standards and regulations for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-140a.3",
+        "Number of incidents of non-compliance associated with water quality permits, standards and regulations",
+        "incidents",
+        "non-compliance",
+        "water",
+        "quality",
+        "permits",
+        "standards",
+        "regulations",
+        "Management",
+        "Manufacturing",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-410a.1.01",
+      "metric_code": "RR-BI-410a.1",
+      "metric": "Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+      "topic": "Lifecycle Emissions Balance",
+      "unit": "Grammes of CO₂-e per megajoule (MJ)",
+      "definition": "RR-BI-410a.1. Lifecycle greenhouse gas (GHG) emissions, by biofuel type\n1\nThe entity shall disclose its lifecycle GHG emissions (in grammes of CO2-e per megajoule) for each biofuel\ncategory produced.\n1.1\nLifecycle GHG emissions are defined as the aggregate quantity of GHG emissions (including direct\nemissions and significant indirect emissions, such as significant emissions from land-use changes) related\nto the full fuel lifecycle, including all stages of fuel and feedstock production and distribution, from feedstock\ngeneration or extraction through the distribution and delivery of the finished fuel, to the ultimate consumer\nand fuel use, in which the mass values for all GHGs are adjusted to account for their relative global\nwarming potential.\n1.2\nThe entity shall disclose its lifecycle GHG emissions for each of the following biofuel types produced: (1)\nrenewable fuel, (2) advanced biofuel, (3) biodiesel and (4) cellulosic biofuel.\n1.2.1\nRenewable fuel is defined as fuel derived from biomass.\n1.2.2\nAdvanced biofuel is defined as fuel derived from algae, animal manure, corn cobs, grape marcs and\nwine lees, nut shells, husk wastes and residues from forestry and forest-based industries, used\ncooking oil, etc.\n1.2.3\nBiodiesel is defined as fuel derived from oils such as rapeseeds, sunflowers, soybeans, palm oil\nand waste cooking oil, and used in place of diesel fuel.\n1.2.4\nCellulosic biofuel is defined as fuel derived from material composed of lignin, cellulose,\nhemicellulose such as biomass sourced from forests, woody energy crops, straw, strove, husks,\ngrasses and cover crops.\n2\nThe entity shall disclose the applicable jurisdictional laws or regulations used for calculation.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+        "Lifecycle GHG (GHG) emissions for renewable fuel",
+        "Lifecycle greenhouse gas (greenhouse gas) emissions for renewable fuel",
+        "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel"
+      ],
+      "bm25_terms": [
+        "RR-BI-410a.1",
+        "greenhouse gas",
+        "GHG",
+        "CO₂-e",
+        "renewable fuel",
+        "Lifecycle",
+        "greenhouse",
+        "gas",
+        "emissions",
+        "renewable",
+        "fuel",
+        "Balance",
+        "Grammes",
+        "CO",
+        "megajoule",
+        "MJ"
+      ],
+      "dense_query": "Find disclosures for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel with unit Grammes of CO₂-e per megajoule (MJ) related to Lifecycle Emissions Balance.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel with unit Grammes of CO₂-e per megajoule (MJ).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel related to Lifecycle Emissions Balance.",
+        "Find numeric table rows or performance metrics reporting RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-410a.1",
+        "Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+        "greenhouse gas",
+        "GHG",
+        "renewable fuel",
+        "Lifecycle",
+        "greenhouse",
+        "gas",
+        "emissions",
+        "renewable",
+        "fuel",
+        "Balance",
+        "Grammes of CO₂-e per megajoule (MJ)"
+      ],
+      "negative_anchor_terms": [
+        "Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+        "Lifecycle greenhouse gas (GHG) emissions for biodiesel",
+        "Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for renewable fuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for advanced biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for renewable fuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for biodiesel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for renewable fuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "unknown",
+        "expected_units": [
+          "Grammes of CO₂-e per megajoule (MJ)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": ""
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-410a.1.02",
+      "metric_code": "RR-BI-410a.1",
+      "metric": "Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+      "topic": "Lifecycle Emissions Balance",
+      "unit": "Grammes of CO₂-e per megajoule (MJ)",
+      "definition": "RR-BI-410a.1. Lifecycle greenhouse gas (GHG) emissions, by biofuel type\n1\nThe entity shall disclose its lifecycle GHG emissions (in grammes of CO2-e per megajoule) for each biofuel\ncategory produced.\n1.1\nLifecycle GHG emissions are defined as the aggregate quantity of GHG emissions (including direct\nemissions and significant indirect emissions, such as significant emissions from land-use changes) related\nto the full fuel lifecycle, including all stages of fuel and feedstock production and distribution, from feedstock\ngeneration or extraction through the distribution and delivery of the finished fuel, to the ultimate consumer\nand fuel use, in which the mass values for all GHGs are adjusted to account for their relative global\nwarming potential.\n1.2\nThe entity shall disclose its lifecycle GHG emissions for each of the following biofuel types produced: (1)\nrenewable fuel, (2) advanced biofuel, (3) biodiesel and (4) cellulosic biofuel.\n1.2.1\nRenewable fuel is defined as fuel derived from biomass.\n1.2.2\nAdvanced biofuel is defined as fuel derived from algae, animal manure, corn cobs, grape marcs and\nwine lees, nut shells, husk wastes and residues from forestry and forest-based industries, used\ncooking oil, etc.\n1.2.3\nBiodiesel is defined as fuel derived from oils such as rapeseeds, sunflowers, soybeans, palm oil\nand waste cooking oil, and used in place of diesel fuel.\n1.2.4\nCellulosic biofuel is defined as fuel derived from material composed of lignin, cellulose,\nhemicellulose such as biomass sourced from forests, woody energy crops, straw, strove, husks,\ngrasses and cover crops.\n2\nThe entity shall disclose the applicable jurisdictional laws or regulations used for calculation.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+        "Lifecycle GHG (GHG) emissions for advanced biofuel",
+        "Lifecycle greenhouse gas (greenhouse gas) emissions for advanced biofuel",
+        "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel"
+      ],
+      "bm25_terms": [
+        "RR-BI-410a.1",
+        "greenhouse gas",
+        "GHG",
+        "CO₂-e",
+        "Lifecycle",
+        "greenhouse",
+        "gas",
+        "emissions",
+        "advanced",
+        "biofuel",
+        "Balance",
+        "Grammes",
+        "CO",
+        "megajoule",
+        "MJ"
+      ],
+      "dense_query": "Find disclosures for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel with unit Grammes of CO₂-e per megajoule (MJ) related to Lifecycle Emissions Balance.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel with unit Grammes of CO₂-e per megajoule (MJ).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel related to Lifecycle Emissions Balance.",
+        "Find numeric table rows or performance metrics reporting RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-410a.1",
+        "Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+        "greenhouse gas",
+        "GHG",
+        "Lifecycle",
+        "greenhouse",
+        "gas",
+        "emissions",
+        "advanced",
+        "biofuel",
+        "Balance",
+        "Grammes of CO₂-e per megajoule (MJ)"
+      ],
+      "negative_anchor_terms": [
+        "Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+        "Lifecycle greenhouse gas (GHG) emissions for biodiesel",
+        "Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for advanced biofuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for renewable fuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for advanced biofuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for biodiesel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for advanced biofuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "unknown",
+        "expected_units": [
+          "Grammes of CO₂-e per megajoule (MJ)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": ""
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-410a.1.03",
+      "metric_code": "RR-BI-410a.1",
+      "metric": "Lifecycle greenhouse gas (GHG) emissions for biodiesel",
+      "topic": "Lifecycle Emissions Balance",
+      "unit": "Grammes of CO₂-e per megajoule (MJ)",
+      "definition": "RR-BI-410a.1. Lifecycle greenhouse gas (GHG) emissions, by biofuel type\n1\nThe entity shall disclose its lifecycle GHG emissions (in grammes of CO2-e per megajoule) for each biofuel\ncategory produced.\n1.1\nLifecycle GHG emissions are defined as the aggregate quantity of GHG emissions (including direct\nemissions and significant indirect emissions, such as significant emissions from land-use changes) related\nto the full fuel lifecycle, including all stages of fuel and feedstock production and distribution, from feedstock\ngeneration or extraction through the distribution and delivery of the finished fuel, to the ultimate consumer\nand fuel use, in which the mass values for all GHGs are adjusted to account for their relative global\nwarming potential.\n1.2\nThe entity shall disclose its lifecycle GHG emissions for each of the following biofuel types produced: (1)\nrenewable fuel, (2) advanced biofuel, (3) biodiesel and (4) cellulosic biofuel.\n1.2.1\nRenewable fuel is defined as fuel derived from biomass.\n1.2.2\nAdvanced biofuel is defined as fuel derived from algae, animal manure, corn cobs, grape marcs and\nwine lees, nut shells, husk wastes and residues from forestry and forest-based industries, used\ncooking oil, etc.\n1.2.3\nBiodiesel is defined as fuel derived from oils such as rapeseeds, sunflowers, soybeans, palm oil\nand waste cooking oil, and used in place of diesel fuel.\n1.2.4\nCellulosic biofuel is defined as fuel derived from material composed of lignin, cellulose,\nhemicellulose such as biomass sourced from forests, woody energy crops, straw, strove, husks,\ngrasses and cover crops.\n2\nThe entity shall disclose the applicable jurisdictional laws or regulations used for calculation.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Lifecycle greenhouse gas (GHG) emissions for biodiesel",
+        "Lifecycle GHG (GHG) emissions for biodiesel",
+        "Lifecycle greenhouse gas (greenhouse gas) emissions for biodiesel",
+        "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel"
+      ],
+      "bm25_terms": [
+        "RR-BI-410a.1",
+        "greenhouse gas",
+        "GHG",
+        "CO₂-e",
+        "Lifecycle",
+        "greenhouse",
+        "gas",
+        "emissions",
+        "biodiesel",
+        "Balance",
+        "Grammes",
+        "CO",
+        "megajoule",
+        "MJ"
+      ],
+      "dense_query": "Find disclosures for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel with unit Grammes of CO₂-e per megajoule (MJ) related to Lifecycle Emissions Balance.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel with unit Grammes of CO₂-e per megajoule (MJ).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel related to Lifecycle Emissions Balance.",
+        "Find numeric table rows or performance metrics reporting RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-410a.1",
+        "Lifecycle greenhouse gas (GHG) emissions for biodiesel",
+        "greenhouse gas",
+        "GHG",
+        "Lifecycle",
+        "greenhouse",
+        "gas",
+        "emissions",
+        "biodiesel",
+        "Balance",
+        "Grammes of CO₂-e per megajoule (MJ)"
+      ],
+      "negative_anchor_terms": [
+        "Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+        "Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+        "Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for biodiesel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for renewable fuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for biodiesel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for advanced biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for biodiesel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "unknown",
+        "expected_units": [
+          "Grammes of CO₂-e per megajoule (MJ)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": ""
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-410a.1.04",
+      "metric_code": "RR-BI-410a.1",
+      "metric": "Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel",
+      "topic": "Lifecycle Emissions Balance",
+      "unit": "Grammes of CO₂-e per megajoule (MJ)",
+      "definition": "RR-BI-410a.1. Lifecycle greenhouse gas (GHG) emissions, by biofuel type\n1\nThe entity shall disclose its lifecycle GHG emissions (in grammes of CO2-e per megajoule) for each biofuel\ncategory produced.\n1.1\nLifecycle GHG emissions are defined as the aggregate quantity of GHG emissions (including direct\nemissions and significant indirect emissions, such as significant emissions from land-use changes) related\nto the full fuel lifecycle, including all stages of fuel and feedstock production and distribution, from feedstock\ngeneration or extraction through the distribution and delivery of the finished fuel, to the ultimate consumer\nand fuel use, in which the mass values for all GHGs are adjusted to account for their relative global\nwarming potential.\n1.2\nThe entity shall disclose its lifecycle GHG emissions for each of the following biofuel types produced: (1)\nrenewable fuel, (2) advanced biofuel, (3) biodiesel and (4) cellulosic biofuel.\n1.2.1\nRenewable fuel is defined as fuel derived from biomass.\n1.2.2\nAdvanced biofuel is defined as fuel derived from algae, animal manure, corn cobs, grape marcs and\nwine lees, nut shells, husk wastes and residues from forestry and forest-based industries, used\ncooking oil, etc.\n1.2.3\nBiodiesel is defined as fuel derived from oils such as rapeseeds, sunflowers, soybeans, palm oil\nand waste cooking oil, and used in place of diesel fuel.\n1.2.4\nCellulosic biofuel is defined as fuel derived from material composed of lignin, cellulose,\nhemicellulose such as biomass sourced from forests, woody energy crops, straw, strove, husks,\ngrasses and cover crops.\n2\nThe entity shall disclose the applicable jurisdictional laws or regulations used for calculation.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel",
+        "Lifecycle GHG (GHG) emissions for cellulosic biofuel",
+        "Lifecycle greenhouse gas (greenhouse gas) emissions for cellulosic biofuel",
+        "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel"
+      ],
+      "bm25_terms": [
+        "RR-BI-410a.1",
+        "greenhouse gas",
+        "GHG",
+        "CO₂-e",
+        "Lifecycle",
+        "greenhouse",
+        "gas",
+        "emissions",
+        "cellulosic",
+        "biofuel",
+        "Balance",
+        "Grammes",
+        "CO",
+        "megajoule",
+        "MJ"
+      ],
+      "dense_query": "Find disclosures for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel with unit Grammes of CO₂-e per megajoule (MJ) related to Lifecycle Emissions Balance.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel with unit Grammes of CO₂-e per megajoule (MJ).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel related to Lifecycle Emissions Balance.",
+        "Find numeric table rows or performance metrics reporting RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-410a.1",
+        "Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel",
+        "greenhouse gas",
+        "GHG",
+        "Lifecycle",
+        "greenhouse",
+        "gas",
+        "emissions",
+        "cellulosic",
+        "biofuel",
+        "Balance",
+        "Grammes of CO₂-e per megajoule (MJ)"
+      ],
+      "negative_anchor_terms": [
+        "Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+        "Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+        "Lifecycle greenhouse gas (GHG) emissions for biodiesel"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for renewable fuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for renewable fuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for advanced biofuel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for advanced biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-410a.1 Lifecycle greenhouse gas (GHG) emissions for biodiesel",
+          "difference": "This profile is only for \"Lifecycle greenhouse gas (GHG) emissions for cellulosic biofuel\"; do not treat evidence for \"Lifecycle greenhouse gas (GHG) emissions for biodiesel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "unknown",
+        "expected_units": [
+          "Grammes of CO₂-e per megajoule (MJ)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": ""
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-430a.1",
+      "metric_code": "RR-BI-430a.1",
+      "metric": "Discussion of strategy to manage risks associated with environmental impacts of feedstock production",
+      "topic": "Sourcing & Environmental Impacts of Feedstock Production",
+      "unit": "n/a",
+      "definition": "RR-BI-430a.1. Discussion of strategy to manage risks associated with\nenvironmental impacts of feedstock production\n1\nThe entity shall discuss its strategy to manage the environmental impacts and regulatory risks associated with\nfeedstock production, where risks may include:\n1.1\nRisks to feedstock supply and pricing created by climate change impacts such as the increased likelihood\nof extreme weather events, decreased availability of clean water resources, increased competition for\narable land, and decreased crop yields because of temperature increases.\n1.2\nLong-term risks to feedstock supply associated with suppliers’ impacts on environmental health including\nthose on biodiversity and soil health that may be because of monoculture practices or fertiliser and\npesticide use.\n1.3\nConstraints created by regulation such as compliance with sustainability criteria in renewable fuel\nmandates; potential regulatory limits on the types of land where feedstock can be grown; potential limits on\nwhat qualifies as renewable biomass; potential for reduction or loss of public or political support for biofuel\nmandates because of the environmental impacts of feedstock production; and resistance to the use of\ngenetically modified organisms (GMOs).\n2\nThe disclosure scope excludes risks associated with the lifecycle GHG emissions, which are addressed in RR-\nBI-410a.1, respectively.\n3\nIf the entity identifies the availability of clean water resources as a risk to feedstock supply or pricing, it shall\ndiscuss the vulnerability to feedstock growing regions with water stress and how it manages price variability risk\nbecause of sourcing feedstock from these regions.\n3.1\nThe entity should identify its known sources of feedstock from growing regions with High (40–80%) or\nExtremely High (>80%) Baseline Water Stress using the World Resources Institute’s (WRI) Water Risk\nAtlas tool, Aqueduct.\n4\nThe entity shall describe how it manages risks or opportunities associated with feedstock production, including\nconstraints created by regulation, and limits on availability and price.\n4.1\nRelevant strategies to discuss include sourcing from feedstock producers that are third-party certified to\nenvironmental sustainability standards, diversification of suppliers, using feedstock procurement criteria to\nchoose suppliers for varied feedstocks with fewer environmental impacts or greater adaptability to the\neffects of environmental externalities (for example, drought-tolerant or disease-resistant feedstocks),\nsupplier audits, sourcing from regions where the entity has greater control over feedstock sources, and\nexpenditures on research and development (R&D) for alternative and substitute feedstocks that are less\nsusceptible to environmental externalities.\n4.2\nThe entity should disclose the sustainability criteria it uses to assess its feedstock suppliers.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Discussion of strategy to manage risks associated with environmental impacts of feedstock production",
+        "RR-BI-430a.1 Discussion of strategy to manage risks associated with environmental impacts of feedstock production"
+      ],
+      "bm25_terms": [
+        "RR-BI-430a.1",
+        "Discussion",
+        "strategy",
+        "manage",
+        "risks",
+        "environmental",
+        "impacts",
+        "feedstock",
+        "production",
+        "Sourcing"
+      ],
+      "dense_query": "Find disclosures for RR-BI-430a.1 Discussion of strategy to manage risks associated with environmental impacts of feedstock production related to Sourcing & Environmental Impacts of Feedstock Production.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-430a.1 Discussion of strategy to manage risks associated with environmental impacts of feedstock production, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-430a.1 Discussion of strategy to manage risks associated with environmental impacts of feedstock production.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-430a.1 Discussion of strategy to manage risks associated with environmental impacts of feedstock production related to Sourcing & Environmental Impacts of Feedstock Production.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for RR-BI-430a.1 Discussion of strategy to manage risks associated with environmental impacts of feedstock production."
+      ],
+      "anchor_terms": [
+        "RR-BI-430a.1",
+        "Discussion of strategy to manage risks associated with environmental impacts of feedstock production",
+        "Discussion",
+        "strategy",
+        "manage",
+        "risks",
+        "environmental",
+        "impacts",
+        "feedstock",
+        "production",
+        "Sourcing"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-430a.2",
+      "metric_code": "RR-BI-430a.2",
+      "metric": "Percentage of biofuel production third-party certified to an environmental sustainability standard",
+      "topic": "Sourcing & Environmental Impacts of Feedstock Production",
+      "unit": "Percentage (%) of litres",
+      "definition": "RR-BI-430a.2. Percentage of biofuel production third-party certified to an\nenvironmental sustainability standard\n1\nThe entity shall calculate the percentage as the volume of biofuel produced that is third-party certified to an\nenvironmental sustainability standard divided by the total volume of biofuel produced.\n2\nEnvironmental sustainability standards include Bonsucro, the Council on Sustainable Biomass Production\n(CSBP), International Sustainability & Carbon Certification, Roundtable on Sustainable Biomaterials (RSB), and\nRoundtable on Responsible Soy (RTRS), as well as other standards with equivalent criteria.\n2.1\nAt a minimum, standards should include the following environmental sustainability topics:\n2.1.1\nGHG and other air emissions, water consumption and quality, soil health, fertiliser and pesticide\nuse, land-use change, biodiversity and waste management.\n3\nThe entity should disclose the certification schemes to which its biofuel is certified and the percentage of\nproduction certified to each scheme.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Percentage of biofuel production third-party certified to an environmental sustainability standard",
+        "Percent of biofuel production third-party certified to an environmental sustainability standard",
+        "RR-BI-430a.2 Percentage of biofuel production third-party certified to an environmental sustainability standard"
+      ],
+      "bm25_terms": [
+        "RR-BI-430a.2",
+        "biofuel",
+        "production",
+        "third-party",
+        "certified",
+        "environmental",
+        "sustainability",
+        "standard",
+        "Sourcing",
+        "Impacts",
+        "Feedstock",
+        "%",
+        "litres",
+        "Percentage (%)",
+        "percent"
+      ],
+      "dense_query": "Find disclosures for RR-BI-430a.2 Percentage of biofuel production third-party certified to an environmental sustainability standard with unit Percentage (%) of litres related to Sourcing & Environmental Impacts of Feedstock Production.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-430a.2 Percentage of biofuel production third-party certified to an environmental sustainability standard, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-430a.2 Percentage of biofuel production third-party certified to an environmental sustainability standard with unit Percentage (%) of litres.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-430a.2 Percentage of biofuel production third-party certified to an environmental sustainability standard related to Sourcing & Environmental Impacts of Feedstock Production.",
+        "Find numeric table rows or performance metrics reporting RR-BI-430a.2 Percentage of biofuel production third-party certified to an environmental sustainability standard for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-430a.2",
+        "Percentage of biofuel production third-party certified to an environmental sustainability standard",
+        "biofuel",
+        "production",
+        "third-party",
+        "certified",
+        "environmental",
+        "sustainability",
+        "standard",
+        "Sourcing",
+        "Impacts",
+        "Feedstock",
+        "Percentage (%) of litres",
+        "Percentage (%)",
+        "%",
+        "percent"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "percentage",
+        "expected_units": [
+          "Percentage (%) of litres",
+          "Percentage (%)",
+          "%",
+          "percent",
+          "percentage"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-530a.1",
+      "metric_code": "RR-BI-530a.1",
+      "metric": "Amount of subsidies received through government programmes",
+      "topic": "Management of the Legal & Regulatory Environment",
+      "unit": "Presentation currency",
+      "definition": "RR-BI-530a.1. Amount of subsidies received through government programmes\n1\nThe entity shall disclose the amount of subsidies received through government programmes during the reporting\nyear. Subsidies include tax credits such as blending and production tax credits, funding for projects such as\nresearch and development, import tariffs, direct payments, capital grants, loans and loan guarantees and any\nother monetary support received from government departments or programmes.\n2\nGovernment programmes include those worldwide at all jurisdictional levels.\n3\nThe entity may disclose the type of biofuel subsidies received and the amount of each. Types of biofuel subsidies\nmay include blending and production tax credits, capital grants, direct payments, loans and loan guarantees,\nsurcharges or tariffs on competing products, and funding for projects such as research and development.\n4\nThe entity shall disclose the amount of subsidies as an aggregate amount that was recognised during the\nreporting year, regardless of the accounting method (for example, deferral method, flow-through method or other\nGAAP methods for investment tax credits).",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Amount of subsidies received through government programmes",
+        "RR-BI-530a.1 Amount of subsidies received through government programmes"
+      ],
+      "bm25_terms": [
+        "RR-BI-530a.1",
+        "subsidies",
+        "received",
+        "government",
+        "programmes",
+        "Management",
+        "Legal",
+        "Regulatory",
+        "Environment",
+        "Presentation",
+        "currency",
+        "reporting currency",
+        "reporting",
+        "monetary amount",
+        "monetary"
+      ],
+      "dense_query": "Find disclosures for RR-BI-530a.1 Amount of subsidies received through government programmes with unit Presentation currency related to Management of the Legal & Regulatory Environment.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-530a.1 Amount of subsidies received through government programmes, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-530a.1 Amount of subsidies received through government programmes with unit Presentation currency.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-530a.1 Amount of subsidies received through government programmes related to Management of the Legal & Regulatory Environment.",
+        "Find numeric table rows or performance metrics reporting RR-BI-530a.1 Amount of subsidies received through government programmes for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-530a.1",
+        "Amount of subsidies received through government programmes",
+        "subsidies",
+        "received",
+        "government",
+        "programmes",
+        "Management",
+        "Legal",
+        "Regulatory",
+        "Environment",
+        "Presentation currency",
+        "reporting currency",
+        "monetary amount",
+        "currency"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "currency",
+        "expected_units": [
+          "Presentation currency",
+          "reporting currency",
+          "monetary amount",
+          "currency"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-530a.2",
+      "metric_code": "RR-BI-530a.2",
+      "metric": "Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry",
+      "topic": "Management of the Legal & Regulatory Environment",
+      "unit": "n/a",
+      "definition": "RR-BI-530a.2. Discussion of corporate positions related to government\nregulations or policy proposals that address environmental and social factors\naffecting the industry\n1\nThe entity shall identify risks and opportunities it faces related to laws, regulations or rulemaking, (hereafter\nreferred to collectively as ‘legal and regulatory environment’) related to environmental and social factors that may\nhave a significant financial impact.\n1.1\nThe scope shall include existing, emerging and known future risks and opportunities.\n1.2\nThe scope shall include risks and opportunities that may exist domestically and globally.\n1.3\nThe regulatory environment related to material environmental and social factors includes those related to\nnon-greenhouse gas air emissions, greenhouse gas emissions, water withdrawals and effluents, feedstock\nsourcing, and process and employee safety.\n2\nRelevant risks may include increased compliance costs, policy reversal (for example, changes to existing\nenvironmental regulations), loss of financial incentives (for example, reduction or elimination of tax deductions),\nreputation (for example, the entity’s stance and actions related to the legal and regulatory environment), legal and\nregulatory environment misalignment with long-term strategy, and misalignment with the expectations of\ncustomers, investors and other stakeholders.\n3\nRelevant opportunities may include improved financial conditions (for example, through policies that incentivise\nbiofuel manufacturing activities), improved community relations (for example, the entity’s stance and actions\nrelated to the legal and regulatory environment), and other benefits the entity realises from the alignment of the\nlegal and regulatory environment with long-term strategy.\n4\nThe entity shall discuss its efforts to manage risks and opportunities associated with each aspect of the legal and\nregulatory environment associated with the topics included in this Standard that are relevant to the entity’s\nbusiness and may have a significant financial impact.\n5\nIn addition to efforts to influence the legal and regulatory environment, the entity shall discuss its overall strategy\nto manage identified risks and opportunities associated with each aspect of the legal and regulatory environment.\n5.1\nAny changes it has made or plans to make to its business structure or model\n5.2\nThe development of new technologies or services\n5.3\nAny changes made or plans to make to operational processes, control or organisational structures",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry",
+        "RR-BI-530a.2 Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry"
+      ],
+      "bm25_terms": [
+        "RR-BI-530a.2",
+        "Discussion",
+        "corporate",
+        "positions",
+        "government",
+        "regulations",
+        "policy",
+        "proposals",
+        "address",
+        "environmental",
+        "social",
+        "factors",
+        "affecting",
+        "industry",
+        "Management",
+        "Legal",
+        "Regulatory",
+        "Environment"
+      ],
+      "dense_query": "Find disclosures for RR-BI-530a.2 Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry related to Management of the Legal & Regulatory Environment.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-530a.2 Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-530a.2 Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-530a.2 Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry related to Management of the Legal & Regulatory Environment.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for RR-BI-530a.2 Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry."
+      ],
+      "anchor_terms": [
+        "RR-BI-530a.2",
+        "Discussion of corporate positions related to government regulations or policy proposals that address environmental and social factors affecting the industry",
+        "Discussion",
+        "corporate",
+        "positions",
+        "government",
+        "regulations",
+        "policy",
+        "proposals",
+        "address",
+        "environmental",
+        "social",
+        "factors",
+        "affecting"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": false,
+        "requires_unit": false
+      },
+      "extraction_hints": {
+        "value_type": "text",
+        "expected_units": [],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-540a.1.01",
+      "metric_code": "RR-BI-540a.1",
+      "metric": "Process Safety Incidents Count (PSIC)",
+      "topic": "Operational Safety, Emergency Preparedness & Response",
+      "unit": "Number",
+      "definition": "RR-BI-540a.1. Process Safety Incidents Count (PSIC), Process Safety Total\nIncident Rate (PSTIR), and Process Safety Incident Severity Rate (PSISR)\n1\nThe entity shall disclose its process safety performance using these indicators, consistent with the American\nNational Standards Institute and American Petroleum Institute’s Process Safety Performance Indicators for the\nRefining and Petrochemical Industries Recommended Practice 754 methodology (ANSI/API RP 754):\n1.1\nProcess Safety Incidents Count (PSIC), defined as the total (annual) count of all incidents that meet the\ndefinition of a Tier-1 Process Safety Event (PSE) per ANSI/API RP 754.\n1.2\nProcess Safety Total Incident Rate (PSTIR), defined as the cumulative (annual) count of incidents\nnormalised by man-hours and calculated as the PSIC multiplied by 200,000 and divided by the total annual\nhours worked by employees, contractors and subcontractors.\n1.3\nProcess Safety Incident Severity Rate (PSISR), defined as the cumulative (annual) severity-weighted rate\nof PSIs and calculated as the Total Severity Score for all Tier 1 PSEs multiplied by 200,000 and divided by\nthe total annual hours worked by employees, contractors and subcontractors.\n2\nThe scope of the disclosure includes PSEs occurring at entity-owned or operated facilities.\n3\nThe entity may disclose separately equivalent PSIC and PSTIR metrics for Tier-2 PSEs as defined by ANSI/API\nRP 754.\nNote to RR-BI-540a.1\n1\nThe entity shall describe incidents with a severity rating of Tier 1 or Tier 2, including the root cause, outcomes and\ncorrective actions implemented in response (for example, technology improvements and operator training).",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Process Safety Incidents Count (PSIC)",
+        "RR-BI-540a.1 Process Safety Incidents Count (PSIC)"
+      ],
+      "bm25_terms": [
+        "RR-BI-540a.1",
+        "Process",
+        "Safety",
+        "Incidents",
+        "Count",
+        "PSIC",
+        "Operational",
+        "Emergency",
+        "Preparedness",
+        "Response",
+        "Number",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for RR-BI-540a.1 Process Safety Incidents Count (PSIC) with unit Number related to Operational Safety, Emergency Preparedness & Response.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-540a.1 Process Safety Incidents Count (PSIC), including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-540a.1 Process Safety Incidents Count (PSIC) with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-540a.1 Process Safety Incidents Count (PSIC) related to Operational Safety, Emergency Preparedness & Response.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for RR-BI-540a.1 Process Safety Incidents Count (PSIC)."
+      ],
+      "anchor_terms": [
+        "RR-BI-540a.1",
+        "Process Safety Incidents Count (PSIC)",
+        "Process",
+        "Safety",
+        "Incidents",
+        "Count",
+        "PSIC",
+        "Operational",
+        "Emergency",
+        "Preparedness",
+        "Response",
+        "Number",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [
+        "Process Safety Total Incident Rate (PSTIR)",
+        "Process Safety Incident Severity Rate (PSISR)"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-540a.1 Process Safety Total Incident Rate (PSTIR)",
+          "difference": "This profile is only for \"Process Safety Incidents Count (PSIC)\"; do not treat evidence for \"Process Safety Total Incident Rate (PSTIR)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-540a.1 Process Safety Incident Severity Rate (PSISR)",
+          "difference": "This profile is only for \"Process Safety Incidents Count (PSIC)\"; do not treat evidence for \"Process Safety Incident Severity Rate (PSISR)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-540a.1.02",
+      "metric_code": "RR-BI-540a.1",
+      "metric": "Process Safety Total Incident Rate (PSTIR)",
+      "topic": "Operational Safety, Emergency Preparedness & Response",
+      "unit": "Rate",
+      "definition": "RR-BI-540a.1. Process Safety Incidents Count (PSIC), Process Safety Total\nIncident Rate (PSTIR), and Process Safety Incident Severity Rate (PSISR)\n1\nThe entity shall disclose its process safety performance using these indicators, consistent with the American\nNational Standards Institute and American Petroleum Institute’s Process Safety Performance Indicators for the\nRefining and Petrochemical Industries Recommended Practice 754 methodology (ANSI/API RP 754):\n1.1\nProcess Safety Incidents Count (PSIC), defined as the total (annual) count of all incidents that meet the\ndefinition of a Tier-1 Process Safety Event (PSE) per ANSI/API RP 754.\n1.2\nProcess Safety Total Incident Rate (PSTIR), defined as the cumulative (annual) count of incidents\nnormalised by man-hours and calculated as the PSIC multiplied by 200,000 and divided by the total annual\nhours worked by employees, contractors and subcontractors.\n1.3\nProcess Safety Incident Severity Rate (PSISR), defined as the cumulative (annual) severity-weighted rate\nof PSIs and calculated as the Total Severity Score for all Tier 1 PSEs multiplied by 200,000 and divided by\nthe total annual hours worked by employees, contractors and subcontractors.\n2\nThe scope of the disclosure includes PSEs occurring at entity-owned or operated facilities.\n3\nThe entity may disclose separately equivalent PSIC and PSTIR metrics for Tier-2 PSEs as defined by ANSI/API\nRP 754.\nNote to RR-BI-540a.1\n1\nThe entity shall describe incidents with a severity rating of Tier 1 or Tier 2, including the root cause, outcomes and\ncorrective actions implemented in response (for example, technology improvements and operator training).",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Process Safety Total Incident Rate (PSTIR)",
+        "RR-BI-540a.1 Process Safety Total Incident Rate (PSTIR)"
+      ],
+      "bm25_terms": [
+        "RR-BI-540a.1",
+        "Process",
+        "Safety",
+        "Incident",
+        "Rate",
+        "PSTIR",
+        "Operational",
+        "Emergency",
+        "Preparedness",
+        "Response",
+        "ratio"
+      ],
+      "dense_query": "Find disclosures for RR-BI-540a.1 Process Safety Total Incident Rate (PSTIR) with unit Rate related to Operational Safety, Emergency Preparedness & Response.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-540a.1 Process Safety Total Incident Rate (PSTIR), including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-540a.1 Process Safety Total Incident Rate (PSTIR) with unit Rate.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-540a.1 Process Safety Total Incident Rate (PSTIR) related to Operational Safety, Emergency Preparedness & Response.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for RR-BI-540a.1 Process Safety Total Incident Rate (PSTIR)."
+      ],
+      "anchor_terms": [
+        "RR-BI-540a.1",
+        "Process Safety Total Incident Rate (PSTIR)",
+        "Process",
+        "Safety",
+        "Incident",
+        "Rate",
+        "PSTIR",
+        "Operational",
+        "Emergency",
+        "Preparedness",
+        "Response",
+        "ratio"
+      ],
+      "negative_anchor_terms": [
+        "Process Safety Incidents Count (PSIC)",
+        "Process Safety Incident Severity Rate (PSISR)"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-540a.1 Process Safety Incidents Count (PSIC)",
+          "difference": "This profile is only for \"Process Safety Total Incident Rate (PSTIR)\"; do not treat evidence for \"Process Safety Incidents Count (PSIC)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-540a.1 Process Safety Incident Severity Rate (PSISR)",
+          "difference": "This profile is only for \"Process Safety Total Incident Rate (PSTIR)\"; do not treat evidence for \"Process Safety Incident Severity Rate (PSISR)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Rate",
+          "ratio"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-540a.1.03",
+      "metric_code": "RR-BI-540a.1",
+      "metric": "Process Safety Incident Severity Rate (PSISR)",
+      "topic": "Operational Safety, Emergency Preparedness & Response",
+      "unit": "Rate",
+      "definition": "RR-BI-540a.1. Process Safety Incidents Count (PSIC), Process Safety Total\nIncident Rate (PSTIR), and Process Safety Incident Severity Rate (PSISR)\n1\nThe entity shall disclose its process safety performance using these indicators, consistent with the American\nNational Standards Institute and American Petroleum Institute’s Process Safety Performance Indicators for the\nRefining and Petrochemical Industries Recommended Practice 754 methodology (ANSI/API RP 754):\n1.1\nProcess Safety Incidents Count (PSIC), defined as the total (annual) count of all incidents that meet the\ndefinition of a Tier-1 Process Safety Event (PSE) per ANSI/API RP 754.\n1.2\nProcess Safety Total Incident Rate (PSTIR), defined as the cumulative (annual) count of incidents\nnormalised by man-hours and calculated as the PSIC multiplied by 200,000 and divided by the total annual\nhours worked by employees, contractors and subcontractors.\n1.3\nProcess Safety Incident Severity Rate (PSISR), defined as the cumulative (annual) severity-weighted rate\nof PSIs and calculated as the Total Severity Score for all Tier 1 PSEs multiplied by 200,000 and divided by\nthe total annual hours worked by employees, contractors and subcontractors.\n2\nThe scope of the disclosure includes PSEs occurring at entity-owned or operated facilities.\n3\nThe entity may disclose separately equivalent PSIC and PSTIR metrics for Tier-2 PSEs as defined by ANSI/API\nRP 754.\nNote to RR-BI-540a.1\n1\nThe entity shall describe incidents with a severity rating of Tier 1 or Tier 2, including the root cause, outcomes and\ncorrective actions implemented in response (for example, technology improvements and operator training).",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "mixed",
+      "aliases": [
+        "Process Safety Incident Severity Rate (PSISR)",
+        "RR-BI-540a.1 Process Safety Incident Severity Rate (PSISR)"
+      ],
+      "bm25_terms": [
+        "RR-BI-540a.1",
+        "Process",
+        "Safety",
+        "Incident",
+        "Severity",
+        "Rate",
+        "PSISR",
+        "Operational",
+        "Emergency",
+        "Preparedness",
+        "Response",
+        "ratio"
+      ],
+      "dense_query": "Find disclosures for RR-BI-540a.1 Process Safety Incident Severity Rate (PSISR) with unit Rate related to Operational Safety, Emergency Preparedness & Response.",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-540a.1 Process Safety Incident Severity Rate (PSISR), including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-540a.1 Process Safety Incident Severity Rate (PSISR) with unit Rate.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-540a.1 Process Safety Incident Severity Rate (PSISR) related to Operational Safety, Emergency Preparedness & Response.",
+        "Find narrative discussion, policy, process, strategy, or management disclosure for RR-BI-540a.1 Process Safety Incident Severity Rate (PSISR)."
+      ],
+      "anchor_terms": [
+        "RR-BI-540a.1",
+        "Process Safety Incident Severity Rate (PSISR)",
+        "Process",
+        "Safety",
+        "Incident",
+        "Severity",
+        "Rate",
+        "PSISR",
+        "Operational",
+        "Emergency",
+        "Preparedness",
+        "Response",
+        "ratio"
+      ],
+      "negative_anchor_terms": [
+        "Process Safety Incidents Count (PSIC)",
+        "Process Safety Total Incident Rate (PSTIR)"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-540a.1 Process Safety Incidents Count (PSIC)",
+          "difference": "This profile is only for \"Process Safety Incident Severity Rate (PSISR)\"; do not treat evidence for \"Process Safety Incidents Count (PSIC)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-540a.1 Process Safety Total Incident Rate (PSTIR)",
+          "difference": "This profile is only for \"Process Safety Incident Severity Rate (PSISR)\"; do not treat evidence for \"Process Safety Total Incident Rate (PSTIR)\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "list-item",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes",
+          "policy section",
+          "risk management section",
+          "governance section",
+          "management discussion"
+        ],
+        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Rate",
+          "ratio"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": true,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-000.A",
+      "metric_code": "RR-BI-000.A",
+      "metric": "Biofuel production capacity",
+      "topic": "",
+      "unit": "Millions of litres (ML)",
+      "definition": "Biofuel production capacity",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Biofuel production capacity",
+        "RR-BI-000.A Biofuel production capacity"
+      ],
+      "bm25_terms": [
+        "RR-BI-000.A",
+        "Biofuel",
+        "production",
+        "capacity",
+        "Millions",
+        "litres",
+        "ML"
+      ],
+      "dense_query": "Find disclosures for RR-BI-000.A Biofuel production capacity with unit Millions of litres (ML).",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-000.A Biofuel production capacity, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-000.A Biofuel production capacity with unit Millions of litres (ML).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-000.A Biofuel production capacity.",
+        "Find numeric table rows or performance metrics reporting RR-BI-000.A Biofuel production capacity for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-000.A",
+        "Biofuel production capacity",
+        "Biofuel",
+        "production",
+        "capacity",
+        "Millions of litres (ML)"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Millions of litres (ML)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-000.B.01",
+      "metric_code": "RR-BI-000.B",
+      "metric": "Production of: (1) renewable fuel",
+      "topic": "",
+      "unit": "Millions of litres (ML)",
+      "definition": "Production of: (1) renewable fuel, (2) advanced biofuel, (3)\nbiodiesel, and (4) cellulosic biofuel",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Production of: (1) renewable fuel",
+        "Production of: renewable fuel",
+        "RR-BI-000.B Production of: (1) renewable fuel"
+      ],
+      "bm25_terms": [
+        "RR-BI-000.B",
+        "renewable fuel",
+        "Production",
+        "renewable",
+        "fuel",
+        "Millions",
+        "litres",
+        "ML"
+      ],
+      "dense_query": "Find disclosures for RR-BI-000.B Production of: (1) renewable fuel with unit Millions of litres (ML).",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-000.B Production of: (1) renewable fuel, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-000.B Production of: (1) renewable fuel with unit Millions of litres (ML).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-000.B Production of: (1) renewable fuel.",
+        "Find numeric table rows or performance metrics reporting RR-BI-000.B Production of: (1) renewable fuel for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-000.B",
+        "Production of: (1) renewable fuel",
+        "renewable fuel",
+        "Production",
+        "renewable",
+        "fuel",
+        "Millions of litres (ML)"
+      ],
+      "negative_anchor_terms": [
+        "Production of: (2) advanced biofuel",
+        "Production of: (3) biodiesel",
+        "Production of: (4) cellulosic biofuel"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-000.B Production of: (2) advanced biofuel",
+          "difference": "This profile is only for \"Production of: (1) renewable fuel\"; do not treat evidence for \"Production of: (2) advanced biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-000.B Production of: (3) biodiesel",
+          "difference": "This profile is only for \"Production of: (1) renewable fuel\"; do not treat evidence for \"Production of: (3) biodiesel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-000.B Production of: (4) cellulosic biofuel",
+          "difference": "This profile is only for \"Production of: (1) renewable fuel\"; do not treat evidence for \"Production of: (4) cellulosic biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Millions of litres (ML)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-000.B.02",
+      "metric_code": "RR-BI-000.B",
+      "metric": "Production of: (2) advanced biofuel",
+      "topic": "",
+      "unit": "Millions of litres (ML)",
+      "definition": "Production of: (1) renewable fuel, (2) advanced biofuel, (3)\nbiodiesel, and (4) cellulosic biofuel",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Production of: (2) advanced biofuel",
+        "Production of: advanced biofuel",
+        "RR-BI-000.B Production of: (2) advanced biofuel"
+      ],
+      "bm25_terms": [
+        "RR-BI-000.B",
+        "Production",
+        "advanced",
+        "biofuel",
+        "Millions",
+        "litres",
+        "ML"
+      ],
+      "dense_query": "Find disclosures for RR-BI-000.B Production of: (2) advanced biofuel with unit Millions of litres (ML).",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-000.B Production of: (2) advanced biofuel, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-000.B Production of: (2) advanced biofuel with unit Millions of litres (ML).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-000.B Production of: (2) advanced biofuel.",
+        "Find numeric table rows or performance metrics reporting RR-BI-000.B Production of: (2) advanced biofuel for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-000.B",
+        "Production of: (2) advanced biofuel",
+        "Production",
+        "advanced",
+        "biofuel",
+        "Millions of litres (ML)"
+      ],
+      "negative_anchor_terms": [
+        "Production of: (1) renewable fuel",
+        "Production of: (3) biodiesel",
+        "Production of: (4) cellulosic biofuel"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-000.B Production of: (1) renewable fuel",
+          "difference": "This profile is only for \"Production of: (2) advanced biofuel\"; do not treat evidence for \"Production of: (1) renewable fuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-000.B Production of: (3) biodiesel",
+          "difference": "This profile is only for \"Production of: (2) advanced biofuel\"; do not treat evidence for \"Production of: (3) biodiesel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-000.B Production of: (4) cellulosic biofuel",
+          "difference": "This profile is only for \"Production of: (2) advanced biofuel\"; do not treat evidence for \"Production of: (4) cellulosic biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Millions of litres (ML)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-000.B.03",
+      "metric_code": "RR-BI-000.B",
+      "metric": "Production of: (3) biodiesel",
+      "topic": "",
+      "unit": "Millions of litres (ML)",
+      "definition": "Production of: (1) renewable fuel, (2) advanced biofuel, (3)\nbiodiesel, and (4) cellulosic biofuel",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Production of: (3) biodiesel",
+        "Production of: biodiesel",
+        "RR-BI-000.B Production of: (3) biodiesel"
+      ],
+      "bm25_terms": [
+        "RR-BI-000.B",
+        "Production",
+        "biodiesel",
+        "Millions",
+        "litres",
+        "ML"
+      ],
+      "dense_query": "Find disclosures for RR-BI-000.B Production of: (3) biodiesel with unit Millions of litres (ML).",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-000.B Production of: (3) biodiesel, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-000.B Production of: (3) biodiesel with unit Millions of litres (ML).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-000.B Production of: (3) biodiesel.",
+        "Find numeric table rows or performance metrics reporting RR-BI-000.B Production of: (3) biodiesel for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-000.B",
+        "Production of: (3) biodiesel",
+        "Production",
+        "biodiesel",
+        "Millions of litres (ML)"
+      ],
+      "negative_anchor_terms": [
+        "Production of: (1) renewable fuel",
+        "Production of: (2) advanced biofuel",
+        "Production of: (4) cellulosic biofuel"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-000.B Production of: (1) renewable fuel",
+          "difference": "This profile is only for \"Production of: (3) biodiesel\"; do not treat evidence for \"Production of: (1) renewable fuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-000.B Production of: (2) advanced biofuel",
+          "difference": "This profile is only for \"Production of: (3) biodiesel\"; do not treat evidence for \"Production of: (2) advanced biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-000.B Production of: (4) cellulosic biofuel",
+          "difference": "This profile is only for \"Production of: (3) biodiesel\"; do not treat evidence for \"Production of: (4) cellulosic biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Millions of litres (ML)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-000.B.04",
+      "metric_code": "RR-BI-000.B",
+      "metric": "Production of: (4) cellulosic biofuel",
+      "topic": "",
+      "unit": "Millions of litres (ML)",
+      "definition": "Production of: (1) renewable fuel, (2) advanced biofuel, (3)\nbiodiesel, and (4) cellulosic biofuel",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Production of: (4) cellulosic biofuel",
+        "Production of: cellulosic biofuel",
+        "RR-BI-000.B Production of: (4) cellulosic biofuel"
+      ],
+      "bm25_terms": [
+        "RR-BI-000.B",
+        "Production",
+        "cellulosic",
+        "biofuel",
+        "Millions",
+        "litres",
+        "ML"
+      ],
+      "dense_query": "Find disclosures for RR-BI-000.B Production of: (4) cellulosic biofuel with unit Millions of litres (ML).",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-000.B Production of: (4) cellulosic biofuel, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-000.B Production of: (4) cellulosic biofuel with unit Millions of litres (ML).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-000.B Production of: (4) cellulosic biofuel.",
+        "Find numeric table rows or performance metrics reporting RR-BI-000.B Production of: (4) cellulosic biofuel for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-000.B",
+        "Production of: (4) cellulosic biofuel",
+        "Production",
+        "cellulosic",
+        "biofuel",
+        "Millions of litres (ML)"
+      ],
+      "negative_anchor_terms": [
+        "Production of: (1) renewable fuel",
+        "Production of: (2) advanced biofuel",
+        "Production of: (3) biodiesel"
+      ],
+      "similar_metric_warnings": [
+        {
+          "confusing_with": "RR-BI-000.B Production of: (1) renewable fuel",
+          "difference": "This profile is only for \"Production of: (4) cellulosic biofuel\"; do not treat evidence for \"Production of: (1) renewable fuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-000.B Production of: (2) advanced biofuel",
+          "difference": "This profile is only for \"Production of: (4) cellulosic biofuel\"; do not treat evidence for \"Production of: (2) advanced biofuel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "RR-BI-000.B Production of: (3) biodiesel",
+          "difference": "This profile is only for \"Production of: (4) cellulosic biofuel\"; do not treat evidence for \"Production of: (3) biodiesel\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        }
+      ],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Millions of litres (ML)"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "RR-BI-000.C",
+      "metric_code": "RR-BI-000.C",
+      "metric": "Amount of feedstock consumed in production",
+      "topic": "",
+      "unit": "Metric tonnes (t)",
+      "definition": "Amount of feedstock consumed in production\n\nNote to RR-BI-000.C – The amount of feedstock consumed in production is defined as feedstock purchases adjusted for changes in\ninventory throughout the reporting period.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Amount of feedstock consumed in production",
+        "RR-BI-000.C Amount of feedstock consumed in production"
+      ],
+      "bm25_terms": [
+        "RR-BI-000.C",
+        "feedstock",
+        "consumed",
+        "production",
+        "tonnes",
+        "Metric tonnes (t)",
+        "CO₂-e",
+        "CO",
+        "t CO2-e",
+        "CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "dense_query": "Find disclosures for RR-BI-000.C Amount of feedstock consumed in production with unit Metric tonnes (t).",
+      "dense_queries": [
+        "Retrieve exact report evidence for RR-BI-000.C Amount of feedstock consumed in production, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches RR-BI-000.C Amount of feedstock consumed in production with unit Metric tonnes (t).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-BI-000.C Amount of feedstock consumed in production.",
+        "Find numeric table rows or performance metrics reporting RR-BI-000.C Amount of feedstock consumed in production for the reporting period."
+      ],
+      "anchor_terms": [
+        "RR-BI-000.C",
+        "Amount of feedstock consumed in production",
+        "feedstock",
+        "consumed",
+        "production",
+        "Metric tonnes (t)",
+        "Metric tonnes (t) CO₂-e",
+        "t CO2-e",
+        "metric tonnes CO2-e"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Metric tonnes (t)",
+          "Metric tonnes (t) CO₂-e",
+          "t CO2-e",
+          "metric tonnes CO2-e",
+          "tonnes CO2 equivalent",
+          "CO2-e",
+          "metric tonnes",
+          "tonnes",
+          "t"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    }
+  ]
+}

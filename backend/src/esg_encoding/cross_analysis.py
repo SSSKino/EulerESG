@@ -15,11 +15,11 @@ from loguru import logger
 from dataclasses import replace
 
 from .file_manager import file_manager
-from .hipporag_settings import HippoRAGSettings
-from .hipporag_retriever import HippoRAGRetriever
-from .flag_reranker import rerank_segment_ids
+from .retrieval.hipporag.settings import HippoRAGSettings
+from .retrieval.hipporag.retriever import HippoRAGRetriever
+from .retrieval.reranker import rerank_segment_ids
 from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
-from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
+from .embedding_settings import get_configured_embedding_model_name
 from .models import ReportContent, DocumentContent, TextSegment, ProcessingConfig
 from .cross_analysis_models import (
     CrossAnalysisReport,
@@ -359,7 +359,6 @@ def get_embedding_model():
         return _model
 
     repo_id = get_configured_embedding_model_name()
-    explicit_path = get_configured_embedding_local_path()
     cache_folder = os.getenv("HF_HOME", "/root/.cache/huggingface")
     device = _get_device()
 
@@ -367,7 +366,6 @@ def get_embedding_model():
         repo_id,
         device=device,
         hf_home=cache_folder,
-        explicit_local_path=explicit_path,
         trust_remote_code=True,
     )
     _model_id = explicit_path or repo_id

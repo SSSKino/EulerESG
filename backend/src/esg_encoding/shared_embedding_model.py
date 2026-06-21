@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import os
 import threading
+import json
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, Iterable, Optional, Tuple
 
 try:
     import torch  # type: ignore
@@ -13,16 +15,128 @@ except Exception:  # pragma: no cover
 from loguru import logger
 from sentence_transformers import SentenceTransformer
 
-from .hf_cache import prefer_local_model
 from .embedding_settings import (
     DEFAULT_EMBEDDING_MODEL_NAME,
-    get_configured_embedding_local_path,
     get_configured_embedding_model_name,
     get_configured_embedding_model_dtype,
     get_configured_rerank_model_dtype,
     get_embedding_query_prompt,
     should_instruction_prompt_queries,
 )
+
+
+
+DEFAULT_HF_HOME = os.getenv("HF_HOME", "/root/.cache/huggingface")
+
+
+@dataclass(frozen=True)
+class LocalModelRef:
+    repo_id: str
+    local_path: Optional[str]
+    used_fallback: bool
+
+
+def _split_repo(repo_id: str) -> Tuple[str, str]:
+    if "/" in repo_id:
+        org, name = repo_id.split("/", 1)
+        return org, name
+    return "", repo_id
+
+
+def _candidate_base_dirs(repo_id: str, hf_home: str) -> Iterable[Path]:
+    """Yield common HuggingFace cache layouts for a repo id."""
+    org, name = _split_repo(repo_id)
+    if org:
+        yield Path(hf_home) / "hub" / f"models--{org}--{name}"
+        yield Path(hf_home) / f"models--{org}--{name}"
+        yield Path(hf_home) / f"{org}--{name}"
+    else:
+        yield Path(hf_home) / "hub" / f"models--{name}"
+        yield Path(hf_home) / f"models--{name}"
+        yield Path(hf_home) / f"{name}"
+
+
+def _looks_like_sentence_transformers_model(path: Path) -> bool:
+    """Lightweight local-model integrity check without importing hf_cache.py."""
+    if not path.exists() or not path.is_dir():
+        return False
+
+    modules = path / "modules.json"
+    if modules.exists():
+        try:
+            data = json.loads(modules.read_text(encoding="utf-8"))
+        except Exception:
+            return False
+        if not isinstance(data, list) or not data:
+            return False
+        for module in data:
+            if not isinstance(module, dict):
+                return False
+            rel = module.get("path") or module.get("name")
+            if not rel or not isinstance(rel, str):
+                continue
+            module_dir = path / rel
+            if not module_dir.exists() or not module_dir.is_dir():
+                return False
+            module_type = str(module.get("type") or "")
+            if (
+                "Pooling" in module_type
+                or "Transformer" in module_type
+                or "Pooling" in rel
+                or "Transformer" in rel
+            ) and not (module_dir / "config.json").exists():
+                return False
+        return True
+
+    return any((path / name).exists() for name in ("config.json", "sentence_bert_config.json"))
+
+
+def find_best_snapshot_path(repo_id: str, hf_home: str = DEFAULT_HF_HOME) -> Optional[str]:
+    candidates: list[tuple[float, Path]] = []
+    for base in _candidate_base_dirs(repo_id, hf_home):
+        snapshots = base / "snapshots"
+        if not snapshots.exists() or not snapshots.is_dir():
+            continue
+        for snap in snapshots.iterdir():
+            if snap.is_dir() and _looks_like_sentence_transformers_model(snap):
+                candidates.append((snap.stat().st_mtime, snap))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    return str(candidates[0][1])
+
+
+def find_best_local_dir(repo_id: str, hf_home: str = DEFAULT_HF_HOME) -> Optional[str]:
+    candidates: list[tuple[float, Path]] = []
+    for base in _candidate_base_dirs(repo_id, hf_home):
+        if _looks_like_sentence_transformers_model(base):
+            candidates.append((base.stat().st_mtime, base))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    return str(candidates[0][1])
+
+
+def prefer_local_model(
+    repo_id: str,
+    explicit_local_path: Optional[str] = None,
+    hf_home: str = DEFAULT_HF_HOME,
+) -> LocalModelRef:
+    """Prefer an explicit local path, then staged HF cache, then snapshot cache."""
+    if explicit_local_path:
+        path = Path(explicit_local_path)
+        if _looks_like_sentence_transformers_model(path):
+            return LocalModelRef(repo_id=repo_id, local_path=str(path), used_fallback=False)
+
+    staged = find_best_local_dir(repo_id, hf_home=hf_home)
+    if staged:
+        return LocalModelRef(repo_id=repo_id, local_path=staged, used_fallback=False)
+
+    snapshot = find_best_snapshot_path(repo_id, hf_home=hf_home)
+    if snapshot:
+        return LocalModelRef(repo_id=repo_id, local_path=snapshot, used_fallback=False)
+
+    return LocalModelRef(repo_id=repo_id, local_path=None, used_fallback=True)
 
 _lock = threading.Lock()
 _cached_models: Dict[Tuple[str, str, str, str, bool], SentenceTransformer] = {}
@@ -96,14 +210,14 @@ def _cleanup_corrupt_snapshot(err: Exception, hf_home: str) -> bool:
 
 
 
-def _configured_dtype(dtype_env_key: str = "LOCAL_EMBEDDINGS_MODEL_DTYPE") -> str:
+def _configured_dtype(dtype_env_key: str = "EMBEDDING_MODEL_DTYPE") -> str:
     """Return normalized runtime precision for the requested model path."""
-    if dtype_env_key == "LOCAL_RERANKER_MODEL_DTYPE":
+    if dtype_env_key == "RERANK_MODEL_DTYPE":
         return get_configured_rerank_model_dtype()
     return get_configured_embedding_model_dtype()
 
 
-def _embedding_model_kwargs(dtype_env_key: str = "LOCAL_EMBEDDINGS_MODEL_DTYPE") -> dict:
+def _embedding_model_kwargs(dtype_env_key: str = "EMBEDDING_MODEL_DTYPE") -> dict:
     """Return model loading kwargs, with precision configurable from Docker/env."""
     dtype = _configured_dtype(dtype_env_key)
     if not dtype:
@@ -129,7 +243,7 @@ def _build_sentence_transformer(
     device: str,
     cache_folder: str,
     trust_remote_code: bool,
-    dtype_env_key: str = "LOCAL_EMBEDDINGS_MODEL_DTYPE",
+    dtype_env_key: str = "EMBEDDING_MODEL_DTYPE",
 ) -> SentenceTransformer:
     """Load a SentenceTransformer with high-quality auto dtype when supported."""
     try:
@@ -158,7 +272,6 @@ def resolve_embedding_model_path(
     if not repo_id:
         repo_id = DEFAULT_EMBEDDING_MODEL_NAME
     hf_home = hf_home or os.getenv("HF_HOME", "/root/.cache/huggingface")
-    explicit_local_path = explicit_local_path or get_configured_embedding_local_path()
     ref = prefer_local_model(repo_id, explicit_local_path=explicit_local_path, hf_home=hf_home)
     resolved_model = ref.local_path or repo_id
     return repo_id, resolved_model, hf_home
@@ -175,7 +288,7 @@ def _embedding_cache_key(
 
     Embedding and dense-rerank can point at the same SentenceTransformer model.
     The cache key therefore uses the effective dtype value, not whether it came
-    from LOCAL_EMBEDDINGS_MODEL_DTYPE or LOCAL_RERANKER_MODEL_DTYPE, so identical
+    from EMBEDDING_MODEL_DTYPE or RERANK_MODEL_DTYPE, so identical
     model/device/precision requests reuse the same loaded instance.
     """
     return (
@@ -194,7 +307,7 @@ def get_shared_embedding_model(
     hf_home: str | None = None,
     explicit_local_path: str | None = None,
     trust_remote_code: bool = True,
-    dtype_env_key: str = "LOCAL_EMBEDDINGS_MODEL_DTYPE",
+    dtype_env_key: str = "EMBEDDING_MODEL_DTYPE",
 ) -> SentenceTransformer:
     device = get_default_embedding_device(device)
     repo_id, resolved_model, hf_home = resolve_embedding_model_path(

@@ -3,12 +3,12 @@
 Why this exists:
 - HippoRAG 2.0.0a4 may reject arbitrary `embedding_model_name` values (allowlist),
   so we route embeddings through `embedding_base_url` instead.
-- You can point LOCAL_EMBEDDINGS_MODEL_PATH to a local snapshot, e.g.
+- You can point EMBEDDING_MODEL to a local snapshot, e.g.
   /root/.cache/huggingface/hub/models--BAAI--bge-m3/snapshots/<REVISION>
 
 Env:
-- EMBEDDING_MODEL / LOCAL_EMBEDDINGS_MODEL_ID: HF model id
-- LOCAL_EMBEDDINGS_MODEL_PATH: optional local snapshot directory only
+- EMBEDDING_MODEL / EMBEDDING_MODEL: HF model id
+- EMBEDDING_MODEL: optional local snapshot directory only
 - LOCAL_EMBEDDINGS_DEVICE: 'cuda' | 'cpu' (default: auto)
 """
 
@@ -29,7 +29,7 @@ except Exception:  # pragma: no cover
 from sentence_transformers import SentenceTransformer  # type: ignore
 
 from .shared_embedding_model import get_shared_embedding_model
-from .embedding_settings import get_configured_embedding_local_path, get_configured_embedding_model_name
+from .embedding_settings import get_configured_embedding_model_name
 
 
 router = APIRouter()
@@ -62,7 +62,6 @@ async def get_local_embedder() -> SentenceTransformer:
             model_path,
             device=device,
             hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
-            explicit_local_path=get_configured_embedding_local_path(),
             trust_remote_code=True,
         )
         return _model

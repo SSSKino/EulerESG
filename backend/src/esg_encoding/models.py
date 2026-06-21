@@ -259,57 +259,6 @@ class ChatRequest(BaseModel):
     )
 
 
-class CrossReportMeta(BaseModel):
-    """Minimal report metadata for cross-report analysis."""
-
-    file_id: str
-    filename: Optional[str] = None
-    uploaded_at: Optional[str] = None
-    framework: Optional[str] = None
-    industry: Optional[str] = None
-    semi_industry: Optional[str] = None
-
-
-class CrossCompareRequest(BaseModel):
-    """Cross report compare request."""
-
-    file_ids: List[str]
-    dimension: str
-    topic: str
-    metrics: Optional[List[str]] = None
-
-
-class CrossEvidenceSnippet(BaseModel):
-    segment_id: Optional[str] = None
-    page_number: Optional[int] = None
-    content: str
-
-
-class CrossMetricValue(BaseModel):
-    name: str
-    value: Optional[str] = None
-    unit: Optional[str] = None
-    page: Optional[int] = None
-    evidence_segments: List[str] = Field(default_factory=list)
-
-
-class CrossReportCompareItem(BaseModel):
-    meta: CrossReportMeta
-    metrics: List[CrossMetricValue] = Field(default_factory=list)
-    summary: str = ""
-    evidence: List[CrossEvidenceSnippet] = Field(default_factory=list)
-
-
-class CrossCompareResponse(BaseModel):
-    dimension: str
-    topic: str
-    results: List[CrossReportCompareItem]
-    insight: str = ""
-
-
-class CrossSummaryResponse(BaseModel):
-    reports: List[CrossReportMeta]
-    available: Dict[str, List[str]] = Field(default_factory=dict, description="file_id -> available metric names")
 
 
 class ChatResponse(BaseModel):

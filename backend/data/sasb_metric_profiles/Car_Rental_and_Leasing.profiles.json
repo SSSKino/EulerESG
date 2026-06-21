@@ -1,0 +1,538 @@
+{
+  "profiles": [
+    {
+      "metric_id": "TR-CR-250a.1",
+      "metric_code": "TR-CR-250a.1",
+      "metric": "Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region",
+      "topic": "Customer Safety",
+      "unit": "Percentage (%)",
+      "definition": "TR-CR-250a.1. Percentage of rental fleet vehicles rated by NCAP with an overall 5-\nstar safety rating, by region\n1 The entity shall disclose the percentage of its rental fleet rated by a New Car Assessment Program (NCAP) with\nan overall 5-star safety rating, by geographical region.\n1.1 The percentage shall be calculated as the number of vehicles in its rental fleet rated by an NCAP with an\noverall 5-star rating divided by the total number of vehicles in its rental fleet rated by an NCAP.\n1.2 The scope of the disclosure includes existing vehicles and newly introduced vehicles in the entity’s rental\nfleet that have received a rating by an NCAP, including carry-over vehicles.\n1.2.1 Carry-over vehicles are defined as vehicles tested under an NCAP in previous years and the\nvehicle design remains unchanged and has retained the safety rating.\n1.3 The scope of the disclosure includes vehicles available for rent through the entity’s franchises.\n1.4 The scope of the disclosure excludes vehicles that do not have an applicable NCAP rating.\n2 The entity shall disclose the percentage by geographical region.\n2.1 Geographical regions are defined as the regions for which the entity conducts segment financial reporting\nand in which vehicles are subject to an NCAP or an applicable jurisdictional equivalent.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region",
+        "Percent of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region",
+        "TR-CR-250a.1 Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region"
+      ],
+      "bm25_terms": [
+        "TR-CR-250a.1",
+        "NCAP",
+        "5-star",
+        "rental",
+        "fleet",
+        "vehicles",
+        "rated",
+        "overall",
+        "safety",
+        "rating",
+        "region",
+        "Customer",
+        "%",
+        "Percentage (%)",
+        "percent",
+        "percentage"
+      ],
+      "dense_query": "Find disclosures for TR-CR-250a.1 Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region with unit Percentage (%) related to Customer Safety.",
+      "dense_queries": [
+        "Retrieve exact report evidence for TR-CR-250a.1 Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches TR-CR-250a.1 Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region with unit Percentage (%).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-CR-250a.1 Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region related to Customer Safety.",
+        "Find numeric table rows or performance metrics reporting TR-CR-250a.1 Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region for the reporting period."
+      ],
+      "anchor_terms": [
+        "TR-CR-250a.1",
+        "Percentage of rental fleet vehicles rated by NCAP with an overall 5-star safety rating, by region",
+        "NCAP",
+        "5-star",
+        "rental",
+        "fleet",
+        "vehicles",
+        "rated",
+        "overall",
+        "safety",
+        "rating",
+        "region",
+        "Customer",
+        "Percentage (%)",
+        "%",
+        "percent",
+        "percentage"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "percentage",
+        "expected_units": [
+          "Percentage (%)",
+          "%",
+          "percent",
+          "percentage"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "TR-CR-250a.2",
+      "metric_code": "TR-CR-250a.2",
+      "metric": "Number of vehicles recalled",
+      "topic": "Customer Safety",
+      "unit": "Number",
+      "definition": "TR-CR-250a.2. Number of vehicles recalled\n1 The entity shall disclose the total number of vehicles in its rental fleet subject to voluntary or involuntary recalls\nissued during the reporting period.\n1.1 Voluntary recalls are those initiated by the entity to remove products from the market for safety-related\nconcerns.\n1.2 Involuntary recalls are those requested or mandated by applicable jurisdictional legal or regulatory\nauthorities when (i) a vehicle or item of vehicle-related equipment does not comply with a governmental\nvehicle safety standard or (ii) when a safety-related defect in vehicle or vehicle-related equipment is\nidentified.\n2 The scope of the disclosure shall include vehicles available for rent through the entity’s franchises.\n3 The entity may disclose the percentage of recalls that were (a) voluntary and (b) involuntary.\n\nNote to TR-CR-250a.2\n1 The entity shall describe its policy for renting vehicles subject to a recall notice, including how this policy extends\nto global and franchise operations.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Number of vehicles recalled",
+        "Count of vehicles recalled",
+        "TR-CR-250a.2 Number of vehicles recalled"
+      ],
+      "bm25_terms": [
+        "TR-CR-250a.2",
+        "vehicles",
+        "recalled",
+        "Customer",
+        "Safety",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for TR-CR-250a.2 Number of vehicles recalled with unit Number related to Customer Safety.",
+      "dense_queries": [
+        "Retrieve exact report evidence for TR-CR-250a.2 Number of vehicles recalled, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches TR-CR-250a.2 Number of vehicles recalled with unit Number.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-CR-250a.2 Number of vehicles recalled related to Customer Safety.",
+        "Find numeric table rows or performance metrics reporting TR-CR-250a.2 Number of vehicles recalled for the reporting period."
+      ],
+      "anchor_terms": [
+        "TR-CR-250a.2",
+        "Number of vehicles recalled",
+        "vehicles",
+        "recalled",
+        "Customer",
+        "Safety",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "TR-CR-410a.1",
+      "metric_code": "TR-CR-410a.1",
+      "metric": "Rental day-weighted average rental fleet fuel economy, by region",
+      "topic": "Fleet Fuel Economy & Utilisation",
+      "unit": "Mpg, L/km, gCO₂/km, km/L",
+      "definition": "TR-CR-410a.1. Rental day-weighted average rental fleet fuel economy, by region\n1 The entity shall disclose the average fuel economy of its passenger vehicle rental fleet, weighted for the rental\ndays of each vehicle model during the reporting period, by geographic region.\n1.1 The average fuel economy shall be calculated as the rental day-weighted harmonic mean of vehicle fuel\nefficiency.\n1.1.1 The harmonic mean is calculated as the reciprocal of the average of the reciprocals.\n1.1.2 Rental day weighting is performed by incorporating into calculations a factor for the fraction of total\nrental days for which each vehicle model accounted.\n2 The entity shall disclose the average fuel economy of its passenger vehicle rental fleet by geographic region.\n2.1 Geographic regions are defined as the regions for which the entity conducts segment financial reporting\nand which are subject to fleet fuel economy, fuel consumption or emissions standards.\n3 Disclosure may be provided in different units for each geographic region which may include:\n3.1 Grams of CO2 per kilometre (gCO2/km) for (1) passenger cars and (2) light commercial vehicles in the\nEuropean Union\n3.2 Litres of petrol per kilometre (L/km) for passenger vehicles in Japan\n3.3 Miles per gallon (mpg) for (1) domestic passenger cars, (2) imported passenger cars and (3) light trucks in\nthe US that are subject to Corporate Average Fuel Economy (CAFE) standards, where these vehicle\ncategories are defined in US 49 CFR Part 523\n3.4 Kilometres per litre (km/L) for passenger vehicles in New Zealand\n4 The scope of disclosure shall include all vehicles subject to national passenger vehicle standards for fleet fuel\neconomy, fuel consumption or emissions.\n5 The entity may disclose fleet fuel economy for other vehicle segments such as:\n5.1 Cargo vehicles in Japan\n5.2 Heavy-duty vehicles in the US\n5.3 Light commercial vehicles in the EU",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Rental day-weighted average rental fleet fuel economy, by region",
+        "TR-CR-410a.1 Rental day-weighted average rental fleet fuel economy, by region"
+      ],
+      "bm25_terms": [
+        "TR-CR-410a.1",
+        "fleet fuel",
+        "Rental",
+        "day-weighted",
+        "fleet",
+        "fuel",
+        "economy",
+        "region",
+        "Utilisation",
+        "Mpg",
+        "km",
+        "gCO"
+      ],
+      "dense_query": "Find disclosures for TR-CR-410a.1 Rental day-weighted average rental fleet fuel economy, by region with unit Mpg, L/km, gCO₂/km, km/L related to Fleet Fuel Economy & Utilisation.",
+      "dense_queries": [
+        "Retrieve exact report evidence for TR-CR-410a.1 Rental day-weighted average rental fleet fuel economy, by region, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches TR-CR-410a.1 Rental day-weighted average rental fleet fuel economy, by region with unit Mpg, L/km, gCO₂/km, km/L.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-CR-410a.1 Rental day-weighted average rental fleet fuel economy, by region related to Fleet Fuel Economy & Utilisation.",
+        "Find numeric table rows or performance metrics reporting TR-CR-410a.1 Rental day-weighted average rental fleet fuel economy, by region for the reporting period."
+      ],
+      "anchor_terms": [
+        "TR-CR-410a.1",
+        "Rental day-weighted average rental fleet fuel economy, by region",
+        "fleet fuel",
+        "Rental",
+        "day-weighted",
+        "fleet",
+        "fuel",
+        "economy",
+        "region",
+        "Utilisation",
+        "Mpg, L/km, gCO₂/km, km/L"
+      ],
+      "negative_anchor_terms": [
+        "electricity consumed",
+        "energy consumed from grid electricity"
+      ],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "unknown",
+        "expected_units": [
+          "Mpg, L/km, gCO₂/km, km/L"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": ""
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "TR-CR-410a.2",
+      "metric_code": "TR-CR-410a.2",
+      "metric": "Fleet utilisation rate",
+      "topic": "Fleet Fuel Economy & Utilisation",
+      "unit": "Rate",
+      "definition": "TR-CR-410a.2. Fleet utilisation rate\n1 The entity shall disclose its fleet utilisation rate.\n1.1 The rate shall be calculated as the total number of rental days divided by the total number of available\nrental days.\n1.1.1 Rental days are defined as the number of 24-hour periods—or portions thereof—that vehicles were\nrented.\n1.1.2 Available rental days are defined as the number of 24-hour periods—or portions thereof—that the\nentity offered vehicles for rental during the reporting period. This figure shall exclude the time when\nvehicles were undergoing inspection, cleaning or maintenance, and any time when they were\nsubject to recall.\n2 The scope of disclosure includes vehicles at all the entity’s rental locations, including airport locations, off-airport\nlocations and vehicles in the entity’s car-sharing fleet.",
+      "type": "Sustainability Disclosure Topics & Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Fleet utilisation rate",
+        "TR-CR-410a.2 Fleet utilisation rate"
+      ],
+      "bm25_terms": [
+        "TR-CR-410a.2",
+        "Fleet Fuel",
+        "Fleet",
+        "utilisation",
+        "rate",
+        "Fuel",
+        "Economy",
+        "ratio"
+      ],
+      "dense_query": "Find disclosures for TR-CR-410a.2 Fleet utilisation rate with unit Rate related to Fleet Fuel Economy & Utilisation.",
+      "dense_queries": [
+        "Retrieve exact report evidence for TR-CR-410a.2 Fleet utilisation rate, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches TR-CR-410a.2 Fleet utilisation rate with unit Rate.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-CR-410a.2 Fleet utilisation rate related to Fleet Fuel Economy & Utilisation.",
+        "Find numeric table rows or performance metrics reporting TR-CR-410a.2 Fleet utilisation rate for the reporting period."
+      ],
+      "anchor_terms": [
+        "TR-CR-410a.2",
+        "Fleet utilisation rate",
+        "Fleet Fuel",
+        "Fleet",
+        "utilisation",
+        "rate",
+        "Fuel",
+        "Economy",
+        "ratio"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Rate",
+          "ratio"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "TR-CR-000.A",
+      "metric_code": "TR-CR-000.A",
+      "metric": "Average vehicle age",
+      "topic": "",
+      "unit": "Months",
+      "definition": "Average vehicle age",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Average vehicle age",
+        "TR-CR-000.A Average vehicle age"
+      ],
+      "bm25_terms": [
+        "TR-CR-000.A",
+        "vehicle",
+        "age",
+        "Months"
+      ],
+      "dense_query": "Find disclosures for TR-CR-000.A Average vehicle age with unit Months.",
+      "dense_queries": [
+        "Retrieve exact report evidence for TR-CR-000.A Average vehicle age, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches TR-CR-000.A Average vehicle age with unit Months.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-CR-000.A Average vehicle age.",
+        "Find numeric table rows or performance metrics reporting TR-CR-000.A Average vehicle age for the reporting period."
+      ],
+      "anchor_terms": [
+        "TR-CR-000.A",
+        "Average vehicle age",
+        "vehicle",
+        "age",
+        "Months"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "unknown",
+        "expected_units": [
+          "Months"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": ""
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "TR-CR-000.B",
+      "metric_code": "TR-CR-000.B",
+      "metric": "Total available rental days",
+      "topic": "",
+      "unit": "Days",
+      "definition": "Total available rental days\n\nNote to TR-CR-000.B – The total number of available rental days is the number of 24-hour periods—or portions thereof—that the entity\noffered vehicles for rental during the reporting period.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Total available rental days",
+        "TR-CR-000.B Total available rental days"
+      ],
+      "bm25_terms": [
+        "TR-CR-000.B",
+        "available",
+        "rental",
+        "days"
+      ],
+      "dense_query": "Find disclosures for TR-CR-000.B Total available rental days with unit Days.",
+      "dense_queries": [
+        "Retrieve exact report evidence for TR-CR-000.B Total available rental days, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches TR-CR-000.B Total available rental days with unit Days.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-CR-000.B Total available rental days.",
+        "Find numeric table rows or performance metrics reporting TR-CR-000.B Total available rental days for the reporting period."
+      ],
+      "anchor_terms": [
+        "TR-CR-000.B",
+        "Total available rental days",
+        "available",
+        "rental",
+        "days"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "unknown",
+        "expected_units": [
+          "Days"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": ""
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    },
+    {
+      "metric_id": "TR-CR-000.C",
+      "metric_code": "TR-CR-000.C",
+      "metric": "Average rental fleet size",
+      "topic": "",
+      "unit": "Number of vehicles",
+      "definition": "Average rental fleet size\n\nNote to TR-CR-000.C – The average rental fleet size is the simple average of the maximum number of vehicles available for rental each\nmonth during the reporting period.",
+      "type": "Activity Metrics",
+      "disclosure_type": "quantitative",
+      "aliases": [
+        "Average rental fleet size",
+        "TR-CR-000.C Average rental fleet size"
+      ],
+      "bm25_terms": [
+        "TR-CR-000.C",
+        "rental",
+        "fleet",
+        "size",
+        "vehicles",
+        "Number of vehicles",
+        "Number",
+        "count",
+        "absolute number",
+        "absolute"
+      ],
+      "dense_query": "Find disclosures for TR-CR-000.C Average rental fleet size with unit Number of vehicles.",
+      "dense_queries": [
+        "Retrieve exact report evidence for TR-CR-000.C Average rental fleet size, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches TR-CR-000.C Average rental fleet size with unit Number of vehicles.",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-CR-000.C Average rental fleet size.",
+        "Find numeric table rows or performance metrics reporting TR-CR-000.C Average rental fleet size for the reporting period."
+      ],
+      "anchor_terms": [
+        "TR-CR-000.C",
+        "Average rental fleet size",
+        "rental",
+        "fleet",
+        "size",
+        "Number of vehicles",
+        "Number",
+        "count",
+        "absolute number"
+      ],
+      "negative_anchor_terms": [],
+      "similar_metric_warnings": [],
+      "preferred_chunk_types": [
+        "table-row",
+        "table",
+        "paragraph",
+        "index",
+        "footnote"
+      ],
+      "evidence_hints": {
+        "likely_locations": [
+          "SASB index",
+          "ESG data table",
+          "performance metrics table",
+          "appendix",
+          "footnotes"
+        ],
+        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "requires_numeric_value": true,
+        "requires_unit": true
+      },
+      "extraction_hints": {
+        "value_type": "number",
+        "expected_units": [
+          "Number of vehicles",
+          "Number",
+          "count",
+          "absolute number"
+        ],
+        "year_sensitive": true,
+        "allow_qualitative_disclosure": false,
+        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+      },
+      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+    }
+  ]
+}

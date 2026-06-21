@@ -31,7 +31,8 @@ transformers>=4.51.0,<5
 sentence-transformers==2.7.0
 einops
 
-# Docs
+# Docs / MinerU client
+mineru
 pymupdf==1.23.0
 python-docx==1.1.0
 openpyxl==3.1.2

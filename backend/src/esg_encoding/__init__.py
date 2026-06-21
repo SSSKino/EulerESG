@@ -40,12 +40,12 @@ _LAZY_IMPORTS = {
     "ContentEmbedder": (".content_embedder", "ContentEmbedder"),
     "ReportEncoder": (".report_encoder", "ReportEncoder"),
     "MetricProcessor": (".metric_processor", "MetricProcessor"),
-    "KeywordRetriever": (".dual_channel_retrieval", "KeywordRetriever"),
-    "SemanticRetriever": (".dual_channel_retrieval", "SemanticRetriever"),
-    "DualChannelRetriever": (".dual_channel_retrieval", "DualChannelRetriever"),
+    "KeywordRetriever": (".retrieval.keyword", "KeywordRetriever"),
+    "SemanticRetriever": (".retrieval.semantic", "SemanticRetriever"),
+    "DualChannelRetriever": (".retrieval.dual_channel", "DualChannelRetriever"),
     "DisclosureInferenceEngine": (".disclosure_inference", "DisclosureInferenceEngine"),
-    "ESGChatbot": (".esg_chatbot", "ESGChatbot"),
-    "flag_reranker": (".flag_reranker", None),
+    "ESGChatbot": (".chat.chatbot", "ESGChatbot"),
+    "flag_reranker": (".retrieval.reranker", None),
 }
 
 __all__ = [

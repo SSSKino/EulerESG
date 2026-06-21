@@ -7,19 +7,30 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONPATH=/workspace/backend/src
 
 # Embedding/rerank model defaults. docker-compose.yml can override these.
-ENV LOCAL_EMBEDDINGS_MODEL_PATH=microsoft/harrier-oss-v1-0.6b \
+ENV EMBEDDING_MODEL=microsoft/harrier-oss-v1-0.6b \
     LOCAL_EMBEDDINGS_DEVICE=cuda \
-    LOCAL_EMBEDDINGS_MODEL_DTYPE=float32 \
-    LOCAL_EMBEDDINGS_QUERY_PROMPT_ENABLED=1 \
-    LOCAL_EMBEDDINGS_FORCE_QUERY_PROMPT=1 \
-    LOCAL_RERANKER_MODEL_PATH=microsoft/harrier-oss-v1-0.6b \
+    EMBEDDING_MODEL_DTYPE=float32 \
+    EMBEDDING_QUERY_PROMPT_ENABLED=1 \
+    EMBEDDING_FORCE_QUERY_PROMPT=1 \
+    RERANK_MODEL=microsoft/harrier-oss-v1-0.6b \
     LOCAL_RERANKER_DEVICE=cuda \
-    LOCAL_RERANKER_MODEL_DTYPE=float32 \
+    RERANK_MODEL_DTYPE=float32 \
     LOCAL_RERANKER_USE_FP16=0 \
     LOCAL_RERANKER_TOP_K=46 \
     LOCAL_RERANKER_BATCH_SIZE=64 \
     LOCAL_RERANKER_EMBED_BATCH_SIZE=64 \
     LOCAL_RERANKER_MAX_CHARS_PER_PASSAGE=4096
+
+
+# MinerU report extraction defaults. docker-compose.yml starts mineru-openai-server.
+# Backend uses the MinerU CLI as an HTTP client; VLM inference runs in the GPU MinerU service.
+ENV MINERU_EXEC_MODE=local-cli \
+    MINERU_BACKEND=vlm-http-client \
+    MINERU_SERVER_URL=http://mineru-openai-server:30000 \
+    MINERU_METHOD=auto \
+    MINERU_FORMULA=true \
+    MINERU_TABLE=true \
+    MINERU_IMAGE_ANALYSIS=false
 
 WORKDIR /workspace
 
