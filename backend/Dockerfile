@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # CUDA 13.0-compatible backend image with vLLM kept inside the backend container.
 # MinerU VLM inference runs in a separate mineru-openai-server container.
 FROM vllm/vllm-openai:v0.21.0
@@ -11,7 +12,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/workspace/backend/src \
-    PIP_NO_CACHE_DIR=1 \
+    PIP_NO_CACHE_DIR=0 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=600 \
     HF_HOME=/root/.cache/huggingface \
     TRANSFORMERS_CACHE=/root/.cache/huggingface \
     HF_HUB_DISABLE_XET=1 \
@@ -44,24 +47,28 @@ ENV MINERU_EXEC_MODE=local-cli \
 
 WORKDIR /workspace/backend
 
-RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|https://mirrors.aliyun.com/ubuntu/|g; s|http://security.ubuntu.com/ubuntu/|https://mirrors.aliyun.com/ubuntu/|g' /etc/apt/sources.list || true \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    sed -i 's|http://archive.ubuntu.com/ubuntu/|https://mirrors.aliyun.com/ubuntu/|g; s|http://security.ubuntu.com/ubuntu/|https://mirrors.aliyun.com/ubuntu/|g' /etc/apt/sources.list || true \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
+       python3 python3-pip python3-venv python-is-python3 \
        git curl ca-certificates \
        build-essential pkg-config \
        libgl1 libgomp1 libglib2.0-0 \
        libnuma1 libnuma-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && python3 -m pip --version
 
 COPY requirements.docker.txt /workspace/backend/requirements.docker.txt
 
-RUN python -m pip install --timeout 600 -U pip setuptools wheel \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python3 -m pip install --timeout 600 --prefer-binary -U pip setuptools wheel \
       -i https://pypi.tuna.tsinghua.edu.cn/simple \
       --trusted-host pypi.tuna.tsinghua.edu.cn \
-    && pip install --timeout 600 -r /workspace/backend/requirements.docker.txt \
+    && python3 -m pip install --timeout 600 --prefer-binary -r /workspace/backend/requirements.docker.txt \
       -i https://pypi.tuna.tsinghua.edu.cn/simple \
       --trusted-host pypi.tuna.tsinghua.edu.cn \
-    && pip install --timeout 600 hipporag==2.0.0a4 gritlm==1.0.2 --no-deps \
+    && python3 -m pip install --timeout 600 --prefer-binary hipporag==2.0.0a4 gritlm==1.0.2 --no-deps \
       -i https://pypi.tuna.tsinghua.edu.cn/simple \
       --trusted-host pypi.tuna.tsinghua.edu.cn
 
@@ -69,4 +76,4 @@ COPY . /workspace/backend
 
 EXPOSE 8000
 
-CMD ["python", "-m", "uvicorn", "esg_encoding.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python3", "-m", "uvicorn", "esg_encoding.api:app", "--host", "0.0.0.0", "--port", "8000"]
