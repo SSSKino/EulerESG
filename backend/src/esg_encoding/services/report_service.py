@@ -1,10 +1,81 @@
 """Report upload and retrieval service functions."""
 
 from .common import *  # noqa: F401,F403
+from fastapi import Header, Query
+from fastapi.responses import StreamingResponse
+
+from ..auth.service import get_user_id_from_authorization
+from ..gpu_model_lifecycle import with_backend_model_task
+from .report_jobs import (
+    TERMINAL_STATUSES,
+    create_report_job,
+    get_executor as get_report_job_executor,
+    get_report_job_events_since,
+    get_report_job_owner,
+    snapshot_report_job,
+    update_report_job,
+)
 
 
+
+def _emit_upload_progress(progress_cb, stage: str, message: str, progress: Optional[float] = None, **extra) -> None:
+    """Send upload/report processing progress to the active SSE job."""
+    if not progress_cb:
+        return
+    try:
+        progress_cb(stage=stage, message=message, progress=progress, extra=extra or None)
+    except Exception as exc:
+        logger.debug(f"Upload progress callback skipped: {exc}")
+
+
+def _patch_file_metadata(file_id: str, **updates) -> None:
+    """Best-effort metadata patch for dashboard polling and refresh."""
+    try:
+        finfo = file_manager.metadata.get("files", {}).get(file_id)
+        if isinstance(finfo, dict):
+            finfo.update({k: v for k, v in updates.items() if v is not None})
+            file_manager._save_metadata()
+    except Exception as exc:
+        logger.debug(f"File metadata patch skipped for {file_id}: {exc}")
+
+
+def _ocr_progress_metadata_updates(extra: Optional[dict]) -> dict:
+    """Extract internal OCR progress fields for backend-side diagnostics only."""
+    if not isinstance(extra, dict):
+        return {}
+
+    progress = extra.get("paddle_progress")
+    if not isinstance(progress, dict):
+        progress = extra
+
+    field_map = {
+        "total_pages": "processing_total_pages",
+        "pages_done": "processing_pages_done",
+        "pages_success": "processing_pages_success",
+        "pages_failed": "processing_pages_failed",
+        "total_units": "processing_total_units",
+        "units_done": "processing_units_done",
+        "units_success": "processing_units_success",
+        "units_failed": "processing_units_failed",
+        "units_running": "processing_units_running",
+        "units_queued": "processing_units_queued",
+        "page_batch_size": "processing_page_batch_size",
+        "running_batches": "processing_running_batches",
+    }
+    return {
+        target_key: progress.get(source_key)
+        for source_key, target_key in field_map.items()
+        if progress.get(source_key) is not None
+    }
+
+
+def _format_sse(event: str, data: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+@with_backend_model_task("upload_report")
 def _sync_upload_report_body(
-    content: bytes,
+    content: Optional[bytes],
     filename: str,
     industry: Optional[str],
     semiIndustry: Optional[str],
@@ -13,27 +84,46 @@ def _sync_upload_report_body(
     griTopic: Optional[str],
     scopeSlugs: Optional[str],
     user_id: int,
+    pre_saved_file_info: Optional[dict] = None,
+    progress_cb=None,
 ) -> dict:
     """PDF encode + assessment off the event loop (keeps /api/files responsive)."""
     try:
-        logger.info("Saving file using file manager...")
-        file_info = file_manager.save_uploaded_file(
-            file_content=content,
-            filename=filename,
-            file_type="report",
-            industry=industry,
-            framework=framework,
-            semi_industry=semiIndustry,
-            gri_sector=griSector,
-            gri_topic=griTopic,
-            user_id=user_id
-        )
-        logger.info(f"File saved at: {file_info['file_path']}")
-        
+        if pre_saved_file_info is not None:
+            file_info = dict(pre_saved_file_info)
+            logger.info(f"Using pre-saved report file: {file_info.get('file_path')}")
+            _emit_upload_progress(progress_cb, "file_saved", "File saved. Starting processing.", 5, file_id=file_info.get("file_id"))
+        else:
+            logger.info("Saving file using file manager...")
+            _emit_upload_progress(progress_cb, "saving", "Saving uploaded PDF.", 2)
+            file_info = file_manager.save_uploaded_file(
+                file_content=content or b"",
+                filename=filename,
+                file_type="report",
+                industry=industry,
+                framework=framework,
+                semi_industry=semiIndustry,
+                gri_sector=griSector,
+                gri_topic=griTopic,
+                user_id=user_id
+            )
+            logger.info(f"File saved at: {file_info['file_path']}")
+            _emit_upload_progress(progress_cb, "file_saved", "File saved. Starting processing.", 5, file_id=file_info.get("file_id"))
+
+        _patch_file_metadata(file_info["file_id"], status="processing", processing_stage="processing", processing_progress=5)
+
         # Process PDF
         logger.info("Starting PDF processing...")
+        _emit_upload_progress(progress_cb, "pdf_processing", "Extracting report content with PaddleOCR-VL.", 8, file_id=file_info.get("file_id"))
         encoder = system_components["report_encoder"]
-        report_content = encoder.encode_pdf(file_info["file_path"], save_markdown=True)
+        old_progress_cb = getattr(getattr(encoder, "extractor", None), "progress_callback", None)
+        if getattr(encoder, "extractor", None) is not None:
+            encoder.extractor.progress_callback = progress_cb
+        try:
+            report_content = encoder.encode_pdf(file_info["file_path"], save_markdown=True)
+        finally:
+            if getattr(encoder, "extractor", None) is not None:
+                encoder.extractor.progress_callback = old_progress_cb
 
         # IMPORTANT: Align document_id with file_id so all downstream (chat/cache/output filenames)
         # use a single stable identifier.
@@ -50,7 +140,8 @@ def _sync_upload_report_body(
         except Exception as e:
             logger.warning(f"Failed to persist report artifacts for {file_info['file_id']}: {e}")
         logger.info("PDF processing completed")
-        
+        _emit_upload_progress(progress_cb, "pdf_processed", "Report text extraction and embeddings completed.", 50, file_id=file_info.get("file_id"))
+
         # Store processing results
         system_components["current_report"] = report_content
         logger.info("Report content stored in system components")
@@ -70,7 +161,8 @@ def _sync_upload_report_body(
         logger.info("Getting report summary...")
         summary = encoder.get_report_summary(report_content)
         logger.info("Report summary obtained")
-        
+        _emit_upload_progress(progress_cb, "summary_ready", "Report summary created.", 52, file_id=file_info.get("file_id"))
+
         # Build scope list: one retrieval + assessment per slug; single PDF encode above.
         fw = (framework or "").strip()
         processor = system_components["metric_processor"]
@@ -156,9 +248,11 @@ def _sync_upload_report_body(
             [],
             expected_scope_keys=expected_scope_keys,
         )
+        _emit_upload_progress(progress_cb, "assessment_start", f"Starting compliance assessment for {len(scopes_list)} scope(s).", 55, file_id=file_info.get("file_id"), total_scopes=len(scopes_list))
 
         try:
-            for scope_key, params in scopes_list:
+            for scope_index, (scope_key, params) in enumerate(scopes_list, 1):
+                _emit_upload_progress(progress_cb, "assessment_scope", f"Analyzing scope {scope_index}/{len(scopes_list)}: {scope_key}.", 55 + 35 * ((scope_index - 1) / max(1, len(scopes_list))), file_id=file_info.get("file_id"), scope_key=scope_key, scope_index=scope_index, total_scopes=len(scopes_list))
                 if fw == "GRI":
                     metrics = processor.load_gri_metrics_by_sector_topic(
                         params["griSector"], params["griTopic"]
@@ -293,6 +387,7 @@ def _sync_upload_report_body(
                     manifest_rows,
                     expected_scope_keys=expected_scope_keys,
                 )
+                _emit_upload_progress(progress_cb, "assessment_scope_done", f"Completed scope {scope_index}/{len(scopes_list)}: {scope_key}.", 55 + 35 * (scope_index / max(1, len(scopes_list))), file_id=file_info.get("file_id"), scope_key=scope_key, scope_index=scope_index, total_scopes=len(scopes_list))
 
             system_components["current_assessment"] = last_assessment
             if last_assessment:
@@ -322,6 +417,8 @@ def _sync_upload_report_body(
                     f"Complete processing chain finished ({len(scopes_list)} scope(s)). "
                     f"Last score: {last_assessment.overall_compliance_score:.2%}"
                 )
+            _patch_file_metadata(file_info["file_id"], status="processed", processing_stage="completed", processing_progress=100)
+            _emit_upload_progress(progress_cb, "completed", "Report processing completed.", 100, file_id=file_info.get("file_id"))
 
             return {
                 "status": "success",
@@ -364,6 +461,9 @@ def _sync_upload_report_body(
                     "确保使用可访问的模型（如 'qwen-plus' 或 'qwen-turbo'）。"
                 )
 
+            _patch_file_metadata(file_info["file_id"], status="processed", processing_stage="partial_success", processing_progress=100)
+            _emit_upload_progress(progress_cb, "partial_success", error_message, 100, file_id=file_info.get("file_id"), error=str(assessment_error))
+
             return {
                 "status": "partial_success",
                 "message": error_message,
@@ -379,7 +479,160 @@ def _sync_upload_report_body(
         # If processing fails, move to failed directory
         if 'file_info' in locals():
             file_manager.move_report_file(file_info["file_id"], "failed")
+            _patch_file_metadata(file_info["file_id"], status="failed", processing_stage="failed", processing_progress=100)
+            _emit_upload_progress(progress_cb, "failed", f"Report processing failed: {e}", 100, file_id=file_info.get("file_id"), error=str(e))
         raise
+
+
+
+def _run_report_processing_job(
+    job_id: str,
+    file_info: dict,
+    filename: str,
+    industry: Optional[str],
+    semiIndustry: Optional[str],
+    framework: Optional[str],
+    griSector: Optional[str],
+    griTopic: Optional[str],
+    scopeSlugs: Optional[str],
+    user_id: int,
+) -> None:
+    """Background report processing entry point."""
+
+    def progress_cb(*, stage: str, message: str, progress: Optional[float] = None, extra: Optional[dict] = None):
+        update_report_job(
+            job_id,
+            status="processing",
+            stage=stage,
+            progress=progress,
+            message=message,
+            extra=extra,
+        )
+        if file_info.get("file_id"):
+            metadata_updates = {
+                "status": "processing",
+                "processing_job_id": job_id,
+                "processing_stage": stage,
+                "processing_progress": progress,
+            }
+            metadata_updates.update(_ocr_progress_metadata_updates(extra))
+            _patch_file_metadata(
+                file_info["file_id"],
+                **metadata_updates,
+            )
+
+    try:
+        update_report_job(job_id, status="processing", stage="started", progress=1, message="Background processing started.")
+        result = _sync_upload_report_body(
+            None,
+            filename,
+            industry,
+            semiIndustry,
+            framework,
+            griSector,
+            griTopic,
+            scopeSlugs,
+            user_id,
+            pre_saved_file_info=file_info,
+            progress_cb=progress_cb,
+        )
+        final_status = str(result.get("status") or "success")
+        update_report_job(
+            job_id,
+            status="partial_success" if final_status == "partial_success" else "success",
+            stage="completed",
+            progress=100,
+            message=result.get("message") or "Report processing completed.",
+            result=result,
+            event_type="done",
+        )
+    except Exception as exc:
+        logger.exception(f"Background report job failed: job_id={job_id}")
+        update_report_job(
+            job_id,
+            status="failed",
+            stage="failed",
+            progress=100,
+            message="Processing failed. Please try again.",
+            error=str(exc),
+            event_type="error",
+        )
+
+
+async def get_report_job_status(
+    job_id: str,
+    user_id: int = Depends(get_current_user),
+):
+    job = snapshot_report_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Report job not found")
+    owner = get_report_job_owner(job_id)
+    if owner is not None and owner != user_id:
+        raise HTTPException(status_code=403, detail="Not allowed to access this report job")
+    return {"status": "success", "job": job}
+
+
+async def report_job_events(
+    job_id: str,
+    request: Request,
+    token: Optional[str] = Query(None),
+    authorization: Optional[str] = Header(None),
+):
+    """SSE stream for report processing progress.
+
+    EventSource cannot set custom Authorization headers. The frontend therefore
+    passes the JWT token as a query parameter. Header auth is also accepted for
+    non-browser clients.
+    """
+    auth_value = authorization
+    if token and not auth_value:
+        auth_value = f"Bearer {token}"
+    if not auth_value:
+        raise HTTPException(status_code=403, detail="Authentication token is required")
+    try:
+        user_id = get_user_id_from_authorization(auth_value)
+    except Exception as exc:
+        raise HTTPException(status_code=403, detail=str(exc))
+
+    job = snapshot_report_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Report job not found")
+    owner = get_report_job_owner(job_id)
+    if owner is not None and owner != user_id:
+        raise HTTPException(status_code=403, detail="Not allowed to access this report job")
+
+    async def event_generator():
+        last_seq = 0
+        snapshot = snapshot_report_job(job_id)
+        if snapshot:
+            last_seq = int(snapshot.get("seq", 0) or 0)
+            yield _format_sse("snapshot", snapshot)
+            if str(snapshot.get("status")) in TERMINAL_STATUSES:
+                yield _format_sse("done" if snapshot.get("status") != "failed" else "error", snapshot)
+                return
+        while True:
+            if await request.is_disconnected():
+                break
+            events = get_report_job_events_since(job_id, last_seq)
+            for event in events:
+                last_seq = int(event.get("seq", last_seq) or last_seq)
+                event_name = str(event.get("event") or "progress")
+                yield _format_sse(event_name, event)
+                if str(event.get("status")) in TERMINAL_STATUSES:
+                    return
+            # Heartbeat keeps proxies and browsers from considering the stream idle.
+            yield ": heartbeat\n\n"
+            await asyncio.sleep(1.0)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 async def upload_report(
@@ -432,9 +685,31 @@ async def upload_report(
         logger.info("=== STARTING FILE PROCESSING ===")
         content = await file.read()
         logger.info(f"File content read successfully, size: {len(content)} bytes")
-        return await asyncio.to_thread(
-            _sync_upload_report_body,
-            content,
+
+        # 保存上传文件后立即返回，真正的 OCR / embedding / compliance 分析在后台线程中执行。
+        file_info = file_manager.save_uploaded_file(
+            file_content=content,
+            filename=file.filename or "",
+            file_type="report",
+            industry=industry,
+            framework=framework,
+            semi_industry=semiIndustry,
+            gri_sector=griSector,
+            gri_topic=griTopic,
+            user_id=user_id,
+        )
+        job = create_report_job(file_id=file_info["file_id"], filename=file.filename or "", user_id=user_id)
+        _patch_file_metadata(
+            file_info["file_id"],
+            status="processing",
+            processing_job_id=job["job_id"],
+            processing_stage="queued",
+            processing_progress=0,
+        )
+        get_report_job_executor().submit(
+            _run_report_processing_job,
+            job["job_id"],
+            file_info,
             file.filename or "",
             industry,
             semiIndustry,
@@ -444,11 +719,22 @@ async def upload_report(
             scopeSlugs,
             user_id,
         )
+
+        return {
+            "status": "accepted",
+            "message": "Report uploaded. Processing has started in the background.",
+            "job_id": job["job_id"],
+            "file_id": file_info["file_id"],
+            "report_id": file_info["file_id"],
+            "processing_status_url": f"/api/report-jobs/{job['job_id']}",
+            "events_url": f"/api/report-jobs/{job['job_id']}/events",
+        }
     except Exception as e:
         logger.error(f"Error processing report: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@with_backend_model_task("upload_metrics")
 async def upload_metrics(
     file: Optional[UploadFile] = File(None),
     metrics_json: Optional[str] = Form(None),
@@ -592,7 +878,11 @@ async def get_latest_report(user_id: int = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def get_report_by_file_id(file_id: str, user_id: int = Depends(get_current_user)):
+async def get_report_by_file_id(
+    file_id: str,
+    scope: Optional[str] = Query(None),
+    user_id: int = Depends(get_current_user),
+):
     """
     Get compliance analysis report for a specific file (只能访问自己的文件)
 
@@ -608,9 +898,32 @@ async def get_report_by_file_id(file_id: str, user_id: int = Depends(get_current
         file_info = file_manager.get_file_info(file_id, user_id=user_id)
         if not file_info:
             raise HTTPException(status_code=404, detail="File not found or access denied")
-        json_file = _find_assessment_json_path(file_id, file_info)
+        canonical_dir = Path(file_manager.compliance_outputs)
+        scope_key = str(scope or "").strip()
+        json_file = _json_path_from_manifest(canonical_dir, file_id, scope_key)
+        if (json_file is None or not json_file.exists()) and scope_key:
+            fw = str(file_info.get("framework") or "").strip()
+            json_file = _compliance_json_path_for_scope(
+                canonical_dir, file_id, fw, file_info, scope_key
+            )
+            if json_file is None or not json_file.exists():
+                safe_scope = _sanitize_compliance_filename_part(scope_key)
+                scoped_matches = list(
+                    canonical_dir.glob(f"*{file_id}*{safe_scope}*compliance*.json")
+                )
+                scoped_matches = [p for p in scoped_matches if p.is_file()]
+                if scoped_matches:
+                    scoped_matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+                    json_file = scoped_matches[0]
+        if (json_file is None or not json_file.exists()) and not scope_key:
+            json_file = _find_assessment_json_path(file_id, file_info)
         if not json_file or not json_file.exists():
-            raise HTTPException(status_code=404, detail=f"No assessment found for file {file_id}")
+            detail = (
+                f"No assessment found for file {file_id} and scope {scope_key}"
+                if scope_key
+                else f"No assessment found for file {file_id}"
+            )
+            raise HTTPException(status_code=404, detail=detail)
 
         # Read JSON to get report_id
         with open(json_file, 'r', encoding='utf-8') as f:
@@ -621,24 +934,55 @@ async def get_report_by_file_id(file_id: str, user_id: int = Depends(get_current
             logger.warning(f"Report ID not found in assessment data for file_id={file_id}")
             raise HTTPException(status_code=404, detail="Report ID not found in assessment data")
 
-        # Now load the markdown report using the report_id
+        # Now load the markdown report using scope-aware paths first, then legacy names.
         md_dirs = [
             Path(file_manager.markdown_outputs),
             Path(file_manager.compliance_outputs),
             legacy_outputs_dir,
         ]
         report_file = None
+
+        md_candidates: List[Path] = []
+        if scope_key:
+            try:
+                _, _, scoped_md = _paths_for_scope_compliance_bundle(
+                    file_manager, file_id, file_info, scope_key
+                )
+                md_candidates.append(scoped_md)
+            except Exception as exc:
+                logger.debug(f"Scope markdown path resolution skipped for {file_id}/{scope_key}: {exc}")
+
+        json_stem = Path(json_file).stem
+        json_suffix = f"_{file_id}_compliance"
+        if json_stem.endswith(json_suffix):
+            scoped_part = json_stem[: -len(json_suffix)]
+            if scoped_part:
+                md_candidates.append(
+                    Path(file_manager.markdown_outputs)
+                    / f"compliance_report_{file_id}_{_sanitize_compliance_filename_part(scoped_part)}.md"
+                )
+
         for d in md_dirs:
-            p = d / f"compliance_report_{report_id}.md"
+            md_candidates.append(d / f"compliance_report_{report_id}.md")
+
+        for p in md_candidates:
             if p.exists():
                 report_file = p
                 break
 
-        # Fallback: try to find any markdown report containing the report_id
+        # Fallback: try to find any markdown report containing the report_id.
         if not report_file:
             for d in [x for x in md_dirs if x.exists()]:
-                matches = list(d.glob(f"*{report_id}*.md"))
+                patterns = [f"*{report_id}*.md"]
+                if scope_key:
+                    safe_scope = _sanitize_compliance_filename_part(scope_key)
+                    patterns.insert(0, f"*{report_id}*{safe_scope}*.md")
+                matches: List[Path] = []
+                for pattern in patterns:
+                    matches.extend(list(d.glob(pattern)))
+                matches = [m for m in matches if m.is_file()]
                 if matches:
+                    matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)
                     report_file = matches[0]
                     break
 
@@ -653,6 +997,7 @@ async def get_report_by_file_id(file_id: str, user_id: int = Depends(get_current
             "status": "success",
             "file_id": file_id,
             "report_id": report_id,
+            "scope": scope_key or None,
             "report_file": report_file.name,
             "content": content,
             "created_at": datetime.fromtimestamp(report_file.stat().st_mtime).isoformat()

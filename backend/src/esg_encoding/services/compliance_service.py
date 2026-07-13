@@ -1,8 +1,10 @@
 """Compliance analysis and assessment service functions."""
 
 from .common import *  # noqa: F401,F403
+from ..gpu_model_lifecycle import with_backend_model_task
 
 
+@with_backend_model_task("analyze_compliance")
 async def analyze_compliance():
     """
     执行合规分析

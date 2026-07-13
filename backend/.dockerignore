@@ -1,30 +1,52 @@
-.git
-**/__pycache__
-**/*.pyc
-**/.pytest_cache
-**/.mypy_cache
-frontend/node_modules
-frontend/dist
+# Python caches
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# NOTE: this .dockerignore lives under backend/ and is evaluated relative to
-# the backend/ directory when used as the Docker build context.
-# The original patterns `backend/outputs` and `backend/uploads` were ineffective
-# (they would match backend/backend/... which doesn't exist).
-outputs
-uploads
+# VCS / IDE
+.git/
+.gitignore
+.vscode/
+.idea/
 
-hf_cache
-hf_cache/**
-.cache
-.cache/**
-**/.env
+# Local env / secrets
+.env
 config/.env
+*.pem
+*.key
 
-# Node / Next.js artifacts (defensive)
-node_modules
-.next
-dist
+# Runtime outputs and uploads
+outputs/
+uploads/
+logs/
+*.log
 
-# Large model/data caches (defensive)
-**/*.parquet
-**/*.npz
+# Model / package caches
+.cache/
+hf_cache/
+models/
+model/
+*.safetensors
+*.bin
+*.onnx
+*.gguf
+
+# Large data / documents
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.pdf
+*.docx
+*.xlsx
+*.parquet
+*.npz
+
+# Node artifacts if copied accidentally
+node_modules/
+.next/
+dist/
+build/

@@ -10,7 +10,8 @@ import openai
 from loguru import logger
 import numpy as np
 
-from ..shared_embedding_model import encode_query_texts
+from ..shared_embedding_model import encode_query_texts, get_shared_embedding_model
+from ..embedding_settings import get_configured_embedding_model_name
 from ..models import (
     ProcessingConfig,
     ChatMessage,
@@ -53,6 +54,27 @@ class ESGChatbot:
         """Inject embedding model (SentenceTransformer) to avoid duplicate loading."""
         self._embedder_model = model
         
+
+    def _ensure_embedder_model(self):
+        """Lazily load embedding model for chat semantic retrieval."""
+        if self._embedder_model is not None:
+            return self._embedder_model
+        try:
+            import os
+            device = os.getenv("LOCAL_EMBEDDINGS_DEVICE") or str(getattr(self.config, "device", "cuda") or "cuda")
+            repo_id = str(getattr(self.config, "embedding_model", "") or get_configured_embedding_model_name())
+            self._embedder_model = get_shared_embedding_model(
+                repo_id,
+                device=device,
+                hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
+                trust_remote_code=True,
+            )
+            logger.info(f"Chat embedding model loaded lazily, device={device}")
+        except Exception as exc:
+            logger.warning(f"Chat lazy embedding model load failed: {exc}")
+            self._embedder_model = None
+        return self._embedder_model
+
     def _init_llm_client(self):
         """初始化LLM客户端"""
         if not self.config.llm_api_key:
@@ -294,9 +316,12 @@ class ESGChatbot:
             return []
 
         # 1) Semantic vector retrieval (preferred)
-        if self._embedding_matrix is not None and self._embedding_matrix.size and self._embedder_model is not None:
+        if self._embedding_matrix is not None and self._embedding_matrix.size:
+            model = self._ensure_embedder_model()
+            if model is None:
+                return []
             try:
-                q_vec = encode_query_texts(self._embedder_model, [query], normalize_embeddings=True, show_progress_bar=False)
+                q_vec = encode_query_texts(model, [query], normalize_embeddings=True, show_progress_bar=False)
                 q = np.asarray(q_vec[0], dtype=np.float32)
                 # Cosine similarity via dot product (matrix normalized in load_context)
                 sims = self._embedding_matrix @ q

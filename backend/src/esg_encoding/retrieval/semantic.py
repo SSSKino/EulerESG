@@ -1,7 +1,23 @@
 """Semantic evidence retrieval."""
 
-from .scoring import *  # noqa: F401,F403
+import os
+import threading
+from typing import List, Optional
+
+import numpy as np
+import torch
+from loguru import logger
+from sklearn.metrics.pairwise import cosine_similarity
+
+from .hipporag.settings import HippoRAGSettings
 from .metric_profile import build_metric_retrieval_profile
+from .reranker import get_reranker
+from .scoring import *  # noqa: F401,F403
+from ..embedding_settings import get_configured_rerank_model_name
+from ..exceptions import ContentEmbeddingError, ESGEncodingError
+from ..models import ESGMetric, ProcessingConfig, ReportContent, RetrievalResult, SemanticExpansion
+from ..shared_embedding_model import encode_query_texts, get_shared_embedding_model
+from ..gpu_model_lifecycle import backend_lazy_load_enabled
 
 
 class SemanticRetriever:
@@ -17,10 +33,20 @@ class SemanticRetriever:
         self.config = config
         self.embedding_model = None
         self.reranker = None
+        self._reranker_initialized = False
         self.reranker_top_k = max(1, int(os.getenv("RERANK_TOP_K", os.getenv("LOCAL_RERANKER_TOP_K", "46")) or "46"))
         self._reranker_lock = threading.Lock()
-        self._init_embedding_model()
-        self._init_reranker()
+        self._lazy_models = backend_lazy_load_enabled()
+        if not self._lazy_models:
+            self._init_embedding_model()
+            self._init_reranker()
+
+    def _ensure_models(self):
+        if self.embedding_model is None:
+            self._init_embedding_model()
+        # Reranker is optional. Load lazily only once, respecting fallback behavior.
+        if not self._reranker_initialized:
+            self._init_reranker()
 
     def _init_embedding_model(self):
         """Initialize embedding model"""
@@ -53,6 +79,7 @@ class SemanticRetriever:
             )
             self.reranker_top_k = max(1, int(getattr(settings, "rerank_top_k", self.reranker_top_k) or self.reranker_top_k))
             self.reranker = get_reranker(settings)
+            self._reranker_initialized = True
             if self.reranker is not None:
                 logger.info(f"Reranker model loaded successfully: {rerank_model}")
             else:
@@ -60,6 +87,7 @@ class SemanticRetriever:
         except Exception as e:
             logger.warning(f"Failed to load reranker model, fallback to cosine similarity: {str(e)}")
             self.reranker = None
+            self._reranker_initialized = True
 
     def _segment_structure_bonus(self, segment, prefer_narrative: bool = False) -> float:
         return _segment_structure_bonus(segment, prefer_narrative=prefer_narrative)
@@ -113,6 +141,7 @@ class SemanticRetriever:
             List[RetrievalResult]: Retrieval results
         """
         try:
+            self._ensure_models()
             query_text = self._build_semantic_query(metric, semantic_expansion)
             if not query_text:
                 raise ValueError("No semantic query text available")

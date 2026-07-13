@@ -3,6 +3,49 @@
 from .common import *  # noqa: F401,F403
 
 
+_INTERNAL_OCR_FILE_FIELDS = {
+    "paddle_progress",
+    "paddle_job_id",
+    "running_batches",
+    "total_units",
+    "units_done",
+    "units_success",
+    "units_failed",
+    "units_running",
+    "units_queued",
+    "pages_done",
+    "pages_success",
+    "pages_failed",
+    "processing_total_pages",
+    "processing_pages_done",
+    "processing_pages_success",
+    "processing_pages_failed",
+    "processing_total_units",
+    "processing_units_done",
+    "processing_units_success",
+    "processing_units_failed",
+    "processing_units_running",
+    "processing_units_queued",
+    "processing_page_batch_size",
+    "processing_running_batches",
+}
+
+
+def _expose_internal_file_details() -> bool:
+    return str(os.getenv("REPORT_JOB_EXPOSE_INTERNAL_DETAILS", "false")).strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _public_file_record(file_info: Dict[str, Any]) -> Dict[str, Any]:
+    if _expose_internal_file_details():
+        return file_info
+    return {k: v for k, v in file_info.items() if k not in _INTERNAL_OCR_FILE_FIELDS}
+
+
 async def list_files(
     file_type: Optional[str] = None, 
     status: Optional[str] = None,
@@ -29,11 +72,12 @@ async def list_files(
             files = sorted(all_files, key=lambda x: x["upload_time"], reverse=True)
 
         files = _enrich_file_records_with_scope_progress(file_manager, files)
+        public_files = [_public_file_record(f) for f in files]
 
         return {
             "status": "success",
-            "files": files,
-            "total_count": len(files)
+            "files": public_files,
+            "total_count": len(public_files)
         }
         
     except Exception as e:
@@ -58,7 +102,7 @@ async def get_file_info(file_id: str, user_id: int = Depends(get_current_user)):
 
     return {
         "status": "success",
-        "file_info": file_info
+        "file_info": _public_file_record(file_info)
     }
 
 

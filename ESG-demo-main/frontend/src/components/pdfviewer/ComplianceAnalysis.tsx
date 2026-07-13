@@ -52,7 +52,10 @@ const ComplianceAnalysis: React.FC<ComplianceAnalysisProps> = ({ analysisFile, o
         0
       );
 
-      const reportData = await apiService.getReportByFileId(analysisFile.file_id);
+      const reportData = await apiService.getReportByFileId(
+        analysisFile.file_id,
+        analysisFile.analysis_scope_key
+      );
       setMarkdownContent(reportData.content);
       setReportFile(reportData.report_file);
 

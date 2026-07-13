@@ -1,21 +1,4 @@
-"""
-MinerU Docker-backed report content extractor.
-
-All report content extraction is delegated to the MinerU GPU service defined in
-this project's docker-compose.yml.  The backend itself only runs the MinerU CLI
-as a lightweight HTTP client; VLM inference is executed by the compose service
-`mineru-openai-server` on GPU.
-
-Compose wiring:
-    backend -> mineru-openai-server:30000
-
-The extractor calls:
-    mineru -p <input.pdf> -o <output_dir> -b vlm-http-client -u http://mineru-openai-server:30000
-
-It then reads MinerU-generated Markdown / content_list JSON and converts them
-into the existing DocumentContent/TextSegment schema used by the rest of the
-backend.  The old PyMuPDF/Tesseract extraction path has been removed.
-"""
+"""PaddleOCR-VL v1.6 Redis 页批次报告内容提取器。"""
 
 from __future__ import annotations
 
@@ -23,15 +6,13 @@ import hashlib
 import json
 import os
 import re
-import shlex
-import shutil
-import subprocess
 import time
+import uuid
 from datetime import datetime
 from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from loguru import logger
 
@@ -39,14 +20,109 @@ from .exceptions import ContentExtractionError
 from .models import DocumentContent, ProcessingConfig, TextSegment
 
 
-class _SimpleHTMLTableParser(HTMLParser):
-    """Small dependency-free HTML table parser for MinerU table output.
+def _shared_dir_mode() -> int:
+    """返回 PaddleOCR 跨容器共享目录权限，默认 0777。"""
+    raw = os.getenv("PADDLEOCR_SHARED_DIR_MODE", "0777")
+    try:
+        return int(str(raw), 8)
+    except Exception:
+        return 0o777
 
-    MinerU may return tables as Markdown, plain pipe tables or HTML.  The rest
-    of the retrieval stack needs stable table/table_row/table_cell chunks, so we
-    parse basic <table>/<tr>/<th>/<td> structure here instead of relying only on
-    Markdown table syntax.
+
+def _shared_file_mode() -> int:
+    """返回 PaddleOCR 跨容器共享文件权限，默认 0666。"""
+    raw = os.getenv("PADDLEOCR_SHARED_FILE_MODE", "0666")
+    try:
+        return int(str(raw), 8)
+    except Exception:
+        return 0o666
+
+
+def _ensure_shared_writable_dir(path: Path) -> Path:
+    """创建并放宽 backend/worker 共享目录权限。
+
+    页级 batch 队列中，backend 负责拆页和提交任务，worker 负责写 batch 结果。
+    两类容器可能使用不同 Linux 用户，因此共享目录需要允许双方读写。
     """
+    path.mkdir(parents=True, exist_ok=True)
+    try:
+        os.chmod(path, _shared_dir_mode())
+    except Exception as exc:
+        logger.warning(f"设置共享目录权限失败: {path} ({exc})")
+    return path
+
+
+def _ensure_shared_file(path: Path) -> Path:
+    """尽量放宽共享文件权限，便于其他容器读取。"""
+    try:
+        os.chmod(path, _shared_file_mode())
+    except Exception as exc:
+        logger.debug(f"设置共享文件权限跳过: {path} ({exc})")
+    return path
+
+
+def _fsync_parent_dir(path: Path) -> None:
+    """尽量刷新父目录元数据，减少 Docker Desktop 共享目录可见性竞态。"""
+    try:
+        fd = os.open(str(path.parent), os.O_RDONLY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+    except Exception:
+        # 某些平台/文件系统不支持目录 fsync，跳过即可。
+        pass
+
+
+def _write_shared_ready_marker(target: Path, *, payload: Optional[Dict[str, Any]] = None) -> Path:
+    """为 batch PDF 写入 .ready 标记。
+
+    backend 先原子写入 batch PDF，再写 ready 标记，worker 只有在 PDF 和
+    ready 标记都可见时才开始解析。这样可以避免 Redis 入队速度快于
+    bind mount 文件可见性导致的 FileNotFound。
+    """
+    marker = target.with_name(target.name + ".ready")
+    marker_tmp = marker.with_name(marker.name + ".tmp")
+    data = {"path": str(target), "size": target.stat().st_size if target.exists() else 0, "created_at": datetime.now().isoformat()}
+    if payload:
+        data.update(payload)
+    with marker_tmp.open("w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except Exception:
+            pass
+    os.replace(marker_tmp, marker)
+    _ensure_shared_file(marker)
+    _fsync_parent_dir(marker)
+    return marker
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return str(value).strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _cleanup_path_tree(path: Path, *, label: str = "") -> None:
+    """删除 PaddleOCR 过程目录。
+
+    页批次队列需要临时 PDF 和 Markdown。合并完成或失败后删除这些过程文件，
+    最终只保留 `<pdf_stem>_extracted.md`。
+    """
+    try:
+        if path.exists():
+            import shutil
+
+            shutil.rmtree(path, ignore_errors=True)
+            logger.info(f"已删除 PaddleOCR 过程目录{f'({label})' if label else ''}: {path}")
+    except Exception as exc:
+        logger.warning(f"删除 PaddleOCR 过程目录失败{f'({label})' if label else ''}: {path} ({exc})")
+
+
+class _SimpleHTMLTableParser(HTMLParser):
+    """轻量级 HTML 表格解析器，用于解析 PaddleOCR-VL Markdown 中的表格。"""
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -84,62 +160,49 @@ class _SimpleHTMLTableParser(HTMLParser):
 
 
 class ContentExtractor:
-    """Extract report content by invoking MinerU and adapting its output.
+    """通过 PaddleOCR-VL v1.6 Redis 队列提取报告内容。
 
-    Environment variables:
-        MINERU_CLI_BIN: MinerU CLI executable inside the backend container. Default: mineru
-        MINERU_BACKEND: MinerU backend. Default: vlm-http-client
-        MINERU_SERVER_URL: MinerU OpenAI-compatible VLM service URL. Default: http://mineru-openai-server:30000
-        MINERU_OUTPUT_DIR: root directory for MinerU outputs. Default: <pdf_dir>/.mineru_output
-        MINERU_METHOD: auto | txt | ocr. Default: auto
-        MINERU_FORMULA: true/false. Default: true
-        MINERU_TABLE: true/false. Default: true
-        MINERU_IMAGE_ANALYSIS: true/false. Default: false
-        MINERU_CLEAN_OUTPUT: true/false. Default: false
-        MINERU_CLI_TIMEOUT: seconds, 0 means no timeout. Default: 0
-        MINERU_EXTRA_ARGS: extra CLI args, e.g. "--lang en"
+    主要环境变量：
+        PADDLEOCR_PAGE_BATCH_SIZE: backend 拆分 PDF 的每批页数，默认 2。
+        PADDLEOCR_VL_TIMEOUT: 解析等待超时时间，单位秒。
     """
 
     def __init__(self, config: ProcessingConfig | None = None):
         self.config = config or ProcessingConfig()
         self.logger = logger.bind(component="ContentExtractor")
+        # 后台上传任务会在这里注入进度回调，用于 SSE 实时推送。
+        self.progress_callback: Optional[Callable[..., None]] = None
+
+    def _emit_progress(self, stage: str, message: str, progress: Optional[float] = None, **extra: Any) -> None:
+        """Best-effort progress event for long OCR extraction."""
+        cb = getattr(self, "progress_callback", None)
+        if not cb:
+            return
+        try:
+            cb(stage=stage, message=message, progress=progress, extra=extra or None)
+        except Exception as exc:
+            self.logger.debug(f"进度回调失败，已忽略: {exc}")
 
     def extract_pdf(self, file_path: str) -> DocumentContent:
-        """Run MinerU and return DocumentContent compatible with the old pipeline."""
         source_path = Path(file_path).resolve()
         if not source_path.exists():
             raise ContentExtractionError(f"文件不存在: {source_path}", file_path=str(source_path))
 
         start = time.time()
         try:
-            self.logger.info(f"开始使用 MinerU 提取报告内容: {source_path}")
-            run_dir = self._run_mineru(source_path)
-            markdown_path = self._find_best_markdown(run_dir, source_path.stem)
-            if markdown_path is None:
-                raise ContentExtractionError(
-                    f"MinerU 已运行但没有生成 Markdown 文件。输出目录: {run_dir}",
-                    file_path=str(source_path),
-                )
-
-            markdown = markdown_path.read_text(encoding="utf-8", errors="ignore").strip()
+            self.logger.info(f"开始使用 PaddleOCR-VL v1.6 提取报告内容: {source_path}")
+            self._emit_progress("ocr_start", "PaddleOCR-VL extraction started.", 10)
+            result = self._run_paddleocr_vl_page_batch_queue(source_path)
+            markdown = str(result.get("markdown") or "").strip()
             if not markdown:
                 raise ContentExtractionError(
-                    f"MinerU 生成的 Markdown 为空: {markdown_path}",
+                    "PaddleOCR-VL 返回的 Markdown 为空",
                     file_path=str(source_path),
                 )
 
             document_id = self._document_id(source_path)
-            content_list_path = self._find_content_list_json(run_dir)
-            if content_list_path:
-                segments = self._segments_from_content_list(content_list_path, document_id)
-            else:
-                segments = []
-
+            segments = self._segments_from_markdown(markdown, document_id)
             if not segments:
-                segments = self._segments_from_markdown(markdown, document_id)
-
-            if not segments:
-                # Keep the downstream embedding pipeline alive, while surfacing a clear warning.
                 segments = [
                     TextSegment(
                         segment_id=f"{document_id}_p1_s1",
@@ -148,7 +211,11 @@ class ContentExtractor:
                         position_y=0.0,
                         position_x=0.0,
                         segment_type="text",
-                        structured_data={"source": "mineru_markdown_fallback"},
+                        structured_data={
+                            "source": "paddleocr_vl_markdown_fallback",
+                            "parser": "paddleocr-vl",
+                            "pipeline_version": result.get("pipeline_version", "v1.6"),
+                        },
                     )
                 ]
 
@@ -159,347 +226,651 @@ class ContentExtractor:
                 markdown_content=markdown,
                 created_at=datetime.now(),
             )
-
             elapsed = time.time() - start
             self.logger.info(
-                f"MinerU 内容提取完成: file={source_path.name}, segments={len(segments)}, elapsed={elapsed:.2f}s, output={run_dir}"
+                f"PaddleOCR-VL 内容提取完成: file={source_path.name}, segments={len(segments)}, "
+                f"elapsed={elapsed:.2f}s, parser_output={result.get('output_dir', '')}"
             )
+            self._emit_progress("ocr_done", f"OCR extraction completed with {len(segments)} segments.", 45, segments=len(segments))
             return document
 
         except ContentExtractionError:
             raise
         except Exception as exc:
-            self.logger.exception(f"MinerU 内容提取失败: {source_path}")
-            raise ContentExtractionError(f"MinerU 内容提取失败: {exc}", file_path=str(source_path)) from exc
+            self.logger.exception(f"PaddleOCR-VL 内容提取失败: {source_path}")
+            raise ContentExtractionError(f"PaddleOCR-VL 内容提取失败: {exc}", file_path=str(source_path)) from exc
 
     def save_markdown(self, document_content: DocumentContent, output_path: str | None = None) -> str:
-        """Save the MinerU Markdown produced during extraction."""
+        """保存供检索和审计使用的最终 Markdown，不包含 OCR 中间产物。"""
         if output_path is None:
             pdf_path = Path(document_content.file_path)
             output_path = str(pdf_path.parent / f"{pdf_path.stem}_extracted.md")
 
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(document_content.markdown_content or "", encoding="utf-8")
+
+        final_markdown = self._format_final_extracted_markdown(document_content)
+        out.write_text(final_markdown, encoding="utf-8")
+        _ensure_shared_file(out)
         return str(out)
 
-    # ------------------------------------------------------------------
-    # MinerU execution
-    # ------------------------------------------------------------------
+    def _format_final_extracted_markdown(self, document_content: DocumentContent) -> str:
+        """只输出文件名、页码、可恢复的段落 ID 和正文。"""
+        pdf_path = Path(document_content.file_path)
+        display_segments = [
+            seg for seg in document_content.segments
+            if getattr(seg, "segment_type", "text") not in {"table_row", "table_cell"}
+            and str(getattr(seg, "content", "") or "").strip()
+        ]
+        lines: list[str] = [f"# {pdf_path.name}"]
 
-    def _run_mineru(self, source_path: Path) -> Path:
-        output_root = self._mineru_output_root(source_path)
-        run_dir = output_root / self._safe_name(source_path.stem)
-        clean = self._env_bool("MINERU_CLEAN_OUTPUT", False)
-        if clean and run_dir.exists():
-            shutil.rmtree(run_dir, ignore_errors=True)
-        run_dir.mkdir(parents=True, exist_ok=True)
+        current_page: int | None = None
+        page_text_counts: dict[int, int] = {}
+        page_table_counts: dict[int, int] = {}
 
-        # Reuse successful prior output unless explicitly cleaned.
-        if not clean and self._find_best_markdown(run_dir, source_path.stem) is not None:
-            self.logger.info(f"复用已有 MinerU 输出: {run_dir}")
-            return run_dir
-
-        # In docker-compose deployment the backend runs the MinerU CLI as an
-        # HTTP client.  The actual VLM inference is handled by the GPU-only
-        # MinerU service `mineru-openai-server`.
-        command = self._build_local_mineru_command(source_path, run_dir)
-
-        log_file = run_dir / "mineru_extract.log"
-        self.logger.info(f"运行 MinerU 命令: {' '.join(shlex.quote(x) for x in command)}")
-        self.logger.info(f"MinerU 日志: {log_file}")
-
-        timeout = int(os.getenv("MINERU_CLI_TIMEOUT", "0") or "0")
-        with log_file.open("w", encoding="utf-8") as lf:
-            lf.write("COMMAND: " + " ".join(shlex.quote(x) for x in command) + "\n\n")
-            process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1,
-            )
-            assert process.stdout is not None
-            start = time.time()
+        def page_num(seg: TextSegment) -> int:
             try:
-                for line in process.stdout:
-                    lf.write(line)
-                    lf.flush()
-                    lower = line.lower()
-                    if any(k in lower for k in ("error", "failed", "traceback", "done", "output", "warning")):
-                        self.logger.info(f"[MinerU] {line.rstrip()}")
-                    if timeout > 0 and time.time() - start > timeout:
-                        process.kill()
-                        raise TimeoutError(f"MinerU CLI 超时: {timeout}s")
-                return_code = process.wait()
-            finally:
-                if process.poll() is None:
-                    process.kill()
+                return max(1, int(getattr(seg, "page_number", 1) or 1))
+            except Exception:
+                return 1
 
-        if return_code != 0:
-            tail = self._tail_text(log_file, max_lines=120)
-            raise ContentExtractionError(
-                f"MinerU CLI 执行失败，exit_code={return_code}。日志: {log_file}\n{tail}",
-                file_path=str(source_path),
-            )
+        display_segments.sort(key=lambda s: (page_num(s), float(getattr(s, "position_y", 0.0) or 0.0), float(getattr(s, "position_x", 0.0) or 0.0)))
 
-        return run_dir
+        for seg in display_segments:
+            page = page_num(seg)
+            if page != current_page:
+                if current_page is not None:
+                    lines.append("")
+                lines.append(f"## 第 {page} 页")
+                current_page = page
 
-    def _build_local_mineru_command(self, source_path: Path, run_dir: Path) -> List[str]:
-        mineru_bin = os.getenv("MINERU_CLI_BIN", "mineru").strip() or "mineru"
-        if shutil.which(mineru_bin) is None:
-            raise ContentExtractionError(
-                "未找到 MinerU CLI。请先安装 MinerU 客户端，并确保 backend 镜像通过 requirements.docker.txt 安装了 mineru。",
-                file_path=str(source_path),
-            )
+            content = str(getattr(seg, "content", "") or "").strip()
+            segment_type = str(getattr(seg, "segment_type", "text") or "text").lower()
 
-        command = [
-            mineru_bin,
-            "-p",
-            str(source_path),
-            "-o",
-            str(run_dir),
-        ]
-        command.extend(self._mineru_backend_args())
-        command.extend(self._mineru_common_args())
-        command.extend(self._extra_args())
-        return command
+            if segment_type == "table":
+                idx = page_table_counts.get(page, 0)
+                page_table_counts[page] = idx + 1
+                marker = f"P{page:03d}_T{idx:03d}"
+                lines.extend(["", f"**{marker}**", "", content, "", "---"])
+            else:
+                idx = page_text_counts.get(page, 0)
+                page_text_counts[page] = idx + 1
+                marker = f"P{page:03d}_S{idx:03d}"
+                lines.extend(["", f"**{marker}**", "", content, "", "---"])
 
-    def _mineru_backend_args(self) -> List[str]:
-        backend = os.getenv("MINERU_BACKEND", "vlm-http-client").strip() or "vlm-http-client"
-        args = ["-b", backend]
-        if backend in {"vlm-http-client", "hybrid-http-client"}:
-            server_url = os.getenv("MINERU_SERVER_URL", "http://mineru-openai-server:30000").strip()
-            if not server_url:
-                raise ContentExtractionError("MINERU_SERVER_URL 不能为空。")
-            args.extend(["-u", server_url])
-        return args
+        return "\n".join(lines).rstrip() + "\n"
 
-    def _mineru_common_args(self) -> List[str]:
-        method = os.getenv("MINERU_METHOD", "auto").strip() or "auto"
-        args = [
-            "-m",
-            method,
-            "--formula",
-            self._bool_cli("MINERU_FORMULA", True),
-            "--table",
-            self._bool_cli("MINERU_TABLE", True),
-            "--image-analysis",
-            self._bool_cli("MINERU_IMAGE_ANALYSIS", False),
-        ]
-        lang = os.getenv("MINERU_LANG", "").strip()
-        if lang:
-            args.extend(["-l", lang])
-        return args
-
-    def _extra_args(self) -> List[str]:
-        raw = os.getenv("MINERU_EXTRA_ARGS", "").strip()
-        return shlex.split(raw) if raw else []
-
-    def _mineru_output_root(self, source_path: Path) -> Path:
-        env_root = os.getenv("MINERU_OUTPUT_DIR", "").strip()
-        root = Path(env_root).expanduser() if env_root else source_path.parent / ".mineru_output"
-        root.mkdir(parents=True, exist_ok=True)
-        return root.resolve()
-
-    # ------------------------------------------------------------------
-    # MinerU output discovery
-    # ------------------------------------------------------------------
-
-    def _find_best_markdown(self, root: Path, preferred_stem: str) -> Optional[Path]:
-        candidates = [p for p in root.rglob("*.md") if p.is_file()]
-        if not candidates:
-            return None
-
-        stem = self._safe_name(preferred_stem).lower()
-        preferred = [p for p in candidates if p.stem.lower() == stem or stem in p.stem.lower()]
-        pool = preferred or candidates
-        non_empty = [p for p in pool if p.stat().st_size > 0]
-        if not non_empty:
-            return None
-        return max(non_empty, key=lambda p: p.stat().st_size)
-
-    def _find_content_list_json(self, root: Path) -> Optional[Path]:
-        patterns = ["*content_list*.json", "*middle*.json", "*.json"]
-        candidates: List[Path] = []
-        for pattern in patterns:
-            candidates.extend(p for p in root.rglob(pattern) if p.is_file())
-        # Prefer explicit content_list files; ignore logs/manifests if possible.
-        scored: List[Tuple[int, int, Path]] = []
-        for p in set(candidates):
-            name = p.name.lower()
-            if "log" in name or "manifest" in name:
-                continue
-            score = 0
-            if "content_list" in name:
-                score += 100
-            if "middle" in name:
-                score += 20
-            scored.append((score, p.stat().st_size, p))
-        if not scored:
-            return None
-        scored.sort(reverse=True)
-        return scored[0][2]
-
-    # ------------------------------------------------------------------
-    # Segment construction from MinerU output
-    # ------------------------------------------------------------------
-
-    def _segments_from_content_list(self, content_list_path: Path, document_id: str) -> List[TextSegment]:
+    def _redis_client(self):
         try:
-            data = json.loads(content_list_path.read_text(encoding="utf-8", errors="ignore"))
+            import redis  # type: ignore
         except Exception as exc:
-            self.logger.warning(f"无法读取 MinerU content_list JSON: {content_list_path}: {exc}")
-            return []
+            raise ContentExtractionError(
+                "PaddleOCR Redis 页批次模式需要安装 redis Python 包",
+                file_path="",
+            ) from exc
 
-        records = self._flatten_json_records(data)
-        segments: List[TextSegment] = []
-        table_index = 0
-        seq = 0
+        redis_url = os.getenv("PADDLEOCR_TASK_QUEUE_URL", "redis://redis:6379/0").strip()
+        client = redis.Redis.from_url(redis_url, decode_responses=True, socket_timeout=30, socket_connect_timeout=30)
+        client.ping()
+        return client
 
-        for item in records:
-            if not isinstance(item, dict):
-                continue
-            page = self._page_number_from_item(item)
-            item_type = str(item.get("type") or item.get("category") or item.get("layout_type") or "text").lower()
-            content = self._content_from_item(item)
-            if not content:
-                continue
+    def _redis_hash_set(self, client, key: str, mapping: Dict[str, Any]) -> None:
+        safe: Dict[str, str] = {}
+        for k, v in mapping.items():
+            if isinstance(v, (dict, list)):
+                safe[k] = json.dumps(v, ensure_ascii=False)
+            else:
+                safe[k] = "" if v is None else str(v)
+        client.hset(key, mapping=safe)
+        client.expire(key, int(os.getenv("PADDLEOCR_TASK_RESULT_TTL", "86400") or "86400"))
 
-            if "table" in item_type:
-                table_index += 1
-                seq += 1
-                table_id = f"{document_id}_table_{table_index:04d}"
-                table_title = self._table_title_from_item(item)
-                table_segment = TextSegment(
-                    segment_id=f"{document_id}_p{page}_s{seq}",
-                    content=content,
-                    page_number=page,
-                    position_y=float(item.get("y") or item.get("top") or 0.0),
-                    position_x=float(item.get("x") or item.get("left") or 0.0),
-                    segment_type="table",
-                    source_table_id=table_id,
-                    structured_data={
-                        "source": "mineru_content_list",
-                        "table_id": table_id,
-                        "raw_type": item_type,
-                        "table_title": table_title,
+    def _remove_queued_batches_for_job(self, client, queue_name: str, job_id: str) -> int:
+        """从 Redis 队列中移除同一 OCR job 的未开始 batch，避免失败后继续消费。"""
+        try:
+            items = client.lrange(queue_name, 0, -1) or []
+            if not items:
+                return 0
+            kept = []
+            removed = 0
+            for raw_item in items:
+                try:
+                    payload = json.loads(raw_item)
+                    if str(payload.get("job_id") or "") == job_id:
+                        removed += 1
+                        continue
+                except Exception:
+                    pass
+                kept.append(raw_item)
+            if removed:
+                pipe = client.pipeline()
+                pipe.delete(queue_name)
+                for raw_item in kept:
+                    pipe.rpush(queue_name, raw_item)
+                pipe.execute()
+                self.logger.warning(
+                    f"已从 PaddleOCR 队列移除失败 job 的剩余 batch: job_id={job_id}, removed={removed}"
+                )
+            return removed
+        except Exception as exc:
+            self.logger.warning(f"清理失败 job 的 Redis 队列项失败: job_id={job_id}, error={exc}")
+            return 0
+
+    def _get_paddleocr_page_batch_size(self) -> int:
+        """读取 PDF 拆分页数。
+
+        注意：PDF 是在 backend 中拆分的，不是在 PaddleOCR worker 中拆分。
+        因此 PADDLEOCR_PAGE_BATCH_SIZE 必须出现在 backend.environment 中。
+        默认值为 2，配置只在 backend.environment 中设置。
+        """
+        raw = os.getenv("PADDLEOCR_PAGE_BATCH_SIZE", "2")
+        try:
+            value = int(str(raw).strip())
+        except Exception:
+            self.logger.warning(
+                f"PADDLEOCR_PAGE_BATCH_SIZE={raw!r} 无法解析为整数，使用默认值 2"
+            )
+            value = 2
+        if value < 1:
+            self.logger.warning(
+                f"PADDLEOCR_PAGE_BATCH_SIZE={raw!r} 小于 1，使用 1"
+            )
+            value = 1
+        self.logger.info(
+            f"PaddleOCR-VL PDF 拆分 batch size 生效: PADDLEOCR_PAGE_BATCH_SIZE={raw!r}, effective={value}"
+        )
+        return value
+
+    def _split_pdf_for_page_batch_queue(
+        self,
+        source_path: Path,
+        job_id: str,
+        batch_size: int,
+    ) -> tuple[list[dict], int, Path]:
+        try:
+            from pypdf import PdfReader, PdfWriter  # type: ignore
+        except Exception as exc:
+            raise ContentExtractionError(
+                "页级 batch 队列需要 backend 安装 pypdf",
+                file_path=str(source_path),
+            ) from exc
+
+        work_root = Path(os.getenv("PADDLEOCR_JOB_WORK_DIR", "/workspace/uploads/paddleocr_vl_jobs"))
+        batch_dir = work_root / job_id / "batches"
+        if batch_dir.exists():
+            import shutil
+
+            shutil.rmtree(batch_dir, ignore_errors=True)
+        _ensure_shared_writable_dir(batch_dir)
+
+        reader = PdfReader(str(source_path))
+        total_pages = len(reader.pages)
+        if total_pages <= 0:
+            raise ContentExtractionError("PDF 没有可解析页", file_path=str(source_path))
+
+        units: list[dict] = []
+        for start in range(0, total_pages, max(1, batch_size)):
+            end = min(start + max(1, batch_size), total_pages)
+            writer = PdfWriter()
+            for page_index in range(start, end):
+                writer.add_page(reader.pages[page_index])
+            unit_index = len(units) + 1
+            batch_path = batch_dir / f"pages_{start + 1:04d}_{end:04d}.pdf"
+            tmp_path = batch_path.with_name(batch_path.name + ".tmp")
+            if tmp_path.exists():
+                try:
+                    tmp_path.unlink()
+                except Exception:
+                    pass
+            # 先写临时文件，flush/fsync 后再原子 rename 成最终文件名。
+            # 这样 worker 不会读到半写入的 PDF。
+            with tmp_path.open("wb") as f:
+                writer.write(f)
+                f.flush()
+                try:
+                    os.fsync(f.fileno())
+                except Exception:
+                    pass
+            os.replace(tmp_path, batch_path)
+            _ensure_shared_file(batch_path)
+            _fsync_parent_dir(batch_path)
+            ready_path = _write_shared_ready_marker(
+                batch_path,
+                payload={
+                    "job_id": job_id,
+                    "unit_index": unit_index,
+                    "start_page": start + 1,
+                    "end_page": end,
+                    "total_pages": total_pages,
+                },
+            )
+            units.append(
+                {
+                    "unit_index": unit_index,
+                    "batch_id": f"batch_{unit_index:04d}",
+                    "start_page": start + 1,
+                    "end_page": end,
+                    "input_path": str(batch_path),
+                    "ready_path": str(ready_path),
+                }
+            )
+
+        # 这里先在 backend 容器内做一次可见性校验，再入 Redis 队列。
+        # 这不能替代 worker 侧等待，但能提前发现目录/权限/挂载异常。
+        visibility_wait = float(os.getenv("PADDLEOCR_SPLIT_VISIBILITY_WAIT_SECONDS", "60") or "60")
+        deadline = time.time() + max(0.0, visibility_wait)
+        while True:
+            missing = []
+            for unit in units:
+                p = Path(unit["input_path"])
+                m = Path(unit["ready_path"])
+                try:
+                    if not (p.exists() and p.stat().st_size > 0 and m.exists() and m.stat().st_size > 0):
+                        missing.append(str(p))
+                except Exception:
+                    missing.append(str(p))
+            if not missing:
+                break
+            if time.time() >= deadline:
+                raise ContentExtractionError(
+                    f"PaddleOCR batch 文件写入后不可见，无法入队: missing={missing[:3]}",
+                    file_path=str(source_path),
+                )
+            time.sleep(0.25)
+
+        return units, total_pages, batch_dir
+
+    def _run_paddleocr_vl_page_batch_queue(self, source_path: Path) -> Dict[str, Any]:
+        client = self._redis_client()
+
+        queue_name = os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse").strip()
+        key_prefix = os.getenv("PADDLEOCR_TASK_KEY_PREFIX", "paddleocr:task").strip()
+        timeout = int(os.getenv("PADDLEOCR_VL_TIMEOUT", "14400") or "14400")
+        poll_interval = float(os.getenv("PADDLEOCR_TASK_POLL_INTERVAL", "2.0") or "2.0")
+        batch_size = self._get_paddleocr_page_batch_size()
+        output_root = Path(os.getenv("PADDLEOCR_OUTPUT_DIR", "/workspace/uploads/paddleocr_vl_output"))
+
+        job_id = f"parse_{uuid.uuid4().hex}"
+        task_key = f"{key_prefix}:{job_id}"
+        output_dir = output_root / job_id
+        _ensure_shared_writable_dir(output_root)
+        _ensure_shared_writable_dir(output_dir)
+        _ensure_shared_writable_dir(output_dir / "batches")
+
+        units, total_pages, batch_dir = self._split_pdf_for_page_batch_queue(source_path, job_id, batch_size)
+        total_units = len(units)
+
+        self.logger.info(
+            f"提交 PaddleOCR-VL 页级 batch 队列任务: job_id={job_id}, file={source_path.name}, "
+            f"pages={total_pages}, units={total_units}, batch_size={batch_size}, queue={queue_name}"
+        )
+        self._emit_progress(
+            "ocr_queued",
+            f"PaddleOCR queued: {total_pages} pages split into {total_units} batch(es).",
+            12,
+            paddle_progress={
+                "paddle_job_id": job_id,
+                "total_pages": total_pages,
+                "pages_done": 0,
+                "pages_success": 0,
+                "pages_failed": 0,
+                "total_units": total_units,
+                "units_done": 0,
+                "units_success": 0,
+                "units_failed": 0,
+                "units_running": 0,
+                "units_queued": total_units,
+                "page_batch_size": batch_size,
+                "running_batches": [],
+            },
+            paddle_job_id=job_id,
+            total_pages=total_pages,
+            total_units=total_units,
+            page_batch_size=batch_size,
+        )
+
+        self._redis_hash_set(
+            client,
+            task_key,
+            {
+                "status": "running",
+                "stage": "batch_queued",
+                "queue_granularity": "page-batch",
+                "filename": source_path.name,
+                "input_path": str(source_path),
+                "batch_dir": str(batch_dir),
+                "output_dir": str(output_dir),
+                "created_at": datetime.now().isoformat(),
+                "total_pages": total_pages,
+                "total_units": total_units,
+                "units_done": 0,
+                "page_batch_size": batch_size,
+            },
+        )
+
+        for unit in units:
+            unit_index = int(unit["unit_index"])
+            batch_key = f"{task_key}:batch:{unit_index:04d}"
+            payload = {
+                "task_type": "page_batch",
+                "job_id": job_id,
+                "filename": source_path.name,
+                "unit_index": unit_index,
+                "batch_id": unit["batch_id"],
+                "total_units": total_units,
+                "start_page": unit["start_page"],
+                "end_page": unit["end_page"],
+                "total_pages": total_pages,
+                "input_path": unit["input_path"],
+                "ready_path": unit.get("ready_path", ""),
+                "created_at": datetime.now().isoformat(),
+            }
+            self._redis_hash_set(
+                client,
+                batch_key,
+                {
+                    "status": "queued",
+                    "stage": "queued",
+                    "job_id": job_id,
+                    "filename": source_path.name,
+                    "unit_index": unit_index,
+                    "total_units": total_units,
+                    "start_page": unit["start_page"],
+                    "end_page": unit["end_page"],
+                    "input_path": unit["input_path"],
+                    "ready_path": unit.get("ready_path", ""),
+                    "created_at": datetime.now().isoformat(),
+                },
+            )
+            client.rpush(queue_name, json.dumps(payload, ensure_ascii=False))
+
+        deadline = time.time() + timeout
+        last_progress_signature = None
+        # 即使 batch 状态没有变化，也要定时推送“仍在处理”的进度。
+        # 否则单个 PaddleOCR batch 处理较久时，前端会看起来像卡住。
+        progress_emit_interval = float(os.getenv("PADDLEOCR_PROGRESS_EMIT_INTERVAL", "5.0") or "5.0")
+        last_progress_emit_ts = 0.0
+        while time.time() < deadline:
+            batch_states = [client.hgetall(f"{task_key}:batch:{i:04d}") for i in range(1, total_units + 1)]
+            statuses = [str(s.get("status", "queued")).lower() for s in batch_states]
+            done_count = sum(1 for s in statuses if s in {"success", "completed"})
+            failed_count = sum(1 for s in statuses if s == "failed")
+            running_count = sum(1 for s in statuses if s in {"running", "predict", "processing"})
+            queued_count = sum(1 for s in statuses if s in {"queued", "waiting", "waiting_model"})
+
+            def _int_field(item: Dict[str, Any], name: str, default: int = 0) -> int:
+                try:
+                    return int(item.get(name) or default)
+                except Exception:
+                    return default
+
+            pages_success = sum(
+                max(0, _int_field(st, "end_page") - _int_field(st, "start_page") + 1)
+                for st, status in zip(batch_states, statuses)
+                if status in {"success", "completed"}
+            )
+            pages_failed = sum(
+                max(0, _int_field(st, "end_page") - _int_field(st, "start_page") + 1)
+                for st, status in zip(batch_states, statuses)
+                if status == "failed"
+            )
+            pages_done = pages_success + pages_failed
+            running_batches = []
+            for st, status in zip(batch_states, statuses):
+                if status in {"running", "predict", "processing"}:
+                    running_batches.append(
+                        {
+                            "unit_index": _int_field(st, "unit_index"),
+                            "start_page": _int_field(st, "start_page"),
+                            "end_page": _int_field(st, "end_page"),
+                            "worker_id": st.get("worker_id") or "",
+                        }
+                    )
+            running_signature = tuple(
+                (b.get("unit_index"), b.get("start_page"), b.get("end_page"), b.get("worker_id"))
+                for b in running_batches
+            )
+            progress_signature = (done_count, failed_count, running_count, queued_count, running_signature)
+
+            now_ts = time.time()
+            should_emit_progress = (
+                progress_signature != last_progress_signature
+                or (progress_emit_interval > 0 and now_ts - last_progress_emit_ts >= progress_emit_interval)
+            )
+
+            if should_emit_progress:
+                running_pages_text = ", ".join(
+                    f"p{b['start_page']}-{b['end_page']}" if b["start_page"] != b["end_page"] else f"p{b['start_page']}"
+                    for b in running_batches[:3]
+                ) or "-"
+                self.logger.info(
+                    f"PaddleOCR-VL page-batch job={job_id} done={done_count}/{total_units} "
+                    f"batch={done_count + failed_count}/{total_units} failed={failed_count} "
+                    f"running={running_count} queued={queued_count} pages={pages_done}/{total_pages} "
+                    f"running_pages={running_pages_text}"
+                )
+                last_progress_signature = progress_signature
+                last_progress_emit_ts = now_ts
+                self._redis_hash_set(
+                    client,
+                    task_key,
+                    {
+                        "status": "running",
+                        "stage": "batch_processing",
+                        "units_done": done_count + failed_count,
+                        "units_success": done_count,
+                        "units_failed": failed_count,
+                        "units_running": running_count,
+                        "units_queued": queued_count,
+                        "pages_done": pages_done,
+                        "pages_success": pages_success,
+                        "pages_failed": pages_failed,
+                        "updated_at": datetime.now().isoformat(),
                     },
                 )
-                segments.append(table_segment)
-                row_cell_segments = self._table_segments_from_markdown(
-                    content,
-                    document_id,
-                    page,
-                    table_id,
-                    start_seq=seq,
-                    table_title=table_title,
+                ocr_progress = 12 + (33 * ((done_count + failed_count) / max(1, total_units)))
+                running_text = ""
+                if running_batches:
+                    shown = ", ".join(
+                        f"p{b['start_page']}-{b['end_page']}" if b["start_page"] != b["end_page"] else f"p{b['start_page']}"
+                        for b in running_batches[:3]
+                    )
+                    running_text = f" Running: {shown}."
+                self._emit_progress(
+                    "ocr_batch_processing",
+                    f"PaddleOCR progress: {done_count + failed_count}/{total_units} batches, {pages_done}/{total_pages} pages done.{running_text}",
+                    ocr_progress,
+                    paddle_progress={
+                        "paddle_job_id": job_id,
+                        "total_pages": total_pages,
+                        "pages_done": pages_done,
+                        "pages_success": pages_success,
+                        "pages_failed": pages_failed,
+                        "total_units": total_units,
+                        "units_done": done_count + failed_count,
+                        "units_success": done_count,
+                        "units_failed": failed_count,
+                        "units_running": running_count,
+                        "units_queued": queued_count,
+                        "page_batch_size": batch_size,
+                        "running_batches": running_batches,
+                        "updated_at": datetime.now().isoformat(),
+                    },
+                    paddle_job_id=job_id,
+                    units_done=done_count + failed_count,
+                    units_success=done_count,
+                    units_failed=failed_count,
+                    units_running=running_count,
+                    units_queued=queued_count,
+                    pages_done=pages_done,
+                    pages_success=pages_success,
+                    pages_failed=pages_failed,
+                    total_pages=total_pages,
+                    total_units=total_units,
+                    running_batches=running_batches,
                 )
-                if row_cell_segments:
-                    segments.extend(row_cell_segments)
-                    seq += len(row_cell_segments)
-                continue
 
-            segment_type = "text"
-            if "title" in item_type or "heading" in item_type:
-                segment_type = "heading"
-            elif "image" in item_type or "figure" in item_type:
-                segment_type = "image"
-            elif "equation" in item_type or "formula" in item_type:
-                segment_type = "formula"
-
-            if segment_type == "text" and len(content.strip()) < int(getattr(self.config, "min_text_length", 10) or 10):
-                continue
-
-            seq += 1
-            segments.append(
-                TextSegment(
-                    segment_id=f"{document_id}_p{page}_s{seq}",
-                    content=content,
-                    page_number=page,
-                    position_y=float(item.get("y") or item.get("top") or 0.0),
-                    position_x=float(item.get("x") or item.get("left") or 0.0),
-                    segment_type=segment_type,
-                    structured_data={"source": "mineru_content_list", "raw_type": item_type},
+            if failed_count:
+                errors = [s.get("error", "unknown worker error") for s in batch_states if str(s.get("status", "")).lower() == "failed"]
+                error_text = errors[0] if errors else "unknown worker error"
+                self._redis_hash_set(
+                    client,
+                    task_key,
+                    {
+                        "status": "failed",
+                        "stage": "failed",
+                        "cancel_requested": "1",
+                        "failed_at": datetime.now().isoformat(),
+                        "error": error_text,
+                    },
                 )
-            )
+                self._remove_queued_batches_for_job(client, queue_name, job_id)
+                # 给当前 worker 一点时间退出/释放，避免 backend 立刻删除目录后 worker 又开始下一批。
+                if running_count:
+                    time.sleep(float(os.getenv("PADDLEOCR_FAILURE_CLEANUP_DELAY", "3.0") or "3.0"))
+                if not _env_bool("PADDLEOCR_KEEP_PROCESS_OUTPUT", False):
+                    _cleanup_path_tree(output_dir, label="失败任务 worker batch 输出")
+                    _cleanup_path_tree(Path(os.getenv("PADDLEOCR_JOB_WORK_DIR", "/workspace/uploads/paddleocr_vl_jobs")) / job_id, label="失败任务拆页 PDF")
+                raise ContentExtractionError(
+                    f"PaddleOCR-VL 页级 batch 解析失败: job_id={job_id}, error={error_text}",
+                    file_path=str(source_path),
+                )
 
-        return segments
+            if done_count + failed_count >= total_units:
+                self._emit_progress("ocr_merging", "Merging OCR batch results.", 45, paddle_job_id=job_id, total_units=total_units)
+                return self._merge_paddleocr_page_batch_results(
+                    client=client,
+                    task_key=task_key,
+                    job_id=job_id,
+                    source_path=source_path,
+                    batch_states=batch_states,
+                    output_dir=output_dir,
+                    total_pages=total_pages,
+                    total_units=total_units,
+                    batch_size=batch_size,
+                )
 
-    def _flatten_json_records(self, data: Any) -> List[Dict[str, Any]]:
-        if isinstance(data, list):
-            out: List[Dict[str, Any]] = []
-            for x in data:
-                if isinstance(x, dict):
-                    out.append(x)
-                elif isinstance(x, list):
-                    out.extend(self._flatten_json_records(x))
-            return out
-        if isinstance(data, dict):
-            for key in ("content_list", "pdf_info", "pages", "blocks", "elements"):
-                val = data.get(key)
-                if isinstance(val, list):
-                    return self._flatten_json_records(val)
-            # MinerU middle JSON sometimes stores pages with blocks nested.
-            out: List[Dict[str, Any]] = []
-            for value in data.values():
-                if isinstance(value, list):
-                    out.extend(self._flatten_json_records(value))
-                elif isinstance(value, dict):
-                    out.extend(self._flatten_json_records(value))
-            return out
-        return []
+            time.sleep(max(0.25, poll_interval))
 
-    def _content_from_item(self, item: Dict[str, Any]) -> str:
-        keys = [
-            "text",
-            "content",
-            "md",
-            "markdown",
-            "table_body",
-            "table_html",
-            "html",
-            "latex",
-            "caption",
-            "img_caption",
-        ]
-        for key in keys:
-            value = item.get(key)
-            if value is None:
-                continue
-            if isinstance(value, list):
-                value = "\n".join(str(x) for x in value if str(x).strip())
-            text = str(value).strip()
-            if text:
-                return text
-        return ""
+        self._redis_hash_set(
+            client,
+            task_key,
+            {
+                "status": "failed",
+                "stage": "timeout",
+                "cancel_requested": "1",
+                "failed_at": datetime.now().isoformat(),
+                "error": f"timeout={timeout}s",
+            },
+        )
+        self._remove_queued_batches_for_job(client, queue_name, job_id)
+        if not _env_bool("PADDLEOCR_KEEP_PROCESS_OUTPUT", False):
+            _cleanup_path_tree(output_dir, label="超时任务 worker batch 输出")
+            _cleanup_path_tree(Path(os.getenv("PADDLEOCR_JOB_WORK_DIR", "/workspace/uploads/paddleocr_vl_jobs")) / job_id, label="超时任务拆页 PDF")
+        raise ContentExtractionError(
+            f"PaddleOCR-VL 页级 batch 队列解析超时: job_id={job_id}, timeout={timeout}s",
+            file_path=str(source_path),
+        )
 
-    def _table_title_from_item(self, item: Dict[str, Any]) -> str:
-        """Extract a concise table title/caption without changing table content."""
-        for key in ("table_title", "title", "caption", "table_caption", "img_caption"):
-            value = item.get(key)
-            if value is None:
-                continue
-            if isinstance(value, list):
-                value = " ".join(str(x) for x in value if str(x).strip())
-            text = re.sub(r"\s+", " ", str(value or "")).strip()
-            if text:
-                return text[:240]
-        return ""
+    def _merge_paddleocr_page_batch_results(
+        self,
+        *,
+        client,
+        task_key: str,
+        job_id: str,
+        source_path: Path,
+        batch_states: list[dict],
+        output_dir: Path,
+        total_pages: int,
+        total_units: int,
+        batch_size: int,
+    ) -> Dict[str, Any]:
+        combined_parts: list[str] = []
+        elapsed_total = 0.0
 
-    def _page_number_from_item(self, item: Dict[str, Any]) -> int:
-        for key in ("page_number", "page_no", "page", "page_id", "page_idx"):
-            value = item.get(key)
-            if value is None:
-                continue
-            try:
-                n = int(value)
-                if key == "page_idx":
-                    n += 1
-                return max(1, n)
-            except Exception:
-                continue
-        return 1
+        for idx, state in enumerate(batch_states, 1):
+            status = str(state.get("status", "")).lower()
+            if status in {"success", "completed"}:
+                try:
+                    result = json.loads(state.get("result_json") or "{}")
+                except Exception:
+                    result = dict(state)
+                md_path = Path(result.get("batch_markdown_path") or state.get("batch_markdown_path") or "")
+                if not md_path.exists():
+                    raise ContentExtractionError(
+                        f"PaddleOCR-VL batch 完成但 batch.md 不存在: job_id={job_id}, unit={idx}, path={md_path}",
+                        file_path=str(source_path),
+                    )
+                md = md_path.read_text(encoding="utf-8", errors="ignore").strip()
+                if md:
+                    combined_parts.append(md)
+                try:
+                    elapsed_total += float(result.get("elapsed_seconds") or 0.0)
+                except Exception:
+                    pass
+            elif status == "failed":
+                error = state.get("error") or state.get("traceback") or "unknown worker error"
+                raise ContentExtractionError(
+                    f"PaddleOCR-VL batch failed: job_id={job_id}, unit={idx}, error={error}",
+                    file_path=str(source_path),
+                )
+            else:
+                raise ContentExtractionError(
+                    f"PaddleOCR-VL batch 状态异常: job_id={job_id}, unit={idx}, status={status}",
+                    file_path=str(source_path),
+                )
+
+        markdown = "\n".join(part for part in combined_parts if str(part).strip()).strip()
+        if not markdown:
+            raise ContentExtractionError("PaddleOCR-VL 页级 batch 没有生成 Markdown", file_path=str(source_path))
+
+        keep_process_output = _env_bool("PADDLEOCR_KEEP_PROCESS_OUTPUT", False)
+        combined_md_path = output_dir / "combined.md"
+        result_markdown_path = ""
+        if keep_process_output:
+            _ensure_shared_writable_dir(output_dir)
+            combined_md_path.write_text(markdown, encoding="utf-8")
+            _ensure_shared_file(combined_md_path)
+            result_markdown_path = str(combined_md_path)
+
+        result = {
+            "status": "success",
+            "parser": "paddleocr-vl",
+            "pipeline_version": "v1.6",
+            "queue_granularity": "page-batch",
+            "mode": "page-batch",
+            "page_batch_size": batch_size,
+            "total_pages": total_pages,
+            "units_processed": total_units,
+            "elapsed_worker_seconds_sum": elapsed_total,
+            "output_dir": str(output_dir) if keep_process_output else "",
+            "result_markdown_path": result_markdown_path,
+            "intermediate_output_removed": not keep_process_output,
+            "markdown": markdown,
+        }
+        self._redis_hash_set(
+            client,
+            task_key,
+            {
+                "status": result["status"],
+                "stage": "completed",
+                "completed_at": datetime.now().isoformat(),
+                "result_json": {k: v for k, v in result.items() if k != "markdown"},
+                "output_dir": result["output_dir"],
+                "result_markdown_path": result_markdown_path,
+                "intermediate_output_removed": str(not keep_process_output).lower(),
+            },
+        )
+
+        if not keep_process_output:
+            _cleanup_path_tree(output_dir, label="worker batch 输出")
+            work_root = Path(os.getenv("PADDLEOCR_JOB_WORK_DIR", "/workspace/uploads/paddleocr_vl_jobs"))
+            _cleanup_path_tree(work_root / job_id, label="backend 拆页 PDF")
+
+        return result
+
+    # ------------------------------------------------------------------
+    # 从 PaddleOCR-VL Markdown 输出构造 TextSegment
+    # ------------------------------------------------------------------
 
     def _segments_from_markdown(self, markdown: str, document_id: str) -> List[TextSegment]:
         blocks = self._split_markdown_blocks(markdown)
@@ -532,7 +903,12 @@ class ContentExtractor:
                         position_x=0.0,
                         segment_type="table",
                         source_table_id=table_id,
-                        structured_data={"source": "mineru_markdown", "table_id": table_id, "table_title": current_heading},
+                        structured_data={
+                            "source": "paddleocr_vl_markdown",
+                            "parser": "paddleocr-vl",
+                            "table_id": table_id,
+                            "table_title": current_heading,
+                        },
                     )
                 )
                 table_segments = self._table_segments_from_markdown(
@@ -563,7 +939,7 @@ class ContentExtractor:
                     position_y=float(seq),
                     position_x=0.0,
                     segment_type=segment_type,
-                    structured_data={"source": "mineru_markdown"},
+                    structured_data={"source": "paddleocr_vl_markdown", "parser": "paddleocr-vl"},
                 )
             )
 
@@ -634,17 +1010,28 @@ class ContentExtractor:
         return [b for b in blocks if b]
 
     def _looks_like_table_line(self, stripped: str) -> bool:
-        """Stricter table-line detector than a raw pipe check."""
         if not stripped:
             return False
         if "<tr" in stripped.lower() or "<td" in stripped.lower() or "<th" in stripped.lower():
             return True
         if "|" not in stripped:
             return False
-        # Standard Markdown / pipe tables should have at least two separators
-        # or start/end pipes.  Avoid treating normal prose containing one pipe
-        # character as a table block.
         return stripped.count("|") >= 2 or (stripped.startswith("|") and "|" in stripped[1:])
+
+    def _looks_like_markdown_table(self, block: str) -> bool:
+        if re.search(r"<\s*(table|tr|td|th)\b", block or "", flags=re.IGNORECASE):
+            return bool(self._parse_html_table_rows(block))
+        lines = [ln for ln in block.splitlines() if ln.strip()]
+        if len(lines) < 2:
+            return False
+        pipe_lines = [ln for ln in lines if self._looks_like_table_line(ln.strip())]
+        if len(pipe_lines) < 2:
+            return False
+        parsed = self._parse_markdown_table_rows("\n".join(pipe_lines))
+        if len(parsed) < 2:
+            return False
+        widths = [len(row) for row in parsed if row]
+        return bool(widths and max(widths) >= 2 and widths.count(widths[0]) >= 2)
 
     def _table_segments_from_markdown(
         self,
@@ -665,6 +1052,7 @@ class ContentExtractor:
         if not any(headers):
             max_cols = max((len(r) for r in data_rows), default=0)
             headers = [f"Column {i + 1}" for i in range(max_cols)]
+
         segments: List[TextSegment] = []
         seq = start_seq
 
@@ -685,7 +1073,8 @@ class ContentExtractor:
                     source_table_id=table_id,
                     row_header=row_header,
                     structured_data={
-                        "source": "mineru_table_parser",
+                        "source": "paddleocr_vl_table_parser",
+                        "parser": "paddleocr-vl",
                         "table_id": table_id,
                         "table_title": table_title,
                         "row_index": r_idx,
@@ -720,7 +1109,8 @@ class ContentExtractor:
                         col_header=col_header,
                         value_text=value,
                         structured_data={
-                            "source": "mineru_table_parser",
+                            "source": "paddleocr_vl_table_parser",
+                            "parser": "paddleocr-vl",
                             "table_id": table_id,
                             "table_title": table_title,
                             "row_index": r_idx,
@@ -751,7 +1141,20 @@ class ContentExtractor:
             parser.close()
         except Exception:
             return []
-        rows = [self._normalise_table_row(row) for row in parser.rows if any(str(c).strip() for c in row)]
+        return [self._normalise_table_row(row) for row in parser.rows if any(str(c).strip() for c in row)]
+
+    def _parse_markdown_table_rows(self, table_md: str) -> List[List[str]]:
+        rows: List[List[str]] = []
+        for line in table_md.splitlines():
+            stripped = line.strip()
+            if not stripped or "|" not in stripped:
+                continue
+            cells = [c.strip() for c in stripped.strip("|").split("|")]
+            if not cells:
+                continue
+            if all(re.fullmatch(r":?-{2,}:?", c.replace(" ", "")) for c in cells if c):
+                continue
+            rows.append(cells)
         return rows
 
     def _normalise_table_row(self, row: Sequence[Any], width: Optional[int] = None) -> List[str]:
@@ -792,39 +1195,12 @@ class ContentExtractor:
         parts.append(f"Page: {page}")
         return "\n".join(p for p in parts if p)
 
-    def _parse_markdown_table_rows(self, table_md: str) -> List[List[str]]:
-        rows: List[List[str]] = []
-        for line in table_md.splitlines():
-            stripped = line.strip()
-            if not stripped or "|" not in stripped:
-                continue
-            cells = [c.strip() for c in stripped.strip("|").split("|")]
-            if not cells:
-                continue
-            # Markdown separator row: |---|:---:|
-            if all(re.fullmatch(r":?-{2,}:?", c.replace(" ", "")) for c in cells if c):
-                continue
-            rows.append(cells)
-        return rows
-
-    def _looks_like_markdown_table(self, block: str) -> bool:
-        if re.search(r"<\s*(table|tr|td|th)\b", block or "", flags=re.IGNORECASE):
-            return bool(self._parse_html_table_rows(block))
-        lines = [ln for ln in block.splitlines() if ln.strip()]
-        if len(lines) < 2:
-            return False
-        pipe_lines = [ln for ln in lines if self._looks_like_table_line(ln.strip())]
-        if len(pipe_lines) < 2:
-            return False
-        parsed = self._parse_markdown_table_rows("\n".join(pipe_lines))
-        if len(parsed) < 2:
-            return False
-        widths = [len(row) for row in parsed if row]
-        return bool(widths and max(widths) >= 2 and widths.count(widths[0]) >= 2)
-
     def _page_marker(self, block: str) -> Optional[int]:
         patterns = [
-            r"<!--\s*page\s*:?\s*(\d+)\s*-->",
+            # 服务端页码标记格式：<!-- Page 12 | PaddleOCR-VL unit 12/116 part 1 -->
+            # 只捕获紧跟在 Page 后面的页码，避免误取后面的 unit/part 数字。
+            r"<!--\s*page\s+(\d+)\b",
+            r"<!--\s*paddleocr-vl\s+page/part\s*:?.*?page\s*(\d+)\b",
             r"^\s*page\s*[:#-]?\s*(\d+)\s*$",
             r"^\s*第\s*(\d+)\s*页\s*$",
         ]
@@ -838,7 +1214,7 @@ class ContentExtractor:
         return None
 
     # ------------------------------------------------------------------
-    # Utilities
+    # 工具函数
     # ------------------------------------------------------------------
 
     def _document_id(self, path: Path) -> str:
@@ -848,19 +1224,3 @@ class ContentExtractor:
     def _safe_name(self, text: str) -> str:
         value = re.sub(r"[^0-9A-Za-z_.-]+", "_", str(text or "")).strip("_")
         return value or "document"
-
-    def _env_bool(self, name: str, default: bool) -> bool:
-        raw = os.getenv(name)
-        if raw is None:
-            return default
-        return str(raw).strip().lower() in {"1", "true", "yes", "y", "on"}
-
-    def _bool_cli(self, name: str, default: bool) -> str:
-        return "true" if self._env_bool(name, default) else "false"
-
-    def _tail_text(self, path: Path, max_lines: int = 80) -> str:
-        try:
-            lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
-            return "\n".join(lines[-max_lines:])
-        except Exception:
-            return ""

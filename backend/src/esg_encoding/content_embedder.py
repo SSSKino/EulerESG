@@ -10,6 +10,7 @@ import torch
 from loguru import logger
 
 from .shared_embedding_model import get_shared_embedding_model
+from .gpu_model_lifecycle import backend_lazy_load_enabled
 from .embedding_settings import get_configured_embedding_model_name
 
 from .models import TextSegment, SegmentEmbedding, DocumentContent, ReportContent, ProcessingConfig
@@ -32,9 +33,15 @@ class ContentEmbedder:
         requested_device = os.getenv("LOCAL_EMBEDDINGS_DEVICE") or str(getattr(self.config, "device", "cuda") or "cuda")
         self.device = torch.device(requested_device)
         
-        # 加载模型
+        # 模型按需加载：服务启动时不占用显存；真正需要 embedding 时再加载。
         self.model = None
-        self._load_model()
+        if not backend_lazy_load_enabled():
+            self._load_model()
+
+    def _ensure_model(self):
+        if self.model is None:
+            self._load_model()
+        return self.model
 
     def _load_model(self):
         """加载嵌入模型（优先本地 HF cache，缺失/损坏才允许远端下载）"""
@@ -65,6 +72,7 @@ class ContentEmbedder:
         """
         try:
             self.logger.info(f"开始生成嵌入: {len(document_content.segments)} 个段落")
+            self._ensure_model()
             
             # 准备文本列表
             texts = [segment.content for segment in document_content.segments]
@@ -106,7 +114,8 @@ class ContentEmbedder:
         """
         try:
             # 使用模型生成嵌入
-            embeddings = self.model.encode(
+            model = self._ensure_model()
+            embeddings = model.encode(
                 texts,
                 batch_size=self.config.batch_size,
                 show_progress_bar=True,
@@ -133,7 +142,8 @@ class ContentEmbedder:
         """
         try:
             # 生成查询嵌入
-            query_embedding = self.model.encode([query_text], normalize_embeddings=True)[0]
+            model = self._ensure_model()
+            query_embedding = model.encode([query_text], normalize_embeddings=True)[0]
             
             # 计算相似度
             similarities = []

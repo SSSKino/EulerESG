@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
-# CUDA 13.0-compatible backend image with vLLM kept inside the backend container.
-# MinerU VLM inference runs in a separate mineru-openai-server container.
+# CUDA 13.0-compatible backend image.
+# PDF parsing is handled by a separate PaddleOCR-VL v1.6 service.
 FROM vllm/vllm-openai:v0.21.0
 # If you must use CUDA 12.9 instead, switch to:
 # FROM vllm/vllm-openai:v0.21.0-cu129
@@ -16,7 +16,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_DEFAULT_TIMEOUT=600 \
     HF_HOME=/root/.cache/huggingface \
-    TRANSFORMERS_CACHE=/root/.cache/huggingface \
     HF_HUB_DISABLE_XET=1 \
     HF_HUB_ENABLE_HF_TRANSFER=0
 
@@ -35,15 +34,9 @@ ENV EMBEDDING_MODEL=microsoft/harrier-oss-v1-0.6b \
     LOCAL_RERANKER_BATCH_SIZE=8 \
     LOCAL_RERANKER_MAX_CHARS_PER_PASSAGE=8192
 
-# Backend uses MinerU CLI as an HTTP client. VLM inference is served by the separate MinerU GPU container.
-ENV MINERU_EXEC_MODE=local-cli \
-    MINERU_BACKEND=vlm-http-client \
-    MINERU_SERVER_URL=http://mineru-openai-server:30000 \
-    MINERU_METHOD=auto \
-    MINERU_FORMULA=true \
-    MINERU_TABLE=true \
-    MINERU_IMAGE_ANALYSIS=false \
-    MINERU_CLI_TIMEOUT=0
+# Backend submits PaddleOCR-VL page batches through Redis.
+ENV PARSER_BACKEND=paddleocr \
+    PADDLEOCR_VL_TIMEOUT=10800
 
 WORKDIR /workspace/backend
 
@@ -62,7 +55,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 COPY requirements.docker.txt /workspace/backend/requirements.docker.txt
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-    python3 -m pip install --timeout 600 --prefer-binary -U pip setuptools wheel \
+    python3 -m pip install --timeout 600 --prefer-binary -U pip "setuptools>=77,<81" wheel \
       -i https://pypi.tuna.tsinghua.edu.cn/simple \
       --trusted-host pypi.tuna.tsinghua.edu.cn \
     && python3 -m pip install --timeout 600 --prefer-binary -r /workspace/backend/requirements.docker.txt \

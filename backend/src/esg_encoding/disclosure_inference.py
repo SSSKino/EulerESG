@@ -1724,83 +1724,335 @@ Return JSON format:
         Returns:
             str: Markdown format report
         """
-        # Deduplicate metric analyses based on metric_id
+        def _status_value(analysis: DisclosureAnalysis) -> str:
+            raw = getattr(analysis, "disclosure_status", "")
+            return raw.value if hasattr(raw, "value") else str(raw or "")
+
+        def _status_label(status: str) -> str:
+            return {
+                "fully_disclosed": "Fully Disclosed",
+                "partially_disclosed": "Partially Disclosed",
+                "not_disclosed": "Not Disclosed",
+            }.get(status, status.replace("_", " ").title() or "Unknown")
+
+        def _clean_text(value: object, *, default: str = "") -> str:
+            text = str(value or default).replace("\r\n", "\n").replace("\r", "\n")
+            text = re.sub(r"[ \t]+", " ", text)
+            text = re.sub(r"\n{3,}", "\n\n", text)
+            return text.strip()
+
+        def _compact(value: object, limit: int = 180) -> str:
+            text = re.sub(r"\s+", " ", _clean_text(value)).strip()
+            if not text:
+                return ""
+            return text if len(text) <= limit else text[: max(0, limit - 3)].rstrip() + "..."
+
+        def _table_cell(value: object, limit: int = 180) -> str:
+            text = _compact(value, limit=limit)
+            if not text:
+                return "-"
+            return text.replace("|", "\\|")
+
+        def _metric_code(analysis: DisclosureAnalysis) -> str:
+            return (
+                _clean_text(getattr(analysis, "metric_code", ""))
+                or _clean_text(getattr(analysis, "metric_id", ""))
+                or "-"
+            )
+
+        def _metric_name(analysis: DisclosureAnalysis) -> str:
+            return _clean_text(getattr(analysis, "metric_name", "")) or "Unnamed metric"
+
+        def _value_text(analysis: DisclosureAnalysis) -> str:
+            value = getattr(analysis, "value", None)
+            if value is None or str(value).strip().lower() in {"", "n/a", "na", "none", "null"}:
+                return "n/a"
+            unit = _clean_text(getattr(analysis, "unit", ""))
+            return f"{value} {unit}".strip()
+
+        def _page_text(analysis: DisclosureAnalysis) -> str:
+            page = getattr(analysis, "page", None)
+            return str(page) if page not in (None, "") else "-"
+
+        def _evidence_text(analysis: DisclosureAnalysis, limit: int = 3) -> str:
+            segments = [
+                str(x).strip()
+                for x in (getattr(analysis, "evidence_segments", None) or [])
+                if str(x).strip()
+            ]
+            if not segments:
+                return "-"
+            shown = segments[:limit]
+            suffix = f" (+{len(segments) - limit} more)" if len(segments) > limit else ""
+            return ", ".join(shown) + suffix
+
+        def _first_suggestion(analysis: DisclosureAnalysis) -> str:
+            suggestions = [
+                _compact(x, 220)
+                for x in (getattr(analysis, "improvement_suggestions", None) or [])
+                if _clean_text(x)
+            ]
+            if suggestions:
+                return suggestions[0]
+            status = _status_value(analysis)
+            if status == "not_disclosed":
+                return "Add an explicit metric-level disclosure with value, unit, reporting period, and boundary."
+            if status == "partially_disclosed":
+                return "Clarify the disclosed value or narrative with scope, methodology, unit, and reporting period."
+            return "Maintain consistent metric-level disclosure and evidence references in future reports."
+
+        def _pct(count: int, total: int) -> str:
+            return f"{count / max(total, 1):.1%}"
+
+        def _metric_phrase(count: int) -> str:
+            return f"{count} metric" if count == 1 else f"{count} metrics"
+
+        def _topic_key(analysis: DisclosureAnalysis) -> str:
+            return (
+                _clean_text(getattr(analysis, "topic", ""))
+                or _clean_text(getattr(analysis, "type", ""))
+                or _clean_text(getattr(analysis, "category", ""))
+                or "General"
+            )
+
+        def _append_field(lines: List[str], label: str, value: object, *, limit: int = 0) -> None:
+            text = _clean_text(value)
+            if not text:
+                return
+            if limit > 0:
+                text = _compact(text, limit)
+            lines.append(f"- **{label}**: {text}")
+
+        def _append_suggestions(lines: List[str], analysis: DisclosureAnalysis) -> None:
+            suggestions = [
+                _clean_text(x)
+                for x in (getattr(analysis, "improvement_suggestions", None) or [])
+                if _clean_text(x)
+            ]
+            if not suggestions and _status_value(analysis) != "fully_disclosed":
+                suggestions = [_first_suggestion(analysis)]
+            if not suggestions:
+                return
+            lines.append("- **Recommended actions**:")
+            for suggestion in suggestions[:5]:
+                lines.append(f"  - {suggestion}")
+
         seen_metric_ids = set()
         unique_metric_analyses = []
         for analysis in assessment.metric_analyses:
-            if analysis.metric_id not in seen_metric_ids:
+            key = (
+                _clean_text(getattr(analysis, "metric_id", ""))
+                or _clean_text(getattr(analysis, "metric_code", ""))
+                or _metric_name(analysis)
+            )
+            if key not in seen_metric_ids:
                 unique_metric_analyses.append(analysis)
-                seen_metric_ids.add(analysis.metric_id)
-        
-        # Update assessment with deduplicated analyses
+                seen_metric_ids.add(key)
+
         total_unique_metrics = len(unique_metric_analyses)
-        
-        # Recalculate disclosure summary based on unique metrics
-        disclosure_summary = {"fully_disclosed": 0, "partially_disclosed": 0, "not_disclosed": 0}
+        disclosure_summary = {
+            "fully_disclosed": 0,
+            "partially_disclosed": 0,
+            "not_disclosed": 0,
+        }
         for analysis in unique_metric_analyses:
-            if analysis.disclosure_status.value == "fully_disclosed":
-                disclosure_summary["fully_disclosed"] += 1
-            elif analysis.disclosure_status.value == "partially_disclosed":
-                disclosure_summary["partially_disclosed"] += 1
+            status = _status_value(analysis)
+            if status in disclosure_summary:
+                disclosure_summary[status] += 1
             else:
                 disclosure_summary["not_disclosed"] += 1
-        
-        # Recalculate overall score
-        overall_score = (disclosure_summary["fully_disclosed"] + 0.5 * disclosure_summary["partially_disclosed"]) / max(total_unique_metrics, 1)
-        
-        report = f"""# ESG Compliance Assessment Report
 
-## Report Overview
-- **Report ID**: {assessment.report_id}
-- **Assessment Date**: {assessment.assessment_date.strftime("%Y-%m-%d %H:%M:%S")}
-- **Analyzed Metrics**: {total_unique_metrics}
-- **Overall Compliance Score**: {overall_score:.2%}
+        overall_score = (
+            disclosure_summary["fully_disclosed"]
+            + 0.5 * disclosure_summary["partially_disclosed"]
+        ) / max(total_unique_metrics, 1)
 
-## Disclosure Status Statistics
+        needs_attention = [
+            a
+            for a in unique_metric_analyses
+            if _status_value(a) in {"not_disclosed", "partially_disclosed"}
+        ]
+        priority_gaps = sorted(
+            needs_attention,
+            key=lambda a: 0 if _status_value(a) == "not_disclosed" else 1,
+        )
 
-| Disclosure Status | Count | Percentage |
-|---------|------|------|
-| Fully Disclosed | {disclosure_summary["fully_disclosed"]} | {disclosure_summary["fully_disclosed"] / max(total_unique_metrics, 1):.1%} |
-| Partially Disclosed | {disclosure_summary["partially_disclosed"]} | {disclosure_summary["partially_disclosed"] / max(total_unique_metrics, 1):.1%} |
-| Not Disclosed | {disclosure_summary["not_disclosed"]} | {disclosure_summary["not_disclosed"] / max(total_unique_metrics, 1):.1%} |
+        topic_counts: Dict[str, int] = {}
+        for analysis in needs_attention:
+            topic = _topic_key(analysis)
+            topic_counts[topic] = topic_counts.get(topic, 0) + 1
+        top_topics = sorted(topic_counts.items(), key=lambda item: item[1], reverse=True)[:3]
 
-## Detailed Analysis Results
+        lines: List[str] = [
+            "# ESG Compliance Assessment Report",
+            "",
+            "## Executive Summary",
+            f"- **Overall compliance score**: {overall_score:.2%}",
+            (
+                f"- **Coverage**: {disclosure_summary['fully_disclosed']} fully disclosed, "
+                f"{disclosure_summary['partially_disclosed']} partially disclosed, "
+                f"{disclosure_summary['not_disclosed']} not disclosed out of "
+                f"{_metric_phrase(total_unique_metrics)}."
+            ),
+            (
+                f"- **Priority workload**: {_metric_phrase(len(needs_attention))} "
+                f"{'needs' if len(needs_attention) == 1 else 'need'} follow-up "
+                f"({disclosure_summary['not_disclosed']} missing, "
+                f"{disclosure_summary['partially_disclosed']} incomplete)."
+            ),
+        ]
+        if top_topics:
+            topic_text = "; ".join(f"{topic}: {count}" for topic, count in top_topics)
+            lines.append(f"- **Largest disclosure gaps by topic/type**: {topic_text}.")
 
-"""
-        
-        # Group by disclosure status using deduplicated metrics
-        for status in [DisclosureStatus.NOT_DISCLOSED, DisclosureStatus.PARTIALLY_DISCLOSED, DisclosureStatus.FULLY_DISCLOSED]:
-            status_metrics = [a for a in unique_metric_analyses if a.disclosure_status == status]
-            
-            if status_metrics:
-                status_name = {
-                    DisclosureStatus.FULLY_DISCLOSED: "✅ Fully Disclosed",
-                    DisclosureStatus.PARTIALLY_DISCLOSED: "⚠️ Partially Disclosed",
-                    DisclosureStatus.NOT_DISCLOSED: "❌ Not Disclosed"
-                }[status]
-                
-                report += f"### {status_name}\n\n"
-                
-                for analysis in status_metrics:
-                    report += f"#### {analysis.metric_name} ({analysis.metric_code})\n"
-                    report += f"- **Analysis Reasoning**: {analysis.reasoning}\n"
-                    
-                    if analysis.evidence_segments:
-                        report += f"- **Evidence Segments**: {', '.join(analysis.evidence_segments[:3])}\n"
-                    
-                    if analysis.improvement_suggestions:
-                        report += "- **Improvement Suggestions**:\n"
-                        for suggestion in analysis.improvement_suggestions:
-                            report += f"  - {suggestion}\n"
-                    
-                    report += "\n"
-        
-        report += """## Improvement Recommendations Summary
+        lines.extend(
+            [
+                "",
+                "## Report Overview",
+                f"- **Report ID**: {assessment.report_id}",
+                f"- **Assessment Date**: {assessment.assessment_date.strftime('%Y-%m-%d %H:%M:%S')}",
+                f"- **Analyzed Metrics**: {total_unique_metrics}",
+                f"- **Overall Compliance Score**: {overall_score:.2%}",
+                "",
+                "## Disclosure Status Statistics",
+                "",
+                "| Disclosure Status | Count | Percentage |",
+                "|---|---:|---:|",
+                (
+                    f"| Fully Disclosed | {disclosure_summary['fully_disclosed']} | "
+                    f"{_pct(disclosure_summary['fully_disclosed'], total_unique_metrics)} |"
+                ),
+                (
+                    f"| Partially Disclosed | {disclosure_summary['partially_disclosed']} | "
+                    f"{_pct(disclosure_summary['partially_disclosed'], total_unique_metrics)} |"
+                ),
+                (
+                    f"| Not Disclosed | {disclosure_summary['not_disclosed']} | "
+                    f"{_pct(disclosure_summary['not_disclosed'], total_unique_metrics)} |"
+                ),
+                "",
+            ]
+        )
 
-Based on the analysis results, it is recommended to prioritize improvements in the following areas:
-1. For undisclosed metrics, recommend adding relevant content in the next report
-2. For partially disclosed metrics, recommend providing more detailed quantitative data
-3. Recommend adopting standardized ESG reporting frameworks to improve completeness and comparability of disclosures
-"""
-        
-        return report
+        if priority_gaps:
+            lines.extend(
+                [
+                    "## Priority Gaps",
+                    "",
+                    "| Priority | Status | Code | Metric | Evidence/Page | Recommended Action |",
+                    "|---:|---|---|---|---|---|",
+                ]
+            )
+            for idx, analysis in enumerate(priority_gaps[:10], start=1):
+                evidence_page = f"{_evidence_text(analysis)} / page {_page_text(analysis)}"
+                lines.append(
+                    "| "
+                    + " | ".join(
+                        [
+                            str(idx),
+                            _table_cell(_status_label(_status_value(analysis)), 80),
+                            _table_cell(_metric_code(analysis), 80),
+                            _table_cell(_metric_name(analysis), 220),
+                            _table_cell(evidence_page, 120),
+                            _table_cell(_first_suggestion(analysis), 260),
+                        ]
+                    )
+                    + " |"
+                )
+            if len(priority_gaps) > 10:
+                lines.append("")
+                lines.append(f"_Showing top 10 of {len(priority_gaps)} metrics needing follow-up._")
+            lines.append("")
+
+        lines.extend(
+            [
+                "## Disclosure Matrix",
+                "",
+                "| Status | Code | Metric | Value | Page | Evidence Segments |",
+                "|---|---|---|---|---:|---|",
+            ]
+        )
+        for analysis in unique_metric_analyses:
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        _table_cell(_status_label(_status_value(analysis)), 80),
+                        _table_cell(_metric_code(analysis), 80),
+                        _table_cell(_metric_name(analysis), 240),
+                        _table_cell(_value_text(analysis), 120),
+                        _table_cell(_page_text(analysis), 40),
+                        _table_cell(_evidence_text(analysis), 160),
+                    ]
+                )
+                + " |"
+            )
+        lines.extend(["", "## Detailed Analysis Results", ""])
+
+        status_sections = [
+            ("partially_disclosed", "Partially Disclosed - Needs Follow-up"),
+            ("not_disclosed", "Not Disclosed - Missing Metrics"),
+            ("fully_disclosed", "Fully Disclosed - Supported Metrics"),
+        ]
+        for status, title in status_sections:
+            status_metrics = [a for a in unique_metric_analyses if _status_value(a) == status]
+            if not status_metrics:
+                continue
+            lines.extend([f"### {title}", ""])
+            for analysis in status_metrics:
+                lines.append(f"#### {_metric_name(analysis)} ({_metric_code(analysis)})")
+                lines.append(f"- **Status**: {_status_label(status)}")
+                _append_field(lines, "Topic/Type", _topic_key(analysis))
+                _append_field(lines, "Expected unit", getattr(analysis, "unit", ""))
+                lines.append(f"- **Reported value**: {_value_text(analysis)}")
+                lines.append(f"- **Page**: {_page_text(analysis)}")
+                if _evidence_text(analysis) != "-":
+                    lines.append(f"- **Evidence segments**: {_evidence_text(analysis)}")
+                _append_field(lines, "Evidence context", getattr(analysis, "context", ""), limit=700)
+                _append_field(lines, "Analysis reasoning", getattr(analysis, "reasoning", ""), limit=1200)
+                _append_suggestions(lines, analysis)
+                lines.append("")
+
+        lines.extend(["## Improvement Recommendations Summary", ""])
+        if needs_attention:
+            lines.append(
+                "1. Prioritize metric-level remediation for missing and partial "
+                "disclosures before broad narrative edits."
+            )
+            if disclosure_summary["not_disclosed"]:
+                missing = [
+                    f"{_metric_code(a)} {_metric_name(a)}"
+                    for a in priority_gaps
+                    if _status_value(a) == "not_disclosed"
+                ][:5]
+                lines.append(
+                    "2. Add explicit disclosures for missing metrics: "
+                    + "; ".join(missing)
+                    + "."
+                )
+            else:
+                lines.append(
+                    "2. No fully missing metrics were detected; focus on strengthening partial disclosures."
+                )
+            if disclosure_summary["partially_disclosed"]:
+                lines.append(
+                    "3. For partially disclosed metrics, add the missing value, "
+                    "unit, reporting boundary, period, and evidence page reference."
+                )
+            else:
+                lines.append(
+                    "3. Keep current fully disclosed metrics traceable by preserving "
+                    "value, unit, period, and source page references."
+                )
+            lines.append(
+                "4. Align future report sections with framework metric codes so "
+                "retrieval and reviewer traceability are stronger."
+            )
+        else:
+            lines.append(
+                "All analyzed metrics are fully disclosed. Maintain the current "
+                "metric-code mapping, evidence citations, and reporting-period "
+                "consistency in future reports."
+            )
+
+        return "\n".join(lines).rstrip() + "\n"

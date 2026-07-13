@@ -16,7 +16,24 @@ export interface UploadResponse {
   status: string;
   report_id: string;
   file_id?: string;
-  summary: string;
+  summary?: string;
+  job_id?: string;
+  message?: string;
+  events_url?: string;
+  processing_status_url?: string;
+}
+
+export interface ReportJobEvent {
+  job_id: string;
+  file_id?: string;
+  filename?: string;
+  status: string;
+  stage?: string;
+  progress?: number;
+  message?: string;
+  error?: string | null;
+  result?: any;
+  seq?: number;
 }
 
 export interface MetricsUploadResponse {
@@ -236,6 +253,109 @@ class APIService {
     });
   }
 
+
+  async getReportJobStatus(jobId: string): Promise<{ status: string; job: ReportJobEvent }> {
+    return this.fetchWithError(`${API_BASE_URL}/api/report-jobs/${encodeURIComponent(jobId)}`);
+  }
+
+  subscribeReportJob(
+    jobId: string,
+    handlers: {
+      onEvent?: (event: ReportJobEvent) => void;
+      onDone?: (event: ReportJobEvent) => void;
+      onError?: (event: ReportJobEvent | Error) => void;
+    }
+  ): () => void {
+    if (typeof window === "undefined") return () => {};
+
+    let closed = false;
+    let terminal = false;
+    let lastSeq = 0;
+    let source: EventSource | null = null;
+    let pollTimer: ReturnType<typeof window.setInterval> | null = null;
+
+    const handleData = (data: ReportJobEvent | null) => {
+      if (!data || closed || terminal) return;
+      const seq = Number(data.seq || 0);
+      if (seq && seq < lastSeq) return;
+      if (seq) lastSeq = seq;
+
+      handlers.onEvent?.(data);
+      if (["success", "partial_success", "failed"].includes(data.status)) {
+        terminal = true;
+        if (data.status === "failed") handlers.onError?.(data);
+        else handlers.onDone?.(data);
+        cleanup();
+      }
+    };
+
+    const parse = (event: MessageEvent): ReportJobEvent | null => {
+      if (!event || typeof event.data !== "string" || !event.data.trim()) return null;
+      try {
+        return JSON.parse(event.data) as ReportJobEvent;
+      } catch (error) {
+        console.warn("Failed to parse report job SSE event", error, event.data);
+        return null;
+      }
+    };
+
+    const startPollingFallback = () => {
+      // Next.js rewrites or proxies can sometimes buffer/close SSE streams.
+      // Polling keeps the UI progress moving even when EventSource is unavailable.
+      if (pollTimer) return;
+      pollTimer = window.setInterval(async () => {
+        if (closed || terminal) return;
+        try {
+          const result = await this.getReportJobStatus(jobId);
+          handleData(result.job);
+        } catch (error) {
+          // Keep polling. A transient network failure should not hide progress forever.
+          console.warn("Report job polling failed", error);
+        }
+      }, 2000);
+    };
+
+    const token = this.getAuthToken();
+    const qs = token ? `?token=${encodeURIComponent(token)}` : "";
+
+    try {
+      source = new EventSource(`${API_BASE_URL}/api/report-jobs/${encodeURIComponent(jobId)}/events${qs}`);
+      source.addEventListener("snapshot", (event) => handleData(parse(event as MessageEvent)));
+      source.addEventListener("progress", (event) => handleData(parse(event as MessageEvent)));
+      source.addEventListener("done", (event) => handleData(parse(event as MessageEvent)));
+      source.addEventListener("error", (event) => {
+        const data = parse(event as MessageEvent);
+        if (data && data.status === "failed") {
+          handleData(data);
+          return;
+        }
+        // Browser EventSource also emits generic error events during reconnects.
+        // Do not fail the upload UI here. Polling remains active as fallback.
+        startPollingFallback();
+      });
+    } catch (error) {
+      console.warn("Report job SSE failed to start; using polling fallback", error);
+      startPollingFallback();
+    }
+
+    // Always enable polling fallback. If SSE works, duplicate events are ignored by seq/status.
+    startPollingFallback();
+
+    function cleanup() {
+      closed = true;
+      if (source) {
+        source.close();
+        source = null;
+      }
+      if (pollTimer) {
+        window.clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
+    return cleanup;
+  }
+
   async getAssessmentScopesForFile(fileId: string): Promise<{
     file_id: string;
     framework?: string;
@@ -355,8 +475,9 @@ class APIService {
   }
 
   // 根据文件ID获取合规报告
-  async getReportByFileId(fileId: string) {
-    return this.fetchWithError(`${API_BASE_URL}/api/reports/${fileId}`);
+  async getReportByFileId(fileId: string, scope?: string) {
+    const qs = scope ? `?scope=${encodeURIComponent(scope)}` : "";
+    return this.fetchWithError(`${API_BASE_URL}/api/reports/${fileId}${qs}`);
   }
 }
 

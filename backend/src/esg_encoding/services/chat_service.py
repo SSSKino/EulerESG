@@ -1,6 +1,7 @@
 """Chat service functions."""
 
 from .common import *  # noqa: F401,F403
+from ..gpu_model_lifecycle import with_backend_model_task
 
 
 async def get_file_chat_history(file_id: str, user_id: int = Depends(get_current_user)):
@@ -19,6 +20,7 @@ async def get_file_chat_history(file_id: str, user_id: int = Depends(get_current
     }
 
 
+@with_backend_model_task("chat_with_file")
 async def chat_with_file(
     file_id: str, 
     request: ChatRequest,
@@ -65,6 +67,7 @@ async def clear_file_chat(file_id: str, user_id: int = Depends(get_current_user)
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@with_backend_model_task("chat")
 async def chat(request: ChatRequest):
     """
     处理聊天请求

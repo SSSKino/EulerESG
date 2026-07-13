@@ -1,6 +1,7 @@
 """Cross-analysis service functions."""
 
 from .common import *  # noqa: F401,F403
+from ..gpu_model_lifecycle import with_backend_model_task
 
 
 async def cross_analysis_reports(ids: str):
@@ -16,6 +17,7 @@ async def cross_analysis_reports(ids: str):
     return CrossReportsResponse(reports=reports)
 
 
+@with_backend_model_task("cross_analysis_compare")
 async def cross_analysis_compare(req: CrossCompareRequest):
     """
     Cross Analysis: semantic extraction + alignment for a topic across multiple reports.
@@ -54,6 +56,7 @@ async def cross_analysis_compare(req: CrossCompareRequest):
     )
 
 
+@with_backend_model_task("cross_analysis_records")
 async def cross_analysis_records(req: CrossRecordsRequest):
     """Cross Analysis: issue-level disclosure records for table rendering.
 

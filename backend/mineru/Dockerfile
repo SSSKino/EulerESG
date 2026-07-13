@@ -16,7 +16,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     TRANSFORMERS_CACHE=/root/.cache/huggingface \
     HF_HUB_DISABLE_XET=1 \
     HF_HUB_ENABLE_HF_TRANSFER=0 \
-    MINERU_MODEL_SOURCE=local
+    MODELSCOPE_CACHE=/root/.cache/modelscope
 
 WORKDIR /workspace/mineru
 

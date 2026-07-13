@@ -72,20 +72,25 @@ def _looks_like_sentence_transformers_model(path: Path) -> bool:
         for module in data:
             if not isinstance(module, dict):
                 return False
-            rel = module.get("path") or module.get("name")
-            if not rel or not isinstance(rel, str):
+            # Sentence Transformers uses path="" for a Transformer module
+            # stored at the snapshot root. Do not replace that valid empty
+            # path with the display name (usually "0").
+            rel = module.get("path") if "path" in module else module.get("name")
+            if rel is None or not isinstance(rel, str):
                 continue
-            module_dir = path / rel
-            if not module_dir.exists() or not module_dir.is_dir():
-                return False
+            module_dir = path if rel == "" else path / rel
             module_type = str(module.get("type") or "")
-            if (
+            requires_config = (
                 "Pooling" in module_type
                 or "Transformer" in module_type
                 or "Pooling" in rel
                 or "Transformer" in rel
-            ) and not (module_dir / "config.json").exists():
-                return False
+            )
+            if requires_config:
+                if not module_dir.exists() or not module_dir.is_dir():
+                    return False
+                if not (module_dir / "config.json").exists():
+                    return False
         return True
 
     return any((path / name).exists() for name in ("config.json", "sentence_bert_config.json"))
@@ -223,7 +228,7 @@ def _embedding_model_kwargs(dtype_env_key: str = "EMBEDDING_MODEL_DTYPE") -> dic
     if not dtype:
         return {}
     if dtype == "auto":
-        return {"torch_dtype": "auto"}
+        return {"dtype": "auto"}
     if torch is None:
         return {}
     dtype_map = {
@@ -234,7 +239,7 @@ def _embedding_model_kwargs(dtype_env_key: str = "EMBEDDING_MODEL_DTYPE") -> dic
     value = dtype_map.get(dtype)
     if value is None:
         return {}
-    return {"torch_dtype": value}
+    return {"dtype": value}
 
 
 def _build_sentence_transformer(
@@ -246,6 +251,9 @@ def _build_sentence_transformer(
     dtype_env_key: str = "EMBEDDING_MODEL_DTYPE",
 ) -> SentenceTransformer:
     """Load a SentenceTransformer with high-quality auto dtype when supported."""
+    processor_kwargs = {}
+    if "harrier-oss" in str(model_name_or_path).lower():
+        processor_kwargs["fix_mistral_regex"] = True
     try:
         return SentenceTransformer(
             model_name_or_path,
@@ -253,6 +261,7 @@ def _build_sentence_transformer(
             cache_folder=cache_folder,
             trust_remote_code=trust_remote_code,
             model_kwargs=_embedding_model_kwargs(dtype_env_key),
+            processor_kwargs=processor_kwargs,
         )
     except TypeError:
         return SentenceTransformer(
@@ -328,7 +337,7 @@ def get_shared_embedding_model(
 
         allow_remote = os.getenv("HF_ALLOW_ONLINE", "1") != "0"
         using_local = resolved_model != repo_id
-        if using_local:
+        if using_local or not allow_remote:
             os.environ.setdefault("HF_HUB_OFFLINE", "1")
             os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
         else:
@@ -385,3 +394,49 @@ def get_shared_embedding_model(
         _cached_models[key] = model
         logger.info(f"[SharedEmbedding] loaded model={repo_id} resolved={resolved_model} device={device} dtype={key[3]}")
         return model
+
+
+def clear_shared_embedding_models() -> int:
+    """Unload all cached SentenceTransformer embedding models.
+
+    Returns the number of cached model objects that were removed.  The function
+    is best-effort and safe to call repeatedly.
+    """
+    import gc
+
+    with _lock:
+        models = list(_cached_models.values())
+        _cached_models.clear()
+
+    for model in models:
+        try:
+            model.to("cpu")
+        except Exception:
+            pass
+        try:
+            # Some SentenceTransformer versions expose a device-specific module
+            # list.  Clearing references here helps Python GC release GPU tensors.
+            modules = list(model.children()) if hasattr(model, "children") else []
+            for module in modules:
+                try:
+                    module.to("cpu")
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+    count = len(models)
+    del models
+    gc.collect()
+    try:
+        if torch is not None and torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            try:
+                torch.cuda.ipc_collect()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    logger.info("[SharedEmbedding] cleared cached embedding models")
+    return count

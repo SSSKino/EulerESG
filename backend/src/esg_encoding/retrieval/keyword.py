@@ -134,7 +134,7 @@ class KeywordRetriever:
         metric: ESGMetric,
         profile: Optional[MetricRetrievalProfile] = None,
     ) -> List[RetrievalResult]:
-        """BM25-style retrieval over MinerU Markdown/TextSegment chunks."""
+        """BM25-style retrieval over Markdown/TextSegment chunks."""
         profile = profile or build_metric_retrieval_profile(metric)
         query_tokens = self._query_tokens(profile)
         if not query_tokens:

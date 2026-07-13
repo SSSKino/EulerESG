@@ -27,6 +27,7 @@ from .models import (
 )
 from .exceptions import ESGEncodingError, ContentEmbeddingError
 from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
+from .gpu_model_lifecycle import backend_lazy_load_enabled
 
 _SASB_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "sasb_metrics"
 _CDP_METRICS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "cdp_metrics"
@@ -108,13 +109,19 @@ class MetricProcessor:
         self.embedding_model = None
         self.llm_client = None
         
-        # 初始化嵌入模型
-        self._init_embedding_model()
+        # 嵌入模型按需加载：只有语义扩展真正需要 embedding 时才加载。
+        if not backend_lazy_load_enabled():
+            self._init_embedding_model()
         
         # 初始化LLM客户端
         if config.llm_api_key:
             self._init_llm_client()
     
+    def _ensure_embedding_model(self):
+        if self.embedding_model is None:
+            self._init_embedding_model()
+        return self.embedding_model
+
     def _init_embedding_model(self):
         """初始化嵌入模型"""
         try:
@@ -995,8 +1002,9 @@ class MetricProcessor:
             expanded_keywords = self._expand_keywords(semantic_keyword_seed, semantic_description)
             
             # 生成嵌入向量
+            embedding_model = self._ensure_embedding_model()
             embedding = encode_query_texts(
-                self.embedding_model,
+                embedding_model,
                 [semantic_description],
                 convert_to_tensor=False,
             )[0].tolist()

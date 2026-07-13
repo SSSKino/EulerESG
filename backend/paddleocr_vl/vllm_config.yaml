@@ -1,0 +1,6 @@
+# RTX 3090 24 GB baseline. Leave headroom for Paddle layout detection and the
+# backend embedding/reranker models that share the same GPU.
+gpu-memory-utilization: 0.40
+max-num-seqs: 32
+max-num-batched-tokens: 16384
+max-model-len: 16384

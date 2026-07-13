@@ -1,335 +1,73 @@
-# 🌱 ESG报告分析系统
+# EulerESG PaddleOCR-VL v1.6 + vLLM 连续批处理
 
-全栈ESG（环境、社会、治理）报告分析平台，提供智能化的ESG数据提取、合规分析和交互式查询功能。
+本版本保留：
 
-## ✨ 系统特性
+- PaddleOCR-VL v1.6，本地版面检测 + 独立 vLLM 识别服务
+- compose 自动模型预检
+- 默认两个 PaddleOCR worker，每个 worker 同时处理一个 2 页任务
+- SSE 前端进度
+- 前端不显示后端日志/PaddleOCR 内部细节
+- `PADDLEOCR_PAGE_BATCH_SIZE: '2'`
+- `PADDLEOCR_BATCH_TIMEOUT_SECONDS: '1200'`
+- `PADDLEOCR_VL_REC_MAX_CONCURRENCY: '16'`
+- vLLM `gpu-memory-utilization: 0.40`
+- Paddle 空闲 30 分钟后释放，最多处理 500 个任务后才重启
 
-- 📄 **智能PDF解析** - 自动提取ESG报告内容并结构化处理
-- 🔍 **双通道检索** - 结合关键词匹配和语义检索的混合搜索
-- 📊 **SASB标准评估** - 基于行业标准的合规性自动评分
-- 💬 **智能问答** - 支持中英文的ESG数据交互式查询
-- 📈 **可视化展示** - 直观的分析结果和合规度展示
+## GPU 推理批处理
 
-## 📁 项目结构
+`PADDLEOCR_PAGE_BATCH_SIZE` 只是每个 Redis 任务包含的 PDF 页数，不是 GPU batch。
+当前 worker 会把版面检测得到的文本、表格、公式区域并发发送到
+`paddleocr-vlm-server`，vLLM 在 GPU 上执行真正的连续批处理：
 
+- 客户端并发：`PADDLEOCR_VL_REC_MAX_CONCURRENCY`，RTX 3090 初始值 16。
+- 服务端序列上限：`max-num-seqs: 32`。
+- 单次调度 token 上限：`max-num-batched-tokens: 16384`。
+- 显存目标：`gpu-memory-utilization: 0.40`，为同卡版面模型和 4B reranker 留空间。
+- 页级并发：两个 worker 各处理一个 2 页任务，因此最多 4 页同时处于解析流程。
+
+backend 启动前由 `backend-model-init` 检查 embedding 与 reranker 缓存。模型保存在
+`hf_cache` volume，报告运行期间只使用本地缓存，不会在 OCR 完成后临时联网下载。
+
+先观察稳定性和吞吐。如 GPU 峰值仍低且确认不会与 4B reranker 同时驻留，可将
+`backend/paddleocr_vl/vllm_config.yaml` 中的显存利用率依次调为 0.45、0.50，
+每次修改后重建 `paddleocr-vlm-server`。共享 GPU 不建议超过 0.55。
+
+## 本次修复
+
+日志中出现：
+
+```text
+Input batch does not exist: /workspace/uploads/paddleocr_vl_jobs/.../pages_0001_0007.pdf
 ```
-ESG DEMO/
-├── backend/                    # Python后端服务
-│   ├── src/                   # 核心源代码
-│   │   └── esg_encoding/      # ESG处理模块（13个核心模块）
-│   ├── scripts/               # 管理和启动脚本
-│   ├── data/sasb_metrics/     # SASB行业指标数据
-│   ├── outputs/               # 生成的合规报告
-│   ├── docs/                  # 后端文档
-│   └── config/                # 环境配置文件
-├── ESG-demo-main/             
-│   └── frontend/              # Next.js前端应用
-│       ├── src/               
-│       │   ├── app/          # Next.js 15 App Router
-│       │   └── components/    # React组件库
-│       ├── public/           # 静态资源
-│       └── out/              # 构建输出
-├── uploads/                   # 文件存储系统
-│   ├── reports/              # ESG报告存储
-│   │   ├── pending/          # 待处理报告
-│   │   └── processed/        # 已处理报告
-│   ├── metrics/              # 指标文件
-│   └── outputs/              # 处理结果
-├── data/                     # 示例数据文件
-├── logs/                     # 系统日志
-├── docs/                     # 项目文档
-└── scripts/                  # 项目级脚本
-```
 
-## 🚀 快速开始
+原因是 Redis 入队速度可能快于 Docker bind mount 文件可见性。backend 已经生成 batch 文件并入队，但 worker 立即消费时，文件在 worker 容器里还没完全可见。
 
-### 环境要求
-- **Python** 3.10+
-- **Node.js** 16+
-- **npm** 或 yarn
+本版本新增：
 
-### 推荐方式：分别启动
+1. backend 原子写入 batch PDF：先写 `.tmp`，fsync 后再 rename。
+2. backend 为每个 batch PDF 写入 `.ready` 标记。
+3. worker 必须等待 PDF 文件和 `.ready` 标记都可见才开始解析。
+4. worker 等待时间改为 `PADDLEOCR_INPUT_WAIT_SECONDS: '120'`。
+5. backend 入队前会校验 batch 文件可见性，配置为 `PADDLEOCR_SPLIT_VISIBILITY_WAIT_SECONDS: '60'`。
 
-> **重要提示**: 由于Windows系统编码问题，推荐使用分别启动方式以获得更好的稳定性。
+## 启动
 
-#### 第一步：启动后端服务
 ```bash
-cd backend
-python scripts/start_backend.py
+docker compose down --remove-orphans
+docker compose up -d redis
+docker compose exec redis redis-cli FLUSHDB
+docker compose stop redis
+docker compose up --build
 ```
 
-等待后端完全启动（看到 "Application startup complete" 和 "Uvicorn running" 消息）
+## 期望日志
 
-#### 第二步：启动前端应用
-```bash
-# 新开一个终端窗口
-cd ESG-demo-main/frontend
-npm install  # 首次运行时安装依赖
-npm run dev -- --port 3001
+对于 116 页 PDF，应该看到：
+
+```text
+PADDLEOCR_PAGE_BATCH_SIZE='2', effective=2
+pages=116, units=58, batch_size=2
+开始 page-batch ... pages=1-8
 ```
 
-### 一键启动（可选）
-```bash
-# 启动完整系统（前端+后端）
-# 注意：可能在某些Windows系统上遇到编码问题
-python scripts/start_project.py
-```
-
-### 手动启动方式
-
-#### 后端服务（如需手动启动）
-```bash
-cd backend/src
-uvicorn esg_encoding.api:app --host 0.0.0.0 --port 8000
-```
-
-#### 前端应用（如需手动启动）
-```bash
-cd ESG-demo-main/frontend
-npm install  # 首次运行时安装依赖
-npm run dev -- --port 3001
-```
-
-## 🔗 访问地址
-
-- **前端界面**: http://localhost:3001
-- **后端API**: http://localhost:8000
-- **API文档**: http://localhost:8000/docs
-
-> 注意：前端运行在3001端口，后端API运行在8000端口
-
-## 💻 技术栈
-
-### 后端技术
-- **框架**: FastAPI (高性能异步框架)
-- **AI/ML**: 
-  - Sentence Transformers (语义嵌入)
-  - 通义千问 API (中文LLM)
-  - PyTorch (深度学习)
-- **数据处理**: 
-  - PyPDF2 (PDF解析)
-  - Pandas (数据分析)
-  - NumPy (数值计算)
-
-### 前端技术
-- **框架**: Next.js 15.3.3 (App Router)
-- **UI库**: 
-  - Ant Design 5.25
-  - Tailwind CSS 4
-  - Radix UI
-- **状态管理**: Zustand 5
-- **PDF展示**: React-PDF 7.7
-
-## 🔧 核心功能模块
-
-### 1. 内容提取器 (`content_extractor.py`)
-- PDF文档解析和文本提取
-- 内容清洗和格式化
-- 元数据提取
-
-### 2. 报告编码器 (`report_encoder.py`)
-- 文档分块处理
-- 向量嵌入生成
-- 语义索引构建
-
-### 3. 指标处理器 (`metric_processor.py`)
-- SASB指标解析
-- Excel/JSON数据导入
-- 行业标准映射
-
-### 4. 双通道检索器 (`dual_channel_retrieval.py`)
-- 关键词精确匹配
-- 语义相似度搜索
-- 混合排序算法
-
-### 5. 披露推理引擎 (`disclosure_inference.py`)
-- AI驱动的合规分析
-- 披露状态评估
-- 自动生成合规报告
-
-### 6. ESG聊天机器人 (`esg_chatbot.py`)
-- 自然语言理解
-- 上下文对话管理
-- 多语言支持
-
-## 🛠️ 配置说明
-
-### 环境变量配置
-1. 复制环境变量模板
-```bash
-cp backend/config/.env.example backend/config/.env
-```
-
-2. 编辑 `.env` 文件，配置API密钥
-```env
-# LLM配置（通义千问）
-LLM_API_KEY=your-api-key-here
-LLM_BASE_URL=https://dashscope.aliyuncs.com/api/v1
-LLM_MODEL=qwen-plus
-```
-
-### SASB行业支持
-系统支持以下SASB行业标准：
-- 电子制造服务
-- 硬件
-- 互联网媒体与服务
-- 半导体
-- 软件与IT服务
-- 电信服务
-
-## 📝 使用流程
-
-1. **上传报告** - 将ESG报告PDF上传到系统
-2. **选择行业** - 选择对应的SASB行业分类
-3. **自动处理** - 系统自动提取和分析内容
-4. **查看结果** - 查看合规评估报告
-5. **智能问答** - 使用聊天功能深入了解报告内容
-
-## 🗂️ 数据流程
-
-```
-上传 → uploads/reports/pending/
-  ↓
-处理 → uploads/reports/processed/
-  ↓
-分析 → backend/outputs/
-  ↓
-展示 → 前端界面
-```
-
-## 📊 API接口
-
-主要API端点：
-- `POST /upload_report` - 上传ESG报告
-- `POST /upload_metrics` - 上传指标文件
-- `POST /process_report` - 处理报告
-- `POST /compliance_assessment` - 合规评估
-- `POST /chat` - 智能问答
-- `GET /system_status` - 系统状态
-
-详细API文档请访问: http://localhost:8000/docs
-
-## 🔍 监控与维护
-
-### 系统健康检查
-```bash
-python backend/scripts/system_health_check.py
-```
-
-### 后端监控
-```bash
-python backend/monitor_backend.py
-```
-
-### 日志查看
-- API日志: `logs/esg_api_server.log`
-- 系统日志: `backend/logs/`
-
-## 🤝 贡献指南
-
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送分支 (`git push origin feature/AmazingFeature`)
-5. 发起 Pull Request
-
-## 📄 许可证
-
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
-
-## 🆘 故障排除
-
-### 启动问题解决方案
-
-1. **一键启动脚本编码错误**
-   ```
-   错误：UnicodeEncodeError: 'gbk' codec can't encode character
-   ```
-   **解决方案**：使用分别启动方式，避免Windows编码问题。
-
-2. **端口占用错误**
-   ```
-   错误：[Errno 10048] error while attempting to bind on address
-   ```
-   **解决步骤**：
-   ```bash
-   # 1. 查看端口占用
-   netstat -ano | findstr :8000
-   
-   # 2. 结束占用进程（替换<PID>为实际进程ID）
-   powershell -Command "Stop-Process -Id <PID> -Force"
-   
-   # 3. 重新启动服务
-   cd backend && python scripts/start_backend.py
-   ```
-
-3. **后端启动但无法访问**
-   - 确保看到 "Application startup complete" 消息
-   - 等待模型加载完成（约20-30秒）
-   - 检查API地址：http://localhost:8000/docs
-
-4. **前端启动失败**
-   ```bash
-   # 检查Node.js版本（需要16+）
-   node --version
-   
-   # 重新安装依赖
-   cd ESG-demo-main/frontend
-   rm -rf node_modules package-lock.json
-   npm install
-   
-   # 启动前端
-   npm run dev -- --port 3001
-   ```
-
-### 常见问题
-
-1. **端口配置**
-   - 前端默认端口: 3001
-   - 后端默认端口: 8000
-   - 所有端口配置已统一更新
-
-2. **依赖安装失败**
-   ```bash
-   # Python依赖
-   pip install -r backend/requirements.txt
-   
-   # Node依赖
-   cd ESG-demo-main/frontend && npm install
-   ```
-
-3. **API密钥配置**
-   - 确保 `backend/config/.env` 文件存在
-   - 检查API密钥是否正确配置
-
-### 启动成功标志
-
-**后端启动成功**应看到以下消息：
-```
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-```
-
-**前端启动成功**应看到以下消息：
-```
-▲ Next.js 15.3.3
-- Local:        http://localhost:3001
-- Network:      http://192.168.x.x:3001
-
-✓ Ready in 1275ms
-```
-
-**系统完全就绪**的验证方法：
-- 访问 http://localhost:3001 看到前端界面
-- 访问 http://localhost:8000/docs 看到API文档
-- 前端能够正常加载数据和显示系统状态
-
-## 📧 联系支持
-
-如有问题或建议，请提交 Issue 或查看 `docs/` 目录下的详细文档。
-
----
-
-<div align="center">
-  <sub>Built with ❤️ for sustainable business</sub>
-</div>
+前端页面只显示用户友好的进度，不显示后端日志、worker id、文件系统路径或 PaddleOCR batch 明细。

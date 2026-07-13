@@ -65,7 +65,7 @@ class _QwenReranker:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
         dtype = _torch_dtype_from_reranker_precision(torch, device=device, use_fp16=use_fp16)
-        model_kwargs = {"torch_dtype": dtype} if dtype is not None else {}
+        model_kwargs = {"dtype": dtype} if dtype is not None else {}
         self.model = AutoModelForCausalLM.from_pretrained(
             preferred,
             **model_kwargs,
@@ -412,3 +412,47 @@ def rerank_segment_ids(
 
     logger.info(f"[Rerank] topK={k} bs={bs} took {time.time()-t0:.2f}s")
     return reranked + tail
+
+
+def clear_reranker_models() -> int:
+    """Unload all cached reranker models and clear CUDA cache."""
+    import gc
+
+    try:
+        import torch  # type: ignore
+    except Exception:  # pragma: no cover
+        torch = None
+
+    with _lock:
+        rerankers = list(_cached_rerankers.values())
+        _cached_rerankers.clear()
+
+    count = len(rerankers)
+    for rr in rerankers:
+        try:
+            model = getattr(rr, "model", None)
+            if model is not None and hasattr(model, "to"):
+                model.to("cpu")
+        except Exception:
+            pass
+        try:
+            tokenizer = getattr(rr, "tokenizer", None)
+            if tokenizer is not None:
+                del tokenizer
+        except Exception:
+            pass
+
+    del rerankers
+    gc.collect()
+    try:
+        if torch is not None and torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            try:
+                torch.cuda.ipc_collect()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    logger.info("[Rerank] cleared cached reranker models")
+    return count

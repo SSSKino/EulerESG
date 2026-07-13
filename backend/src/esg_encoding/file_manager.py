@@ -128,6 +128,7 @@ class FileManager:
     def _save_metadata(self):
         """保存文件元数据"""
         try:
+            self.metadata_file.parent.mkdir(parents=True, exist_ok=True)
             with open(self.metadata_file, 'w', encoding='utf-8') as f:
                 json.dump(self.metadata, f, ensure_ascii=False, indent=2)
         except Exception as e:
@@ -185,8 +186,13 @@ class FileManager:
         
         target_path = target_dir / safe_filename
         
-        # 保存文件
+        # 保存文件。运行期间如果 uploads 子目录被清理，必须在写入前重新创建。
         try:
+            target_dir.mkdir(parents=True, exist_ok=True)
+            try:
+                os.chmod(target_dir, 0o777)
+            except Exception:
+                pass
             with open(target_path, 'wb') as f:
                 f.write(file_content)
 

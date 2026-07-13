@@ -12,6 +12,7 @@ starlette>=0.40.0
 aiofiles>=23.2.0
 python-multipart>=0.0.9
 httpx>=0.27.0,<1
+redis>=5.0.0,<6
 loguru>=0.7.2
 regex>=2024.0.0
 tqdm>=4.66.0
@@ -33,8 +34,7 @@ einops>=0.7.0
 FlagEmbedding>=1.2.11
 peft>=0.17.1
 
-# Docs / MinerU lightweight client
-mineru
+# Docs / PaddleOCR-VL client support
 pymupdf>=1.23.0
 python-docx>=1.1.0
 openpyxl>=3.1.2
@@ -46,3 +46,5 @@ networkx>=3.4.2
 python-igraph>=0.11.8
 tiktoken>=0.7.0
 boto3>=1.34.0
+
+pypdf>=4.0.0

@@ -29,7 +29,14 @@ async def lifespan(app: FastAPI):
     startup initialization in one place.
     """
     await system_service.startup_event()
-    yield
+    try:
+        yield
+    finally:
+        try:
+            from ..gpu_model_lifecycle import unload_backend_models
+            unload_backend_models("app shutdown")
+        except Exception as exc:
+            logger.warning(f"Backend model cleanup on shutdown skipped: {exc}")
 
 
 app = FastAPI(
