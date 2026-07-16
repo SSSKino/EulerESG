@@ -12,7 +12,8 @@
       "aliases": [
         "Number of account holders whose information is used for secondary purposes",
         "Count of account holders whose information is used for secondary purposes",
-        "FN-CF-220a.1 Number of account holders whose information is used for secondary purposes"
+        "FN-CF-220a.1 Number of account holders whose information is used for secondary purposes",
+        "Total number of account holders whose information is used for secondary purposes"
       ],
       "bm25_terms": [
         "FN-CF-220a.1",
@@ -26,10 +27,27 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of account holders whose information is used for secondary purposes",
+        "Count of account holders whose information is used for secondary purposes",
+        "FN-CF-220a.1 Number of account holders whose information is used for secondary purposes",
+        "Total number of account holders whose information is used for secondary purposes",
+        "account holders",
+        "holders whose",
+        "whose",
+        "whose used",
+        "used",
+        "used secondary",
+        "secondary purposes",
+        "Number of account holders whose information is used for"
       ],
-      "dense_query": "Find disclosures for FN-CF-220a.1 Number of account holders whose information is used for secondary purposes with unit Number related to Customer Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-220a.1 'Number of account holders whose information is used for secondary purposes', under 'Customer Privacy', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-220a.1 'Number of account holders whose information is used for secondary purposes', under 'Customer Privacy', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-220a.1 'Number of account holders whose information is used for secondary purposes'; retain every reported year and label.",
+        "When FN-CF-220a.1 'Number of account holders whose information is used for secondary purposes' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-220a.1 'Number of account holders whose information is used for secondary purposes', including: Number of account holders whose information is used for secondary purposes; Count of account holders whose information is used for secondary purposes; FN-CF-220a.1 Number of account holders whose information is used for secondary purposes; Total number of account holders whose information is used for secondary purposes.",
+        "Find disclosures for FN-CF-220a.1 Number of account holders whose information is used for secondary purposes with unit Number related to Customer Privacy.",
         "Retrieve exact report evidence for FN-CF-220a.1 Number of account holders whose information is used for secondary purposes, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-220a.1 Number of account holders whose information is used for secondary purposes with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-220a.1 Number of account holders whose information is used for secondary purposes related to Customer Privacy.",
@@ -47,7 +65,17 @@
         "Privacy",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of account holders whose information is used for secondary purposes",
+        "FN-CF-220a.1 Number of account holders whose information is used for secondary purposes",
+        "Total number of account holders whose information is used for secondary purposes",
+        "account holders",
+        "holders whose",
+        "whose",
+        "whose used",
+        "used",
+        "used secondary",
+        "secondary purposes"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -56,7 +84,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -64,24 +94,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of account holders whose information is used for secondary purposes'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of account holders whose information is used for secondary purposes' (FN-CF-220a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-CF-220a.2",
@@ -112,10 +190,29 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with customer privacy",
+        "Monetary losses as a result of legal proceedings associated with customer privacy",
+        "FN-CF-220a.2 Total amount of monetary losses as a result of legal proceedings associated with customer privacy",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated customer",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with customer privacy"
       ],
-      "dense_query": "Find disclosures for FN-CF-220a.2 Total amount of monetary losses as a result of legal proceedings associated with customer privacy with unit Presentation currency related to Customer Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-220a.2 'Total amount of monetary losses as a result of legal proceedings associated with customer privacy', under 'Customer Privacy', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-220a.2 'Total amount of monetary losses as a result of legal proceedings associated with customer privacy', under 'Customer Privacy', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-220a.2 'Total amount of monetary losses as a result of legal proceedings associated with customer privacy'; retain every reported year and label.",
+        "When FN-CF-220a.2 'Total amount of monetary losses as a result of legal proceedings associated with customer privacy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-220a.2 'Total amount of monetary losses as a result of legal proceedings associated with customer privacy', including: Total amount of monetary losses as a result of legal proceedings associated with customer privacy; Monetary losses as a result of legal proceedings associated with customer privacy; FN-CF-220a.2 Total amount of monetary losses as a result of legal proceedings associated with customer privacy.",
+        "Find disclosures for FN-CF-220a.2 Total amount of monetary losses as a result of legal proceedings associated with customer privacy with unit Presentation currency related to Customer Privacy.",
         "Retrieve exact report evidence for FN-CF-220a.2 Total amount of monetary losses as a result of legal proceedings associated with customer privacy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-220a.2 Total amount of monetary losses as a result of legal proceedings associated with customer privacy with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-220a.2 Total amount of monetary losses as a result of legal proceedings associated with customer privacy related to Customer Privacy.",
@@ -136,7 +233,17 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with customer privacy",
+        "FN-CF-220a.2 Total amount of monetary losses as a result of legal proceedings associated with customer privacy",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated customer",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -150,7 +257,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -158,25 +267,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with customer privacy', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with customer privacy' (FN-CF-220a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-CF-230a.1.01",
@@ -200,10 +358,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of data breaches",
+        "Number of data breaches",
+        "FN-CF-230a.1 (1) Number of data breaches",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of account holders affected"
       ],
-      "dense_query": "Find disclosures for FN-CF-230a.1 (1) Number of data breaches with unit Number related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.1 '(1) Number of data breaches', under 'Data Security', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.1 '(1) Number of data breaches', under 'Data Security', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-230a.1 '(1) Number of data breaches'; retain every reported year and label.",
+        "When FN-CF-230a.1 '(1) Number of data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-230a.1 '(1) Number of data breaches', including: (1) Number of data breaches; Number of data breaches; FN-CF-230a.1 (1) Number of data breaches.",
+        "Disambiguate FN-CF-230a.1 '(1) Number of data breaches' from sibling metrics sharing FN-CF-230a.1: (2) Percentage that are personal data breaches; (3) Number of account holders affected.",
+        "Find disclosures for FN-CF-230a.1 (1) Number of data breaches with unit Number related to Data Security.",
         "Retrieve exact report evidence for FN-CF-230a.1 (1) Number of data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-230a.1 (1) Number of data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-230a.1 (1) Number of data breaches related to Data Security.",
@@ -211,20 +380,24 @@
       ],
       "anchor_terms": [
         "FN-CF-230a.1",
+        "(1) Number of data breaches",
         "Number of data breaches",
         "data breach",
         "breaches",
         "Security",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-CF-230a.1 (1) Number of data breaches"
       ],
       "negative_anchor_terms": [
         "Percentage that are personal data breaches",
         "Number of account holders affected",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(2) Percentage that are personal data breaches",
+        "(3) Number of account holders affected"
       ],
       "similar_metric_warnings": [
         {
@@ -241,7 +414,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -249,24 +424,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of data breaches' (FN-CF-230a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage that are personal data breaches; (3) Number of account holders affected."
     },
     {
       "metric_id": "FN-CF-230a.1.02",
@@ -280,7 +503,8 @@
       "aliases": [
         "(2) Percentage that are personal data breaches",
         "Percentage that are personal data breaches",
-        "FN-CF-230a.1 (2) Percentage that are personal data breaches"
+        "FN-CF-230a.1 (2) Percentage that are personal data breaches",
+        "(2) Percent that are personal data breaches"
       ],
       "bm25_terms": [
         "FN-CF-230a.1",
@@ -292,10 +516,27 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage that are personal data breaches",
+        "Percentage that are personal data breaches",
+        "FN-CF-230a.1 (2) Percentage that are personal data breaches",
+        "(2) Percent that are personal data breaches",
+        "that",
+        "that are",
+        "are",
+        "are personal",
+        "personal breaches",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of account holders affected"
       ],
-      "dense_query": "Find disclosures for FN-CF-230a.1 (2) Percentage that are personal data breaches with unit Percentage (%) related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.1 '(2) Percentage that are personal data breaches', under 'Data Security', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.1 '(2) Percentage that are personal data breaches', under 'Data Security', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-230a.1 '(2) Percentage that are personal data breaches'; retain every reported year and label.",
+        "When FN-CF-230a.1 '(2) Percentage that are personal data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-230a.1 '(2) Percentage that are personal data breaches', including: (2) Percentage that are personal data breaches; Percentage that are personal data breaches; FN-CF-230a.1 (2) Percentage that are personal data breaches; (2) Percent that are personal data breaches.",
+        "Disambiguate FN-CF-230a.1 '(2) Percentage that are personal data breaches' from sibling metrics sharing FN-CF-230a.1: (1) Number of data breaches; (3) Number of account holders affected.",
+        "Find disclosures for FN-CF-230a.1 (2) Percentage that are personal data breaches with unit Percentage (%) related to Data Security.",
         "Retrieve exact report evidence for FN-CF-230a.1 (2) Percentage that are personal data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-230a.1 (2) Percentage that are personal data breaches with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-230a.1 (2) Percentage that are personal data breaches related to Data Security.",
@@ -303,6 +544,7 @@
       ],
       "anchor_terms": [
         "FN-CF-230a.1",
+        "(2) Percentage that are personal data breaches",
         "Percentage that are personal data breaches",
         "data breach",
         "personal data",
@@ -312,14 +554,23 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "FN-CF-230a.1 (2) Percentage that are personal data breaches",
+        "(2) Percent that are personal data breaches",
+        "that",
+        "that are",
+        "are",
+        "are personal",
+        "personal breaches"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
         "Number of account holders affected",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(3) Number of account holders affected"
       ],
       "similar_metric_warnings": [
         {
@@ -336,7 +587,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -344,11 +597,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage that are personal data breaches', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -360,9 +639,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage that are personal data breaches' (FN-CF-230a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (3) Number of account holders affected."
     },
     {
       "metric_id": "FN-CF-230a.1.03",
@@ -387,10 +689,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of account holders affected",
+        "Number of account holders affected",
+        "FN-CF-230a.1 (3) Number of account holders affected",
+        "account holders",
+        "holders affected",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of account holders affected"
       ],
-      "dense_query": "Find disclosures for FN-CF-230a.1 (3) Number of account holders affected with unit Number related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.1 '(3) Number of account holders affected', under 'Data Security', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.1 '(3) Number of account holders affected', under 'Data Security', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-230a.1 '(3) Number of account holders affected'; retain every reported year and label.",
+        "When FN-CF-230a.1 '(3) Number of account holders affected' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-230a.1 '(3) Number of account holders affected', including: (3) Number of account holders affected; Number of account holders affected; FN-CF-230a.1 (3) Number of account holders affected.",
+        "Disambiguate FN-CF-230a.1 '(3) Number of account holders affected' from sibling metrics sharing FN-CF-230a.1: (1) Number of data breaches; (2) Percentage that are personal data breaches.",
+        "Find disclosures for FN-CF-230a.1 (3) Number of account holders affected with unit Number related to Data Security.",
         "Retrieve exact report evidence for FN-CF-230a.1 (3) Number of account holders affected, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-230a.1 (3) Number of account holders affected with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-230a.1 (3) Number of account holders affected related to Data Security.",
@@ -398,6 +713,7 @@
       ],
       "anchor_terms": [
         "FN-CF-230a.1",
+        "(3) Number of account holders affected",
         "Number of account holders affected",
         "account",
         "holders",
@@ -405,11 +721,16 @@
         "Security",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-CF-230a.1 (3) Number of account holders affected",
+        "account holders",
+        "holders affected"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
-        "Percentage that are personal data breaches"
+        "Percentage that are personal data breaches",
+        "(1) Number of data breaches",
+        "(2) Percentage that are personal data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -426,7 +747,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -434,24 +757,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of account holders affected'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of account holders affected' (FN-CF-230a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage that are personal data breaches."
     },
     {
       "metric_id": "FN-CF-230a.2.01",
@@ -479,10 +850,28 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Card-related fraud losses from (1) card-not-present fraud",
+        "Card-related fraud losses from card-not-present fraud",
+        "FN-CF-230a.2 Card-related fraud losses from (1) card-not-present fraud",
+        "Card-related fraud",
+        "fraud losses",
+        "losses card-not-present",
+        "card-not-present fraud",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Card-related fraud losses from (1) card-not-present fraud and",
+        "(2) card-present and other fraud"
       ],
-      "dense_query": "Find disclosures for FN-CF-230a.2 Card-related fraud losses from (1) card-not-present fraud with unit Presentation currency related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.2 'Card-related fraud losses from (1) card-not-present fraud', under 'Data Security', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.2 'Card-related fraud losses from (1) card-not-present fraud', under 'Data Security', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-230a.2 'Card-related fraud losses from (1) card-not-present fraud'; retain every reported year and label.",
+        "When FN-CF-230a.2 'Card-related fraud losses from (1) card-not-present fraud' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-230a.2 'Card-related fraud losses from (1) card-not-present fraud', including: Card-related fraud losses from (1) card-not-present fraud; Card-related fraud losses from card-not-present fraud; FN-CF-230a.2 Card-related fraud losses from (1) card-not-present fraud.",
+        "Disambiguate FN-CF-230a.2 'Card-related fraud losses from (1) card-not-present fraud' from sibling metrics sharing FN-CF-230a.2: Card-related fraud losses from (2) card-present and other fraud.",
+        "Find disclosures for FN-CF-230a.2 Card-related fraud losses from (1) card-not-present fraud with unit Presentation currency related to Data Security.",
         "Retrieve exact report evidence for FN-CF-230a.2 Card-related fraud losses from (1) card-not-present fraud, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-230a.2 Card-related fraud losses from (1) card-not-present fraud with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-230a.2 Card-related fraud losses from (1) card-not-present fraud related to Data Security.",
@@ -499,7 +888,15 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Card-related fraud losses from card-not-present fraud",
+        "FN-CF-230a.2 Card-related fraud losses from (1) card-not-present fraud",
+        "Card-related fraud",
+        "fraud losses",
+        "losses card-not-present",
+        "card-not-present fraud",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "Card-related fraud losses from (2) card-present and other fraud"
@@ -515,7 +912,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -523,25 +922,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Card-related fraud losses from (1) card-not-present fraud', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Card-related fraud losses from (1) card-not-present fraud' (FN-CF-230a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Card-related fraud losses from (2) card-present and other fraud."
     },
     {
       "metric_id": "FN-CF-230a.2.02",
@@ -570,10 +1018,30 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Card-related fraud losses from (2) card-present and other fraud",
+        "Card-related fraud losses from card-present and other fraud",
+        "FN-CF-230a.2 Card-related fraud losses from (2) card-present and other fraud",
+        "Card-related fraud",
+        "fraud losses",
+        "losses card-present",
+        "card-present other",
+        "other fraud",
+        "Card-related fraud losses from (2) card-present",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Card-related fraud losses from (1) card-not-present fraud and",
+        "(2) card-present and other fraud"
       ],
-      "dense_query": "Find disclosures for FN-CF-230a.2 Card-related fraud losses from (2) card-present and other fraud with unit Presentation currency related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.2 'Card-related fraud losses from (2) card-present and other fraud', under 'Data Security', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.2 'Card-related fraud losses from (2) card-present and other fraud', under 'Data Security', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-230a.2 'Card-related fraud losses from (2) card-present and other fraud'; retain every reported year and label.",
+        "When FN-CF-230a.2 'Card-related fraud losses from (2) card-present and other fraud' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-230a.2 'Card-related fraud losses from (2) card-present and other fraud', including: Card-related fraud losses from (2) card-present and other fraud; Card-related fraud losses from card-present and other fraud; FN-CF-230a.2 Card-related fraud losses from (2) card-present and other fraud.",
+        "Disambiguate FN-CF-230a.2 'Card-related fraud losses from (2) card-present and other fraud' from sibling metrics sharing FN-CF-230a.2: Card-related fraud losses from (1) card-not-present fraud.",
+        "Find disclosures for FN-CF-230a.2 Card-related fraud losses from (2) card-present and other fraud with unit Presentation currency related to Data Security.",
         "Retrieve exact report evidence for FN-CF-230a.2 Card-related fraud losses from (2) card-present and other fraud, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-230a.2 Card-related fraud losses from (2) card-present and other fraud with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-230a.2 Card-related fraud losses from (2) card-present and other fraud related to Data Security.",
@@ -591,7 +1059,17 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Card-related fraud losses from card-present and other fraud",
+        "FN-CF-230a.2 Card-related fraud losses from (2) card-present and other fraud",
+        "Card-related fraud",
+        "fraud losses",
+        "losses card-present",
+        "card-present other",
+        "other fraud",
+        "Card-related fraud losses from (2) card-present",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "Card-related fraud losses from (1) card-not-present fraud"
@@ -607,7 +1085,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -615,25 +1095,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Card-related fraud losses from (2) card-present and other fraud', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Card-related fraud losses from (2) card-present and other fraud' (FN-CF-230a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Card-related fraud losses from (1) card-not-present fraud."
     },
     {
       "metric_id": "FN-CF-230a.3",
@@ -646,7 +1175,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of approach to identifying and addressing data security risks",
-        "FN-CF-230a.3 Description of approach to identifying and addressing data security risks"
+        "FN-CF-230a.3 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks"
       ],
       "bm25_terms": [
         "FN-CF-230a.3",
@@ -655,10 +1185,25 @@
         "identifying",
         "addressing",
         "security",
-        "risks"
+        "risks",
+        "Description of approach to identifying and addressing data security risks",
+        "FN-CF-230a.3 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks",
+        "identifying addressing",
+        "addressing security",
+        "security risks",
+        "Description of approach to identifying",
+        "addressing data security risks",
+        "Description of approach to identifying and addressing data security",
+        "The entity shall describe its approach to identifying information system vulnerabilities that may pose a data"
       ],
-      "dense_query": "Find disclosures for FN-CF-230a.3 Description of approach to identifying and addressing data security risks related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.3 'Description of approach to identifying and addressing data security risks', under 'Data Security'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-230a.3 'Description of approach to identifying and addressing data security risks', under 'Data Security'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers FN-CF-230a.3 'Description of approach to identifying and addressing data security risks'.",
+        "When FN-CF-230a.3 'Description of approach to identifying and addressing data security risks' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-230a.3 'Description of approach to identifying and addressing data security risks', including: Description of approach to identifying and addressing data security risks; FN-CF-230a.3 Description of approach to identifying and addressing data security risks; approach to identifying and addressing data security risks.",
+        "Find disclosures for FN-CF-230a.3 Description of approach to identifying and addressing data security risks related to Data Security.",
         "Retrieve exact report evidence for FN-CF-230a.3 Description of approach to identifying and addressing data security risks, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-230a.3 Description of approach to identifying and addressing data security risks.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-230a.3 Description of approach to identifying and addressing data security risks related to Data Security.",
@@ -672,7 +1217,14 @@
         "identifying",
         "addressing",
         "security",
-        "risks"
+        "risks",
+        "FN-CF-230a.3 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks",
+        "identifying addressing",
+        "addressing security",
+        "security risks",
+        "Description of approach to identifying",
+        "addressing data security risks"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -682,7 +1234,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -694,20 +1248,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of approach to identifying and addressing data security risks'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of approach to identifying and addressing data security risks' (FN-CF-230a.3). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-CF-270a.1",
@@ -738,10 +1340,31 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold",
+        "Percent of total remuneration for covered employees that is variable and linked to the amount of products and services sold",
+        "FN-CF-270a.1 Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold",
+        "remuneration covered",
+        "covered employees",
+        "employees that",
+        "that",
+        "that variable",
+        "variable linked",
+        "linked products",
+        "products services",
+        "services sold",
+        "Percentage of total remuneration for covered employees that is variable",
+        "linked to the amount of products",
+        "Percentage of total remuneration for covered employees that is",
+        "variable and linked to the amount of products and services sold"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.1 Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold with unit Percentage (%) related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.1 'Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold', under 'Selling Practices', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.1 'Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold', under 'Selling Practices', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.1 'Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold'; retain every reported year and label.",
+        "When FN-CF-270a.1 'Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.1 'Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold', including: Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold; Percent of total remuneration for covered employees that is variable and linked to the amount of products and services sold; FN-CF-270a.1 Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold.",
+        "Find disclosures for FN-CF-270a.1 Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold with unit Percentage (%) related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.1 Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.1 Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.1 Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold related to Selling Practices.",
@@ -763,7 +1386,20 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of total remuneration for covered employees that is variable and linked to the amount of products and services sold",
+        "FN-CF-270a.1 Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold",
+        "remuneration covered",
+        "covered employees",
+        "employees that",
+        "that",
+        "that variable",
+        "variable linked",
+        "linked products",
+        "products services",
+        "services sold",
+        "Percentage of total remuneration for covered employees that is variable",
+        "linked to the amount of products"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -772,7 +1408,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -780,11 +1418,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -796,9 +1460,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of total remuneration for covered employees that is variable and linked to the amount of products and services sold' (FN-CF-270a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-CF-270a.2.01",
@@ -826,10 +1513,25 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Approval rate for (1) credit products for applicants",
+        "Approval rate for credit products for applicants",
+        "FN-CF-270a.2 Approval rate for (1) credit products for applicants",
+        "Approval rate",
+        "rate credit",
+        "credit products",
+        "products applicants",
+        "Approval rate for (1) credit and (2) pre-paid products for applicants",
+        "The entity shall disclose the approval rate for its (1) credit and (2) pre-paid products for all applicants in the"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.2 Approval rate for (1) credit products for applicants with unit Percentage (%) related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.2 'Approval rate for (1) credit products for applicants', under 'Selling Practices', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.2 'Approval rate for (1) credit products for applicants', under 'Selling Practices', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.2 'Approval rate for (1) credit products for applicants'; retain every reported year and label.",
+        "When FN-CF-270a.2 'Approval rate for (1) credit products for applicants' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.2 'Approval rate for (1) credit products for applicants', including: Approval rate for (1) credit products for applicants; Approval rate for credit products for applicants; FN-CF-270a.2 Approval rate for (1) credit products for applicants.",
+        "Disambiguate FN-CF-270a.2 'Approval rate for (1) credit products for applicants' from sibling metrics sharing FN-CF-270a.2: Approval rate for (2) pre-paid products for applicants.",
+        "Find disclosures for FN-CF-270a.2 Approval rate for (1) credit products for applicants with unit Percentage (%) related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.2 Approval rate for (1) credit products for applicants, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.2 Approval rate for (1) credit products for applicants with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.2 Approval rate for (1) credit products for applicants related to Selling Practices.",
@@ -848,7 +1550,13 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Approval rate for credit products for applicants",
+        "FN-CF-270a.2 Approval rate for (1) credit products for applicants",
+        "Approval rate",
+        "rate credit",
+        "credit products",
+        "products applicants"
       ],
       "negative_anchor_terms": [
         "Approval rate for (2) pre-paid products for applicants"
@@ -864,7 +1572,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -872,11 +1582,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Approval rate for (1) credit products for applicants', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -888,9 +1624,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Approval rate for (1) credit products for applicants' (FN-CF-270a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Approval rate for (2) pre-paid products for applicants."
     },
     {
       "metric_id": "FN-CF-270a.2.02",
@@ -918,10 +1677,25 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Approval rate for (2) pre-paid products for applicants",
+        "Approval rate for pre-paid products for applicants",
+        "FN-CF-270a.2 Approval rate for (2) pre-paid products for applicants",
+        "Approval rate",
+        "rate pre-paid",
+        "pre-paid products",
+        "products applicants",
+        "Approval rate for (1) credit and (2) pre-paid products for applicants",
+        "The entity shall disclose the approval rate for its (1) credit and (2) pre-paid products for all applicants in the"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.2 Approval rate for (2) pre-paid products for applicants with unit Percentage (%) related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.2 'Approval rate for (2) pre-paid products for applicants', under 'Selling Practices', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.2 'Approval rate for (2) pre-paid products for applicants', under 'Selling Practices', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.2 'Approval rate for (2) pre-paid products for applicants'; retain every reported year and label.",
+        "When FN-CF-270a.2 'Approval rate for (2) pre-paid products for applicants' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.2 'Approval rate for (2) pre-paid products for applicants', including: Approval rate for (2) pre-paid products for applicants; Approval rate for pre-paid products for applicants; FN-CF-270a.2 Approval rate for (2) pre-paid products for applicants.",
+        "Disambiguate FN-CF-270a.2 'Approval rate for (2) pre-paid products for applicants' from sibling metrics sharing FN-CF-270a.2: Approval rate for (1) credit products for applicants.",
+        "Find disclosures for FN-CF-270a.2 Approval rate for (2) pre-paid products for applicants with unit Percentage (%) related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.2 Approval rate for (2) pre-paid products for applicants, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.2 Approval rate for (2) pre-paid products for applicants with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.2 Approval rate for (2) pre-paid products for applicants related to Selling Practices.",
@@ -940,7 +1714,13 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Approval rate for pre-paid products for applicants",
+        "FN-CF-270a.2 Approval rate for (2) pre-paid products for applicants",
+        "Approval rate",
+        "rate pre-paid",
+        "pre-paid products",
+        "products applicants"
       ],
       "negative_anchor_terms": [
         "Approval rate for (1) credit products for applicants"
@@ -956,7 +1736,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -964,11 +1746,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Approval rate for (2) pre-paid products for applicants', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -980,9 +1788,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Approval rate for (2) pre-paid products for applicants' (FN-CF-270a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Approval rate for (1) credit products for applicants."
     },
     {
       "metric_id": "FN-CF-270a.3.01",
@@ -1010,10 +1841,28 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "(1) Average fees from add-on products",
+        "Average fees from add-on products",
+        "FN-CF-270a.3 (1) Average fees from add-on products",
+        "Average",
+        "Average fees",
+        "fees add-on",
+        "add-on products",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "(1) Average fees from add-on products, (2) average APR of credit",
+        "products, (3) average age of credit products, (4) average number of credit"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.3 (1) Average fees from add-on products with unit Presentation currency related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(1) Average fees from add-on products', under 'Selling Practices', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(1) Average fees from add-on products', under 'Selling Practices', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.3 '(1) Average fees from add-on products'; retain every reported year and label.",
+        "When FN-CF-270a.3 '(1) Average fees from add-on products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.3 '(1) Average fees from add-on products', including: (1) Average fees from add-on products; Average fees from add-on products; FN-CF-270a.3 (1) Average fees from add-on products.",
+        "Disambiguate FN-CF-270a.3 '(1) Average fees from add-on products' from sibling metrics sharing FN-CF-270a.3: (2) Average APR of credit products; (3) Average age of credit products; (4) Average number of credit accounts; (5) Average annual fees for pre-paid products.",
+        "Find disclosures for FN-CF-270a.3 (1) Average fees from add-on products with unit Presentation currency related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.3 (1) Average fees from add-on products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.3 (1) Average fees from add-on products with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.3 (1) Average fees from add-on products related to Selling Practices.",
@@ -1021,6 +1870,7 @@
       ],
       "anchor_terms": [
         "FN-CF-270a.3",
+        "(1) Average fees from add-on products",
         "Average fees from add-on products",
         "fees",
         "add-on",
@@ -1030,13 +1880,24 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "FN-CF-270a.3 (1) Average fees from add-on products",
+        "Average",
+        "Average fees",
+        "fees add-on",
+        "add-on products",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "Average APR of credit products",
         "Average age of credit products",
         "Average number of credit accounts",
-        "Average annual fees for pre-paid products"
+        "Average annual fees for pre-paid products",
+        "(2) Average APR of credit products",
+        "(3) Average age of credit products",
+        "(4) Average number of credit accounts",
+        "(5) Average annual fees for pre-paid products"
       ],
       "similar_metric_warnings": [
         {
@@ -1061,7 +1922,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1069,25 +1932,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Average fees from add-on products', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Average fees from add-on products' (FN-CF-270a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Average APR of credit products; (3) Average age of credit products; (4) Average number of credit accounts; (5) Average annual fees for pre-paid products."
     },
     {
       "metric_id": "FN-CF-270a.3.02",
@@ -1113,10 +2025,25 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Average APR of credit products",
+        "Average APR of credit products",
+        "FN-CF-270a.3 (2) Average APR of credit products",
+        "Average",
+        "Average APR",
+        "APR credit",
+        "credit products",
+        "(1) Average fees from add-on products, (2) average APR of credit",
+        "products, (3) average age of credit products, (4) average number of credit"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.3 (2) Average APR of credit products with unit Percentage (%) related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(2) Average APR of credit products', under 'Selling Practices', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(2) Average APR of credit products', under 'Selling Practices', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.3 '(2) Average APR of credit products'; retain every reported year and label.",
+        "When FN-CF-270a.3 '(2) Average APR of credit products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.3 '(2) Average APR of credit products', including: (2) Average APR of credit products; Average APR of credit products; FN-CF-270a.3 (2) Average APR of credit products.",
+        "Disambiguate FN-CF-270a.3 '(2) Average APR of credit products' from sibling metrics sharing FN-CF-270a.3: (1) Average fees from add-on products; (3) Average age of credit products; (4) Average number of credit accounts; (5) Average annual fees for pre-paid products.",
+        "Find disclosures for FN-CF-270a.3 (2) Average APR of credit products with unit Percentage (%) related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.3 (2) Average APR of credit products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.3 (2) Average APR of credit products with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.3 (2) Average APR of credit products related to Selling Practices.",
@@ -1124,6 +2051,7 @@
       ],
       "anchor_terms": [
         "FN-CF-270a.3",
+        "(2) Average APR of credit products",
         "Average APR of credit products",
         "APR",
         "credit",
@@ -1133,13 +2061,22 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "FN-CF-270a.3 (2) Average APR of credit products",
+        "Average",
+        "Average APR",
+        "APR credit",
+        "credit products"
       ],
       "negative_anchor_terms": [
         "Average fees from add-on products",
         "Average age of credit products",
         "Average number of credit accounts",
-        "Average annual fees for pre-paid products"
+        "Average annual fees for pre-paid products",
+        "(1) Average fees from add-on products",
+        "(3) Average age of credit products",
+        "(4) Average number of credit accounts",
+        "(5) Average annual fees for pre-paid products"
       ],
       "similar_metric_warnings": [
         {
@@ -1164,7 +2101,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1172,11 +2111,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Average APR of credit products', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1188,9 +2153,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Average APR of credit products' (FN-CF-270a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Average fees from add-on products; (3) Average age of credit products; (4) Average number of credit accounts; (5) Average annual fees for pre-paid products."
     },
     {
       "metric_id": "FN-CF-270a.3.03",
@@ -1213,10 +2201,25 @@
         "products",
         "Selling",
         "Practices",
-        "Months"
+        "Months",
+        "(3) Average age of credit products",
+        "Average age of credit products",
+        "FN-CF-270a.3 (3) Average age of credit products",
+        "Average",
+        "Average age",
+        "age credit",
+        "credit products",
+        "(1) Average fees from add-on products, (2) average APR of credit",
+        "products, (3) average age of credit products, (4) average number of credit"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.3 (3) Average age of credit products with unit Months related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(3) Average age of credit products', under 'Selling Practices', with expected unit 'Months'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(3) Average age of credit products', under 'Selling Practices', with expected unit 'Months'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.3 '(3) Average age of credit products'; retain every reported year and label.",
+        "When FN-CF-270a.3 '(3) Average age of credit products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.3 '(3) Average age of credit products', including: (3) Average age of credit products; Average age of credit products; FN-CF-270a.3 (3) Average age of credit products.",
+        "Disambiguate FN-CF-270a.3 '(3) Average age of credit products' from sibling metrics sharing FN-CF-270a.3: (1) Average fees from add-on products; (2) Average APR of credit products; (4) Average number of credit accounts; (5) Average annual fees for pre-paid products.",
+        "Find disclosures for FN-CF-270a.3 (3) Average age of credit products with unit Months related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.3 (3) Average age of credit products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.3 (3) Average age of credit products with unit Months.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.3 (3) Average age of credit products related to Selling Practices.",
@@ -1224,19 +2227,29 @@
       ],
       "anchor_terms": [
         "FN-CF-270a.3",
+        "(3) Average age of credit products",
         "Average age of credit products",
         "age",
         "credit",
         "products",
         "Selling",
         "Practices",
-        "Months"
+        "Months",
+        "FN-CF-270a.3 (3) Average age of credit products",
+        "Average",
+        "Average age",
+        "age credit",
+        "credit products"
       ],
       "negative_anchor_terms": [
         "Average fees from add-on products",
         "Average APR of credit products",
         "Average number of credit accounts",
-        "Average annual fees for pre-paid products"
+        "Average annual fees for pre-paid products",
+        "(1) Average fees from add-on products",
+        "(2) Average APR of credit products",
+        "(4) Average number of credit accounts",
+        "(5) Average annual fees for pre-paid products"
       ],
       "similar_metric_warnings": [
         {
@@ -1261,7 +2274,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1269,22 +2284,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Average age of credit products', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "duration",
         "expected_units": [
-          "Months"
+          "Months",
+          "days",
+          "hours",
+          "years"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Average age of credit products' (FN-CF-270a.3, expected unit: Months). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Average fees from add-on products; (2) Average APR of credit products; (4) Average number of credit accounts; (5) Average annual fees for pre-paid products."
     },
     {
       "metric_id": "FN-CF-270a.3.04",
@@ -1309,10 +2376,24 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(4) Average number of credit accounts",
+        "Average number of credit accounts",
+        "FN-CF-270a.3 (4) Average number of credit accounts",
+        "Average",
+        "Average credit",
+        "credit accounts",
+        "(1) Average fees from add-on products, (2) average APR of credit",
+        "products, (3) average age of credit products, (4) average number of credit"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.3 (4) Average number of credit accounts with unit Number related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(4) Average number of credit accounts', under 'Selling Practices', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(4) Average number of credit accounts', under 'Selling Practices', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.3 '(4) Average number of credit accounts'; retain every reported year and label.",
+        "When FN-CF-270a.3 '(4) Average number of credit accounts' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.3 '(4) Average number of credit accounts', including: (4) Average number of credit accounts; Average number of credit accounts; FN-CF-270a.3 (4) Average number of credit accounts.",
+        "Disambiguate FN-CF-270a.3 '(4) Average number of credit accounts' from sibling metrics sharing FN-CF-270a.3: (1) Average fees from add-on products; (2) Average APR of credit products; (3) Average age of credit products; (5) Average annual fees for pre-paid products.",
+        "Find disclosures for FN-CF-270a.3 (4) Average number of credit accounts with unit Number related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.3 (4) Average number of credit accounts, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.3 (4) Average number of credit accounts with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.3 (4) Average number of credit accounts related to Selling Practices.",
@@ -1320,6 +2401,7 @@
       ],
       "anchor_terms": [
         "FN-CF-270a.3",
+        "(4) Average number of credit accounts",
         "Average number of credit accounts",
         "credit",
         "accounts",
@@ -1327,13 +2409,21 @@
         "Practices",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-CF-270a.3 (4) Average number of credit accounts",
+        "Average",
+        "Average credit",
+        "credit accounts"
       ],
       "negative_anchor_terms": [
         "Average fees from add-on products",
         "Average APR of credit products",
         "Average age of credit products",
-        "Average annual fees for pre-paid products"
+        "Average annual fees for pre-paid products",
+        "(1) Average fees from add-on products",
+        "(2) Average APR of credit products",
+        "(3) Average age of credit products",
+        "(5) Average annual fees for pre-paid products"
       ],
       "similar_metric_warnings": [
         {
@@ -1358,7 +2448,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1366,24 +2458,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(4) Average number of credit accounts'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(4) Average number of credit accounts' (FN-CF-270a.3, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Average fees from add-on products; (2) Average APR of credit products; (3) Average age of credit products; (5) Average annual fees for pre-paid products."
     },
     {
       "metric_id": "FN-CF-270a.3.05",
@@ -1412,10 +2552,29 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "(5) Average annual fees for pre-paid products",
+        "Average annual fees for pre-paid products",
+        "FN-CF-270a.3 (5) Average annual fees for pre-paid products",
+        "Average",
+        "Average annual",
+        "annual fees",
+        "fees pre-paid",
+        "pre-paid products",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "(1) Average fees from add-on products, (2) average APR of credit",
+        "products, (3) average age of credit products, (4) average number of credit"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.3 (5) Average annual fees for pre-paid products with unit Presentation currency related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(5) Average annual fees for pre-paid products', under 'Selling Practices', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.3 '(5) Average annual fees for pre-paid products', under 'Selling Practices', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.3 '(5) Average annual fees for pre-paid products'; retain every reported year and label.",
+        "When FN-CF-270a.3 '(5) Average annual fees for pre-paid products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.3 '(5) Average annual fees for pre-paid products', including: (5) Average annual fees for pre-paid products; Average annual fees for pre-paid products; FN-CF-270a.3 (5) Average annual fees for pre-paid products.",
+        "Disambiguate FN-CF-270a.3 '(5) Average annual fees for pre-paid products' from sibling metrics sharing FN-CF-270a.3: (1) Average fees from add-on products; (2) Average APR of credit products; (3) Average age of credit products; (4) Average number of credit accounts.",
+        "Find disclosures for FN-CF-270a.3 (5) Average annual fees for pre-paid products with unit Presentation currency related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.3 (5) Average annual fees for pre-paid products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.3 (5) Average annual fees for pre-paid products with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.3 (5) Average annual fees for pre-paid products related to Selling Practices.",
@@ -1423,6 +2582,7 @@
       ],
       "anchor_terms": [
         "FN-CF-270a.3",
+        "(5) Average annual fees for pre-paid products",
         "Average annual fees for pre-paid products",
         "annual",
         "fees",
@@ -1433,13 +2593,25 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "FN-CF-270a.3 (5) Average annual fees for pre-paid products",
+        "Average",
+        "Average annual",
+        "annual fees",
+        "fees pre-paid",
+        "pre-paid products",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "Average fees from add-on products",
         "Average APR of credit products",
         "Average age of credit products",
-        "Average number of credit accounts"
+        "Average number of credit accounts",
+        "(1) Average fees from add-on products",
+        "(2) Average APR of credit products",
+        "(3) Average age of credit products",
+        "(4) Average number of credit accounts"
       ],
       "similar_metric_warnings": [
         {
@@ -1464,7 +2636,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1472,25 +2646,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(5) Average annual fees for pre-paid products', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(5) Average annual fees for pre-paid products' (FN-CF-270a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Average fees from add-on products; (2) Average APR of credit products; (3) Average age of credit products; (4) Average number of credit accounts."
     },
     {
       "metric_id": "FN-CF-270a.4.01",
@@ -1516,10 +2739,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of customer complaints filed",
+        "Number of customer complaints filed",
+        "FN-CF-270a.4 (1) Number of customer complaints filed",
+        "customer complaints",
+        "complaints filed",
+        "(1) Number of customer complaints filed, (2) percentage with",
+        "monetary or non-monetary relief"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.4 (1) Number of customer complaints filed with unit Number related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.4 '(1) Number of customer complaints filed', under 'Selling Practices', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.4 '(1) Number of customer complaints filed', under 'Selling Practices', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.4 '(1) Number of customer complaints filed'; retain every reported year and label.",
+        "When FN-CF-270a.4 '(1) Number of customer complaints filed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.4 '(1) Number of customer complaints filed', including: (1) Number of customer complaints filed; Number of customer complaints filed; FN-CF-270a.4 (1) Number of customer complaints filed.",
+        "Disambiguate FN-CF-270a.4 '(1) Number of customer complaints filed' from sibling metrics sharing FN-CF-270a.4: (2) Percentage with monetary or non-monetary relief.",
+        "Find disclosures for FN-CF-270a.4 (1) Number of customer complaints filed with unit Number related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.4 (1) Number of customer complaints filed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.4 (1) Number of customer complaints filed with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.4 (1) Number of customer complaints filed related to Selling Practices.",
@@ -1527,6 +2763,7 @@
       ],
       "anchor_terms": [
         "FN-CF-270a.4",
+        "(1) Number of customer complaints filed",
         "Number of customer complaints filed",
         "customer",
         "complaints",
@@ -1535,10 +2772,14 @@
         "Practices",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-CF-270a.4 (1) Number of customer complaints filed",
+        "customer complaints",
+        "complaints filed"
       ],
       "negative_anchor_terms": [
-        "Percentage with monetary or non-monetary relief"
+        "Percentage with monetary or non-monetary relief",
+        "(2) Percentage with monetary or non-monetary relief"
       ],
       "similar_metric_warnings": [
         {
@@ -1551,7 +2792,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1559,24 +2802,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of customer complaints filed'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of customer complaints filed' (FN-CF-270a.4, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage with monetary or non-monetary relief."
     },
     {
       "metric_id": "FN-CF-270a.4.02",
@@ -1590,7 +2881,8 @@
       "aliases": [
         "(2) Percentage with monetary or non-monetary relief",
         "Percentage with monetary or non-monetary relief",
-        "FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief"
+        "FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief",
+        "(2) Percent with monetary or non-monetary relief"
       ],
       "bm25_terms": [
         "FN-CF-270a.4",
@@ -1602,10 +2894,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage with monetary or non-monetary relief",
+        "Percentage with monetary or non-monetary relief",
+        "FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief",
+        "(2) Percent with monetary or non-monetary relief",
+        "monetary non-monetary",
+        "non-monetary relief",
+        "(1) Number of customer complaints filed, (2) percentage with",
+        "monetary or non-monetary relief"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief with unit Percentage (%) related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.4 '(2) Percentage with monetary or non-monetary relief', under 'Selling Practices', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.4 '(2) Percentage with monetary or non-monetary relief', under 'Selling Practices', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.4 '(2) Percentage with monetary or non-monetary relief'; retain every reported year and label.",
+        "When FN-CF-270a.4 '(2) Percentage with monetary or non-monetary relief' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.4 '(2) Percentage with monetary or non-monetary relief', including: (2) Percentage with monetary or non-monetary relief; Percentage with monetary or non-monetary relief; FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief; (2) Percent with monetary or non-monetary relief.",
+        "Disambiguate FN-CF-270a.4 '(2) Percentage with monetary or non-monetary relief' from sibling metrics sharing FN-CF-270a.4: (1) Number of customer complaints filed.",
+        "Find disclosures for FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief with unit Percentage (%) related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief related to Selling Practices.",
@@ -1613,6 +2919,7 @@
       ],
       "anchor_terms": [
         "FN-CF-270a.4",
+        "(2) Percentage with monetary or non-monetary relief",
         "Percentage with monetary or non-monetary relief",
         "monetary",
         "non-monetary",
@@ -1622,10 +2929,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "FN-CF-270a.4 (2) Percentage with monetary or non-monetary relief",
+        "(2) Percent with monetary or non-monetary relief",
+        "monetary non-monetary",
+        "non-monetary relief"
       ],
       "negative_anchor_terms": [
-        "Number of customer complaints filed"
+        "Number of customer complaints filed",
+        "(1) Number of customer complaints filed"
       ],
       "similar_metric_warnings": [
         {
@@ -1638,7 +2950,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1646,11 +2960,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage with monetary or non-monetary relief', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1662,9 +3002,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage with monetary or non-monetary relief' (FN-CF-270a.4, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of customer complaints filed."
     },
     {
       "metric_id": "FN-CF-270a.5",
@@ -1696,10 +3059,33 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products",
+        "Monetary losses as a result of legal proceedings associated with selling and servicing of products",
+        "FN-CF-270a.5 Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated selling",
+        "selling servicing",
+        "servicing products",
+        "Total amount of monetary losses as a result of legal proceedings associated with selling",
+        "servicing of products",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with selling and servicing of products"
       ],
-      "dense_query": "Find disclosures for FN-CF-270a.5 Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products with unit Presentation currency related to Selling Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.5 'Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products', under 'Selling Practices', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-270a.5 'Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products', under 'Selling Practices', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-270a.5 'Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products'; retain every reported year and label.",
+        "When FN-CF-270a.5 'Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-270a.5 'Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products', including: Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products; Monetary losses as a result of legal proceedings associated with selling and servicing of products; FN-CF-270a.5 Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products.",
+        "Find disclosures for FN-CF-270a.5 Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products with unit Presentation currency related to Selling Practices.",
         "Retrieve exact report evidence for FN-CF-270a.5 Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-270a.5 Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-270a.5 Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products related to Selling Practices.",
@@ -1721,7 +3107,21 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with selling and servicing of products",
+        "FN-CF-270a.5 Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated selling",
+        "selling servicing",
+        "servicing products",
+        "Total amount of monetary losses as a result of legal proceedings associated with selling",
+        "servicing of products",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1735,7 +3135,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1743,25 +3145,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with selling and servicing of products' (FN-CF-270a.5, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-CF-000.A.01",
@@ -1776,7 +3227,8 @@
         "Number of unique consumers with an active (1) credit card account",
         "Number of unique consumers with an active credit card account",
         "Count of unique consumers with an active (1) credit card account",
-        "FN-CF-000.A Number of unique consumers with an active (1) credit card account"
+        "FN-CF-000.A Number of unique consumers with an active (1) credit card account",
+        "Total number of unique consumers with an active (1) credit card account"
       ],
       "bm25_terms": [
         "FN-CF-000.A",
@@ -1789,10 +3241,28 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of unique consumers with an active (1) credit card account",
+        "Number of unique consumers with an active credit card account",
+        "Count of unique consumers with an active (1) credit card account",
+        "FN-CF-000.A Number of unique consumers with an active (1) credit card account",
+        "Total number of unique consumers with an active (1) credit card account",
+        "unique consumers",
+        "consumers active",
+        "active credit",
+        "credit card",
+        "card account",
+        "Number of unique consumers with an active (1) credit card",
+        "account and (2) pre-paid debit card account"
       ],
-      "dense_query": "Find disclosures for FN-CF-000.A Number of unique consumers with an active (1) credit card account with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-000.A 'Number of unique consumers with an active (1) credit card account', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-000.A 'Number of unique consumers with an active (1) credit card account', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-000.A 'Number of unique consumers with an active (1) credit card account'; retain every reported year and label.",
+        "When FN-CF-000.A 'Number of unique consumers with an active (1) credit card account' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-000.A 'Number of unique consumers with an active (1) credit card account', including: Number of unique consumers with an active (1) credit card account; Number of unique consumers with an active credit card account; Count of unique consumers with an active (1) credit card account; FN-CF-000.A Number of unique consumers with an active (1) credit card account; Total number of unique consumers with an active (1) credit card account.",
+        "Disambiguate FN-CF-000.A 'Number of unique consumers with an active (1) credit card account' from sibling metrics sharing FN-CF-000.A: Number of unique consumers with an active (2) pre-paid debit card account.",
+        "Find disclosures for FN-CF-000.A Number of unique consumers with an active (1) credit card account with unit Number.",
         "Retrieve exact report evidence for FN-CF-000.A Number of unique consumers with an active (1) credit card account, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-000.A Number of unique consumers with an active (1) credit card account with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-000.A Number of unique consumers with an active (1) credit card account.",
@@ -1809,7 +3279,16 @@
         "account",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of unique consumers with an active credit card account",
+        "Count of unique consumers with an active (1) credit card account",
+        "FN-CF-000.A Number of unique consumers with an active (1) credit card account",
+        "Total number of unique consumers with an active (1) credit card account",
+        "unique consumers",
+        "consumers active",
+        "active credit",
+        "credit card",
+        "card account"
       ],
       "negative_anchor_terms": [
         "Number of unique consumers with an active (2) pre-paid debit card account"
@@ -1825,7 +3304,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1833,24 +3314,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of unique consumers with an active (1) credit card account'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of unique consumers with an active (1) credit card account' (FN-CF-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of unique consumers with an active (2) pre-paid debit card account."
     },
     {
       "metric_id": "FN-CF-000.A.02",
@@ -1865,7 +3394,8 @@
         "Number of unique consumers with an active (2) pre-paid debit card account",
         "Number of unique consumers with an active pre-paid debit card account",
         "Count of unique consumers with an active (2) pre-paid debit card account",
-        "FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account"
+        "FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account",
+        "Total number of unique consumers with an active (2) pre-paid debit card account"
       ],
       "bm25_terms": [
         "FN-CF-000.A",
@@ -1879,10 +3409,29 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of unique consumers with an active (2) pre-paid debit card account",
+        "Number of unique consumers with an active pre-paid debit card account",
+        "Count of unique consumers with an active (2) pre-paid debit card account",
+        "FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account",
+        "Total number of unique consumers with an active (2) pre-paid debit card account",
+        "unique consumers",
+        "consumers active",
+        "active pre-paid",
+        "pre-paid debit",
+        "debit card",
+        "card account",
+        "Number of unique consumers with an active (1) credit card",
+        "account and (2) pre-paid debit card account7"
       ],
-      "dense_query": "Find disclosures for FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-000.A 'Number of unique consumers with an active (2) pre-paid debit card account', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-000.A 'Number of unique consumers with an active (2) pre-paid debit card account', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-000.A 'Number of unique consumers with an active (2) pre-paid debit card account'; retain every reported year and label.",
+        "When FN-CF-000.A 'Number of unique consumers with an active (2) pre-paid debit card account' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-000.A 'Number of unique consumers with an active (2) pre-paid debit card account', including: Number of unique consumers with an active (2) pre-paid debit card account; Number of unique consumers with an active pre-paid debit card account; Count of unique consumers with an active (2) pre-paid debit card account; FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account; Total number of unique consumers with an active (2) pre-paid debit card account.",
+        "Disambiguate FN-CF-000.A 'Number of unique consumers with an active (2) pre-paid debit card account' from sibling metrics sharing FN-CF-000.A: Number of unique consumers with an active (1) credit card account.",
+        "Find disclosures for FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account with unit Number.",
         "Retrieve exact report evidence for FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account.",
@@ -1900,7 +3449,17 @@
         "account",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of unique consumers with an active pre-paid debit card account",
+        "Count of unique consumers with an active (2) pre-paid debit card account",
+        "FN-CF-000.A Number of unique consumers with an active (2) pre-paid debit card account",
+        "Total number of unique consumers with an active (2) pre-paid debit card account",
+        "unique consumers",
+        "consumers active",
+        "active pre-paid",
+        "pre-paid debit",
+        "debit card",
+        "card account"
       ],
       "negative_anchor_terms": [
         "Number of unique consumers with an active (1) credit card account"
@@ -1916,7 +3475,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1924,24 +3485,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of unique consumers with an active (2) pre-paid debit card account'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of unique consumers with an active (2) pre-paid debit card account' (FN-CF-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of unique consumers with an active (1) credit card account."
     },
     {
       "metric_id": "FN-CF-000.B.01",
@@ -1956,7 +3565,8 @@
         "Number of (1) credit card accounts",
         "Number of credit card accounts",
         "Count of (1) credit card accounts",
-        "FN-CF-000.B Number of (1) credit card accounts"
+        "FN-CF-000.B Number of (1) credit card accounts",
+        "Total number of (1) credit card accounts"
       ],
       "bm25_terms": [
         "FN-CF-000.B",
@@ -1966,10 +3576,24 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of (1) credit card accounts",
+        "Number of credit card accounts",
+        "Count of (1) credit card accounts",
+        "FN-CF-000.B Number of (1) credit card accounts",
+        "Total number of (1) credit card accounts",
+        "credit card",
+        "card accounts",
+        "Number of (1) credit card accounts and (2) pre-paid debit"
       ],
-      "dense_query": "Find disclosures for FN-CF-000.B Number of (1) credit card accounts with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-000.B 'Number of (1) credit card accounts', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-000.B 'Number of (1) credit card accounts', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-000.B 'Number of (1) credit card accounts'; retain every reported year and label.",
+        "When FN-CF-000.B 'Number of (1) credit card accounts' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-000.B 'Number of (1) credit card accounts', including: Number of (1) credit card accounts; Number of credit card accounts; Count of (1) credit card accounts; FN-CF-000.B Number of (1) credit card accounts; Total number of (1) credit card accounts.",
+        "Disambiguate FN-CF-000.B 'Number of (1) credit card accounts' from sibling metrics sharing FN-CF-000.B: Number of (2) pre-paid debit card accounts.",
+        "Find disclosures for FN-CF-000.B Number of (1) credit card accounts with unit Number.",
         "Retrieve exact report evidence for FN-CF-000.B Number of (1) credit card accounts, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-000.B Number of (1) credit card accounts with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-000.B Number of (1) credit card accounts.",
@@ -1983,7 +3607,13 @@
         "accounts",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of credit card accounts",
+        "Count of (1) credit card accounts",
+        "FN-CF-000.B Number of (1) credit card accounts",
+        "Total number of (1) credit card accounts",
+        "credit card",
+        "card accounts"
       ],
       "negative_anchor_terms": [
         "Number of (2) pre-paid debit card accounts"
@@ -1999,7 +3629,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2007,24 +3639,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of (1) credit card accounts'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of (1) credit card accounts' (FN-CF-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of (2) pre-paid debit card accounts."
     },
     {
       "metric_id": "FN-CF-000.B.02",
@@ -2039,7 +3719,8 @@
         "Number of (2) pre-paid debit card accounts",
         "Number of pre-paid debit card accounts",
         "Count of (2) pre-paid debit card accounts",
-        "FN-CF-000.B Number of (2) pre-paid debit card accounts"
+        "FN-CF-000.B Number of (2) pre-paid debit card accounts",
+        "Total number of (2) pre-paid debit card accounts"
       ],
       "bm25_terms": [
         "FN-CF-000.B",
@@ -2050,10 +3731,25 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of (2) pre-paid debit card accounts",
+        "Number of pre-paid debit card accounts",
+        "Count of (2) pre-paid debit card accounts",
+        "FN-CF-000.B Number of (2) pre-paid debit card accounts",
+        "Total number of (2) pre-paid debit card accounts",
+        "pre-paid debit",
+        "debit card",
+        "card accounts",
+        "Number of (1) credit card accounts and (2) pre-paid debit"
       ],
-      "dense_query": "Find disclosures for FN-CF-000.B Number of (2) pre-paid debit card accounts with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-CF-000.B 'Number of (2) pre-paid debit card accounts', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-CF-000.B 'Number of (2) pre-paid debit card accounts', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-CF-000.B 'Number of (2) pre-paid debit card accounts'; retain every reported year and label.",
+        "When FN-CF-000.B 'Number of (2) pre-paid debit card accounts' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-CF-000.B 'Number of (2) pre-paid debit card accounts', including: Number of (2) pre-paid debit card accounts; Number of pre-paid debit card accounts; Count of (2) pre-paid debit card accounts; FN-CF-000.B Number of (2) pre-paid debit card accounts; Total number of (2) pre-paid debit card accounts.",
+        "Disambiguate FN-CF-000.B 'Number of (2) pre-paid debit card accounts' from sibling metrics sharing FN-CF-000.B: Number of (1) credit card accounts.",
+        "Find disclosures for FN-CF-000.B Number of (2) pre-paid debit card accounts with unit Number.",
         "Retrieve exact report evidence for FN-CF-000.B Number of (2) pre-paid debit card accounts, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-CF-000.B Number of (2) pre-paid debit card accounts with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-CF-000.B Number of (2) pre-paid debit card accounts.",
@@ -2068,7 +3764,14 @@
         "accounts",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of pre-paid debit card accounts",
+        "Count of (2) pre-paid debit card accounts",
+        "FN-CF-000.B Number of (2) pre-paid debit card accounts",
+        "Total number of (2) pre-paid debit card accounts",
+        "pre-paid debit",
+        "debit card",
+        "card accounts"
       ],
       "negative_anchor_terms": [
         "Number of (1) credit card accounts"
@@ -2084,7 +3787,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2092,24 +3797,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of (2) pre-paid debit card accounts'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of (2) pre-paid debit card accounts' (FN-CF-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of (1) credit card accounts."
     }
   ]
 }

@@ -24,10 +24,23 @@
         "Manufacturing",
         "Gigajoules",
         "GJ",
-        "Gigajoules (GJ)"
+        "Gigajoules (GJ)",
+        "(1) Total energy consumed",
+        "Total energy consumed",
+        "(1) Energy consumption",
+        "CG-BF-130a.1 (1) Total energy consumed",
+        "gigajoule",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for CG-BF-130a.1 (1) Total energy consumed with unit Gigajoules (GJ) related to Energy Management in Manufacturing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-130a.1 '(1) Total energy consumed', under 'Energy Management in Manufacturing', with expected unit 'Gigajoules (GJ)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-130a.1 '(1) Total energy consumed', under 'Energy Management in Manufacturing', with expected unit 'Gigajoules (GJ)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-130a.1 '(1) Total energy consumed'; retain every reported year and label.",
+        "When CG-BF-130a.1 '(1) Total energy consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-130a.1 '(1) Total energy consumed', including: (1) Total energy consumed; Total energy consumed; (1) Energy consumption; CG-BF-130a.1 (1) Total energy consumed.",
+        "Disambiguate CG-BF-130a.1 '(1) Total energy consumed' from sibling metrics sharing CG-BF-130a.1: (2) Percentage of energy it consumed that was supplied from grid electricity; (3) Percentage of energy it consumed that was renewable energy.",
+        "Find disclosures for CG-BF-130a.1 (1) Total energy consumed with unit Gigajoules (GJ) related to Energy Management in Manufacturing.",
         "Retrieve exact report evidence for CG-BF-130a.1 (1) Total energy consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-130a.1 (1) Total energy consumed with unit Gigajoules (GJ).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-130a.1 (1) Total energy consumed related to Energy Management in Manufacturing.",
@@ -35,6 +48,7 @@
       ],
       "anchor_terms": [
         "CG-BF-130a.1",
+        "(1) Total energy consumed",
         "Total energy consumed",
         "energy consumed",
         "energy",
@@ -43,11 +57,16 @@
         "Manufacturing",
         "Gigajoules (GJ)",
         "GJ",
-        "gigajoules"
+        "gigajoules",
+        "(1) Energy consumption",
+        "CG-BF-130a.1 (1) Total energy consumed",
+        "gigajoule"
       ],
       "negative_anchor_terms": [
         "Percentage of energy it consumed that was supplied from grid electricity",
-        "Percentage of energy it consumed that was renewable energy"
+        "Percentage of energy it consumed that was renewable energy",
+        "(2) Percentage of energy it consumed that was supplied from grid electricity",
+        "(3) Percentage of energy it consumed that was renewable energy"
       ],
       "similar_metric_warnings": [
         {
@@ -64,7 +83,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -72,24 +93,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total energy consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "energy",
         "expected_units": [
           "Gigajoules (GJ)",
           "GJ",
-          "gigajoules"
+          "MWh",
+          "kWh",
+          "MJ",
+          "kJ"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total energy consumed' (CG-BF-130a.1, expected unit: Gigajoules (GJ)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of energy it consumed that was supplied from grid electricity; (3) Percentage of energy it consumed that was renewable energy."
     },
     {
       "metric_id": "CG-BF-130a.1.02",
@@ -103,7 +176,8 @@
       "aliases": [
         "(2) Percentage of energy it consumed that was supplied from grid electricity",
         "Percentage of energy it consumed that was supplied from grid electricity",
-        "CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity"
+        "CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity",
+        "(2) Percent of energy it consumed that was supplied from grid electricity"
       ],
       "bm25_terms": [
         "CG-BF-130a.1",
@@ -118,10 +192,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of energy it consumed that was supplied from grid electricity",
+        "Percentage of energy it consumed that was supplied from grid electricity",
+        "CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity",
+        "(2) Percent of energy it consumed that was supplied from grid electricity",
+        "energy consumed",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was supplied",
+        "supplied grid",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity with unit Percentage (%) related to Energy Management in Manufacturing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-130a.1 '(2) Percentage of energy it consumed that was supplied from grid electricity', under 'Energy Management in Manufacturing', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-130a.1 '(2) Percentage of energy it consumed that was supplied from grid electricity', under 'Energy Management in Manufacturing', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-130a.1 '(2) Percentage of energy it consumed that was supplied from grid electricity'; retain every reported year and label.",
+        "When CG-BF-130a.1 '(2) Percentage of energy it consumed that was supplied from grid electricity' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-130a.1 '(2) Percentage of energy it consumed that was supplied from grid electricity', including: (2) Percentage of energy it consumed that was supplied from grid electricity; Percentage of energy it consumed that was supplied from grid electricity; CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity; (2) Percent of energy it consumed that was supplied from grid electricity.",
+        "Disambiguate CG-BF-130a.1 '(2) Percentage of energy it consumed that was supplied from grid electricity' from sibling metrics sharing CG-BF-130a.1: (1) Total energy consumed; (3) Percentage of energy it consumed that was renewable energy.",
+        "Find disclosures for CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity with unit Percentage (%) related to Energy Management in Manufacturing.",
         "Retrieve exact report evidence for CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity related to Energy Management in Manufacturing.",
@@ -129,6 +222,7 @@
       ],
       "anchor_terms": [
         "CG-BF-130a.1",
+        "(2) Percentage of energy it consumed that was supplied from grid electricity",
         "Percentage of energy it consumed that was supplied from grid electricity",
         "grid electricity",
         "energy",
@@ -141,13 +235,24 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "CG-BF-130a.1 (2) Percentage of energy it consumed that was supplied from grid electricity",
+        "(2) Percent of energy it consumed that was supplied from grid electricity",
+        "energy consumed",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was supplied",
+        "supplied grid"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
         "Percentage of energy it consumed that was renewable energy",
         "renewable energy",
-        "fuel consumed"
+        "fuel consumed",
+        "(1) Total energy consumed",
+        "(3) Percentage of energy it consumed that was renewable energy"
       ],
       "similar_metric_warnings": [
         {
@@ -168,7 +273,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -176,11 +283,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of energy it consumed that was supplied from grid electricity', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -192,9 +325,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of energy it consumed that was supplied from grid electricity' (CG-BF-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (3) Percentage of energy it consumed that was renewable energy."
     },
     {
       "metric_id": "CG-BF-130a.1.03",
@@ -208,7 +364,8 @@
       "aliases": [
         "(3) Percentage of energy it consumed that was renewable energy",
         "Percentage of energy it consumed that was renewable energy",
-        "CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy"
+        "CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy",
+        "(3) Percent of energy it consumed that was renewable energy"
       ],
       "bm25_terms": [
         "CG-BF-130a.1",
@@ -221,10 +378,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(3) Percentage of energy it consumed that was renewable energy",
+        "Percentage of energy it consumed that was renewable energy",
+        "CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy",
+        "(3) Percent of energy it consumed that was renewable energy",
+        "energy consumed",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was renewable",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy with unit Percentage (%) related to Energy Management in Manufacturing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-130a.1 '(3) Percentage of energy it consumed that was renewable energy', under 'Energy Management in Manufacturing', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-130a.1 '(3) Percentage of energy it consumed that was renewable energy', under 'Energy Management in Manufacturing', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-130a.1 '(3) Percentage of energy it consumed that was renewable energy'; retain every reported year and label.",
+        "When CG-BF-130a.1 '(3) Percentage of energy it consumed that was renewable energy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-130a.1 '(3) Percentage of energy it consumed that was renewable energy', including: (3) Percentage of energy it consumed that was renewable energy; Percentage of energy it consumed that was renewable energy; CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy; (3) Percent of energy it consumed that was renewable energy.",
+        "Disambiguate CG-BF-130a.1 '(3) Percentage of energy it consumed that was renewable energy' from sibling metrics sharing CG-BF-130a.1: (1) Total energy consumed; (2) Percentage of energy it consumed that was supplied from grid electricity.",
+        "Find disclosures for CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy with unit Percentage (%) related to Energy Management in Manufacturing.",
         "Retrieve exact report evidence for CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy related to Energy Management in Manufacturing.",
@@ -232,6 +407,7 @@
       ],
       "anchor_terms": [
         "CG-BF-130a.1",
+        "(3) Percentage of energy it consumed that was renewable energy",
         "Percentage of energy it consumed that was renewable energy",
         "renewable energy",
         "energy",
@@ -242,13 +418,23 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "CG-BF-130a.1 (3) Percentage of energy it consumed that was renewable energy",
+        "(3) Percent of energy it consumed that was renewable energy",
+        "energy consumed",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was renewable"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
         "Percentage of energy it consumed that was supplied from grid electricity",
         "grid electricity",
-        "non-renewable energy"
+        "non-renewable energy",
+        "(1) Total energy consumed",
+        "(2) Percentage of energy it consumed that was supplied from grid electricity"
       ],
       "similar_metric_warnings": [
         {
@@ -269,7 +455,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -277,11 +465,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage of energy it consumed that was renewable energy', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -293,9 +507,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage of energy it consumed that was renewable energy' (CG-BF-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (2) Percentage of energy it consumed that was supplied from grid electricity."
     },
     {
       "metric_id": "CG-BF-250a.1",
@@ -320,10 +557,29 @@
         "hazards",
         "chemicals",
         "products",
-        "Management"
+        "Management",
+        "Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "CG-BF-250a.1 Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "processes assess",
+        "assess manage",
+        "manage risks",
+        "risks hazards",
+        "hazards associated",
+        "associated",
+        "associated chemicals",
+        "chemicals products",
+        "Discussion of processes to assess",
+        "manage risks or hazards associated with chemicals in products",
+        "Discussion of processes to assess and manage risks or hazards",
+        "associated with chemicals in products"
       ],
-      "dense_query": "Find disclosures for CG-BF-250a.1 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Management of Chemicals in Products.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-250a.1 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', under 'Management of Chemicals in Products'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-250a.1 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', under 'Management of Chemicals in Products'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-BF-250a.1 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products'.",
+        "When CG-BF-250a.1 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-250a.1 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', including: Discussion of processes to assess and manage risks or hazards associated with chemicals in products; CG-BF-250a.1 Discussion of processes to assess and manage risks or hazards associated with chemicals in products.",
+        "Find disclosures for CG-BF-250a.1 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Management of Chemicals in Products.",
         "Retrieve exact report evidence for CG-BF-250a.1 Discussion of processes to assess and manage risks or hazards associated with chemicals in products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-250a.1 Discussion of processes to assess and manage risks or hazards associated with chemicals in products.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-250a.1 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Management of Chemicals in Products.",
@@ -340,7 +596,18 @@
         "hazards",
         "chemicals",
         "products",
-        "Management"
+        "Management",
+        "CG-BF-250a.1 Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "processes assess",
+        "assess manage",
+        "manage risks",
+        "risks hazards",
+        "hazards associated",
+        "associated",
+        "associated chemicals",
+        "chemicals products",
+        "Discussion of processes to assess",
+        "manage risks or hazards associated with chemicals in products"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -350,7 +617,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -362,20 +631,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products' (CG-BF-250a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-BF-250a.2",
@@ -408,10 +725,32 @@
         "%",
         "revenue",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards",
+        "Percent of eligible products meeting volatile organic compound (VOC) emissions and content standards",
+        "CG-BF-250a.2 Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards",
+        "eligible products",
+        "products meeting",
+        "meeting volatile",
+        "volatile organic",
+        "organic compound",
+        "compound VOC",
+        "VOC emissions",
+        "emissions content",
+        "content standards",
+        "Percentage of eligible products meeting volatile organic compound (VOC) emissions",
+        "Percentage (%) by revenue",
+        "percentage",
+        "Percentage of eligible products meeting volatile organic compound",
+        "(VOC) emissions and content standards"
       ],
-      "dense_query": "Find disclosures for CG-BF-250a.2 Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards with unit Percentage (%) by revenue related to Management of Chemicals in Products.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-250a.2 'Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards', under 'Management of Chemicals in Products', with expected unit 'Percentage (%) by revenue'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-250a.2 'Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards', under 'Management of Chemicals in Products', with expected unit 'Percentage (%) by revenue'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-250a.2 'Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards'; retain every reported year and label.",
+        "When CG-BF-250a.2 'Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-250a.2 'Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards', including: Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards; Percent of eligible products meeting volatile organic compound (VOC) emissions and content standards; CG-BF-250a.2 Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards.",
+        "Find disclosures for CG-BF-250a.2 Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards with unit Percentage (%) by revenue related to Management of Chemicals in Products.",
         "Retrieve exact report evidence for CG-BF-250a.2 Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-250a.2 Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards with unit Percentage (%) by revenue.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-250a.2 Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards related to Management of Chemicals in Products.",
@@ -435,7 +774,20 @@
         "Percentage (%) by revenue",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percent of eligible products meeting volatile organic compound (VOC) emissions and content standards",
+        "CG-BF-250a.2 Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards",
+        "eligible products",
+        "products meeting",
+        "meeting volatile",
+        "volatile organic",
+        "organic compound",
+        "compound VOC",
+        "VOC emissions",
+        "emissions content",
+        "content standards",
+        "Percentage of eligible products meeting volatile organic compound (VOC) emissions",
+        "percentage"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -444,7 +796,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -452,11 +806,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -465,16 +845,36 @@
           "Percentage (%)",
           "%",
           "percent",
-          "percentage",
-          "reporting currency",
-          "monetary amount",
-          "presentation currency"
+          "percentage"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of eligible products meeting volatile organic compound (VOC) emissions and content standards' (CG-BF-250a.2, expected unit: Percentage (%) by revenue). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-BF-410a.1",
@@ -487,7 +887,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of efforts to manage product lifecycle impacts and meet demand for sustainable products",
-        "CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products"
+        "CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products",
+        "efforts to manage product lifecycle impacts and meet demand for sustainable products"
       ],
       "bm25_terms": [
         "CG-BF-410a.1",
@@ -501,10 +902,29 @@
         "demand",
         "sustainable",
         "products",
-        "Environmental"
+        "Environmental",
+        "Description of efforts to manage product lifecycle impacts and meet demand for sustainable products",
+        "CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products",
+        "efforts to manage product lifecycle impacts and meet demand for sustainable products",
+        "efforts manage",
+        "manage product",
+        "product lifecycle",
+        "lifecycle impacts",
+        "impacts meet",
+        "meet demand",
+        "demand sustainable",
+        "sustainable products",
+        "Description of efforts to manage product lifecycle impacts",
+        "meet demand for sustainable products",
+        "Description of efforts to manage product lifecycle impacts and"
       ],
-      "dense_query": "Find disclosures for CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products related to Product Lifecycle Environmental Impacts.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-410a.1 'Description of efforts to manage product lifecycle impacts and meet demand for sustainable products', under 'Product Lifecycle Environmental Impacts'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-410a.1 'Description of efforts to manage product lifecycle impacts and meet demand for sustainable products', under 'Product Lifecycle Environmental Impacts'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-BF-410a.1 'Description of efforts to manage product lifecycle impacts and meet demand for sustainable products'.",
+        "When CG-BF-410a.1 'Description of efforts to manage product lifecycle impacts and meet demand for sustainable products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-410a.1 'Description of efforts to manage product lifecycle impacts and meet demand for sustainable products', including: Description of efforts to manage product lifecycle impacts and meet demand for sustainable products; CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products; efforts to manage product lifecycle impacts and meet demand for sustainable products.",
+        "Find disclosures for CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products related to Product Lifecycle Environmental Impacts.",
         "Retrieve exact report evidence for CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products related to Product Lifecycle Environmental Impacts.",
@@ -523,7 +943,19 @@
         "demand",
         "sustainable",
         "products",
-        "Environmental"
+        "Environmental",
+        "CG-BF-410a.1 Description of efforts to manage product lifecycle impacts and meet demand for sustainable products",
+        "efforts to manage product lifecycle impacts and meet demand for sustainable products",
+        "efforts manage",
+        "manage product",
+        "product lifecycle",
+        "lifecycle impacts",
+        "impacts meet",
+        "meet demand",
+        "demand sustainable",
+        "sustainable products",
+        "Description of efforts to manage product lifecycle impacts",
+        "meet demand for sustainable products"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -533,7 +965,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -545,20 +979,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of efforts to manage product lifecycle impacts and meet demand for sustainable products'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of efforts to manage product lifecycle impacts and meet demand for sustainable products' (CG-BF-410a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-BF-410a.2.01",
@@ -590,10 +1072,28 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "(1) Weight of end-of-life material recovered",
+        "Weight of end-of-life material recovered",
+        "CG-BF-410a.2 (1) Weight of end-of-life material recovered",
+        "Weight end-of-life",
+        "end-of-life material",
+        "material recovered",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Weight of end-of-life material recovered, (2) percentage of",
+        "recovered materials recycled"
       ],
-      "dense_query": "Find disclosures for CG-BF-410a.2 (1) Weight of end-of-life material recovered with unit Metric tonnes (t) related to Product Lifecycle Environmental Impacts.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-410a.2 '(1) Weight of end-of-life material recovered', under 'Product Lifecycle Environmental Impacts', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-410a.2 '(1) Weight of end-of-life material recovered', under 'Product Lifecycle Environmental Impacts', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-410a.2 '(1) Weight of end-of-life material recovered'; retain every reported year and label.",
+        "When CG-BF-410a.2 '(1) Weight of end-of-life material recovered' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-410a.2 '(1) Weight of end-of-life material recovered', including: (1) Weight of end-of-life material recovered; Weight of end-of-life material recovered; CG-BF-410a.2 (1) Weight of end-of-life material recovered.",
+        "Disambiguate CG-BF-410a.2 '(1) Weight of end-of-life material recovered' from sibling metrics sharing CG-BF-410a.2: (2) Percentage of end-of-life materials recovered that were recycled or remanufactured.",
+        "Find disclosures for CG-BF-410a.2 (1) Weight of end-of-life material recovered with unit Metric tonnes (t) related to Product Lifecycle Environmental Impacts.",
         "Retrieve exact report evidence for CG-BF-410a.2 (1) Weight of end-of-life material recovered, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-410a.2 (1) Weight of end-of-life material recovered with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-410a.2 (1) Weight of end-of-life material recovered related to Product Lifecycle Environmental Impacts.",
@@ -601,6 +1101,7 @@
       ],
       "anchor_terms": [
         "CG-BF-410a.2",
+        "(1) Weight of end-of-life material recovered",
         "Weight of end-of-life material recovered",
         "Weight",
         "end-of-life",
@@ -613,10 +1114,20 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "CG-BF-410a.2 (1) Weight of end-of-life material recovered",
+        "Weight end-of-life",
+        "end-of-life material",
+        "material recovered",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
-        "Percentage of end-of-life materials recovered that were recycled or remanufactured"
+        "Percentage of end-of-life materials recovered that were recycled or remanufactured",
+        "(2) Percentage of end-of-life materials recovered that were recycled or remanufactured"
       ],
       "similar_metric_warnings": [
         {
@@ -629,7 +1140,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -637,30 +1150,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Weight of end-of-life material recovered', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Weight of end-of-life material recovered' (CG-BF-410a.2, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of end-of-life materials recovered that were recycled or remanufactured."
     },
     {
       "metric_id": "CG-BF-410a.2.02",
@@ -674,7 +1233,8 @@
       "aliases": [
         "(2) Percentage of end-of-life materials recovered that were recycled or remanufactured",
         "Percentage of end-of-life materials recovered that were recycled or remanufactured",
-        "CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured"
+        "CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured",
+        "(2) Percent of end-of-life materials recovered that were recycled or remanufactured"
       ],
       "bm25_terms": [
         "CG-BF-410a.2",
@@ -690,10 +1250,32 @@
         "%",
         "weight",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "(2) Percentage of end-of-life materials recovered that were recycled or remanufactured",
+        "Percentage of end-of-life materials recovered that were recycled or remanufactured",
+        "CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured",
+        "(2) Percent of end-of-life materials recovered that were recycled or remanufactured",
+        "end-of-life materials",
+        "materials recovered",
+        "recovered that",
+        "that",
+        "that were",
+        "were",
+        "were recycled",
+        "recycled remanufactured",
+        "Percentage (%) by weight",
+        "percentage",
+        "(1) Weight of end-of-life material recovered, (2) percentage of",
+        "recovered materials recycled"
       ],
-      "dense_query": "Find disclosures for CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured with unit Percentage (%) by weight related to Product Lifecycle Environmental Impacts.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-410a.2 '(2) Percentage of end-of-life materials recovered that were recycled or remanufactured', under 'Product Lifecycle Environmental Impacts', with expected unit 'Percentage (%) by weight'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-410a.2 '(2) Percentage of end-of-life materials recovered that were recycled or remanufactured', under 'Product Lifecycle Environmental Impacts', with expected unit 'Percentage (%) by weight'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-410a.2 '(2) Percentage of end-of-life materials recovered that were recycled or remanufactured'; retain every reported year and label.",
+        "When CG-BF-410a.2 '(2) Percentage of end-of-life materials recovered that were recycled or remanufactured' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-410a.2 '(2) Percentage of end-of-life materials recovered that were recycled or remanufactured', including: (2) Percentage of end-of-life materials recovered that were recycled or remanufactured; Percentage of end-of-life materials recovered that were recycled or remanufactured; CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured; (2) Percent of end-of-life materials recovered that were recycled or remanufactured.",
+        "Disambiguate CG-BF-410a.2 '(2) Percentage of end-of-life materials recovered that were recycled or remanufactured' from sibling metrics sharing CG-BF-410a.2: (1) Weight of end-of-life material recovered.",
+        "Find disclosures for CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured with unit Percentage (%) by weight related to Product Lifecycle Environmental Impacts.",
         "Retrieve exact report evidence for CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured with unit Percentage (%) by weight.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured related to Product Lifecycle Environmental Impacts.",
@@ -701,6 +1283,7 @@
       ],
       "anchor_terms": [
         "CG-BF-410a.2",
+        "(2) Percentage of end-of-life materials recovered that were recycled or remanufactured",
         "Percentage of end-of-life materials recovered that were recycled or remanufactured",
         "end-of-life",
         "materials",
@@ -714,10 +1297,22 @@
         "Percentage (%) by weight",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "CG-BF-410a.2 (2) Percentage of end-of-life materials recovered that were recycled or remanufactured",
+        "(2) Percent of end-of-life materials recovered that were recycled or remanufactured",
+        "end-of-life materials",
+        "materials recovered",
+        "recovered that",
+        "that",
+        "that were",
+        "were",
+        "were recycled",
+        "recycled remanufactured",
+        "percentage"
       ],
       "negative_anchor_terms": [
-        "Weight of end-of-life material recovered"
+        "Weight of end-of-life material recovered",
+        "(1) Weight of end-of-life material recovered"
       ],
       "similar_metric_warnings": [
         {
@@ -730,7 +1325,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -738,11 +1335,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of end-of-life materials recovered that were recycled or remanufactured', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -755,9 +1378,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of end-of-life materials recovered that were recycled or remanufactured' (CG-BF-410a.2, expected unit: Percentage (%) by weight). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Weight of end-of-life material recovered."
     },
     {
       "metric_id": "CG-BF-430a.1.01",
@@ -789,10 +1435,29 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "(1) Total weight of wood fibre materials purchased",
+        "Total weight of wood fibre materials purchased",
+        "CG-BF-430a.1 (1) Total weight of wood fibre materials purchased",
+        "weight wood",
+        "wood fibre",
+        "fibre materials",
+        "materials purchased",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Total weight of wood fibre materials purchased, (2) percentage",
+        "from third-party certified forestlands, (3) percentage by standard and"
       ],
-      "dense_query": "Find disclosures for CG-BF-430a.1 (1) Total weight of wood fibre materials purchased with unit Metric tonnes (t) related to Wood Supply Chain Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(1) Total weight of wood fibre materials purchased', under 'Wood Supply Chain Management', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(1) Total weight of wood fibre materials purchased', under 'Wood Supply Chain Management', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-430a.1 '(1) Total weight of wood fibre materials purchased'; retain every reported year and label.",
+        "When CG-BF-430a.1 '(1) Total weight of wood fibre materials purchased' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-430a.1 '(1) Total weight of wood fibre materials purchased', including: (1) Total weight of wood fibre materials purchased; Total weight of wood fibre materials purchased; CG-BF-430a.1 (1) Total weight of wood fibre materials purchased.",
+        "Disambiguate CG-BF-430a.1 '(1) Total weight of wood fibre materials purchased' from sibling metrics sharing CG-BF-430a.1: (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (3) Percentage by third-party forest management standard; (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard.",
+        "Find disclosures for CG-BF-430a.1 (1) Total weight of wood fibre materials purchased with unit Metric tonnes (t) related to Wood Supply Chain Management.",
         "Retrieve exact report evidence for CG-BF-430a.1 (1) Total weight of wood fibre materials purchased, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-430a.1 (1) Total weight of wood fibre materials purchased with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-430a.1 (1) Total weight of wood fibre materials purchased related to Wood Supply Chain Management.",
@@ -800,6 +1465,7 @@
       ],
       "anchor_terms": [
         "CG-BF-430a.1",
+        "(1) Total weight of wood fibre materials purchased",
         "Total weight of wood fibre materials purchased",
         "weight",
         "wood",
@@ -812,13 +1478,27 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "CG-BF-430a.1 (1) Total weight of wood fibre materials purchased",
+        "weight wood",
+        "wood fibre",
+        "fibre materials",
+        "materials purchased",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
         "Percentage by third-party forest management standard",
         "Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
-        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
+        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "(3) Percentage by third-party forest management standard",
+        "(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
       ],
       "similar_metric_warnings": [
         {
@@ -843,7 +1523,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -851,30 +1533,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total weight of wood fibre materials purchased', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total weight of wood fibre materials purchased' (CG-BF-430a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (3) Percentage by third-party forest management standard; (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard."
     },
     {
       "metric_id": "CG-BF-430a.1.02",
@@ -888,7 +1616,8 @@
       "aliases": [
         "(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
         "Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
-        "CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard"
+        "CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "(2) Percent of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard"
       ],
       "bm25_terms": [
         "CG-BF-430a.1",
@@ -908,10 +1637,34 @@
         "%",
         "weight",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "(2) Percent of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "wood fibre",
+        "fibre materials",
+        "materials purchased",
+        "purchased sourced",
+        "sourced forestlands",
+        "forestlands certified",
+        "certified third-party",
+        "third-party forest",
+        "forest management",
+        "management standard",
+        "Percentage (%) by weight",
+        "percentage",
+        "(1) Total weight of wood fibre materials purchased, (2) percentage",
+        "from third-party certified forestlands, (3) percentage by standard and"
       ],
-      "dense_query": "Find disclosures for CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard with unit Percentage (%) by weight related to Wood Supply Chain Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard', under 'Wood Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard', under 'Wood Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-430a.1 '(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard'; retain every reported year and label.",
+        "When CG-BF-430a.1 '(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-430a.1 '(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard', including: (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (2) Percent of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard.",
+        "Disambiguate CG-BF-430a.1 '(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard' from sibling metrics sharing CG-BF-430a.1: (1) Total weight of wood fibre materials purchased; (3) Percentage by third-party forest management standard; (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard.",
+        "Find disclosures for CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard with unit Percentage (%) by weight related to Wood Supply Chain Management.",
         "Retrieve exact report evidence for CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard with unit Percentage (%) by weight.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard related to Wood Supply Chain Management.",
@@ -919,6 +1672,7 @@
       ],
       "anchor_terms": [
         "CG-BF-430a.1",
+        "(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
         "Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
         "wood",
         "fibre",
@@ -935,13 +1689,30 @@
         "Percentage (%) by weight",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "CG-BF-430a.1 (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "(2) Percent of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "wood fibre",
+        "fibre materials",
+        "materials purchased",
+        "purchased sourced",
+        "sourced forestlands",
+        "forestlands certified",
+        "certified third-party",
+        "third-party forest",
+        "forest management",
+        "management standard",
+        "percentage"
       ],
       "negative_anchor_terms": [
         "Total weight of wood fibre materials purchased",
         "Percentage by third-party forest management standard",
         "Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
-        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
+        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "(1) Total weight of wood fibre materials purchased",
+        "(3) Percentage by third-party forest management standard",
+        "(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
       ],
       "similar_metric_warnings": [
         {
@@ -966,7 +1737,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -974,11 +1747,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -991,9 +1790,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard' (CG-BF-430a.1, expected unit: Percentage (%) by weight). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total weight of wood fibre materials purchased; (3) Percentage by third-party forest management standard; (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard."
     },
     {
       "metric_id": "CG-BF-430a.1.03",
@@ -1007,7 +1829,8 @@
       "aliases": [
         "(3) Percentage by third-party forest management standard",
         "Percentage by third-party forest management standard",
-        "CG-BF-430a.1 (3) Percentage by third-party forest management standard"
+        "CG-BF-430a.1 (3) Percentage by third-party forest management standard",
+        "(3) Percent by third-party forest management standard"
       ],
       "bm25_terms": [
         "CG-BF-430a.1",
@@ -1021,10 +1844,27 @@
         "%",
         "weight",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "(3) Percentage by third-party forest management standard",
+        "Percentage by third-party forest management standard",
+        "CG-BF-430a.1 (3) Percentage by third-party forest management standard",
+        "(3) Percent by third-party forest management standard",
+        "third-party forest",
+        "forest management",
+        "management standard",
+        "Percentage (%) by weight",
+        "percentage",
+        "(1) Total weight of wood fibre materials purchased, (2) percentage",
+        "from third-party certified forestlands, (3) percentage by standard and"
       ],
-      "dense_query": "Find disclosures for CG-BF-430a.1 (3) Percentage by third-party forest management standard with unit Percentage (%) by weight related to Wood Supply Chain Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(3) Percentage by third-party forest management standard', under 'Wood Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(3) Percentage by third-party forest management standard', under 'Wood Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-430a.1 '(3) Percentage by third-party forest management standard'; retain every reported year and label.",
+        "When CG-BF-430a.1 '(3) Percentage by third-party forest management standard' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-430a.1 '(3) Percentage by third-party forest management standard', including: (3) Percentage by third-party forest management standard; Percentage by third-party forest management standard; CG-BF-430a.1 (3) Percentage by third-party forest management standard; (3) Percent by third-party forest management standard.",
+        "Disambiguate CG-BF-430a.1 '(3) Percentage by third-party forest management standard' from sibling metrics sharing CG-BF-430a.1: (1) Total weight of wood fibre materials purchased; (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard.",
+        "Find disclosures for CG-BF-430a.1 (3) Percentage by third-party forest management standard with unit Percentage (%) by weight related to Wood Supply Chain Management.",
         "Retrieve exact report evidence for CG-BF-430a.1 (3) Percentage by third-party forest management standard, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-430a.1 (3) Percentage by third-party forest management standard with unit Percentage (%) by weight.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-430a.1 (3) Percentage by third-party forest management standard related to Wood Supply Chain Management.",
@@ -1032,6 +1872,7 @@
       ],
       "anchor_terms": [
         "CG-BF-430a.1",
+        "(3) Percentage by third-party forest management standard",
         "Percentage by third-party forest management standard",
         "third-party",
         "forest",
@@ -1043,13 +1884,23 @@
         "Percentage (%) by weight",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "CG-BF-430a.1 (3) Percentage by third-party forest management standard",
+        "(3) Percent by third-party forest management standard",
+        "third-party forest",
+        "forest management",
+        "management standard",
+        "percentage"
       ],
       "negative_anchor_terms": [
         "Total weight of wood fibre materials purchased",
         "Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
         "Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
-        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
+        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "(1) Total weight of wood fibre materials purchased",
+        "(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
       ],
       "similar_metric_warnings": [
         {
@@ -1074,7 +1925,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1082,11 +1935,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage by third-party forest management standard', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1099,9 +1978,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage by third-party forest management standard' (CG-BF-430a.1, expected unit: Percentage (%) by weight). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total weight of wood fibre materials purchased; (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard."
     },
     {
       "metric_id": "CG-BF-430a.1.04",
@@ -1115,7 +2017,8 @@
       "aliases": [
         "(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
         "Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
-        "CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards"
+        "CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "(4) Percent of total wood fibre materials purchased that have been certified to wood fibre standards"
       ],
       "bm25_terms": [
         "CG-BF-430a.1",
@@ -1132,10 +2035,35 @@
         "%",
         "weight",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "(4) Percent of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "wood fibre",
+        "fibre materials",
+        "materials purchased",
+        "purchased that",
+        "that",
+        "that have",
+        "have",
+        "have been",
+        "been certified",
+        "certified wood",
+        "fibre standards",
+        "Percentage (%) by weight",
+        "percentage",
+        "(1) Total weight of wood fibre materials purchased, (2) percentage",
+        "from third-party certified forestlands, (3) percentage by standard and"
       ],
-      "dense_query": "Find disclosures for CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards with unit Percentage (%) by weight related to Wood Supply Chain Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards', under 'Wood Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards', under 'Wood Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-430a.1 '(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards'; retain every reported year and label.",
+        "When CG-BF-430a.1 '(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-430a.1 '(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards', including: (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards; (4) Percent of total wood fibre materials purchased that have been certified to wood fibre standards.",
+        "Disambiguate CG-BF-430a.1 '(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards' from sibling metrics sharing CG-BF-430a.1: (1) Total weight of wood fibre materials purchased; (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (3) Percentage by third-party forest management standard; (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard.",
+        "Find disclosures for CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards with unit Percentage (%) by weight related to Wood Supply Chain Management.",
         "Retrieve exact report evidence for CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards with unit Percentage (%) by weight.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards related to Wood Supply Chain Management.",
@@ -1143,6 +2071,7 @@
       ],
       "anchor_terms": [
         "CG-BF-430a.1",
+        "(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
         "Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
         "wood",
         "fibre",
@@ -1157,13 +2086,31 @@
         "Percentage (%) by weight",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "CG-BF-430a.1 (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "(4) Percent of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "wood fibre",
+        "fibre materials",
+        "materials purchased",
+        "purchased that",
+        "that",
+        "that have",
+        "have",
+        "have been",
+        "been certified",
+        "certified wood",
+        "fibre standards",
+        "percentage"
       ],
       "negative_anchor_terms": [
         "Total weight of wood fibre materials purchased",
         "Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
         "Percentage by third-party forest management standard",
-        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
+        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "(1) Total weight of wood fibre materials purchased",
+        "(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "(3) Percentage by third-party forest management standard",
+        "(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
       ],
       "similar_metric_warnings": [
         {
@@ -1188,7 +2135,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1196,11 +2145,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1213,9 +2188,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards' (CG-BF-430a.1, expected unit: Percentage (%) by weight). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total weight of wood fibre materials purchased; (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (3) Percentage by third-party forest management standard; (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard."
     },
     {
       "metric_id": "CG-BF-430a.1.05",
@@ -1229,7 +2227,8 @@
       "aliases": [
         "(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
         "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
-        "CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
+        "CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "(5) Percent of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard"
       ],
       "bm25_terms": [
         "CG-BF-430a.1",
@@ -1247,10 +2246,37 @@
         "%",
         "weight",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "(5) Percent of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "wood fibre",
+        "fibre materials",
+        "materials purchased",
+        "purchased certified",
+        "certified each",
+        "each",
+        "each applicable",
+        "applicable wood",
+        "fibre standard",
+        "standard separately",
+        "separately standard",
+        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard",
+        "separately by standard",
+        "Percentage (%) by weight",
+        "percentage",
+        "(1) Total weight of wood fibre materials purchased, (2) percentage",
+        "from third-party certified forestlands, (3) percentage by standard and"
       ],
-      "dense_query": "Find disclosures for CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard with unit Percentage (%) by weight related to Wood Supply Chain Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard', under 'Wood Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-430a.1 '(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard', under 'Wood Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-430a.1 '(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard'; retain every reported year and label.",
+        "When CG-BF-430a.1 '(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-430a.1 '(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard', including: (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard; Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard; CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard; (5) Percent of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard.",
+        "Disambiguate CG-BF-430a.1 '(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard' from sibling metrics sharing CG-BF-430a.1: (1) Total weight of wood fibre materials purchased; (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (3) Percentage by third-party forest management standard; (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards.",
+        "Find disclosures for CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard with unit Percentage (%) by weight related to Wood Supply Chain Management.",
         "Retrieve exact report evidence for CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard with unit Percentage (%) by weight.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard related to Wood Supply Chain Management.",
@@ -1258,6 +2284,7 @@
       ],
       "anchor_terms": [
         "CG-BF-430a.1",
+        "(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
         "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
         "wood",
         "fibre",
@@ -1273,13 +2300,33 @@
         "Percentage (%) by weight",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "CG-BF-430a.1 (5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "(5) Percent of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard",
+        "wood fibre",
+        "fibre materials",
+        "materials purchased",
+        "purchased certified",
+        "certified each",
+        "each",
+        "each applicable",
+        "applicable wood",
+        "fibre standard",
+        "standard separately",
+        "separately standard",
+        "Percentage of wood fibre materials purchased certified to each applicable wood fibre standard",
+        "separately by standard",
+        "percentage"
       ],
       "negative_anchor_terms": [
         "Total weight of wood fibre materials purchased",
         "Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
         "Percentage by third-party forest management standard",
-        "Percentage of total wood fibre materials purchased that have been certified to wood fibre standards"
+        "Percentage of total wood fibre materials purchased that have been certified to wood fibre standards",
+        "(1) Total weight of wood fibre materials purchased",
+        "(2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard",
+        "(3) Percentage by third-party forest management standard",
+        "(4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards"
       ],
       "similar_metric_warnings": [
         {
@@ -1304,7 +2351,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1312,11 +2361,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1329,9 +2404,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(5) Percentage of wood fibre materials purchased certified to each applicable wood fibre standard, separately by standard' (CG-BF-430a.1, expected unit: Percentage (%) by weight). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total weight of wood fibre materials purchased; (2) Percentage of total wood fibre materials purchased sourced from forestlands certified to a third-party forest management standard; (3) Percentage by third-party forest management standard; (4) Percentage of total wood fibre materials purchased that have been certified to wood fibre standards."
     },
     {
       "metric_id": "CG-BF-000.A",
@@ -1352,10 +2450,18 @@
         "production",
         "See",
         "note",
-        "See note"
+        "See note",
+        "Annual production",
+        "CG-BF-000.A Annual production",
+        "Note to CG-BF-000.A – Production shall be disclosed in typical units tracked by the entity such as number of units, weight or"
       ],
-      "dense_query": "Find disclosures for CG-BF-000.A Annual production with unit See note.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-000.A 'Annual production'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-000.A 'Annual production'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-000.A 'Annual production'; retain every reported year and label.",
+        "When CG-BF-000.A 'Annual production' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-000.A 'Annual production', including: Annual production; CG-BF-000.A Annual production.",
+        "Find disclosures for CG-BF-000.A Annual production with unit See note.",
         "Retrieve exact report evidence for CG-BF-000.A Annual production, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-000.A Annual production with unit See note.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-000.A Annual production.",
@@ -1366,7 +2472,8 @@
         "Annual production",
         "Annual",
         "production",
-        "See note"
+        "See note",
+        "CG-BF-000.A Annual production"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1375,7 +2482,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1383,22 +2492,69 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Annual production'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
-        "expected_units": [
-          "See note"
-        ],
+        "value_type": "number",
+        "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Annual production' (CG-BF-000.A, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-BF-000.B",
@@ -1420,10 +2576,24 @@
         "facilities",
         "Square",
         "metres",
-        "Square metres (m²)"
+        "Square metres (m²)",
+        "Area of manufacturing facilities",
+        "CG-BF-000.B Area of manufacturing facilities",
+        "Area manufacturing",
+        "manufacturing facilities",
+        "m2",
+        "m?",
+        "square metres",
+        "square meters",
+        "Note to CG-BF-000.B – The scope of disclosure shall be limited to the total area under roof, including manufacturing and administrative"
       ],
-      "dense_query": "Find disclosures for CG-BF-000.B Area of manufacturing facilities with unit Square metres (m²).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-BF-000.B 'Area of manufacturing facilities', with expected unit 'Square metres (m²)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-BF-000.B 'Area of manufacturing facilities', with expected unit 'Square metres (m²)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-BF-000.B 'Area of manufacturing facilities'; retain every reported year and label.",
+        "When CG-BF-000.B 'Area of manufacturing facilities' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-BF-000.B 'Area of manufacturing facilities', including: Area of manufacturing facilities; CG-BF-000.B Area of manufacturing facilities.",
+        "Find disclosures for CG-BF-000.B Area of manufacturing facilities with unit Square metres (m²).",
         "Retrieve exact report evidence for CG-BF-000.B Area of manufacturing facilities, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-BF-000.B Area of manufacturing facilities with unit Square metres (m²).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-BF-000.B Area of manufacturing facilities.",
@@ -1435,7 +2605,14 @@
         "Area",
         "manufacturing",
         "facilities",
-        "Square metres (m²)"
+        "Square metres (m²)",
+        "CG-BF-000.B Area of manufacturing facilities",
+        "Area manufacturing",
+        "manufacturing facilities",
+        "m2",
+        "m?",
+        "square metres",
+        "square meters"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1444,7 +2621,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1452,22 +2631,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Area of manufacturing facilities', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "area",
         "expected_units": [
-          "Square metres (m²)"
+          "Square metres (m²)",
+          "hectares",
+          "ha",
+          "m2",
+          "m?",
+          "square metres",
+          "square meters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Area of manufacturing facilities' (CG-BF-000.B, expected unit: Square metres (m²)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

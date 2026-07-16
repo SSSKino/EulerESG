@@ -24,10 +24,23 @@
         "regulations",
         "Management",
         "Chemicals",
-        "Products"
+        "Products",
+        "Discussion of processes to maintain compliance with restricted substances regulations",
+        "CG-AA-250a.1 Discussion of processes to maintain compliance with restricted substances regulations",
+        "processes maintain",
+        "maintain compliance",
+        "compliance restricted",
+        "restricted substances",
+        "substances regulations",
+        "Discussion of processes to maintain compliance with restricted"
       ],
-      "dense_query": "Find disclosures for CG-AA-250a.1 Discussion of processes to maintain compliance with restricted substances regulations related to Management of Chemicals in Products.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-250a.1 'Discussion of processes to maintain compliance with restricted substances regulations', under 'Management of Chemicals in Products'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-250a.1 'Discussion of processes to maintain compliance with restricted substances regulations', under 'Management of Chemicals in Products'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-AA-250a.1 'Discussion of processes to maintain compliance with restricted substances regulations'.",
+        "When CG-AA-250a.1 'Discussion of processes to maintain compliance with restricted substances regulations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-250a.1 'Discussion of processes to maintain compliance with restricted substances regulations', including: Discussion of processes to maintain compliance with restricted substances regulations; CG-AA-250a.1 Discussion of processes to maintain compliance with restricted substances regulations.",
+        "Find disclosures for CG-AA-250a.1 Discussion of processes to maintain compliance with restricted substances regulations related to Management of Chemicals in Products.",
         "Retrieve exact report evidence for CG-AA-250a.1 Discussion of processes to maintain compliance with restricted substances regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-250a.1 Discussion of processes to maintain compliance with restricted substances regulations.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-250a.1 Discussion of processes to maintain compliance with restricted substances regulations related to Management of Chemicals in Products.",
@@ -45,7 +58,13 @@
         "regulations",
         "Management",
         "Chemicals",
-        "Products"
+        "Products",
+        "CG-AA-250a.1 Discussion of processes to maintain compliance with restricted substances regulations",
+        "processes maintain",
+        "maintain compliance",
+        "compliance restricted",
+        "restricted substances",
+        "substances regulations"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -55,7 +74,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -67,20 +88,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of processes to maintain compliance with restricted substances regulations'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of processes to maintain compliance with restricted substances regulations' (CG-AA-250a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-AA-250a.2",
@@ -105,10 +174,29 @@
         "hazards",
         "chemicals",
         "products",
-        "Management"
+        "Management",
+        "Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "CG-AA-250a.2 Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "processes assess",
+        "assess manage",
+        "manage risks",
+        "risks hazards",
+        "hazards associated",
+        "associated",
+        "associated chemicals",
+        "chemicals products",
+        "Discussion of processes to assess",
+        "manage risks or hazards associated with chemicals in products",
+        "Discussion of processes to assess and manage risks or hazards",
+        "associated with chemicals in products"
       ],
-      "dense_query": "Find disclosures for CG-AA-250a.2 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Management of Chemicals in Products.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-250a.2 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', under 'Management of Chemicals in Products'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-250a.2 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', under 'Management of Chemicals in Products'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-AA-250a.2 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products'.",
+        "When CG-AA-250a.2 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-250a.2 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', including: Discussion of processes to assess and manage risks or hazards associated with chemicals in products; CG-AA-250a.2 Discussion of processes to assess and manage risks or hazards associated with chemicals in products.",
+        "Find disclosures for CG-AA-250a.2 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Management of Chemicals in Products.",
         "Retrieve exact report evidence for CG-AA-250a.2 Discussion of processes to assess and manage risks or hazards associated with chemicals in products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-250a.2 Discussion of processes to assess and manage risks or hazards associated with chemicals in products.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-250a.2 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Management of Chemicals in Products.",
@@ -125,7 +213,18 @@
         "hazards",
         "chemicals",
         "products",
-        "Management"
+        "Management",
+        "CG-AA-250a.2 Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "processes assess",
+        "assess manage",
+        "manage risks",
+        "risks hazards",
+        "hazards associated",
+        "associated",
+        "associated chemicals",
+        "chemicals products",
+        "Discussion of processes to assess",
+        "manage risks or hazards associated with chemicals in products"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -135,7 +234,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -147,20 +248,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products' (CG-AA-250a.2). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-AA-430a.1.01",
@@ -195,10 +344,30 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements",
+        "Percentage of Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements",
+        "Percent of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements",
+        "CG-AA-430a.1 Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements",
+        "Tier supplier",
+        "supplier facilities",
+        "facilities compliance",
+        "compliance wastewater",
+        "wastewater discharge",
+        "discharge permits",
+        "permits contractual",
+        "contractual agreements",
+        "Percentage of (1) Tier 1 supplier facilities and (2) supplier facilities",
+        "beyond Tier 1 in compliance with wastewater discharge permits or contractual"
       ],
-      "dense_query": "Find disclosures for CG-AA-430a.1 Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements with unit Percentage (%) related to Environmental Impacts in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430a.1 'Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements', under 'Environmental Impacts in the Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430a.1 'Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements', under 'Environmental Impacts in the Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430a.1 'Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements'; retain every reported year and label.",
+        "When CG-AA-430a.1 'Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430a.1 'Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements', including: Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements; Percentage of Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements; Percent of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements; CG-AA-430a.1 Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements.",
+        "Disambiguate CG-AA-430a.1 'Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements' from sibling metrics sharing CG-AA-430a.1: Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements.",
+        "Find disclosures for CG-AA-430a.1 Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements with unit Percentage (%) related to Environmental Impacts in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430a.1 Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430a.1 Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430a.1 Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements related to Environmental Impacts in the Supply Chain.",
@@ -222,7 +391,18 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements",
+        "Percent of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements",
+        "CG-AA-430a.1 Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements",
+        "Tier supplier",
+        "supplier facilities",
+        "facilities compliance",
+        "compliance wastewater",
+        "wastewater discharge",
+        "discharge permits",
+        "permits contractual",
+        "contractual agreements"
       ],
       "negative_anchor_terms": [
         "Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements"
@@ -238,7 +418,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -246,11 +428,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -262,9 +470,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements' (CG-AA-430a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements."
     },
     {
       "metric_id": "CG-AA-430a.1.02",
@@ -300,10 +531,31 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements",
+        "Percentage of supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements",
+        "Percent of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements",
+        "CG-AA-430a.1 Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements",
+        "supplier facilities",
+        "facilities beyond",
+        "beyond Tier",
+        "Tier compliance",
+        "compliance wastewater",
+        "wastewater discharge",
+        "discharge permits",
+        "permits contractual",
+        "contractual agreements",
+        "Percentage of (1) Tier 1 supplier facilities and (2) supplier facilities",
+        "beyond Tier 1 in compliance with wastewater discharge permits or contractual"
       ],
-      "dense_query": "Find disclosures for CG-AA-430a.1 Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements with unit Percentage (%) related to Environmental Impacts in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430a.1 'Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements', under 'Environmental Impacts in the Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430a.1 'Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements', under 'Environmental Impacts in the Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430a.1 'Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements'; retain every reported year and label.",
+        "When CG-AA-430a.1 'Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430a.1 'Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements', including: Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements; Percentage of supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements; Percent of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements; CG-AA-430a.1 Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements.",
+        "Disambiguate CG-AA-430a.1 'Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements' from sibling metrics sharing CG-AA-430a.1: Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements.",
+        "Find disclosures for CG-AA-430a.1 Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements with unit Percentage (%) related to Environmental Impacts in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430a.1 Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430a.1 Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430a.1 Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements related to Environmental Impacts in the Supply Chain.",
@@ -327,7 +579,19 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements",
+        "Percent of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements",
+        "CG-AA-430a.1 Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements",
+        "supplier facilities",
+        "facilities beyond",
+        "beyond Tier",
+        "Tier compliance",
+        "compliance wastewater",
+        "wastewater discharge",
+        "discharge permits",
+        "permits contractual",
+        "contractual agreements"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements"
@@ -343,7 +607,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -351,11 +617,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -367,9 +659,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (2) supplier facilities beyond Tier 1 in compliance with wastewater discharge permits or contractual agreements' (CG-AA-430a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) Tier 1 supplier facilities in compliance with wastewater discharge permits or contractual agreements."
     },
     {
       "metric_id": "CG-AA-430a.2.01",
@@ -408,10 +723,37 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "Percentage of Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "Percent of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "CG-AA-430a.2 Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "Tier supplier",
+        "supplier facilities",
+        "facilities that",
+        "that",
+        "that have",
+        "have",
+        "have completed",
+        "completed Sustainable",
+        "Sustainable Apparel",
+        "Apparel Coalition's",
+        "Coalition's",
+        "Coalition's Higg",
+        "Higg Facility",
+        "Facility Environmental",
+        "Environmental Module",
+        "Percentage of (1) Tier 1 supplier facilities and (2) supplier facilities",
+        "beyond Tier 1 that have completed the Sustainable Apparel Coalition’s Higg"
       ],
-      "dense_query": "Find disclosures for CG-AA-430a.2 Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment with unit Percentage (%) related to Environmental Impacts in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430a.2 'Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment', under 'Environmental Impacts in the Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430a.2 'Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment', under 'Environmental Impacts in the Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430a.2 'Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment'; retain every reported year and label.",
+        "When CG-AA-430a.2 'Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430a.2 'Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment', including: Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment; Percentage of Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment; Percent of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment; CG-AA-430a.2 Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment.",
+        "Disambiguate CG-AA-430a.2 'Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment' from sibling metrics sharing CG-AA-430a.2: Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment.",
+        "Find disclosures for CG-AA-430a.2 Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment with unit Percentage (%) related to Environmental Impacts in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430a.2 Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430a.2 Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430a.2 Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment related to Environmental Impacts in the Supply Chain.",
@@ -435,7 +777,25 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "Percent of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "CG-AA-430a.2 Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "Tier supplier",
+        "supplier facilities",
+        "facilities that",
+        "that",
+        "that have",
+        "have",
+        "have completed",
+        "completed Sustainable",
+        "Sustainable Apparel",
+        "Apparel Coalition's",
+        "Coalition's",
+        "Coalition's Higg",
+        "Higg Facility",
+        "Facility Environmental",
+        "Environmental Module"
       ],
       "negative_anchor_terms": [
         "Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment"
@@ -451,7 +811,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -459,11 +821,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -475,9 +863,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment' (CG-AA-430a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment."
     },
     {
       "metric_id": "CG-AA-430a.2.02",
@@ -517,10 +928,37 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "Percentage of supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "Percent of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "CG-AA-430a.2 Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "supplier facilities",
+        "facilities beyond",
+        "beyond Tier",
+        "Tier that",
+        "that",
+        "that have",
+        "have",
+        "have completed",
+        "completed Sustainable",
+        "Sustainable Apparel",
+        "Apparel Coalition's",
+        "Coalition's",
+        "Coalition's Higg",
+        "Higg Facility",
+        "Facility Environmental",
+        "Percentage of (1) Tier 1 supplier facilities and (2) supplier facilities",
+        "beyond Tier 1 that have completed the Sustainable Apparel Coalition’s Higg"
       ],
-      "dense_query": "Find disclosures for CG-AA-430a.2 Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment with unit Percentage (%) related to Environmental Impacts in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430a.2 'Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment', under 'Environmental Impacts in the Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430a.2 'Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment', under 'Environmental Impacts in the Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430a.2 'Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment'; retain every reported year and label.",
+        "When CG-AA-430a.2 'Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430a.2 'Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment', including: Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment; Percentage of supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment; Percent of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment; CG-AA-430a.2 Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment.",
+        "Disambiguate CG-AA-430a.2 'Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment' from sibling metrics sharing CG-AA-430a.2: Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment.",
+        "Find disclosures for CG-AA-430a.2 Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment with unit Percentage (%) related to Environmental Impacts in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430a.2 Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430a.2 Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430a.2 Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment related to Environmental Impacts in the Supply Chain.",
@@ -544,7 +982,25 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "Percent of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "CG-AA-430a.2 Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment",
+        "supplier facilities",
+        "facilities beyond",
+        "beyond Tier",
+        "Tier that",
+        "that",
+        "that have",
+        "have",
+        "have completed",
+        "completed Sustainable",
+        "Sustainable Apparel",
+        "Apparel Coalition's",
+        "Coalition's",
+        "Coalition's Higg",
+        "Higg Facility",
+        "Facility Environmental"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment"
@@ -560,7 +1016,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -568,11 +1026,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -584,9 +1068,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (2) supplier facilities beyond Tier 1 that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment' (CG-AA-430a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) Tier 1 supplier facilities that have completed the Sustainable Apparel Coalition's Higg Facility Environmental Module (Higg FEM) assessment or an equivalent environmental data assessment."
     },
     {
       "metric_id": "CG-AA-430b.1.01",
@@ -619,10 +1126,33 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct",
+        "Percentage of Tier 1 supplier facilities that have been audited to a labour code of conduct",
+        "Percent of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct",
+        "CG-AA-430b.1 Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct",
+        "Tier supplier",
+        "supplier facilities",
+        "facilities that",
+        "that",
+        "that have",
+        "have",
+        "have been",
+        "been audited",
+        "audited labour",
+        "labour code",
+        "code conduct",
+        "Percentage of (1) Tier 1 supplier facilities and (2) supplier facilities",
+        "beyond Tier 1 that have been audited to a labour code of conduct, (3) percentage"
       ],
-      "dense_query": "Find disclosures for CG-AA-430b.1 Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct with unit Percentage (%) related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.1 'Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct', under 'Labour Conditions in the Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.1 'Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct', under 'Labour Conditions in the Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430b.1 'Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct'; retain every reported year and label.",
+        "When CG-AA-430b.1 'Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430b.1 'Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct', including: Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct; Percentage of Tier 1 supplier facilities that have been audited to a labour code of conduct; Percent of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct; CG-AA-430b.1 Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct.",
+        "Disambiguate CG-AA-430b.1 'Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct' from sibling metrics sharing CG-AA-430b.1: Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct; Percentage of (3) total audits conducted by a third-party auditor.",
+        "Find disclosures for CG-AA-430b.1 Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct with unit Percentage (%) related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430b.1 Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430b.1 Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430b.1 Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct related to Labour Conditions in the Supply Chain.",
@@ -645,7 +1175,21 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of Tier 1 supplier facilities that have been audited to a labour code of conduct",
+        "Percent of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct",
+        "CG-AA-430b.1 Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct",
+        "Tier supplier",
+        "supplier facilities",
+        "facilities that",
+        "that",
+        "that have",
+        "have",
+        "have been",
+        "been audited",
+        "audited labour",
+        "labour code",
+        "code conduct"
       ],
       "negative_anchor_terms": [
         "Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
@@ -666,7 +1210,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -674,11 +1220,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -690,9 +1262,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct' (CG-AA-430b.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct; Percentage of (3) total audits conducted by a third-party auditor."
     },
     {
       "metric_id": "CG-AA-430b.1.02",
@@ -726,10 +1321,34 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
+        "Percentage of supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
+        "Percent of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
+        "CG-AA-430b.1 Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
+        "supplier facilities",
+        "facilities beyond",
+        "beyond Tier",
+        "Tier that",
+        "that",
+        "that have",
+        "have",
+        "have been",
+        "been audited",
+        "audited labour",
+        "labour code",
+        "code conduct",
+        "Percentage of (1) Tier 1 supplier facilities and (2) supplier facilities",
+        "beyond Tier 1 that have been audited to a labour code of conduct, (3) percentage"
       ],
-      "dense_query": "Find disclosures for CG-AA-430b.1 Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct with unit Percentage (%) related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.1 'Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct', under 'Labour Conditions in the Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.1 'Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct', under 'Labour Conditions in the Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430b.1 'Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct'; retain every reported year and label.",
+        "When CG-AA-430b.1 'Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430b.1 'Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct', including: Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct; Percentage of supplier facilities beyond Tier 1 that have been audited to a labour code of conduct; Percent of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct; CG-AA-430b.1 Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct.",
+        "Disambiguate CG-AA-430b.1 'Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct' from sibling metrics sharing CG-AA-430b.1: Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct; Percentage of (3) total audits conducted by a third-party auditor.",
+        "Find disclosures for CG-AA-430b.1 Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct with unit Percentage (%) related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430b.1 Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430b.1 Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430b.1 Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct related to Labour Conditions in the Supply Chain.",
@@ -753,7 +1372,22 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
+        "Percent of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
+        "CG-AA-430b.1 Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct",
+        "supplier facilities",
+        "facilities beyond",
+        "beyond Tier",
+        "Tier that",
+        "that",
+        "that have",
+        "have",
+        "have been",
+        "been audited",
+        "audited labour",
+        "labour code",
+        "code conduct"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct",
@@ -774,7 +1408,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -782,11 +1418,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -798,9 +1460,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct' (CG-AA-430b.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct; Percentage of (3) total audits conducted by a third-party auditor."
     },
     {
       "metric_id": "CG-AA-430b.1.03",
@@ -830,10 +1515,25 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (3) total audits conducted by a third-party auditor",
+        "Percentage of total audits conducted by a third-party auditor",
+        "Percent of (3) total audits conducted by a third-party auditor",
+        "CG-AA-430b.1 Percentage of (3) total audits conducted by a third-party auditor",
+        "audits conducted",
+        "conducted third-party",
+        "third-party auditor",
+        "Percentage of (1) Tier 1 supplier facilities and (2) supplier facilities",
+        "beyond Tier 1 that have been audited to a labour code of conduct, (3) percentage"
       ],
-      "dense_query": "Find disclosures for CG-AA-430b.1 Percentage of (3) total audits conducted by a third-party auditor with unit Percentage (%) related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.1 'Percentage of (3) total audits conducted by a third-party auditor', under 'Labour Conditions in the Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.1 'Percentage of (3) total audits conducted by a third-party auditor', under 'Labour Conditions in the Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430b.1 'Percentage of (3) total audits conducted by a third-party auditor'; retain every reported year and label.",
+        "When CG-AA-430b.1 'Percentage of (3) total audits conducted by a third-party auditor' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430b.1 'Percentage of (3) total audits conducted by a third-party auditor', including: Percentage of (3) total audits conducted by a third-party auditor; Percentage of total audits conducted by a third-party auditor; Percent of (3) total audits conducted by a third-party auditor; CG-AA-430b.1 Percentage of (3) total audits conducted by a third-party auditor.",
+        "Disambiguate CG-AA-430b.1 'Percentage of (3) total audits conducted by a third-party auditor' from sibling metrics sharing CG-AA-430b.1: Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct; Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct.",
+        "Find disclosures for CG-AA-430b.1 Percentage of (3) total audits conducted by a third-party auditor with unit Percentage (%) related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430b.1 Percentage of (3) total audits conducted by a third-party auditor, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430b.1 Percentage of (3) total audits conducted by a third-party auditor with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430b.1 Percentage of (3) total audits conducted by a third-party auditor related to Labour Conditions in the Supply Chain.",
@@ -853,7 +1553,13 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of total audits conducted by a third-party auditor",
+        "Percent of (3) total audits conducted by a third-party auditor",
+        "CG-AA-430b.1 Percentage of (3) total audits conducted by a third-party auditor",
+        "audits conducted",
+        "conducted third-party",
+        "third-party auditor"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct",
@@ -874,7 +1580,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -882,11 +1590,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (3) total audits conducted by a third-party auditor', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -898,9 +1632,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (3) total audits conducted by a third-party auditor' (CG-AA-430b.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) Tier 1 supplier facilities that have been audited to a labour code of conduct; Percentage of (2) supplier facilities beyond Tier 1 that have been audited to a labour code of conduct."
     },
     {
       "metric_id": "CG-AA-430b.2.01",
@@ -929,10 +1686,29 @@
         "Conditions",
         "Supply",
         "Chain",
-        "ratio"
+        "ratio",
+        "(1) Priority non-conformance rate for suppliers' labour code of conduct audits",
+        "Priority non-conformance rate for suppliers' labour code of conduct audits",
+        "CG-AA-430b.2 (1) Priority non-conformance rate for suppliers' labour code of conduct audits",
+        "Priority non-conformance",
+        "non-conformance rate",
+        "rate suppliers'",
+        "suppliers'",
+        "suppliers' labour",
+        "labour code",
+        "code conduct",
+        "conduct audits",
+        "(1) Priority non-conformance rate and (2) associated corrective",
+        "action rate for suppliers’ labour code of conduct audits"
       ],
-      "dense_query": "Find disclosures for CG-AA-430b.2 (1) Priority non-conformance rate for suppliers' labour code of conduct audits with unit Rate related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.2 '(1) Priority non-conformance rate for suppliers' labour code of conduct audits', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.2 '(1) Priority non-conformance rate for suppliers' labour code of conduct audits', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430b.2 '(1) Priority non-conformance rate for suppliers' labour code of conduct audits'; retain every reported year and label.",
+        "When CG-AA-430b.2 '(1) Priority non-conformance rate for suppliers' labour code of conduct audits' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430b.2 '(1) Priority non-conformance rate for suppliers' labour code of conduct audits', including: (1) Priority non-conformance rate for suppliers' labour code of conduct audits; Priority non-conformance rate for suppliers' labour code of conduct audits; CG-AA-430b.2 (1) Priority non-conformance rate for suppliers' labour code of conduct audits.",
+        "Disambiguate CG-AA-430b.2 '(1) Priority non-conformance rate for suppliers' labour code of conduct audits' from sibling metrics sharing CG-AA-430b.2: (2) Associated corrective action rate for suppliers' labour code of conduct audits.",
+        "Find disclosures for CG-AA-430b.2 (1) Priority non-conformance rate for suppliers' labour code of conduct audits with unit Rate related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430b.2 (1) Priority non-conformance rate for suppliers' labour code of conduct audits, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430b.2 (1) Priority non-conformance rate for suppliers' labour code of conduct audits with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430b.2 (1) Priority non-conformance rate for suppliers' labour code of conduct audits related to Labour Conditions in the Supply Chain.",
@@ -940,6 +1716,7 @@
       ],
       "anchor_terms": [
         "CG-AA-430b.2",
+        "(1) Priority non-conformance rate for suppliers' labour code of conduct audits",
         "Priority non-conformance rate for suppliers' labour code of conduct audits",
         "Priority",
         "non-conformance",
@@ -952,10 +1729,20 @@
         "Conditions",
         "Supply",
         "Chain",
-        "ratio"
+        "ratio",
+        "CG-AA-430b.2 (1) Priority non-conformance rate for suppliers' labour code of conduct audits",
+        "Priority non-conformance",
+        "non-conformance rate",
+        "rate suppliers'",
+        "suppliers'",
+        "suppliers' labour",
+        "labour code",
+        "code conduct",
+        "conduct audits"
       ],
       "negative_anchor_terms": [
-        "Associated corrective action rate for suppliers' labour code of conduct audits"
+        "Associated corrective action rate for suppliers' labour code of conduct audits",
+        "(2) Associated corrective action rate for suppliers' labour code of conduct audits"
       ],
       "similar_metric_warnings": [
         {
@@ -968,7 +1755,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -976,23 +1765,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Priority non-conformance rate for suppliers' labour code of conduct audits', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Priority non-conformance rate for suppliers' labour code of conduct audits' (CG-AA-430b.2, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Associated corrective action rate for suppliers' labour code of conduct audits."
     },
     {
       "metric_id": "CG-AA-430b.2.02",
@@ -1021,10 +1858,31 @@
         "Conditions",
         "Supply",
         "Chain",
-        "ratio"
+        "ratio",
+        "(2) Associated corrective action rate for suppliers' labour code of conduct audits",
+        "Associated corrective action rate for suppliers' labour code of conduct audits",
+        "CG-AA-430b.2 (2) Associated corrective action rate for suppliers' labour code of conduct audits",
+        "Associated",
+        "Associated corrective",
+        "corrective action",
+        "action rate",
+        "rate suppliers'",
+        "suppliers'",
+        "suppliers' labour",
+        "labour code",
+        "code conduct",
+        "conduct audits",
+        "(1) Priority non-conformance rate and (2) associated corrective",
+        "action rate for suppliers’ labour code of conduct audits"
       ],
-      "dense_query": "Find disclosures for CG-AA-430b.2 (2) Associated corrective action rate for suppliers' labour code of conduct audits with unit Rate related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.2 '(2) Associated corrective action rate for suppliers' labour code of conduct audits', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.2 '(2) Associated corrective action rate for suppliers' labour code of conduct audits', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-430b.2 '(2) Associated corrective action rate for suppliers' labour code of conduct audits'; retain every reported year and label.",
+        "When CG-AA-430b.2 '(2) Associated corrective action rate for suppliers' labour code of conduct audits' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430b.2 '(2) Associated corrective action rate for suppliers' labour code of conduct audits', including: (2) Associated corrective action rate for suppliers' labour code of conduct audits; Associated corrective action rate for suppliers' labour code of conduct audits; CG-AA-430b.2 (2) Associated corrective action rate for suppliers' labour code of conduct audits.",
+        "Disambiguate CG-AA-430b.2 '(2) Associated corrective action rate for suppliers' labour code of conduct audits' from sibling metrics sharing CG-AA-430b.2: (1) Priority non-conformance rate for suppliers' labour code of conduct audits.",
+        "Find disclosures for CG-AA-430b.2 (2) Associated corrective action rate for suppliers' labour code of conduct audits with unit Rate related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430b.2 (2) Associated corrective action rate for suppliers' labour code of conduct audits, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430b.2 (2) Associated corrective action rate for suppliers' labour code of conduct audits with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430b.2 (2) Associated corrective action rate for suppliers' labour code of conduct audits related to Labour Conditions in the Supply Chain.",
@@ -1032,6 +1890,7 @@
       ],
       "anchor_terms": [
         "CG-AA-430b.2",
+        "(2) Associated corrective action rate for suppliers' labour code of conduct audits",
         "Associated corrective action rate for suppliers' labour code of conduct audits",
         "corrective",
         "action",
@@ -1044,10 +1903,22 @@
         "Conditions",
         "Supply",
         "Chain",
-        "ratio"
+        "ratio",
+        "CG-AA-430b.2 (2) Associated corrective action rate for suppliers' labour code of conduct audits",
+        "Associated",
+        "Associated corrective",
+        "corrective action",
+        "action rate",
+        "rate suppliers'",
+        "suppliers'",
+        "suppliers' labour",
+        "labour code",
+        "code conduct",
+        "conduct audits"
       ],
       "negative_anchor_terms": [
-        "Priority non-conformance rate for suppliers' labour code of conduct audits"
+        "Priority non-conformance rate for suppliers' labour code of conduct audits",
+        "(1) Priority non-conformance rate for suppliers' labour code of conduct audits"
       ],
       "similar_metric_warnings": [
         {
@@ -1060,7 +1931,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1068,23 +1941,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Associated corrective action rate for suppliers' labour code of conduct audits', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Associated corrective action rate for suppliers' labour code of conduct audits' (CG-AA-430b.2, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Priority non-conformance rate for suppliers' labour code of conduct audits."
     },
     {
       "metric_id": "CG-AA-430b.3",
@@ -1098,7 +2019,8 @@
       "aliases": [
         "Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain",
         "Description of the greatest labour and environmental, health and safety risks in the supply chain",
-        "CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain"
+        "CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain",
+        "the greatest (1) labour and (2) environmental, health and safety risks in the supply chain"
       ],
       "bm25_terms": [
         "CG-AA-430b.3",
@@ -1111,10 +2033,30 @@
         "risks",
         "supply",
         "chain",
-        "Conditions"
+        "Conditions",
+        "Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain",
+        "Description of the greatest labour and environmental, health and safety risks in the supply chain",
+        "CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain",
+        "the greatest (1) labour and (2) environmental, health and safety risks in the supply chain",
+        "greatest labour",
+        "labour environmental",
+        "environmental health",
+        "health safety",
+        "safety risks",
+        "risks supply",
+        "supply chain",
+        "Description of the greatest (1) labour",
+        "safety risks in the supply chain",
+        "Description of the greatest (1) labour and (2) environmental, health",
+        "and safety risks in the supply chain"
       ],
-      "dense_query": "Find disclosures for CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.3 'Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain', under 'Labour Conditions in the Supply Chain'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-430b.3 'Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain', under 'Labour Conditions in the Supply Chain'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-AA-430b.3 'Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain'.",
+        "When CG-AA-430b.3 'Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-430b.3 'Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain', including: Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain; Description of the greatest labour and environmental, health and safety risks in the supply chain; CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain; the greatest (1) labour and (2) environmental, health and safety risks in the supply chain.",
+        "Find disclosures for CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain related to Labour Conditions in the Supply Chain.",
@@ -1132,7 +2074,19 @@
         "risks",
         "supply",
         "chain",
-        "Conditions"
+        "Conditions",
+        "Description of the greatest labour and environmental, health and safety risks in the supply chain",
+        "CG-AA-430b.3 Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain",
+        "the greatest (1) labour and (2) environmental, health and safety risks in the supply chain",
+        "greatest labour",
+        "labour environmental",
+        "environmental health",
+        "health safety",
+        "safety risks",
+        "risks supply",
+        "supply chain",
+        "Description of the greatest (1) labour",
+        "safety risks in the supply chain"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1142,7 +2096,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1154,20 +2110,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of the greatest (1) labour and (2) environmental, health and safety risks in the supply chain' (CG-AA-430b.3). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-AA-440a.3",
@@ -1205,10 +2209,34 @@
         "factors",
         "management",
         "strategy",
-        "addressing"
+        "addressing",
+        "(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities",
+        "List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities",
+        "List of priority raw materials; for each priority raw material: environmental or social factor(s) most likely to threaten sourcing, discussion on business risks or opportunities associated with environmental or social factors and management strategy for addressing business risks and opportunities",
+        "CG-AA-440a.3 (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities",
+        "List priority",
+        "priority raw",
+        "raw materials",
+        "materials each",
+        "each",
+        "each priority",
+        "raw material",
+        "material environmental",
+        "environmental social",
+        "social factor",
+        "factor most",
+        "most likely",
+        "likely threaten",
+        "(1) List of priority raw materials",
+        "for each priority raw material"
       ],
-      "dense_query": "Find disclosures for CG-AA-440a.3 (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities related to Raw Materials Sourcing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-440a.3 '(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities', under 'Raw Materials Sourcing'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-440a.3 '(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities', under 'Raw Materials Sourcing'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-AA-440a.3 '(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities'.",
+        "When CG-AA-440a.3 '(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-440a.3 '(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities', including: (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities; List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities; List of priority raw materials; for each priority raw material: environmental or social factor(s) most likely to threaten sourcing, discussion on business risks or opportunities associated with environmental or social factors and management strategy for addressing business risks and opportunities; CG-AA-440a.3 (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities.",
+        "Find disclosures for CG-AA-440a.3 (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities related to Raw Materials Sourcing.",
         "Retrieve exact report evidence for CG-AA-440a.3 (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-440a.3 (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-440a.3 (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities related to Raw Materials Sourcing.",
@@ -1216,6 +2244,7 @@
       ],
       "anchor_terms": [
         "CG-AA-440a.3",
+        "(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities",
         "List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities",
         "List",
         "priority",
@@ -1228,7 +2257,22 @@
         "most",
         "likely",
         "threaten",
-        "sourcing"
+        "sourcing",
+        "List of priority raw materials; for each priority raw material: environmental or social factor(s) most likely to threaten sourcing, discussion on business risks or opportunities associated with environmental or social factors and management strategy for addressing business risks and opportunities",
+        "CG-AA-440a.3 (1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities",
+        "List priority",
+        "priority raw",
+        "raw materials",
+        "materials each",
+        "each",
+        "each priority",
+        "raw material",
+        "material environmental",
+        "environmental social",
+        "social factor",
+        "factor most",
+        "most likely",
+        "likely threaten"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1238,7 +2282,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1250,20 +2296,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses '(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) List of priority raw materials; for each priority raw material: (2) environmental or social factor(s) most likely to threaten sourcing, (3) discussion on business risks or opportunities associated with environmental or social factors and (4) management strategy for addressing business risks and opportunities' (CG-AA-440a.3, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-AA-440a.4.01",
@@ -1293,10 +2387,31 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "(1) Amount of priority raw materials purchased, by material",
+        "Amount of priority raw materials purchased, by material",
+        "CG-AA-440a.4 (1) Amount of priority raw materials purchased, by material",
+        "priority raw",
+        "raw materials",
+        "materials purchased",
+        "purchased material",
+        "Amount of priority raw materials purchased",
+        "by material",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Amount of priority raw materials purchased, by material, and",
+        "(2) amount of each priority raw material that is certified to a third-party"
       ],
-      "dense_query": "Find disclosures for CG-AA-440a.4 (1) Amount of priority raw materials purchased, by material with unit Metric tonnes (t) related to Raw Materials Sourcing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-440a.4 '(1) Amount of priority raw materials purchased, by material', under 'Raw Materials Sourcing', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-440a.4 '(1) Amount of priority raw materials purchased, by material', under 'Raw Materials Sourcing', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-440a.4 '(1) Amount of priority raw materials purchased, by material'; retain every reported year and label.",
+        "When CG-AA-440a.4 '(1) Amount of priority raw materials purchased, by material' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-440a.4 '(1) Amount of priority raw materials purchased, by material', including: (1) Amount of priority raw materials purchased, by material; Amount of priority raw materials purchased, by material; CG-AA-440a.4 (1) Amount of priority raw materials purchased, by material.",
+        "Disambiguate CG-AA-440a.4 '(1) Amount of priority raw materials purchased, by material' from sibling metrics sharing CG-AA-440a.4: (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard.",
+        "Find disclosures for CG-AA-440a.4 (1) Amount of priority raw materials purchased, by material with unit Metric tonnes (t) related to Raw Materials Sourcing.",
         "Retrieve exact report evidence for CG-AA-440a.4 (1) Amount of priority raw materials purchased, by material, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-440a.4 (1) Amount of priority raw materials purchased, by material with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-440a.4 (1) Amount of priority raw materials purchased, by material related to Raw Materials Sourcing.",
@@ -1304,6 +2419,7 @@
       ],
       "anchor_terms": [
         "CG-AA-440a.4",
+        "(1) Amount of priority raw materials purchased, by material",
         "Amount of priority raw materials purchased, by material",
         "priority",
         "raw",
@@ -1314,10 +2430,23 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "CG-AA-440a.4 (1) Amount of priority raw materials purchased, by material",
+        "priority raw",
+        "raw materials",
+        "materials purchased",
+        "purchased material",
+        "Amount of priority raw materials purchased",
+        "by material",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
-        "Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard"
+        "Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard",
+        "(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard"
       ],
       "similar_metric_warnings": [
         {
@@ -1330,7 +2459,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1338,30 +2469,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Amount of priority raw materials purchased, by material', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Amount of priority raw materials purchased, by material' (CG-AA-440a.4, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard."
     },
     {
       "metric_id": "CG-AA-440a.4.02",
@@ -1395,10 +2572,39 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard",
+        "Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard",
+        "CG-AA-440a.4 (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard",
+        "each",
+        "each priority",
+        "priority raw",
+        "raw material",
+        "material that",
+        "that",
+        "that certified",
+        "certified third-party",
+        "third-party environmental",
+        "environmental social",
+        "social standard",
+        "standard standard",
+        "Amount of each priority raw material that is certified to a third-party environmental or social standard",
+        "by standard",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Amount of priority raw materials purchased, by material, and",
+        "(2) amount of each priority raw material that is certified to a third-party"
       ],
-      "dense_query": "Find disclosures for CG-AA-440a.4 (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard with unit Metric tonnes (t) related to Raw Materials Sourcing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-440a.4 '(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard', under 'Raw Materials Sourcing', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-440a.4 '(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard', under 'Raw Materials Sourcing', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-440a.4 '(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard'; retain every reported year and label.",
+        "When CG-AA-440a.4 '(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-440a.4 '(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard', including: (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard; Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard; CG-AA-440a.4 (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard.",
+        "Disambiguate CG-AA-440a.4 '(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard' from sibling metrics sharing CG-AA-440a.4: (1) Amount of priority raw materials purchased, by material.",
+        "Find disclosures for CG-AA-440a.4 (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard with unit Metric tonnes (t) related to Raw Materials Sourcing.",
         "Retrieve exact report evidence for CG-AA-440a.4 (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-440a.4 (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-440a.4 (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard related to Raw Materials Sourcing.",
@@ -1406,6 +2612,7 @@
       ],
       "anchor_terms": [
         "CG-AA-440a.4",
+        "(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard",
         "Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard",
         "priority",
         "raw",
@@ -1420,10 +2627,31 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "CG-AA-440a.4 (2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard",
+        "each",
+        "each priority",
+        "priority raw",
+        "raw material",
+        "material that",
+        "that",
+        "that certified",
+        "certified third-party",
+        "third-party environmental",
+        "environmental social",
+        "social standard",
+        "standard standard",
+        "Amount of each priority raw material that is certified to a third-party environmental or social standard",
+        "by standard",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
-        "Amount of priority raw materials purchased, by material"
+        "Amount of priority raw materials purchased, by material",
+        "(1) Amount of priority raw materials purchased, by material"
       ],
       "similar_metric_warnings": [
         {
@@ -1436,7 +2664,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1444,30 +2674,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Amount of each priority raw material that is certified to a third-party environmental or social standard, by standard' (CG-AA-440a.4, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Amount of priority raw materials purchased, by material."
     },
     {
       "metric_id": "CG-AA-000.A.01",
@@ -1482,7 +2758,8 @@
         "Number of (1) Tier 1 suppliers",
         "Number of Tier 1 suppliers",
         "Count of (1) Tier 1 suppliers",
-        "CG-AA-000.A Number of (1) Tier 1 suppliers"
+        "CG-AA-000.A Number of (1) Tier 1 suppliers",
+        "Total number of (1) Tier 1 suppliers"
       ],
       "bm25_terms": [
         "CG-AA-000.A",
@@ -1491,10 +2768,24 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of (1) Tier 1 suppliers",
+        "Number of Tier 1 suppliers",
+        "Count of (1) Tier 1 suppliers",
+        "CG-AA-000.A Number of (1) Tier 1 suppliers",
+        "Total number of (1) Tier 1 suppliers",
+        "Tier suppliers",
+        "Number of (1) Tier 1 suppliers and (2) suppliers beyond Tier 1",
+        "Note to CG-AA-000.A – Tier 1 suppliers are defined as suppliers that transact directly with the entity, such as finished goods"
       ],
-      "dense_query": "Find disclosures for CG-AA-000.A Number of (1) Tier 1 suppliers with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-000.A 'Number of (1) Tier 1 suppliers', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-000.A 'Number of (1) Tier 1 suppliers', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-000.A 'Number of (1) Tier 1 suppliers'; retain every reported year and label.",
+        "When CG-AA-000.A 'Number of (1) Tier 1 suppliers' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-000.A 'Number of (1) Tier 1 suppliers', including: Number of (1) Tier 1 suppliers; Number of Tier 1 suppliers; Count of (1) Tier 1 suppliers; CG-AA-000.A Number of (1) Tier 1 suppliers; Total number of (1) Tier 1 suppliers.",
+        "Disambiguate CG-AA-000.A 'Number of (1) Tier 1 suppliers' from sibling metrics sharing CG-AA-000.A: Number of (2) suppliers beyond Tier 1.",
+        "Find disclosures for CG-AA-000.A Number of (1) Tier 1 suppliers with unit Number.",
         "Retrieve exact report evidence for CG-AA-000.A Number of (1) Tier 1 suppliers, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-000.A Number of (1) Tier 1 suppliers with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-000.A Number of (1) Tier 1 suppliers.",
@@ -1507,7 +2798,12 @@
         "suppliers",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of Tier 1 suppliers",
+        "Count of (1) Tier 1 suppliers",
+        "CG-AA-000.A Number of (1) Tier 1 suppliers",
+        "Total number of (1) Tier 1 suppliers",
+        "Tier suppliers"
       ],
       "negative_anchor_terms": [
         "Number of (2) suppliers beyond Tier 1"
@@ -1523,7 +2819,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1531,24 +2829,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of (1) Tier 1 suppliers'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of (1) Tier 1 suppliers' (CG-AA-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of (2) suppliers beyond Tier 1."
     },
     {
       "metric_id": "CG-AA-000.A.02",
@@ -1563,7 +2909,8 @@
         "Number of (2) suppliers beyond Tier 1",
         "Number of suppliers beyond Tier 1",
         "Count of (2) suppliers beyond Tier 1",
-        "CG-AA-000.A Number of (2) suppliers beyond Tier 1"
+        "CG-AA-000.A Number of (2) suppliers beyond Tier 1",
+        "Total number of (2) suppliers beyond Tier 1"
       ],
       "bm25_terms": [
         "CG-AA-000.A",
@@ -1573,10 +2920,25 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of (2) suppliers beyond Tier 1",
+        "Number of suppliers beyond Tier 1",
+        "Count of (2) suppliers beyond Tier 1",
+        "CG-AA-000.A Number of (2) suppliers beyond Tier 1",
+        "Total number of (2) suppliers beyond Tier 1",
+        "suppliers beyond",
+        "beyond Tier",
+        "Number of (1) Tier 1 suppliers and (2) suppliers beyond Tier 1",
+        "Note to CG-AA-000.A – Tier 1 suppliers are defined as suppliers that transact directly with the entity, such as finished goods"
       ],
-      "dense_query": "Find disclosures for CG-AA-000.A Number of (2) suppliers beyond Tier 1 with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-AA-000.A 'Number of (2) suppliers beyond Tier 1', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-AA-000.A 'Number of (2) suppliers beyond Tier 1', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-AA-000.A 'Number of (2) suppliers beyond Tier 1'; retain every reported year and label.",
+        "When CG-AA-000.A 'Number of (2) suppliers beyond Tier 1' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-AA-000.A 'Number of (2) suppliers beyond Tier 1', including: Number of (2) suppliers beyond Tier 1; Number of suppliers beyond Tier 1; Count of (2) suppliers beyond Tier 1; CG-AA-000.A Number of (2) suppliers beyond Tier 1; Total number of (2) suppliers beyond Tier 1.",
+        "Disambiguate CG-AA-000.A 'Number of (2) suppliers beyond Tier 1' from sibling metrics sharing CG-AA-000.A: Number of (1) Tier 1 suppliers.",
+        "Find disclosures for CG-AA-000.A Number of (2) suppliers beyond Tier 1 with unit Number.",
         "Retrieve exact report evidence for CG-AA-000.A Number of (2) suppliers beyond Tier 1, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-AA-000.A Number of (2) suppliers beyond Tier 1 with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-AA-000.A Number of (2) suppliers beyond Tier 1.",
@@ -1590,7 +2952,13 @@
         "Tier",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of suppliers beyond Tier 1",
+        "Count of (2) suppliers beyond Tier 1",
+        "CG-AA-000.A Number of (2) suppliers beyond Tier 1",
+        "Total number of (2) suppliers beyond Tier 1",
+        "suppliers beyond",
+        "beyond Tier"
       ],
       "negative_anchor_terms": [
         "Number of (1) Tier 1 suppliers"
@@ -1606,7 +2974,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1614,24 +2984,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of (2) suppliers beyond Tier 1'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of (2) suppliers beyond Tier 1' (CG-AA-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of (1) Tier 1 suppliers."
     }
   ]
 }

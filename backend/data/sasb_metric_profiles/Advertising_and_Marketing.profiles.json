@@ -21,10 +21,28 @@
         "targeted",
         "advertising",
         "consumer",
-        "privacy"
+        "privacy",
+        "Discussion of policies and practices relating to targeted advertising and consumer privacy",
+        "SV-AD-220a.1 Discussion of policies and practices relating to targeted advertising and consumer privacy",
+        "policies practices",
+        "practices relating",
+        "relating",
+        "relating targeted",
+        "targeted advertising",
+        "advertising consumer",
+        "consumer privacy",
+        "Discussion of policies",
+        "practices relating to targeted advertising",
+        "Discussion of policies and practices relating to targeted",
+        "advertising and consumer privacy"
       ],
-      "dense_query": "Find disclosures for SV-AD-220a.1 Discussion of policies and practices relating to targeted advertising and consumer privacy related to Data Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-220a.1 'Discussion of policies and practices relating to targeted advertising and consumer privacy', under 'Data Privacy'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-220a.1 'Discussion of policies and practices relating to targeted advertising and consumer privacy', under 'Data Privacy'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers SV-AD-220a.1 'Discussion of policies and practices relating to targeted advertising and consumer privacy'.",
+        "When SV-AD-220a.1 'Discussion of policies and practices relating to targeted advertising and consumer privacy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-220a.1 'Discussion of policies and practices relating to targeted advertising and consumer privacy', including: Discussion of policies and practices relating to targeted advertising and consumer privacy; SV-AD-220a.1 Discussion of policies and practices relating to targeted advertising and consumer privacy.",
+        "Find disclosures for SV-AD-220a.1 Discussion of policies and practices relating to targeted advertising and consumer privacy related to Data Privacy.",
         "Retrieve exact report evidence for SV-AD-220a.1 Discussion of policies and practices relating to targeted advertising and consumer privacy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-220a.1 Discussion of policies and practices relating to targeted advertising and consumer privacy.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-220a.1 Discussion of policies and practices relating to targeted advertising and consumer privacy related to Data Privacy.",
@@ -39,7 +57,17 @@
         "targeted",
         "advertising",
         "consumer",
-        "privacy"
+        "privacy",
+        "SV-AD-220a.1 Discussion of policies and practices relating to targeted advertising and consumer privacy",
+        "policies practices",
+        "practices relating",
+        "relating",
+        "relating targeted",
+        "targeted advertising",
+        "advertising consumer",
+        "consumer privacy",
+        "Discussion of policies",
+        "practices relating to targeted advertising"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -49,7 +77,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -61,20 +91,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of policies and practices relating to targeted advertising and consumer privacy'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of policies and practices relating to targeted advertising and consumer privacy' (SV-AD-220a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-AD-220a.2",
@@ -102,10 +180,30 @@
         "%",
         "revenue",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of online advertising impressions that are targeted to custom audiences",
+        "Percent of online advertising impressions that are targeted to custom audiences",
+        "SV-AD-220a.2 Percentage of online advertising impressions that are targeted to custom audiences",
+        "online advertising",
+        "advertising impressions",
+        "impressions that",
+        "that",
+        "that are",
+        "are",
+        "are targeted",
+        "targeted custom",
+        "custom audiences",
+        "Percentage (%) by revenue",
+        "percentage",
+        "Percentage of online advertising impressions that are targeted to"
       ],
-      "dense_query": "Find disclosures for SV-AD-220a.2 Percentage of online advertising impressions that are targeted to custom audiences with unit Percentage (%) by revenue related to Data Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-220a.2 'Percentage of online advertising impressions that are targeted to custom audiences', under 'Data Privacy', with expected unit 'Percentage (%) by revenue'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-220a.2 'Percentage of online advertising impressions that are targeted to custom audiences', under 'Data Privacy', with expected unit 'Percentage (%) by revenue'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-220a.2 'Percentage of online advertising impressions that are targeted to custom audiences'; retain every reported year and label.",
+        "When SV-AD-220a.2 'Percentage of online advertising impressions that are targeted to custom audiences' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-220a.2 'Percentage of online advertising impressions that are targeted to custom audiences', including: Percentage of online advertising impressions that are targeted to custom audiences; Percent of online advertising impressions that are targeted to custom audiences; SV-AD-220a.2 Percentage of online advertising impressions that are targeted to custom audiences.",
+        "Find disclosures for SV-AD-220a.2 Percentage of online advertising impressions that are targeted to custom audiences with unit Percentage (%) by revenue related to Data Privacy.",
         "Retrieve exact report evidence for SV-AD-220a.2 Percentage of online advertising impressions that are targeted to custom audiences, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-220a.2 Percentage of online advertising impressions that are targeted to custom audiences with unit Percentage (%) by revenue.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-220a.2 Percentage of online advertising impressions that are targeted to custom audiences related to Data Privacy.",
@@ -124,7 +222,19 @@
         "Percentage (%) by revenue",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percent of online advertising impressions that are targeted to custom audiences",
+        "SV-AD-220a.2 Percentage of online advertising impressions that are targeted to custom audiences",
+        "online advertising",
+        "advertising impressions",
+        "impressions that",
+        "that",
+        "that are",
+        "are",
+        "are targeted",
+        "targeted custom",
+        "custom audiences",
+        "percentage"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -133,7 +243,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -141,11 +253,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of online advertising impressions that are targeted to custom audiences', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -154,16 +292,36 @@
           "Percentage (%)",
           "%",
           "percent",
-          "percentage",
-          "reporting currency",
-          "monetary amount",
-          "presentation currency"
+          "percentage"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of online advertising impressions that are targeted to custom audiences' (SV-AD-220a.2, expected unit: Percentage (%) by revenue). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-AD-220a.3",
@@ -193,10 +351,30 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with consumer privacy",
+        "Monetary losses as a result of legal proceedings associated with consumer privacy",
+        "SV-AD-220a.3 Total amount of monetary losses as a result of legal proceedings associated with consumer privacy",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated consumer",
+        "consumer privacy",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with consumer privacy"
       ],
-      "dense_query": "Find disclosures for SV-AD-220a.3 Total amount of monetary losses as a result of legal proceedings associated with consumer privacy with unit Presentation currency related to Data Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-220a.3 'Total amount of monetary losses as a result of legal proceedings associated with consumer privacy', under 'Data Privacy', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-220a.3 'Total amount of monetary losses as a result of legal proceedings associated with consumer privacy', under 'Data Privacy', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-220a.3 'Total amount of monetary losses as a result of legal proceedings associated with consumer privacy'; retain every reported year and label.",
+        "When SV-AD-220a.3 'Total amount of monetary losses as a result of legal proceedings associated with consumer privacy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-220a.3 'Total amount of monetary losses as a result of legal proceedings associated with consumer privacy', including: Total amount of monetary losses as a result of legal proceedings associated with consumer privacy; Monetary losses as a result of legal proceedings associated with consumer privacy; SV-AD-220a.3 Total amount of monetary losses as a result of legal proceedings associated with consumer privacy.",
+        "Find disclosures for SV-AD-220a.3 Total amount of monetary losses as a result of legal proceedings associated with consumer privacy with unit Presentation currency related to Data Privacy.",
         "Retrieve exact report evidence for SV-AD-220a.3 Total amount of monetary losses as a result of legal proceedings associated with consumer privacy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-220a.3 Total amount of monetary losses as a result of legal proceedings associated with consumer privacy with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-220a.3 Total amount of monetary losses as a result of legal proceedings associated with consumer privacy related to Data Privacy.",
@@ -216,7 +394,18 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with consumer privacy",
+        "SV-AD-220a.3 Total amount of monetary losses as a result of legal proceedings associated with consumer privacy",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated consumer",
+        "consumer privacy",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -230,7 +419,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -238,25 +429,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with consumer privacy', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with consumer privacy' (SV-AD-220a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-AD-270a.1",
@@ -289,10 +529,34 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising",
+        "Monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising",
+        "SV-AD-270a.1 Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated false",
+        "false deceptive",
+        "deceptive unfair",
+        "unfair advertising",
+        "Total amount of monetary losses as a result of legal proceedings associated with false",
+        "deceptive or unfair advertising",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with false, deceptive or unfair advertising"
       ],
-      "dense_query": "Find disclosures for SV-AD-270a.1 Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising with unit Presentation currency related to Advertising Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-270a.1 'Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising', under 'Advertising Integrity', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-270a.1 'Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising', under 'Advertising Integrity', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-270a.1 'Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising'; retain every reported year and label.",
+        "When SV-AD-270a.1 'Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-270a.1 'Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising', including: Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising; Monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising; SV-AD-270a.1 Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising.",
+        "Find disclosures for SV-AD-270a.1 Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising with unit Presentation currency related to Advertising Integrity.",
         "Retrieve exact report evidence for SV-AD-270a.1 Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-270a.1 Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-270a.1 Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising related to Advertising Integrity.",
@@ -315,7 +579,22 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising",
+        "SV-AD-270a.1 Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated false",
+        "false deceptive",
+        "deceptive unfair",
+        "unfair advertising",
+        "Total amount of monetary losses as a result of legal proceedings associated with false",
+        "deceptive or unfair advertising",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -329,7 +608,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -337,25 +618,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with false, deceptive or unfair advertising' (SV-AD-270a.1, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-AD-270a.2.01",
@@ -385,10 +715,29 @@
         "%",
         "revenue",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent",
+        "Percent of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent",
+        "SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent",
+        "campaigns reviewed",
+        "reviewed adherence",
+        "adherence self-regulatory",
+        "self-regulatory assessment",
+        "assessment procedure",
+        "procedure equivalent",
+        "Percentage (%) by revenue",
+        "percentage",
+        "Percentage of campaigns reviewed for adherence with a self",
+        "regulatory assessment procedure or equivalent, percentage of those in"
       ],
-      "dense_query": "Find disclosures for SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent with unit Percentage (%) by revenue related to Advertising Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent', under 'Advertising Integrity', with expected unit 'Percentage (%) by revenue'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent', under 'Advertising Integrity', with expected unit 'Percentage (%) by revenue'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent'; retain every reported year and label.",
+        "When SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent', including: Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent; Percent of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent; SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent.",
+        "Disambiguate SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent' from sibling metrics sharing SV-AD-270a.2: Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance.",
+        "Find disclosures for SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent with unit Percentage (%) by revenue related to Advertising Integrity.",
         "Retrieve exact report evidence for SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent with unit Percentage (%) by revenue.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent related to Advertising Integrity.",
@@ -409,7 +758,16 @@
         "Percentage (%) by revenue",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percent of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent",
+        "SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent",
+        "campaigns reviewed",
+        "reviewed adherence",
+        "adherence self-regulatory",
+        "self-regulatory assessment",
+        "assessment procedure",
+        "procedure equivalent",
+        "percentage"
       ],
       "negative_anchor_terms": [
         "Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance"
@@ -425,7 +783,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -433,11 +793,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -446,16 +832,36 @@
           "Percentage (%)",
           "%",
           "percent",
-          "percentage",
-          "reporting currency",
-          "monetary amount",
-          "presentation currency"
+          "percentage"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent' (SV-AD-270a.2, expected unit: Percentage (%) by revenue). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance."
     },
     {
       "metric_id": "SV-AD-270a.2.02",
@@ -486,10 +892,34 @@
         "%",
         "revenue",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance",
+        "Percent of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance",
+        "SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance",
+        "campaigns reviewed",
+        "reviewed adherence",
+        "adherence self-regulatory",
+        "self-regulatory assessment",
+        "assessment procedure",
+        "procedure equivalent",
+        "equivalent that",
+        "that",
+        "that are",
+        "are",
+        "are compliance",
+        "Percentage (%) by revenue",
+        "percentage",
+        "Percentage of campaigns reviewed for adherence with a self",
+        "regulatory assessment procedure or equivalent, percentage of those in"
       ],
-      "dense_query": "Find disclosures for SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance with unit Percentage (%) by revenue related to Advertising Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance', under 'Advertising Integrity', with expected unit 'Percentage (%) by revenue'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance', under 'Advertising Integrity', with expected unit 'Percentage (%) by revenue'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance'; retain every reported year and label.",
+        "When SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance', including: Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance; Percent of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance; SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance.",
+        "Disambiguate SV-AD-270a.2 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance' from sibling metrics sharing SV-AD-270a.2: Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent.",
+        "Find disclosures for SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance with unit Percentage (%) by revenue related to Advertising Integrity.",
         "Retrieve exact report evidence for SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance with unit Percentage (%) by revenue.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance related to Advertising Integrity.",
@@ -511,7 +941,21 @@
         "Percentage (%) by revenue",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percent of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance",
+        "SV-AD-270a.2 Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance",
+        "campaigns reviewed",
+        "reviewed adherence",
+        "adherence self-regulatory",
+        "self-regulatory assessment",
+        "assessment procedure",
+        "procedure equivalent",
+        "equivalent that",
+        "that",
+        "that are",
+        "are",
+        "are compliance",
+        "percentage"
       ],
       "negative_anchor_terms": [
         "Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent"
@@ -527,7 +971,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -535,11 +981,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -548,16 +1020,36 @@
           "Percentage (%)",
           "%",
           "percent",
-          "percentage",
-          "reporting currency",
-          "monetary amount",
-          "presentation currency"
+          "percentage"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent that are in compliance' (SV-AD-270a.2, expected unit: Percentage (%) by revenue). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of campaigns reviewed for adherence with a self-regulatory assessment procedure or equivalent."
     },
     {
       "metric_id": "SV-AD-270a.3",
@@ -585,10 +1077,27 @@
         "%",
         "revenue",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of campaigns that promote alcohol or tobacco products",
+        "Percent of campaigns that promote alcohol or tobacco products",
+        "SV-AD-270a.3 Percentage of campaigns that promote alcohol or tobacco products",
+        "campaigns that",
+        "that",
+        "that promote",
+        "promote alcohol",
+        "alcohol tobacco",
+        "tobacco products",
+        "Percentage (%) by revenue",
+        "percentage",
+        "The entity shall disclose the percentage, by revenue, of its advertising and marketing campaigns that promote"
       ],
-      "dense_query": "Find disclosures for SV-AD-270a.3 Percentage of campaigns that promote alcohol or tobacco products with unit Percentage (%) by revenue related to Advertising Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-270a.3 'Percentage of campaigns that promote alcohol or tobacco products', under 'Advertising Integrity', with expected unit 'Percentage (%) by revenue'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-270a.3 'Percentage of campaigns that promote alcohol or tobacco products', under 'Advertising Integrity', with expected unit 'Percentage (%) by revenue'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-270a.3 'Percentage of campaigns that promote alcohol or tobacco products'; retain every reported year and label.",
+        "When SV-AD-270a.3 'Percentage of campaigns that promote alcohol or tobacco products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-270a.3 'Percentage of campaigns that promote alcohol or tobacco products', including: Percentage of campaigns that promote alcohol or tobacco products; Percent of campaigns that promote alcohol or tobacco products; SV-AD-270a.3 Percentage of campaigns that promote alcohol or tobacco products.",
+        "Find disclosures for SV-AD-270a.3 Percentage of campaigns that promote alcohol or tobacco products with unit Percentage (%) by revenue related to Advertising Integrity.",
         "Retrieve exact report evidence for SV-AD-270a.3 Percentage of campaigns that promote alcohol or tobacco products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-270a.3 Percentage of campaigns that promote alcohol or tobacco products with unit Percentage (%) by revenue.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-270a.3 Percentage of campaigns that promote alcohol or tobacco products related to Advertising Integrity.",
@@ -607,7 +1116,16 @@
         "Percentage (%) by revenue",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percent of campaigns that promote alcohol or tobacco products",
+        "SV-AD-270a.3 Percentage of campaigns that promote alcohol or tobacco products",
+        "campaigns that",
+        "that",
+        "that promote",
+        "promote alcohol",
+        "alcohol tobacco",
+        "tobacco products",
+        "percentage"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -616,7 +1134,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -624,11 +1144,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of campaigns that promote alcohol or tobacco products', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -637,16 +1183,36 @@
           "Percentage (%)",
           "%",
           "percent",
-          "percentage",
-          "reporting currency",
-          "monetary amount",
-          "presentation currency"
+          "percentage"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of campaigns that promote alcohol or tobacco products' (SV-AD-270a.3, expected unit: Percentage (%) by revenue). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-AD-330a.1.01",
@@ -675,10 +1241,23 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of gender representation for (a) executive management",
+        "Percent of gender representation for (a) executive management",
+        "SV-AD-330a.1 Percentage of gender representation for (a) executive management",
+        "representation executive",
+        "executive management",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, (c) professionals, and"
       ],
-      "dense_query": "Find disclosures for SV-AD-330a.1 Percentage of gender representation for (a) executive management with unit Percentage (%) related to Workforce Diversity & Inclusion.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of gender representation for (a) executive management', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of gender representation for (a) executive management', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-330a.1 'Percentage of gender representation for (a) executive management'; retain every reported year and label.",
+        "When SV-AD-330a.1 'Percentage of gender representation for (a) executive management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-330a.1 'Percentage of gender representation for (a) executive management', including: Percentage of gender representation for (a) executive management; Percent of gender representation for (a) executive management; SV-AD-330a.1 Percentage of gender representation for (a) executive management.",
+        "Disambiguate SV-AD-330a.1 'Percentage of gender representation for (a) executive management' from sibling metrics sharing SV-AD-330a.1: Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees.",
+        "Find disclosures for SV-AD-330a.1 Percentage of gender representation for (a) executive management with unit Percentage (%) related to Workforce Diversity & Inclusion.",
         "Retrieve exact report evidence for SV-AD-330a.1 Percentage of gender representation for (a) executive management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-330a.1 Percentage of gender representation for (a) executive management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-330a.1 Percentage of gender representation for (a) executive management related to Workforce Diversity & Inclusion.",
@@ -698,7 +1277,11 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of gender representation for (a) executive management",
+        "SV-AD-330a.1 Percentage of gender representation for (a) executive management",
+        "representation executive",
+        "executive management"
       ],
       "negative_anchor_terms": [
         "Percentage of gender representation for (b) non-executive management",
@@ -706,7 +1289,9 @@
         "Percentage of gender representation for (d) all other employees",
         "Percentage of diversity group representation for (a) executive management",
         "Percentage of diversity group representation for (b) non-executive management",
-        "diversity group representation"
+        "diversity group representation",
+        "Percentage of diversity group representation for (c) professionals",
+        "Percentage of diversity group representation for (d) all other employees"
       ],
       "similar_metric_warnings": [
         {
@@ -724,6 +1309,18 @@
         {
           "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
           "difference": "This profile is only for \"Percentage of gender representation for (a) executive management\"; do not treat evidence for \"Percentage of diversity group representation for (a) executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+          "difference": "The canonical target is 'Percentage of gender representation for (a) executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+          "difference": "The canonical target is 'Percentage of gender representation for (a) executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (c) professionals' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+          "difference": "The canonical target is 'Percentage of gender representation for (a) executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -731,7 +1328,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -739,11 +1338,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of gender representation for (a) executive management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -755,9 +1380,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of gender representation for (a) executive management' (SV-AD-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees."
     },
     {
       "metric_id": "SV-AD-330a.1.02",
@@ -786,10 +1434,23 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of gender representation for (b) non-executive management",
+        "Percent of gender representation for (b) non-executive management",
+        "SV-AD-330a.1 Percentage of gender representation for (b) non-executive management",
+        "representation non-executive",
+        "non-executive management",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, (c) professionals, and"
       ],
-      "dense_query": "Find disclosures for SV-AD-330a.1 Percentage of gender representation for (b) non-executive management with unit Percentage (%) related to Workforce Diversity & Inclusion.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of gender representation for (b) non-executive management', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of gender representation for (b) non-executive management', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-330a.1 'Percentage of gender representation for (b) non-executive management'; retain every reported year and label.",
+        "When SV-AD-330a.1 'Percentage of gender representation for (b) non-executive management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-330a.1 'Percentage of gender representation for (b) non-executive management', including: Percentage of gender representation for (b) non-executive management; Percent of gender representation for (b) non-executive management; SV-AD-330a.1 Percentage of gender representation for (b) non-executive management.",
+        "Disambiguate SV-AD-330a.1 'Percentage of gender representation for (b) non-executive management' from sibling metrics sharing SV-AD-330a.1: Percentage of gender representation for (a) executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees.",
+        "Find disclosures for SV-AD-330a.1 Percentage of gender representation for (b) non-executive management with unit Percentage (%) related to Workforce Diversity & Inclusion.",
         "Retrieve exact report evidence for SV-AD-330a.1 Percentage of gender representation for (b) non-executive management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-330a.1 Percentage of gender representation for (b) non-executive management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-330a.1 Percentage of gender representation for (b) non-executive management related to Workforce Diversity & Inclusion.",
@@ -809,7 +1470,11 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of gender representation for (b) non-executive management",
+        "SV-AD-330a.1 Percentage of gender representation for (b) non-executive management",
+        "representation non-executive",
+        "non-executive management"
       ],
       "negative_anchor_terms": [
         "Percentage of gender representation for (a) executive management",
@@ -817,7 +1482,9 @@
         "Percentage of gender representation for (d) all other employees",
         "Percentage of diversity group representation for (a) executive management",
         "Percentage of diversity group representation for (b) non-executive management",
-        "diversity group representation"
+        "diversity group representation",
+        "Percentage of diversity group representation for (c) professionals",
+        "Percentage of diversity group representation for (d) all other employees"
       ],
       "similar_metric_warnings": [
         {
@@ -835,6 +1502,18 @@
         {
           "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
           "difference": "This profile is only for \"Percentage of gender representation for (b) non-executive management\"; do not treat evidence for \"Percentage of diversity group representation for (a) executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+          "difference": "The canonical target is 'Percentage of gender representation for (b) non-executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+          "difference": "The canonical target is 'Percentage of gender representation for (b) non-executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (c) professionals' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+          "difference": "The canonical target is 'Percentage of gender representation for (b) non-executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -842,7 +1521,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -850,11 +1531,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of gender representation for (b) non-executive management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -866,9 +1573,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of gender representation for (b) non-executive management' (SV-AD-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of gender representation for (a) executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees."
     },
     {
       "metric_id": "SV-AD-330a.1.03",
@@ -896,10 +1626,22 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of gender representation for (c) professionals",
+        "Percent of gender representation for (c) professionals",
+        "SV-AD-330a.1 Percentage of gender representation for (c) professionals",
+        "representation professionals",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, (c) professionals, and"
       ],
-      "dense_query": "Find disclosures for SV-AD-330a.1 Percentage of gender representation for (c) professionals with unit Percentage (%) related to Workforce Diversity & Inclusion.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of gender representation for (c) professionals', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of gender representation for (c) professionals', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-330a.1 'Percentage of gender representation for (c) professionals'; retain every reported year and label.",
+        "When SV-AD-330a.1 'Percentage of gender representation for (c) professionals' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-330a.1 'Percentage of gender representation for (c) professionals', including: Percentage of gender representation for (c) professionals; Percent of gender representation for (c) professionals; SV-AD-330a.1 Percentage of gender representation for (c) professionals.",
+        "Disambiguate SV-AD-330a.1 'Percentage of gender representation for (c) professionals' from sibling metrics sharing SV-AD-330a.1: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees.",
+        "Find disclosures for SV-AD-330a.1 Percentage of gender representation for (c) professionals with unit Percentage (%) related to Workforce Diversity & Inclusion.",
         "Retrieve exact report evidence for SV-AD-330a.1 Percentage of gender representation for (c) professionals, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-330a.1 Percentage of gender representation for (c) professionals with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-330a.1 Percentage of gender representation for (c) professionals related to Workforce Diversity & Inclusion.",
@@ -918,7 +1660,10 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of gender representation for (c) professionals",
+        "SV-AD-330a.1 Percentage of gender representation for (c) professionals",
+        "representation professionals"
       ],
       "negative_anchor_terms": [
         "Percentage of gender representation for (a) executive management",
@@ -926,7 +1671,9 @@
         "Percentage of gender representation for (d) all other employees",
         "Percentage of diversity group representation for (a) executive management",
         "Percentage of diversity group representation for (b) non-executive management",
-        "diversity group representation"
+        "diversity group representation",
+        "Percentage of diversity group representation for (c) professionals",
+        "Percentage of diversity group representation for (d) all other employees"
       ],
       "similar_metric_warnings": [
         {
@@ -944,6 +1691,18 @@
         {
           "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
           "difference": "This profile is only for \"Percentage of gender representation for (c) professionals\"; do not treat evidence for \"Percentage of diversity group representation for (a) executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+          "difference": "The canonical target is 'Percentage of gender representation for (c) professionals' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+          "difference": "The canonical target is 'Percentage of gender representation for (c) professionals' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (c) professionals' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+          "difference": "The canonical target is 'Percentage of gender representation for (c) professionals' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -951,7 +1710,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -959,11 +1720,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of gender representation for (c) professionals', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -975,9 +1762,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of gender representation for (c) professionals' (SV-AD-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees."
     },
     {
       "metric_id": "SV-AD-330a.1.04",
@@ -1006,10 +1816,25 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of gender representation for (d) all other employees",
+        "Percent of gender representation for (d) all other employees",
+        "SV-AD-330a.1 Percentage of gender representation for (d) all other employees",
+        "representation all",
+        "all",
+        "all other",
+        "other employees",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, (c) professionals, and"
       ],
-      "dense_query": "Find disclosures for SV-AD-330a.1 Percentage of gender representation for (d) all other employees with unit Percentage (%) related to Workforce Diversity & Inclusion.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of gender representation for (d) all other employees', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of gender representation for (d) all other employees', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-330a.1 'Percentage of gender representation for (d) all other employees'; retain every reported year and label.",
+        "When SV-AD-330a.1 'Percentage of gender representation for (d) all other employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-330a.1 'Percentage of gender representation for (d) all other employees', including: Percentage of gender representation for (d) all other employees; Percent of gender representation for (d) all other employees; SV-AD-330a.1 Percentage of gender representation for (d) all other employees.",
+        "Disambiguate SV-AD-330a.1 'Percentage of gender representation for (d) all other employees' from sibling metrics sharing SV-AD-330a.1: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees.",
+        "Find disclosures for SV-AD-330a.1 Percentage of gender representation for (d) all other employees with unit Percentage (%) related to Workforce Diversity & Inclusion.",
         "Retrieve exact report evidence for SV-AD-330a.1 Percentage of gender representation for (d) all other employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-330a.1 Percentage of gender representation for (d) all other employees with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-330a.1 Percentage of gender representation for (d) all other employees related to Workforce Diversity & Inclusion.",
@@ -1029,7 +1854,13 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of gender representation for (d) all other employees",
+        "SV-AD-330a.1 Percentage of gender representation for (d) all other employees",
+        "representation all",
+        "all",
+        "all other",
+        "other employees"
       ],
       "negative_anchor_terms": [
         "Percentage of gender representation for (a) executive management",
@@ -1037,7 +1868,9 @@
         "Percentage of gender representation for (c) professionals",
         "Percentage of diversity group representation for (a) executive management",
         "Percentage of diversity group representation for (b) non-executive management",
-        "diversity group representation"
+        "diversity group representation",
+        "Percentage of diversity group representation for (c) professionals",
+        "Percentage of diversity group representation for (d) all other employees"
       ],
       "similar_metric_warnings": [
         {
@@ -1055,6 +1888,18 @@
         {
           "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
           "difference": "This profile is only for \"Percentage of gender representation for (d) all other employees\"; do not treat evidence for \"Percentage of diversity group representation for (a) executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+          "difference": "The canonical target is 'Percentage of gender representation for (d) all other employees' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+          "difference": "The canonical target is 'Percentage of gender representation for (d) all other employees' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (c) professionals' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+          "difference": "The canonical target is 'Percentage of gender representation for (d) all other employees' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1062,7 +1907,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1070,11 +1917,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of gender representation for (d) all other employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1086,9 +1959,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of gender representation for (d) all other employees' (SV-AD-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees."
     },
     {
       "metric_id": "SV-AD-330a.1.05",
@@ -1117,14 +2013,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of diversity group representation for (a) executive management",
+        "Percent of diversity group representation for (a) executive management",
+        "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
+        "group representation",
+        "representation executive",
+        "executive management",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, (c) professionals, and"
       ],
-      "dense_query": "Find disclosures for SV-AD-330a.1 Percentage of diversity group representation for (a) executive management with unit Percentage (%) related to Workforce Diversity & Inclusion.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of diversity group representation for (a) executive management', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of diversity group representation for (a) executive management', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-330a.1 'Percentage of diversity group representation for (a) executive management'; retain every reported year and label.",
+        "When SV-AD-330a.1 'Percentage of diversity group representation for (a) executive management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-330a.1 'Percentage of diversity group representation for (a) executive management', including: Percentage of diversity group representation for (a) executive management; Percent of diversity group representation for (a) executive management; SV-AD-330a.1 Percentage of diversity group representation for (a) executive management.",
+        "Disambiguate SV-AD-330a.1 'Percentage of diversity group representation for (a) executive management' from sibling metrics sharing SV-AD-330a.1: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees.",
+        "Find disclosures for SV-AD-330a.1 Percentage of diversity group representation for (a) executive management with unit Percentage (%) related to Workforce Diversity & Inclusion.",
         "Retrieve exact report evidence for SV-AD-330a.1 Percentage of diversity group representation for (a) executive management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-330a.1 Percentage of diversity group representation for (a) executive management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-330a.1 Percentage of diversity group representation for (a) executive management related to Workforce Diversity & Inclusion.",
-        "Find numeric table rows or performance metrics reporting SV-AD-330a.1 Percentage of diversity group representation for (a) executive management for the reporting period."
+        "Find numeric table rows or performance metrics reporting SV-AD-330a.1 Percentage of diversity group representation for (a) executive management for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: group."
       ],
       "anchor_terms": [
         "SV-AD-330a.1",
@@ -1140,7 +2051,12 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of diversity group representation for (a) executive management",
+        "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
+        "group representation",
+        "representation executive",
+        "executive management"
       ],
       "negative_anchor_terms": [
         "Percentage of gender representation for (a) executive management",
@@ -1148,7 +2064,9 @@
         "Percentage of gender representation for (c) professionals",
         "Percentage of gender representation for (d) all other employees",
         "Percentage of diversity group representation for (b) non-executive management",
-        "gender representation"
+        "gender representation",
+        "Percentage of diversity group representation for (c) professionals",
+        "Percentage of diversity group representation for (d) all other employees"
       ],
       "similar_metric_warnings": [
         {
@@ -1166,6 +2084,18 @@
         {
           "confusing_with": "SV-AD-330a.1 Percentage of gender representation for (d) all other employees",
           "difference": "This profile is only for \"Percentage of diversity group representation for (a) executive management\"; do not treat evidence for \"Percentage of gender representation for (d) all other employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (a) executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (a) executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (c) professionals' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (a) executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1173,7 +2103,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1181,11 +2113,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of diversity group representation for (a) executive management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1197,9 +2155,34 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "group"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of diversity group representation for (a) executive management' (SV-AD-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees. Preserve separate reported values and source labels for the variable dimensions: group."
     },
     {
       "metric_id": "SV-AD-330a.1.06",
@@ -1228,14 +2211,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of diversity group representation for (b) non-executive management",
+        "Percent of diversity group representation for (b) non-executive management",
+        "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+        "group representation",
+        "representation non-executive",
+        "non-executive management",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, (c) professionals, and"
       ],
-      "dense_query": "Find disclosures for SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management with unit Percentage (%) related to Workforce Diversity & Inclusion.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of diversity group representation for (b) non-executive management', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of diversity group representation for (b) non-executive management', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-330a.1 'Percentage of diversity group representation for (b) non-executive management'; retain every reported year and label.",
+        "When SV-AD-330a.1 'Percentage of diversity group representation for (b) non-executive management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-330a.1 'Percentage of diversity group representation for (b) non-executive management', including: Percentage of diversity group representation for (b) non-executive management; Percent of diversity group representation for (b) non-executive management; SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management.",
+        "Disambiguate SV-AD-330a.1 'Percentage of diversity group representation for (b) non-executive management' from sibling metrics sharing SV-AD-330a.1: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees.",
+        "Find disclosures for SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management with unit Percentage (%) related to Workforce Diversity & Inclusion.",
         "Retrieve exact report evidence for SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management related to Workforce Diversity & Inclusion.",
-        "Find numeric table rows or performance metrics reporting SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management for the reporting period."
+        "Find numeric table rows or performance metrics reporting SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: group."
       ],
       "anchor_terms": [
         "SV-AD-330a.1",
@@ -1251,7 +2249,12 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of diversity group representation for (b) non-executive management",
+        "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+        "group representation",
+        "representation non-executive",
+        "non-executive management"
       ],
       "negative_anchor_terms": [
         "Percentage of gender representation for (a) executive management",
@@ -1259,7 +2262,9 @@
         "Percentage of gender representation for (c) professionals",
         "Percentage of gender representation for (d) all other employees",
         "Percentage of diversity group representation for (a) executive management",
-        "gender representation"
+        "gender representation",
+        "Percentage of diversity group representation for (c) professionals",
+        "Percentage of diversity group representation for (d) all other employees"
       ],
       "similar_metric_warnings": [
         {
@@ -1277,6 +2282,18 @@
         {
           "confusing_with": "SV-AD-330a.1 Percentage of gender representation for (d) all other employees",
           "difference": "This profile is only for \"Percentage of diversity group representation for (b) non-executive management\"; do not treat evidence for \"Percentage of gender representation for (d) all other employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (a) executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (c) professionals' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1284,7 +2301,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1292,11 +2311,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of diversity group representation for (b) non-executive management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1308,9 +2353,34 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "group"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of diversity group representation for (b) non-executive management' (SV-AD-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (c) professionals; Percentage of diversity group representation for (d) all other employees. Preserve separate reported values and source labels for the variable dimensions: group."
     },
     {
       "metric_id": "SV-AD-330a.1.07",
@@ -1338,14 +2408,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of diversity group representation for (c) professionals",
+        "Percent of diversity group representation for (c) professionals",
+        "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+        "group representation",
+        "representation professionals",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, (c) professionals, and"
       ],
-      "dense_query": "Find disclosures for SV-AD-330a.1 Percentage of diversity group representation for (c) professionals with unit Percentage (%) related to Workforce Diversity & Inclusion.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of diversity group representation for (c) professionals', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of diversity group representation for (c) professionals', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-330a.1 'Percentage of diversity group representation for (c) professionals'; retain every reported year and label.",
+        "When SV-AD-330a.1 'Percentage of diversity group representation for (c) professionals' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-330a.1 'Percentage of diversity group representation for (c) professionals', including: Percentage of diversity group representation for (c) professionals; Percent of diversity group representation for (c) professionals; SV-AD-330a.1 Percentage of diversity group representation for (c) professionals.",
+        "Disambiguate SV-AD-330a.1 'Percentage of diversity group representation for (c) professionals' from sibling metrics sharing SV-AD-330a.1: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (d) all other employees.",
+        "Find disclosures for SV-AD-330a.1 Percentage of diversity group representation for (c) professionals with unit Percentage (%) related to Workforce Diversity & Inclusion.",
         "Retrieve exact report evidence for SV-AD-330a.1 Percentage of diversity group representation for (c) professionals, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-330a.1 Percentage of diversity group representation for (c) professionals with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-330a.1 Percentage of diversity group representation for (c) professionals related to Workforce Diversity & Inclusion.",
-        "Find numeric table rows or performance metrics reporting SV-AD-330a.1 Percentage of diversity group representation for (c) professionals for the reporting period."
+        "Find numeric table rows or performance metrics reporting SV-AD-330a.1 Percentage of diversity group representation for (c) professionals for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: group."
       ],
       "anchor_terms": [
         "SV-AD-330a.1",
@@ -1360,7 +2444,11 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of diversity group representation for (c) professionals",
+        "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+        "group representation",
+        "representation professionals"
       ],
       "negative_anchor_terms": [
         "Percentage of gender representation for (a) executive management",
@@ -1368,7 +2456,9 @@
         "Percentage of gender representation for (c) professionals",
         "Percentage of gender representation for (d) all other employees",
         "Percentage of diversity group representation for (a) executive management",
-        "gender representation"
+        "gender representation",
+        "Percentage of diversity group representation for (b) non-executive management",
+        "Percentage of diversity group representation for (d) all other employees"
       ],
       "similar_metric_warnings": [
         {
@@ -1386,6 +2476,18 @@
         {
           "confusing_with": "SV-AD-330a.1 Percentage of gender representation for (d) all other employees",
           "difference": "This profile is only for \"Percentage of diversity group representation for (c) professionals\"; do not treat evidence for \"Percentage of gender representation for (d) all other employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (c) professionals' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (a) executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (c) professionals' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (c) professionals' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1393,7 +2495,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1401,11 +2505,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of diversity group representation for (c) professionals', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1417,9 +2547,34 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "group"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of diversity group representation for (c) professionals' (SV-AD-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (d) all other employees. Preserve separate reported values and source labels for the variable dimensions: group."
     },
     {
       "metric_id": "SV-AD-330a.1.08",
@@ -1448,14 +2603,31 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of diversity group representation for (d) all other employees",
+        "Percent of diversity group representation for (d) all other employees",
+        "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+        "group representation",
+        "representation all",
+        "all",
+        "all other",
+        "other employees",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, (c) professionals, and"
       ],
-      "dense_query": "Find disclosures for SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees with unit Percentage (%) related to Workforce Diversity & Inclusion.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of diversity group representation for (d) all other employees', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-330a.1 'Percentage of diversity group representation for (d) all other employees', under 'Workforce Diversity & Inclusion', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-330a.1 'Percentage of diversity group representation for (d) all other employees'; retain every reported year and label.",
+        "When SV-AD-330a.1 'Percentage of diversity group representation for (d) all other employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-330a.1 'Percentage of diversity group representation for (d) all other employees', including: Percentage of diversity group representation for (d) all other employees; Percent of diversity group representation for (d) all other employees; SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees.",
+        "Disambiguate SV-AD-330a.1 'Percentage of diversity group representation for (d) all other employees' from sibling metrics sharing SV-AD-330a.1: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals.",
+        "Find disclosures for SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees with unit Percentage (%) related to Workforce Diversity & Inclusion.",
         "Retrieve exact report evidence for SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees related to Workforce Diversity & Inclusion.",
-        "Find numeric table rows or performance metrics reporting SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees for the reporting period."
+        "Find numeric table rows or performance metrics reporting SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: group."
       ],
       "anchor_terms": [
         "SV-AD-330a.1",
@@ -1471,7 +2643,14 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of diversity group representation for (d) all other employees",
+        "SV-AD-330a.1 Percentage of diversity group representation for (d) all other employees",
+        "group representation",
+        "representation all",
+        "all",
+        "all other",
+        "other employees"
       ],
       "negative_anchor_terms": [
         "Percentage of gender representation for (a) executive management",
@@ -1479,7 +2658,9 @@
         "Percentage of gender representation for (c) professionals",
         "Percentage of gender representation for (d) all other employees",
         "Percentage of diversity group representation for (a) executive management",
-        "gender representation"
+        "gender representation",
+        "Percentage of diversity group representation for (b) non-executive management",
+        "Percentage of diversity group representation for (c) professionals"
       ],
       "similar_metric_warnings": [
         {
@@ -1497,6 +2678,18 @@
         {
           "confusing_with": "SV-AD-330a.1 Percentage of gender representation for (d) all other employees",
           "difference": "This profile is only for \"Percentage of diversity group representation for (d) all other employees\"; do not treat evidence for \"Percentage of gender representation for (d) all other employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (a) executive management",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (a) executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (b) non-executive management",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (b) non-executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
+        },
+        {
+          "confusing_with": "SV-AD-330a.1 Percentage of diversity group representation for (c) professionals",
+          "difference": "The canonical target is 'Percentage of diversity group representation for (d) all other employees' (Percentage (%)). Do not substitute 'Percentage of diversity group representation for (c) professionals' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1504,7 +2697,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1512,11 +2707,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of diversity group representation for (d) all other employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1528,9 +2749,34 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "group"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of diversity group representation for (d) all other employees' (SV-AD-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of gender representation for (a) executive management; Percentage of gender representation for (b) non-executive management; Percentage of gender representation for (c) professionals; Percentage of gender representation for (d) all other employees; Percentage of diversity group representation for (a) executive management; Percentage of diversity group representation for (b) non-executive management; Percentage of diversity group representation for (c) professionals. Preserve separate reported values and source labels for the variable dimensions: group."
     },
     {
       "metric_id": "SV-AD-000.A",
@@ -1538,7 +2784,7 @@
       "metric": "Median reach of advertisements and marketing campaigns",
       "topic": "",
       "unit": "Number",
-      "definition": "Median reach of advertisements and marketing\ncampaigns \n\nNote to SV-AD-000.A – ‘Reach’ refers to the percentage of consumers in the target audience that are exposed to a particular\nadvertisement in the stated period. ‘Target audience’ refers to the group of people at whom advertisements are aimed.",
+      "definition": "Median reach of advertisements and marketing\ncampaigns\n\nNote to SV-AD-000.A – ‘Reach’ refers to the percentage of consumers in the target audience that are exposed to a particular\nadvertisement in the stated period. ‘Target audience’ refers to the group of people at whom advertisements are aimed.",
       "type": "Activity Metrics",
       "disclosure_type": "quantitative",
       "aliases": [
@@ -1555,10 +2801,24 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Median reach of advertisements and marketing campaigns",
+        "SV-AD-000.A Median reach of advertisements and marketing campaigns",
+        "Median reach",
+        "reach advertisements",
+        "advertisements marketing",
+        "marketing campaigns",
+        "Median reach of advertisements",
+        "Median reach of advertisements and marketing",
+        "Note to SV-AD-000.A – ‘Reach’ refers to the percentage of consumers in the target audience that are exposed to a particular"
       ],
-      "dense_query": "Find disclosures for SV-AD-000.A Median reach of advertisements and marketing campaigns with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-000.A 'Median reach of advertisements and marketing campaigns', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-000.A 'Median reach of advertisements and marketing campaigns', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-000.A 'Median reach of advertisements and marketing campaigns'; retain every reported year and label.",
+        "When SV-AD-000.A 'Median reach of advertisements and marketing campaigns' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-000.A 'Median reach of advertisements and marketing campaigns', including: Median reach of advertisements and marketing campaigns; SV-AD-000.A Median reach of advertisements and marketing campaigns.",
+        "Find disclosures for SV-AD-000.A Median reach of advertisements and marketing campaigns with unit Number.",
         "Retrieve exact report evidence for SV-AD-000.A Median reach of advertisements and marketing campaigns, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-000.A Median reach of advertisements and marketing campaigns with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-000.A Median reach of advertisements and marketing campaigns.",
@@ -1574,7 +2834,13 @@
         "campaigns",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "SV-AD-000.A Median reach of advertisements and marketing campaigns",
+        "Median reach",
+        "reach advertisements",
+        "advertisements marketing",
+        "marketing campaigns",
+        "Median reach of advertisements"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1583,7 +2849,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1591,24 +2859,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Median reach of advertisements and marketing campaigns'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Median reach of advertisements and marketing campaigns' (SV-AD-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-AD-000.B",
@@ -1616,13 +2932,14 @@
       "metric": "Number of exposures to advertisements or marketing campaigns",
       "topic": "",
       "unit": "Number",
-      "definition": "Number of exposures to advertisements or marketing\ncampaigns \n\nNote to SV-AD-000.B – ‘Exposures’ refers to the opportunities that a viewer, listener or reader had to see or hear an advertisement (also\nknown as ‘impressions’ for online marketing).",
+      "definition": "Number of exposures to advertisements or marketing\ncampaigns\n\nNote to SV-AD-000.B – ‘Exposures’ refers to the opportunities that a viewer, listener or reader had to see or hear an advertisement (also\nknown as ‘impressions’ for online marketing).",
       "type": "Activity Metrics",
       "disclosure_type": "quantitative",
       "aliases": [
         "Number of exposures to advertisements or marketing campaigns",
         "Count of exposures to advertisements or marketing campaigns",
-        "SV-AD-000.B Number of exposures to advertisements or marketing campaigns"
+        "SV-AD-000.B Number of exposures to advertisements or marketing campaigns",
+        "Total number of exposures to advertisements or marketing campaigns"
       ],
       "bm25_terms": [
         "SV-AD-000.B",
@@ -1633,10 +2950,24 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of exposures to advertisements or marketing campaigns",
+        "Count of exposures to advertisements or marketing campaigns",
+        "SV-AD-000.B Number of exposures to advertisements or marketing campaigns",
+        "Total number of exposures to advertisements or marketing campaigns",
+        "exposures advertisements",
+        "advertisements marketing",
+        "marketing campaigns",
+        "Number of exposures to advertisements or marketing",
+        "Note to SV-AD-000.B – ‘Exposures’ refers to the opportunities that a viewer, listener or reader had to see or hear an advertisement"
       ],
-      "dense_query": "Find disclosures for SV-AD-000.B Number of exposures to advertisements or marketing campaigns with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-000.B 'Number of exposures to advertisements or marketing campaigns', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-000.B 'Number of exposures to advertisements or marketing campaigns', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-000.B 'Number of exposures to advertisements or marketing campaigns'; retain every reported year and label.",
+        "When SV-AD-000.B 'Number of exposures to advertisements or marketing campaigns' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-000.B 'Number of exposures to advertisements or marketing campaigns', including: Number of exposures to advertisements or marketing campaigns; Count of exposures to advertisements or marketing campaigns; SV-AD-000.B Number of exposures to advertisements or marketing campaigns; Total number of exposures to advertisements or marketing campaigns.",
+        "Find disclosures for SV-AD-000.B Number of exposures to advertisements or marketing campaigns with unit Number.",
         "Retrieve exact report evidence for SV-AD-000.B Number of exposures to advertisements or marketing campaigns, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-000.B Number of exposures to advertisements or marketing campaigns with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-000.B Number of exposures to advertisements or marketing campaigns.",
@@ -1651,7 +2982,13 @@
         "campaigns",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of exposures to advertisements or marketing campaigns",
+        "SV-AD-000.B Number of exposures to advertisements or marketing campaigns",
+        "Total number of exposures to advertisements or marketing campaigns",
+        "exposures advertisements",
+        "advertisements marketing",
+        "marketing campaigns"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1660,7 +2997,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1668,24 +3007,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of exposures to advertisements or marketing campaigns'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of exposures to advertisements or marketing campaigns' (SV-AD-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-AD-000.C",
@@ -1693,7 +3080,7 @@
       "metric": "Median frequency of exposures",
       "topic": "",
       "unit": "Number",
-      "definition": "Median frequency of exposures \n\nNote to SV-AD-000.C – ‘Frequency’ refers to the number of times targeted individuals are exposed to advertisements or marketing\ncampaigns in the stated period.",
+      "definition": "Median frequency of exposures\n\nNote to SV-AD-000.C – ‘Frequency’ refers to the number of times targeted individuals are exposed to advertisements or marketing\ncampaigns in the stated period.",
       "type": "Activity Metrics",
       "disclosure_type": "quantitative",
       "aliases": [
@@ -1708,10 +3095,20 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Median frequency of exposures",
+        "SV-AD-000.C Median frequency of exposures",
+        "Median frequency",
+        "frequency exposures",
+        "Note to SV-AD-000.C – ‘Frequency’ refers to the number of times targeted individuals are exposed to advertisements or marketing"
       ],
-      "dense_query": "Find disclosures for SV-AD-000.C Median frequency of exposures with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-000.C 'Median frequency of exposures', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-000.C 'Median frequency of exposures', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-000.C 'Median frequency of exposures'; retain every reported year and label.",
+        "When SV-AD-000.C 'Median frequency of exposures' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-000.C 'Median frequency of exposures', including: Median frequency of exposures; SV-AD-000.C Median frequency of exposures.",
+        "Find disclosures for SV-AD-000.C Median frequency of exposures with unit Number.",
         "Retrieve exact report evidence for SV-AD-000.C Median frequency of exposures, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-000.C Median frequency of exposures with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-000.C Median frequency of exposures.",
@@ -1725,7 +3122,10 @@
         "exposures",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "SV-AD-000.C Median frequency of exposures",
+        "Median frequency",
+        "frequency exposures"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1734,7 +3134,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1742,24 +3144,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Median frequency of exposures'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Median frequency of exposures' (SV-AD-000.C, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-AD-000.D",
@@ -1773,7 +3223,8 @@
       "aliases": [
         "Number of employees",
         "Count of employees",
-        "SV-AD-000.D Number of employees"
+        "SV-AD-000.D Number of employees",
+        "Total number of employees"
       ],
       "bm25_terms": [
         "SV-AD-000.D",
@@ -1781,10 +3232,19 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of employees",
+        "Count of employees",
+        "SV-AD-000.D Number of employees",
+        "Total number of employees"
       ],
-      "dense_query": "Find disclosures for SV-AD-000.D Number of employees with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-AD-000.D 'Number of employees', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-AD-000.D 'Number of employees', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-AD-000.D 'Number of employees'; retain every reported year and label.",
+        "When SV-AD-000.D 'Number of employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-AD-000.D 'Number of employees', including: Number of employees; Count of employees; SV-AD-000.D Number of employees; Total number of employees.",
+        "Find disclosures for SV-AD-000.D Number of employees with unit Number.",
         "Retrieve exact report evidence for SV-AD-000.D Number of employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-AD-000.D Number of employees with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-AD-000.D Number of employees.",
@@ -1796,7 +3256,10 @@
         "employees",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of employees",
+        "SV-AD-000.D Number of employees",
+        "Total number of employees"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1805,7 +3268,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1813,24 +3278,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of employees'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of employees' (SV-AD-000.D, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

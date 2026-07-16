@@ -11,7 +11,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of policies and practices to secure customers' personal health data records and other personal data",
-        "HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data"
+        "HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data",
+        "policies and practices to secure customers' personal health data records and other personal data"
       ],
       "bm25_terms": [
         "HC-MC-230a.1",
@@ -29,10 +30,32 @@
         "Customer",
         "Privacy",
         "Technology",
-        "Standards"
+        "Standards",
+        "Description of policies and practices to secure customers' personal health data records and other personal data",
+        "HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data",
+        "policies and practices to secure customers' personal health data records and other personal data",
+        "policies practices",
+        "practices secure",
+        "secure customers'",
+        "customers'",
+        "customers' personal",
+        "personal health",
+        "health records",
+        "records other",
+        "other personal",
+        "Description of policies",
+        "practices to secure customers' personal health data records",
+        "other personal data",
+        "Description of policies and practices to secure customers’",
+        "personal health data records and other personal data"
       ],
-      "dense_query": "Find disclosures for HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data related to Customer Privacy & Technology Standards.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data', under 'Customer Privacy & Technology Standards'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data', under 'Customer Privacy & Technology Standards'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-MC-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data'.",
+        "When HC-MC-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data', including: Description of policies and practices to secure customers' personal health data records and other personal data; HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data; policies and practices to secure customers' personal health data records and other personal data.",
+        "Find disclosures for HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data related to Customer Privacy & Technology Standards.",
         "Retrieve exact report evidence for HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data related to Customer Privacy & Technology Standards.",
@@ -52,7 +75,21 @@
         "health",
         "records",
         "other",
-        "Customer"
+        "Customer",
+        "HC-MC-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data",
+        "policies and practices to secure customers' personal health data records and other personal data",
+        "policies practices",
+        "practices secure",
+        "secure customers'",
+        "customers'",
+        "customers' personal",
+        "personal health",
+        "health records",
+        "records other",
+        "other personal",
+        "Description of policies",
+        "practices to secure customers' personal health data records",
+        "other personal data"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -62,7 +99,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -74,20 +113,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies and practices to secure customers' personal health data records and other personal data'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies and practices to secure customers' personal health data records and other personal data' (HC-MC-230a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-230a.2.01",
@@ -115,10 +202,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of data breaches",
+        "Number of data breaches",
+        "HC-MC-230a.2 (1) Number of data breaches",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-MC-230a.2 (1) Number of data breaches with unit Number related to Customer Privacy & Technology Standards.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(1) Number of data breaches', under 'Customer Privacy & Technology Standards', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(1) Number of data breaches', under 'Customer Privacy & Technology Standards', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-230a.2 '(1) Number of data breaches'; retain every reported year and label.",
+        "When HC-MC-230a.2 '(1) Number of data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-230a.2 '(1) Number of data breaches', including: (1) Number of data breaches; Number of data breaches; HC-MC-230a.2 (1) Number of data breaches.",
+        "Disambiguate HC-MC-230a.2 '(1) Number of data breaches' from sibling metrics sharing HC-MC-230a.2: (2) Percentage involving (a) personal data only; (2) Percentage involving (b) personal health data; (3) Number of customers affected in each category, (a) personal data only; (3) Number of customers affected in each category, (b) personal health data.",
+        "Find disclosures for HC-MC-230a.2 (1) Number of data breaches with unit Number related to Customer Privacy & Technology Standards.",
         "Retrieve exact report evidence for HC-MC-230a.2 (1) Number of data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-230a.2 (1) Number of data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-230a.2 (1) Number of data breaches related to Customer Privacy & Technology Standards.",
@@ -126,6 +224,7 @@
       ],
       "anchor_terms": [
         "HC-MC-230a.2",
+        "(1) Number of data breaches",
         "Number of data breaches",
         "data breach",
         "Customer Privacy",
@@ -136,7 +235,8 @@
         "Standards",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "HC-MC-230a.2 (1) Number of data breaches"
       ],
       "negative_anchor_terms": [
         "Percentage involving (a) personal data only",
@@ -145,7 +245,11 @@
         "Number of customers affected in each category, (b) personal health data",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(2) Percentage involving (a) personal data only",
+        "(2) Percentage involving (b) personal health data",
+        "(3) Number of customers affected in each category, (a) personal data only",
+        "(3) Number of customers affected in each category, (b) personal health data"
       ],
       "similar_metric_warnings": [
         {
@@ -170,7 +274,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -178,24 +284,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of data breaches' (HC-MC-230a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage involving (a) personal data only; (2) Percentage involving (b) personal health data; (3) Number of customers affected in each category, (a) personal data only; (3) Number of customers affected in each category, (b) personal health data."
     },
     {
       "metric_id": "HC-MC-230a.2.02",
@@ -209,7 +363,8 @@
       "aliases": [
         "(2) Percentage involving (a) personal data only",
         "Percentage involving (a) personal data only",
-        "HC-MC-230a.2 (2) Percentage involving (a) personal data only"
+        "HC-MC-230a.2 (2) Percentage involving (a) personal data only",
+        "(2) Percent involving (a) personal data only"
       ],
       "bm25_terms": [
         "HC-MC-230a.2",
@@ -225,10 +380,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage involving (a) personal data only",
+        "Percentage involving (a) personal data only",
+        "HC-MC-230a.2 (2) Percentage involving (a) personal data only",
+        "(2) Percent involving (a) personal data only",
+        "involving personal",
+        "personal only",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-MC-230a.2 (2) Percentage involving (a) personal data only with unit Percentage (%) related to Customer Privacy & Technology Standards.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(2) Percentage involving (a) personal data only', under 'Customer Privacy & Technology Standards', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(2) Percentage involving (a) personal data only', under 'Customer Privacy & Technology Standards', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-230a.2 '(2) Percentage involving (a) personal data only'; retain every reported year and label.",
+        "When HC-MC-230a.2 '(2) Percentage involving (a) personal data only' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-230a.2 '(2) Percentage involving (a) personal data only', including: (2) Percentage involving (a) personal data only; Percentage involving (a) personal data only; HC-MC-230a.2 (2) Percentage involving (a) personal data only; (2) Percent involving (a) personal data only.",
+        "Disambiguate HC-MC-230a.2 '(2) Percentage involving (a) personal data only' from sibling metrics sharing HC-MC-230a.2: (1) Number of data breaches; (2) Percentage involving (b) personal health data; (3) Number of customers affected in each category, (a) personal data only; (3) Number of customers affected in each category, (b) personal health data.",
+        "Find disclosures for HC-MC-230a.2 (2) Percentage involving (a) personal data only with unit Percentage (%) related to Customer Privacy & Technology Standards.",
         "Retrieve exact report evidence for HC-MC-230a.2 (2) Percentage involving (a) personal data only, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-230a.2 (2) Percentage involving (a) personal data only with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-230a.2 (2) Percentage involving (a) personal data only related to Customer Privacy & Technology Standards.",
@@ -236,6 +405,7 @@
       ],
       "anchor_terms": [
         "HC-MC-230a.2",
+        "(2) Percentage involving (a) personal data only",
         "Percentage involving (a) personal data only",
         "personal data",
         "Customer Privacy",
@@ -249,13 +419,21 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "HC-MC-230a.2 (2) Percentage involving (a) personal data only",
+        "(2) Percent involving (a) personal data only",
+        "involving personal",
+        "personal only"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
         "Percentage involving (b) personal health data",
         "Number of customers affected in each category, (a) personal data only",
-        "Number of customers affected in each category, (b) personal health data"
+        "Number of customers affected in each category, (b) personal health data",
+        "(1) Number of data breaches",
+        "(2) Percentage involving (b) personal health data",
+        "(3) Number of customers affected in each category, (a) personal data only",
+        "(3) Number of customers affected in each category, (b) personal health data"
       ],
       "similar_metric_warnings": [
         {
@@ -280,7 +458,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -288,11 +468,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage involving (a) personal data only', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -304,9 +510,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage involving (a) personal data only' (HC-MC-230a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage involving (b) personal health data; (3) Number of customers affected in each category, (a) personal data only; (3) Number of customers affected in each category, (b) personal health data."
     },
     {
       "metric_id": "HC-MC-230a.2.03",
@@ -320,7 +549,8 @@
       "aliases": [
         "(2) Percentage involving (b) personal health data",
         "Percentage involving (b) personal health data",
-        "HC-MC-230a.2 (2) Percentage involving (b) personal health data"
+        "HC-MC-230a.2 (2) Percentage involving (b) personal health data",
+        "(2) Percent involving (b) personal health data"
       ],
       "bm25_terms": [
         "HC-MC-230a.2",
@@ -335,10 +565,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage involving (b) personal health data",
+        "Percentage involving (b) personal health data",
+        "HC-MC-230a.2 (2) Percentage involving (b) personal health data",
+        "(2) Percent involving (b) personal health data",
+        "involving personal",
+        "personal health",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-MC-230a.2 (2) Percentage involving (b) personal health data with unit Percentage (%) related to Customer Privacy & Technology Standards.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(2) Percentage involving (b) personal health data', under 'Customer Privacy & Technology Standards', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(2) Percentage involving (b) personal health data', under 'Customer Privacy & Technology Standards', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-230a.2 '(2) Percentage involving (b) personal health data'; retain every reported year and label.",
+        "When HC-MC-230a.2 '(2) Percentage involving (b) personal health data' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-230a.2 '(2) Percentage involving (b) personal health data', including: (2) Percentage involving (b) personal health data; Percentage involving (b) personal health data; HC-MC-230a.2 (2) Percentage involving (b) personal health data; (2) Percent involving (b) personal health data.",
+        "Disambiguate HC-MC-230a.2 '(2) Percentage involving (b) personal health data' from sibling metrics sharing HC-MC-230a.2: (1) Number of data breaches; (2) Percentage involving (a) personal data only; (3) Number of customers affected in each category, (a) personal data only; (3) Number of customers affected in each category, (b) personal health data.",
+        "Find disclosures for HC-MC-230a.2 (2) Percentage involving (b) personal health data with unit Percentage (%) related to Customer Privacy & Technology Standards.",
         "Retrieve exact report evidence for HC-MC-230a.2 (2) Percentage involving (b) personal health data, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-230a.2 (2) Percentage involving (b) personal health data with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-230a.2 (2) Percentage involving (b) personal health data related to Customer Privacy & Technology Standards.",
@@ -346,6 +590,7 @@
       ],
       "anchor_terms": [
         "HC-MC-230a.2",
+        "(2) Percentage involving (b) personal health data",
         "Percentage involving (b) personal health data",
         "Customer Privacy",
         "involving",
@@ -358,13 +603,21 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "HC-MC-230a.2 (2) Percentage involving (b) personal health data",
+        "(2) Percent involving (b) personal health data",
+        "involving personal",
+        "personal health"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
         "Percentage involving (a) personal data only",
         "Number of customers affected in each category, (a) personal data only",
-        "Number of customers affected in each category, (b) personal health data"
+        "Number of customers affected in each category, (b) personal health data",
+        "(1) Number of data breaches",
+        "(2) Percentage involving (a) personal data only",
+        "(3) Number of customers affected in each category, (a) personal data only",
+        "(3) Number of customers affected in each category, (b) personal health data"
       ],
       "similar_metric_warnings": [
         {
@@ -389,7 +642,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -397,11 +652,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage involving (b) personal health data', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -413,9 +694,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage involving (b) personal health data' (HC-MC-230a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage involving (a) personal data only; (3) Number of customers affected in each category, (a) personal data only; (3) Number of customers affected in each category, (b) personal health data."
     },
     {
       "metric_id": "HC-MC-230a.2.04",
@@ -447,10 +751,28 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of customers affected in each category, (a) personal data only",
+        "Number of customers affected in each category, (a) personal data only",
+        "HC-MC-230a.2 (3) Number of customers affected in each category, (a) personal data only",
+        "customers affected",
+        "affected each",
+        "each",
+        "each personal",
+        "personal only",
+        "Number of customers affected in each category",
+        "personal data only",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-MC-230a.2 (3) Number of customers affected in each category, (a) personal data only with unit Number related to Customer Privacy & Technology Standards.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(3) Number of customers affected in each category, (a) personal data only', under 'Customer Privacy & Technology Standards', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(3) Number of customers affected in each category, (a) personal data only', under 'Customer Privacy & Technology Standards', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-230a.2 '(3) Number of customers affected in each category, (a) personal data only'; retain every reported year and label.",
+        "When HC-MC-230a.2 '(3) Number of customers affected in each category, (a) personal data only' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-230a.2 '(3) Number of customers affected in each category, (a) personal data only', including: (3) Number of customers affected in each category, (a) personal data only; Number of customers affected in each category, (a) personal data only; HC-MC-230a.2 (3) Number of customers affected in each category, (a) personal data only.",
+        "Disambiguate HC-MC-230a.2 '(3) Number of customers affected in each category, (a) personal data only' from sibling metrics sharing HC-MC-230a.2: (1) Number of data breaches; (2) Percentage involving (a) personal data only; (2) Percentage involving (b) personal health data; (3) Number of customers affected in each category, (b) personal health data.",
+        "Find disclosures for HC-MC-230a.2 (3) Number of customers affected in each category, (a) personal data only with unit Number related to Customer Privacy & Technology Standards.",
         "Retrieve exact report evidence for HC-MC-230a.2 (3) Number of customers affected in each category, (a) personal data only, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-230a.2 (3) Number of customers affected in each category, (a) personal data only with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-230a.2 (3) Number of customers affected in each category, (a) personal data only related to Customer Privacy & Technology Standards.",
@@ -458,6 +780,7 @@
       ],
       "anchor_terms": [
         "HC-MC-230a.2",
+        "(3) Number of customers affected in each category, (a) personal data only",
         "Number of customers affected in each category, (a) personal data only",
         "personal data",
         "Customer Privacy",
@@ -472,13 +795,25 @@
         "Standards",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "HC-MC-230a.2 (3) Number of customers affected in each category, (a) personal data only",
+        "customers affected",
+        "affected each",
+        "each",
+        "each personal",
+        "personal only",
+        "Number of customers affected in each category",
+        "personal data only"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
         "Percentage involving (a) personal data only",
         "Percentage involving (b) personal health data",
-        "Number of customers affected in each category, (b) personal health data"
+        "Number of customers affected in each category, (b) personal health data",
+        "(1) Number of data breaches",
+        "(2) Percentage involving (a) personal data only",
+        "(2) Percentage involving (b) personal health data",
+        "(3) Number of customers affected in each category, (b) personal health data"
       ],
       "similar_metric_warnings": [
         {
@@ -503,7 +838,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -511,24 +848,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of customers affected in each category, (a) personal data only'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of customers affected in each category, (a) personal data only' (HC-MC-230a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage involving (a) personal data only; (2) Percentage involving (b) personal health data; (3) Number of customers affected in each category, (b) personal health data."
     },
     {
       "metric_id": "HC-MC-230a.2.05",
@@ -559,10 +944,28 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of customers affected in each category, (b) personal health data",
+        "Number of customers affected in each category, (b) personal health data",
+        "HC-MC-230a.2 (3) Number of customers affected in each category, (b) personal health data",
+        "customers affected",
+        "affected each",
+        "each",
+        "each personal",
+        "personal health",
+        "Number of customers affected in each category",
+        "personal health data",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-MC-230a.2 (3) Number of customers affected in each category, (b) personal health data with unit Number related to Customer Privacy & Technology Standards.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(3) Number of customers affected in each category, (b) personal health data', under 'Customer Privacy & Technology Standards', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.2 '(3) Number of customers affected in each category, (b) personal health data', under 'Customer Privacy & Technology Standards', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-230a.2 '(3) Number of customers affected in each category, (b) personal health data'; retain every reported year and label.",
+        "When HC-MC-230a.2 '(3) Number of customers affected in each category, (b) personal health data' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-230a.2 '(3) Number of customers affected in each category, (b) personal health data', including: (3) Number of customers affected in each category, (b) personal health data; Number of customers affected in each category, (b) personal health data; HC-MC-230a.2 (3) Number of customers affected in each category, (b) personal health data.",
+        "Disambiguate HC-MC-230a.2 '(3) Number of customers affected in each category, (b) personal health data' from sibling metrics sharing HC-MC-230a.2: (1) Number of data breaches; (2) Percentage involving (a) personal data only; (2) Percentage involving (b) personal health data; (3) Number of customers affected in each category, (a) personal data only.",
+        "Find disclosures for HC-MC-230a.2 (3) Number of customers affected in each category, (b) personal health data with unit Number related to Customer Privacy & Technology Standards.",
         "Retrieve exact report evidence for HC-MC-230a.2 (3) Number of customers affected in each category, (b) personal health data, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-230a.2 (3) Number of customers affected in each category, (b) personal health data with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-230a.2 (3) Number of customers affected in each category, (b) personal health data related to Customer Privacy & Technology Standards.",
@@ -570,6 +973,7 @@
       ],
       "anchor_terms": [
         "HC-MC-230a.2",
+        "(3) Number of customers affected in each category, (b) personal health data",
         "Number of customers affected in each category, (b) personal health data",
         "Customer Privacy",
         "customers",
@@ -583,13 +987,25 @@
         "Standards",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "HC-MC-230a.2 (3) Number of customers affected in each category, (b) personal health data",
+        "customers affected",
+        "affected each",
+        "each",
+        "each personal",
+        "personal health",
+        "Number of customers affected in each category",
+        "personal health data"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
         "Percentage involving (a) personal data only",
         "Percentage involving (b) personal health data",
-        "Number of customers affected in each category, (a) personal data only"
+        "Number of customers affected in each category, (a) personal data only",
+        "(1) Number of data breaches",
+        "(2) Percentage involving (a) personal data only",
+        "(2) Percentage involving (b) personal health data",
+        "(3) Number of customers affected in each category, (a) personal data only"
       ],
       "similar_metric_warnings": [
         {
@@ -614,7 +1030,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -622,24 +1040,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of customers affected in each category, (b) personal health data'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of customers affected in each category, (b) personal health data' (HC-MC-230a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage involving (a) personal data only; (2) Percentage involving (b) personal health data; (3) Number of customers affected in each category, (a) personal data only."
     },
     {
       "metric_id": "HC-MC-230a.3",
@@ -673,10 +1139,31 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with data security and privacy",
+        "Monetary losses as a result of legal proceedings associated with data security and privacy",
+        "HC-MC-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated security",
+        "security privacy",
+        "Total amount of monetary losses as a result of legal proceedings associated with data security",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with data security and privacy"
       ],
-      "dense_query": "Find disclosures for HC-MC-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy with unit Presentation currency related to Customer Privacy & Technology Standards.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy', under 'Customer Privacy & Technology Standards', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy', under 'Customer Privacy & Technology Standards', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy'; retain every reported year and label.",
+        "When HC-MC-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy', including: Total amount of monetary losses as a result of legal proceedings associated with data security and privacy; Monetary losses as a result of legal proceedings associated with data security and privacy; HC-MC-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy.",
+        "Find disclosures for HC-MC-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy with unit Presentation currency related to Customer Privacy & Technology Standards.",
         "Retrieve exact report evidence for HC-MC-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy related to Customer Privacy & Technology Standards.",
@@ -700,7 +1187,19 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with data security and privacy",
+        "HC-MC-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated security",
+        "security privacy",
+        "Total amount of monetary losses as a result of legal proceedings associated with data security",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -714,7 +1213,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -722,25 +1223,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy' (HC-MC-230a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-240a.1",
@@ -774,10 +1324,33 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care",
+        "Percent of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care",
+        "HC-MC-240a.1 Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care",
+        "health care",
+        "care insurance",
+        "insurance premiums",
+        "premiums spent",
+        "spent directly",
+        "directly medical",
+        "medical claims",
+        "claims efforts",
+        "efforts improve",
+        "improve quality",
+        "quality care",
+        "Percentage of total health care insurance premiums spent directly on medical claims",
+        "efforts to improve the quality of care",
+        "Percentage of total health care insurance premiums spent directly",
+        "on medical claims and efforts to improve the quality of care"
       ],
-      "dense_query": "Find disclosures for HC-MC-240a.1 Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care with unit Percentage (%) related to Access to Coverage.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-240a.1 'Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care', under 'Access to Coverage', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-240a.1 'Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care', under 'Access to Coverage', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-240a.1 'Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care'; retain every reported year and label.",
+        "When HC-MC-240a.1 'Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-240a.1 'Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care', including: Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care; Percent of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care; HC-MC-240a.1 Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care.",
+        "Find disclosures for HC-MC-240a.1 Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care with unit Percentage (%) related to Access to Coverage.",
         "Retrieve exact report evidence for HC-MC-240a.1 Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-240a.1 Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-240a.1 Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care related to Access to Coverage.",
@@ -801,7 +1374,22 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care",
+        "HC-MC-240a.1 Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care",
+        "health care",
+        "care insurance",
+        "insurance premiums",
+        "premiums spent",
+        "spent directly",
+        "directly medical",
+        "medical claims",
+        "claims efforts",
+        "efforts improve",
+        "improve quality",
+        "quality care",
+        "Percentage of total health care insurance premiums spent directly on medical claims",
+        "efforts to improve the quality of care"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -810,7 +1398,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -818,11 +1408,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -834,9 +1450,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of total health care insurance premiums spent directly on medical claims and efforts to improve the quality of care' (HC-MC-240a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-240a.4",
@@ -849,7 +1488,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of policies and practices regarding customer access to coverage",
-        "HC-MC-240a.4 Description of policies and practices regarding customer access to coverage"
+        "HC-MC-240a.4 Description of policies and practices regarding customer access to coverage",
+        "policies and practices regarding customer access to coverage"
       ],
       "bm25_terms": [
         "HC-MC-240a.4",
@@ -859,10 +1499,27 @@
         "regarding",
         "customer",
         "access",
-        "coverage"
+        "coverage",
+        "Description of policies and practices regarding customer access to coverage",
+        "HC-MC-240a.4 Description of policies and practices regarding customer access to coverage",
+        "policies and practices regarding customer access to coverage",
+        "policies practices",
+        "practices regarding",
+        "regarding customer",
+        "customer access",
+        "access coverage",
+        "Description of policies",
+        "practices regarding customer access to coverage",
+        "Description of policies and practices regarding customer access",
+        "The entity shall describe its policies and practices regarding customer access to coverage, including how it"
       ],
-      "dense_query": "Find disclosures for HC-MC-240a.4 Description of policies and practices regarding customer access to coverage related to Access to Coverage.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-240a.4 'Description of policies and practices regarding customer access to coverage', under 'Access to Coverage'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-240a.4 'Description of policies and practices regarding customer access to coverage', under 'Access to Coverage'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-MC-240a.4 'Description of policies and practices regarding customer access to coverage'.",
+        "When HC-MC-240a.4 'Description of policies and practices regarding customer access to coverage' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-240a.4 'Description of policies and practices regarding customer access to coverage', including: Description of policies and practices regarding customer access to coverage; HC-MC-240a.4 Description of policies and practices regarding customer access to coverage; policies and practices regarding customer access to coverage.",
+        "Find disclosures for HC-MC-240a.4 Description of policies and practices regarding customer access to coverage related to Access to Coverage.",
         "Retrieve exact report evidence for HC-MC-240a.4 Description of policies and practices regarding customer access to coverage, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-240a.4 Description of policies and practices regarding customer access to coverage.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-240a.4 Description of policies and practices regarding customer access to coverage related to Access to Coverage.",
@@ -877,7 +1534,16 @@
         "regarding",
         "customer",
         "access",
-        "coverage"
+        "coverage",
+        "HC-MC-240a.4 Description of policies and practices regarding customer access to coverage",
+        "policies and practices regarding customer access to coverage",
+        "policies practices",
+        "practices regarding",
+        "regarding customer",
+        "customer access",
+        "access coverage",
+        "Description of policies",
+        "practices regarding customer access to coverage"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -887,7 +1553,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -899,20 +1567,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies and practices regarding customer access to coverage'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies and practices regarding customer access to coverage' (HC-MC-240a.4). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-250a.2",
@@ -934,10 +1650,23 @@
         "rate",
         "plan",
         "Performance",
-        "ratio"
+        "ratio",
+        "Enrolee retention rate by plan type",
+        "HC-MC-250a.2 Enrolee retention rate by plan type",
+        "Enrolee retention",
+        "retention rate",
+        "rate plan",
+        "plan type",
+        "type",
+        "The entity shall disclose its enrolee retention rate"
       ],
-      "dense_query": "Find disclosures for HC-MC-250a.2 Enrolee retention rate by plan type with unit Rate related to Plan Performance.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-250a.2 'Enrolee retention rate by plan type', under 'Plan Performance', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-250a.2 'Enrolee retention rate by plan type', under 'Plan Performance', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-250a.2 'Enrolee retention rate by plan type'; retain every reported year and label.",
+        "When HC-MC-250a.2 'Enrolee retention rate by plan type' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-250a.2 'Enrolee retention rate by plan type', including: Enrolee retention rate by plan type; HC-MC-250a.2 Enrolee retention rate by plan type.",
+        "Find disclosures for HC-MC-250a.2 Enrolee retention rate by plan type with unit Rate related to Plan Performance.",
         "Retrieve exact report evidence for HC-MC-250a.2 Enrolee retention rate by plan type, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-250a.2 Enrolee retention rate by plan type with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-250a.2 Enrolee retention rate by plan type related to Plan Performance.",
@@ -951,7 +1680,13 @@
         "rate",
         "plan",
         "Performance",
-        "ratio"
+        "ratio",
+        "HC-MC-250a.2 Enrolee retention rate by plan type",
+        "Enrolee retention",
+        "retention rate",
+        "rate plan",
+        "plan type",
+        "type"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -961,7 +1696,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -973,23 +1710,70 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Enrolee retention rate by plan type', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Enrolee retention rate by plan type' (HC-MC-250a.2, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-250a.3",
@@ -1018,10 +1802,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of claims denied that were appealed by customers and ultimately reversed",
+        "Percent of claims denied that were appealed by customers and ultimately reversed",
+        "HC-MC-250a.3 Percentage of claims denied that were appealed by customers and ultimately reversed",
+        "claims denied",
+        "denied that",
+        "that",
+        "that were",
+        "were",
+        "were appealed",
+        "appealed customers",
+        "customers ultimately",
+        "ultimately reversed",
+        "Percentage of claims denied that were appealed by customers",
+        "Percentage of claims denied that were appealed by customers and"
       ],
-      "dense_query": "Find disclosures for HC-MC-250a.3 Percentage of claims denied that were appealed by customers and ultimately reversed with unit Percentage (%) related to Plan Performance.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-250a.3 'Percentage of claims denied that were appealed by customers and ultimately reversed', under 'Plan Performance', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-250a.3 'Percentage of claims denied that were appealed by customers and ultimately reversed', under 'Plan Performance', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-250a.3 'Percentage of claims denied that were appealed by customers and ultimately reversed'; retain every reported year and label.",
+        "When HC-MC-250a.3 'Percentage of claims denied that were appealed by customers and ultimately reversed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-250a.3 'Percentage of claims denied that were appealed by customers and ultimately reversed', including: Percentage of claims denied that were appealed by customers and ultimately reversed; Percent of claims denied that were appealed by customers and ultimately reversed; HC-MC-250a.3 Percentage of claims denied that were appealed by customers and ultimately reversed.",
+        "Find disclosures for HC-MC-250a.3 Percentage of claims denied that were appealed by customers and ultimately reversed with unit Percentage (%) related to Plan Performance.",
         "Retrieve exact report evidence for HC-MC-250a.3 Percentage of claims denied that were appealed by customers and ultimately reversed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-250a.3 Percentage of claims denied that were appealed by customers and ultimately reversed with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-250a.3 Percentage of claims denied that were appealed by customers and ultimately reversed related to Plan Performance.",
@@ -1041,7 +1844,19 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of claims denied that were appealed by customers and ultimately reversed",
+        "HC-MC-250a.3 Percentage of claims denied that were appealed by customers and ultimately reversed",
+        "claims denied",
+        "denied that",
+        "that",
+        "that were",
+        "were",
+        "were appealed",
+        "appealed customers",
+        "customers ultimately",
+        "ultimately reversed",
+        "Percentage of claims denied that were appealed by customers"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1050,7 +1865,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1058,11 +1875,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of claims denied that were appealed by customers and ultimately reversed', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1074,9 +1917,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of claims denied that were appealed by customers and ultimately reversed' (HC-MC-250a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-250a.4",
@@ -1098,10 +1964,21 @@
         "grievance",
         "rate",
         "Performance",
-        "ratio"
+        "ratio",
+        "Plan enrolee grievance rate",
+        "HC-MC-250a.4 Plan enrolee grievance rate",
+        "Plan enrolee",
+        "enrolee grievance",
+        "grievance rate",
+        "The entity shall disclose the plan enrolee grievance rate"
       ],
-      "dense_query": "Find disclosures for HC-MC-250a.4 Plan enrolee grievance rate with unit Rate related to Plan Performance.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-250a.4 'Plan enrolee grievance rate', under 'Plan Performance', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-250a.4 'Plan enrolee grievance rate', under 'Plan Performance', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-250a.4 'Plan enrolee grievance rate'; retain every reported year and label.",
+        "When HC-MC-250a.4 'Plan enrolee grievance rate' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-250a.4 'Plan enrolee grievance rate', including: Plan enrolee grievance rate; HC-MC-250a.4 Plan enrolee grievance rate.",
+        "Find disclosures for HC-MC-250a.4 Plan enrolee grievance rate with unit Rate related to Plan Performance.",
         "Retrieve exact report evidence for HC-MC-250a.4 Plan enrolee grievance rate, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-250a.4 Plan enrolee grievance rate with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-250a.4 Plan enrolee grievance rate related to Plan Performance.",
@@ -1115,7 +1992,11 @@
         "grievance",
         "rate",
         "Performance",
-        "ratio"
+        "ratio",
+        "HC-MC-250a.4 Plan enrolee grievance rate",
+        "Plan enrolee",
+        "enrolee grievance",
+        "grievance rate"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1125,7 +2006,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1137,23 +2020,70 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Plan enrolee grievance rate', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Plan enrolee grievance rate' (HC-MC-250a.4, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-250a.5",
@@ -1166,7 +2096,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of plan performance and ratings for offered plan types, by region",
-        "HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region"
+        "HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region",
+        "plan performance and ratings for offered plan types, by region"
       ],
       "bm25_terms": [
         "HC-MC-250a.5",
@@ -1175,14 +2106,35 @@
         "performance",
         "ratings",
         "offered",
-        "region"
+        "region",
+        "Description of plan performance and ratings for offered plan types, by region",
+        "HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region",
+        "plan performance and ratings for offered plan types, by region",
+        "plan performance",
+        "performance ratings",
+        "ratings offered",
+        "offered plan",
+        "plan types",
+        "types",
+        "types region",
+        "Description of plan performance",
+        "ratings for offered plan types",
+        "by region",
+        "Description of plan performance and ratings for offered plan types",
+        "The entity shall discuss (1) the plan types offered by the entity and relevant information regarding plan"
       ],
-      "dense_query": "Find disclosures for HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region related to Plan Performance.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-250a.5 'Description of plan performance and ratings for offered plan types, by region', under 'Plan Performance'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-250a.5 'Description of plan performance and ratings for offered plan types, by region', under 'Plan Performance'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-MC-250a.5 'Description of plan performance and ratings for offered plan types, by region'.",
+        "When HC-MC-250a.5 'Description of plan performance and ratings for offered plan types, by region' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-250a.5 'Description of plan performance and ratings for offered plan types, by region', including: Description of plan performance and ratings for offered plan types, by region; HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region; plan performance and ratings for offered plan types, by region.",
+        "Find disclosures for HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region related to Plan Performance.",
         "Retrieve exact report evidence for HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region related to Plan Performance.",
-        "Find narrative discussion, policy, process, strategy, or management disclosure for HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region."
+        "Find narrative discussion, policy, process, strategy, or management disclosure for HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region.",
+        "Preserve separate reported values and source labels for the variable dimensions: region."
       ],
       "anchor_terms": [
         "HC-MC-250a.5",
@@ -1192,7 +2144,19 @@
         "performance",
         "ratings",
         "offered",
-        "region"
+        "region",
+        "HC-MC-250a.5 Description of plan performance and ratings for offered plan types, by region",
+        "plan performance and ratings for offered plan types, by region",
+        "plan performance",
+        "performance ratings",
+        "ratings offered",
+        "offered plan",
+        "plan types",
+        "types",
+        "types region",
+        "Description of plan performance",
+        "ratings for offered plan types",
+        "by region"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1202,7 +2166,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1214,20 +2180,70 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of plan performance and ratings for offered plan types, by region'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "region"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of plan performance and ratings for offered plan types, by region' (HC-MC-250a.5). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. Preserve separate reported values and source labels for the variable dimensions: region."
     },
     {
       "metric_id": "HC-MC-260a.1.01",
@@ -1256,10 +2272,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: (1) diet and nutrition",
+        "Percentage of enrolees in wellness programs by type: diet and nutrition",
+        "Percent of enrolees in wellness programs by type: (1) diet and nutrition",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (1) diet and nutrition",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type diet",
+        "diet nutrition",
+        "Percentage of enrolees in wellness programs by type",
+        "Percentage of enrolees in wellness programs by type: (1) diet and",
+        "nutrition, (2) exercise, (3) stress management, (4) mental health, (5) smoking or"
       ],
-      "dense_query": "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (1) diet and nutrition with unit Percentage (%) related to Improved Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition'; retain every reported year and label.",
+        "When HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition', including: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: diet and nutrition; Percent of enrolees in wellness programs by type: (1) diet and nutrition; HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (1) diet and nutrition.",
+        "Disambiguate HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition' from sibling metrics sharing HC-MC-260a.1: Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: (6) other.",
+        "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (1) diet and nutrition with unit Percentage (%) related to Improved Outcomes.",
         "Retrieve exact report evidence for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (1) diet and nutrition, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (1) diet and nutrition with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (1) diet and nutrition related to Improved Outcomes.",
@@ -1278,7 +2313,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: diet and nutrition",
+        "Percent of enrolees in wellness programs by type: (1) diet and nutrition",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (1) diet and nutrition",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type diet",
+        "diet nutrition",
+        "Percentage of enrolees in wellness programs by type"
       ],
       "negative_anchor_terms": [
         "Percentage of enrolees in wellness programs by type: (2) exercise",
@@ -1303,6 +2348,10 @@
         {
           "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
           "difference": "This profile is only for \"Percentage of enrolees in wellness programs by type: (1) diet and nutrition\"; do not treat evidence for \"Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other",
+          "difference": "The canonical target is 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition' (Percentage (%)). Do not substitute 'Percentage of enrolees in wellness programs by type: (6) other' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1310,7 +2359,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1318,11 +2369,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1334,9 +2411,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of enrolees in wellness programs by type: (1) diet and nutrition' (HC-MC-260a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: (6) other."
     },
     {
       "metric_id": "HC-MC-260a.1.02",
@@ -1364,10 +2464,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: (2) exercise",
+        "Percentage of enrolees in wellness programs by type: exercise",
+        "Percent of enrolees in wellness programs by type: (2) exercise",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (2) exercise",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type exercise",
+        "Percentage of enrolees in wellness programs by type",
+        "Percentage of enrolees in wellness programs by type: (1) diet and",
+        "nutrition, (2) exercise, (3) stress management, (4) mental health, (5) smoking or"
       ],
-      "dense_query": "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (2) exercise with unit Percentage (%) related to Improved Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (2) exercise', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (2) exercise', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (2) exercise'; retain every reported year and label.",
+        "When HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (2) exercise' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (2) exercise', including: Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: exercise; Percent of enrolees in wellness programs by type: (2) exercise; HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (2) exercise.",
+        "Disambiguate HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (2) exercise' from sibling metrics sharing HC-MC-260a.1: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: (6) other.",
+        "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (2) exercise with unit Percentage (%) related to Improved Outcomes.",
         "Retrieve exact report evidence for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (2) exercise, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (2) exercise with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (2) exercise related to Improved Outcomes.",
@@ -1385,7 +2503,16 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: exercise",
+        "Percent of enrolees in wellness programs by type: (2) exercise",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (2) exercise",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type exercise",
+        "Percentage of enrolees in wellness programs by type"
       ],
       "negative_anchor_terms": [
         "Percentage of enrolees in wellness programs by type: (1) diet and nutrition",
@@ -1410,6 +2537,10 @@
         {
           "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
           "difference": "This profile is only for \"Percentage of enrolees in wellness programs by type: (2) exercise\"; do not treat evidence for \"Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other",
+          "difference": "The canonical target is 'Percentage of enrolees in wellness programs by type: (2) exercise' (Percentage (%)). Do not substitute 'Percentage of enrolees in wellness programs by type: (6) other' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1417,7 +2548,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1425,11 +2558,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of enrolees in wellness programs by type: (2) exercise', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1441,9 +2600,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of enrolees in wellness programs by type: (2) exercise' (HC-MC-260a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: (6) other."
     },
     {
       "metric_id": "HC-MC-260a.1.03",
@@ -1472,10 +2654,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: (3) stress management",
+        "Percentage of enrolees in wellness programs by type: stress management",
+        "Percent of enrolees in wellness programs by type: (3) stress management",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (3) stress management",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type stress",
+        "stress management",
+        "Percentage of enrolees in wellness programs by type",
+        "Percentage of enrolees in wellness programs by type: (1) diet and",
+        "nutrition, (2) exercise, (3) stress management, (4) mental health, (5) smoking or"
       ],
-      "dense_query": "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (3) stress management with unit Percentage (%) related to Improved Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (3) stress management', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (3) stress management', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (3) stress management'; retain every reported year and label.",
+        "When HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (3) stress management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (3) stress management', including: Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: stress management; Percent of enrolees in wellness programs by type: (3) stress management; HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (3) stress management.",
+        "Disambiguate HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (3) stress management' from sibling metrics sharing HC-MC-260a.1: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: (6) other.",
+        "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (3) stress management with unit Percentage (%) related to Improved Outcomes.",
         "Retrieve exact report evidence for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (3) stress management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (3) stress management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (3) stress management related to Improved Outcomes.",
@@ -1494,7 +2695,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: stress management",
+        "Percent of enrolees in wellness programs by type: (3) stress management",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (3) stress management",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type stress",
+        "stress management",
+        "Percentage of enrolees in wellness programs by type"
       ],
       "negative_anchor_terms": [
         "Percentage of enrolees in wellness programs by type: (1) diet and nutrition",
@@ -1519,6 +2730,10 @@
         {
           "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
           "difference": "This profile is only for \"Percentage of enrolees in wellness programs by type: (3) stress management\"; do not treat evidence for \"Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other",
+          "difference": "The canonical target is 'Percentage of enrolees in wellness programs by type: (3) stress management' (Percentage (%)). Do not substitute 'Percentage of enrolees in wellness programs by type: (6) other' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1526,7 +2741,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1534,11 +2751,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of enrolees in wellness programs by type: (3) stress management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1550,9 +2793,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of enrolees in wellness programs by type: (3) stress management' (HC-MC-260a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: (6) other."
     },
     {
       "metric_id": "HC-MC-260a.1.04",
@@ -1581,10 +2847,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: (4) mental health",
+        "Percentage of enrolees in wellness programs by type: mental health",
+        "Percent of enrolees in wellness programs by type: (4) mental health",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type mental",
+        "mental health",
+        "Percentage of enrolees in wellness programs by type",
+        "Percentage of enrolees in wellness programs by type: (1) diet and",
+        "nutrition, (2) exercise, (3) stress management, (4) mental health, (5) smoking or"
       ],
-      "dense_query": "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health with unit Percentage (%) related to Improved Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (4) mental health', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (4) mental health', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (4) mental health'; retain every reported year and label.",
+        "When HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (4) mental health' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (4) mental health', including: Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: mental health; Percent of enrolees in wellness programs by type: (4) mental health; HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health.",
+        "Disambiguate HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (4) mental health' from sibling metrics sharing HC-MC-260a.1: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: (6) other.",
+        "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health with unit Percentage (%) related to Improved Outcomes.",
         "Retrieve exact report evidence for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health related to Improved Outcomes.",
@@ -1603,7 +2888,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: mental health",
+        "Percent of enrolees in wellness programs by type: (4) mental health",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type mental",
+        "mental health",
+        "Percentage of enrolees in wellness programs by type"
       ],
       "negative_anchor_terms": [
         "Percentage of enrolees in wellness programs by type: (1) diet and nutrition",
@@ -1628,6 +2923,10 @@
         {
           "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
           "difference": "This profile is only for \"Percentage of enrolees in wellness programs by type: (4) mental health\"; do not treat evidence for \"Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other",
+          "difference": "The canonical target is 'Percentage of enrolees in wellness programs by type: (4) mental health' (Percentage (%)). Do not substitute 'Percentage of enrolees in wellness programs by type: (6) other' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1635,7 +2934,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1643,11 +2944,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of enrolees in wellness programs by type: (4) mental health', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1659,9 +2986,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of enrolees in wellness programs by type: (4) mental health' (HC-MC-260a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: (6) other."
     },
     {
       "metric_id": "HC-MC-260a.1.05",
@@ -1691,10 +3041,31 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
+        "Percentage of enrolees in wellness programs by type: smoking or alcohol cessation",
+        "Percent of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type smoking",
+        "smoking alcohol",
+        "alcohol cessation",
+        "Percentage of enrolees in wellness programs by type",
+        "smoking or alcohol cessation",
+        "Percentage of enrolees in wellness programs by type: (1) diet and",
+        "nutrition, (2) exercise, (3) stress management, (4) mental health, (5) smoking or"
       ],
-      "dense_query": "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation with unit Percentage (%) related to Improved Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation'; retain every reported year and label.",
+        "When HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation', including: Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation; Percentage of enrolees in wellness programs by type: smoking or alcohol cessation; Percent of enrolees in wellness programs by type: (5) smoking or alcohol cessation; HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation.",
+        "Disambiguate HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation' from sibling metrics sharing HC-MC-260a.1: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (6) other.",
+        "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation with unit Percentage (%) related to Improved Outcomes.",
         "Retrieve exact report evidence for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation related to Improved Outcomes.",
@@ -1714,7 +3085,19 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: smoking or alcohol cessation",
+        "Percent of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type smoking",
+        "smoking alcohol",
+        "alcohol cessation",
+        "Percentage of enrolees in wellness programs by type",
+        "smoking or alcohol cessation"
       ],
       "negative_anchor_terms": [
         "Percentage of enrolees in wellness programs by type: (1) diet and nutrition",
@@ -1739,6 +3122,10 @@
         {
           "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health",
           "difference": "This profile is only for \"Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation\"; do not treat evidence for \"Percentage of enrolees in wellness programs by type: (4) mental health\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other",
+          "difference": "The canonical target is 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation' (Percentage (%)). Do not substitute 'Percentage of enrolees in wellness programs by type: (6) other' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1746,7 +3133,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1754,11 +3143,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1770,9 +3185,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation' (HC-MC-260a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (6) other."
     },
     {
       "metric_id": "HC-MC-260a.1.06",
@@ -1800,10 +3238,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: (6) other",
+        "Percentage of enrolees in wellness programs by type: other",
+        "Percent of enrolees in wellness programs by type: (6) other",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type other",
+        "Percentage of enrolees in wellness programs by type",
+        "Percentage of enrolees in wellness programs by type: (1) diet and",
+        "nutrition, (2) exercise, (3) stress management, (4) mental health, (5) smoking or"
       ],
-      "dense_query": "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other with unit Percentage (%) related to Improved Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (6) other', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (6) other', under 'Improved Outcomes', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (6) other'; retain every reported year and label.",
+        "When HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (6) other' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (6) other', including: Percentage of enrolees in wellness programs by type: (6) other; Percentage of enrolees in wellness programs by type: other; Percent of enrolees in wellness programs by type: (6) other; HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other.",
+        "Disambiguate HC-MC-260a.1 'Percentage of enrolees in wellness programs by type: (6) other' from sibling metrics sharing HC-MC-260a.1: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation.",
+        "Find disclosures for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other with unit Percentage (%) related to Improved Outcomes.",
         "Retrieve exact report evidence for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other related to Improved Outcomes.",
@@ -1821,7 +3277,16 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of enrolees in wellness programs by type: other",
+        "Percent of enrolees in wellness programs by type: (6) other",
+        "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (6) other",
+        "enrolees wellness",
+        "wellness programs",
+        "programs type",
+        "type",
+        "type other",
+        "Percentage of enrolees in wellness programs by type"
       ],
       "negative_anchor_terms": [
         "Percentage of enrolees in wellness programs by type: (1) diet and nutrition",
@@ -1846,6 +3311,10 @@
         {
           "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (4) mental health",
           "difference": "This profile is only for \"Percentage of enrolees in wellness programs by type: (6) other\"; do not treat evidence for \"Percentage of enrolees in wellness programs by type: (4) mental health\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "HC-MC-260a.1 Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation",
+          "difference": "The canonical target is 'Percentage of enrolees in wellness programs by type: (6) other' (Percentage (%)). Do not substitute 'Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1853,7 +3322,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1861,11 +3332,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of enrolees in wellness programs by type: (6) other', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1877,9 +3374,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of enrolees in wellness programs by type: (6) other' (HC-MC-260a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of enrolees in wellness programs by type: (1) diet and nutrition; Percentage of enrolees in wellness programs by type: (2) exercise; Percentage of enrolees in wellness programs by type: (3) stress management; Percentage of enrolees in wellness programs by type: (4) mental health; Percentage of enrolees in wellness programs by type: (5) smoking or alcohol cessation."
     },
     {
       "metric_id": "HC-MC-260a.4",
@@ -1904,10 +3424,26 @@
         "enrolee",
         "health",
         "Improved",
-        "Outcomes"
+        "Outcomes",
+        "Discussion of initiatives and programmes to maintain and improve enrolee health",
+        "HC-MC-260a.4 Discussion of initiatives and programmes to maintain and improve enrolee health",
+        "initiatives programmes",
+        "programmes maintain",
+        "maintain improve",
+        "improve enrolee",
+        "enrolee health",
+        "Discussion of initiatives",
+        "programmes to maintain",
+        "improve enrolee health",
+        "Discussion of initiatives and programmes to maintain and improve"
       ],
-      "dense_query": "Find disclosures for HC-MC-260a.4 Discussion of initiatives and programmes to maintain and improve enrolee health related to Improved Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.4 'Discussion of initiatives and programmes to maintain and improve enrolee health', under 'Improved Outcomes'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-260a.4 'Discussion of initiatives and programmes to maintain and improve enrolee health', under 'Improved Outcomes'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-MC-260a.4 'Discussion of initiatives and programmes to maintain and improve enrolee health'.",
+        "When HC-MC-260a.4 'Discussion of initiatives and programmes to maintain and improve enrolee health' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-260a.4 'Discussion of initiatives and programmes to maintain and improve enrolee health', including: Discussion of initiatives and programmes to maintain and improve enrolee health; HC-MC-260a.4 Discussion of initiatives and programmes to maintain and improve enrolee health.",
+        "Find disclosures for HC-MC-260a.4 Discussion of initiatives and programmes to maintain and improve enrolee health related to Improved Outcomes.",
         "Retrieve exact report evidence for HC-MC-260a.4 Discussion of initiatives and programmes to maintain and improve enrolee health, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-260a.4 Discussion of initiatives and programmes to maintain and improve enrolee health.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-260a.4 Discussion of initiatives and programmes to maintain and improve enrolee health related to Improved Outcomes.",
@@ -1924,7 +3460,16 @@
         "enrolee",
         "health",
         "Improved",
-        "Outcomes"
+        "Outcomes",
+        "HC-MC-260a.4 Discussion of initiatives and programmes to maintain and improve enrolee health",
+        "initiatives programmes",
+        "programmes maintain",
+        "maintain improve",
+        "improve enrolee",
+        "enrolee health",
+        "Discussion of initiatives",
+        "programmes to maintain",
+        "improve enrolee health"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1934,7 +3479,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1946,20 +3493,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of initiatives and programmes to maintain and improve enrolee health'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of initiatives and programmes to maintain and improve enrolee health' (HC-MC-260a.4). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-450a.1",
@@ -1995,10 +3590,34 @@
         "mortality",
         "illnesses",
         "diseases",
-        "incorporated"
+        "incorporated",
+        "Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models",
+        "HC-MC-450a.1 Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models",
+        "strategy address",
+        "address effects",
+        "effects climate",
+        "climate change",
+        "change business",
+        "business operations",
+        "operations how",
+        "how specific",
+        "specific risks",
+        "risks presented",
+        "presented changes",
+        "changes geographical",
+        "Impacts",
+        "Human",
+        "Health",
+        "Discussion of the strategy to address the effects of climate change",
+        "on business operations and how specific risks presented by changes in the"
       ],
-      "dense_query": "Find disclosures for HC-MC-450a.1 Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models related to Climate Change Impacts on Human Health.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-450a.1 'Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models', under 'Climate Change Impacts on Human Health'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-450a.1 'Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models', under 'Climate Change Impacts on Human Health'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-MC-450a.1 'Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models'.",
+        "When HC-MC-450a.1 'Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-450a.1 'Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models', including: Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models; HC-MC-450a.1 Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models.",
+        "Find disclosures for HC-MC-450a.1 Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models related to Climate Change Impacts on Human Health.",
         "Retrieve exact report evidence for HC-MC-450a.1 Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-450a.1 Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-450a.1 Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models related to Climate Change Impacts on Human Health.",
@@ -2018,7 +3637,21 @@
         "how",
         "specific",
         "risks",
-        "presented"
+        "presented",
+        "HC-MC-450a.1 Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models",
+        "strategy address",
+        "address effects",
+        "effects climate",
+        "climate change",
+        "change business",
+        "business operations",
+        "operations how",
+        "how specific",
+        "specific risks",
+        "risks presented",
+        "presented changes",
+        "changes",
+        "changes geographical"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2028,7 +3661,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2040,20 +3675,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of the strategy to address the effects of climate change on business operations and how specific risks presented by changes in the geographical incidence, morbidity and mortality of illnesses and diseases are incorporated into risk models' (HC-MC-450a.1, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-MC-000.A",
@@ -2067,7 +3750,8 @@
       "aliases": [
         "Number of enrollees by plan type",
         "Count of enrollees by plan type",
-        "HC-MC-000.A Number of enrollees by plan type"
+        "HC-MC-000.A Number of enrollees by plan type",
+        "Total number of enrollees by plan type"
       ],
       "bm25_terms": [
         "HC-MC-000.A",
@@ -2076,10 +3760,22 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of enrollees by plan type",
+        "Count of enrollees by plan type",
+        "HC-MC-000.A Number of enrollees by plan type",
+        "Total number of enrollees by plan type",
+        "enrollees plan",
+        "plan type",
+        "type"
       ],
-      "dense_query": "Find disclosures for HC-MC-000.A Number of enrollees by plan type with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-MC-000.A 'Number of enrollees by plan type', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-MC-000.A 'Number of enrollees by plan type', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-MC-000.A 'Number of enrollees by plan type'; retain every reported year and label.",
+        "When HC-MC-000.A 'Number of enrollees by plan type' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-MC-000.A 'Number of enrollees by plan type', including: Number of enrollees by plan type; Count of enrollees by plan type; HC-MC-000.A Number of enrollees by plan type; Total number of enrollees by plan type.",
+        "Find disclosures for HC-MC-000.A Number of enrollees by plan type with unit Number.",
         "Retrieve exact report evidence for HC-MC-000.A Number of enrollees by plan type, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-MC-000.A Number of enrollees by plan type with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-MC-000.A Number of enrollees by plan type.",
@@ -2092,7 +3788,13 @@
         "plan",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of enrollees by plan type",
+        "HC-MC-000.A Number of enrollees by plan type",
+        "Total number of enrollees by plan type",
+        "enrollees plan",
+        "plan type",
+        "type"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2102,7 +3804,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2114,24 +3818,71 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of enrollees by plan type'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of enrollees by plan type' (HC-MC-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

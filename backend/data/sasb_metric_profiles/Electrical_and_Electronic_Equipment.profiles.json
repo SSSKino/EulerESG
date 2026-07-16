@@ -22,10 +22,22 @@
         "Management",
         "Gigajoules",
         "GJ",
-        "Gigajoules (GJ)"
+        "Gigajoules (GJ)",
+        "Total energy consumed",
+        "Energy consumption",
+        "RT-EE-130a.1 Total energy consumed",
+        "gigajoule",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for RT-EE-130a.1 Total energy consumed with unit Gigajoules (GJ) related to Energy Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-130a.1 'Total energy consumed', under 'Energy Management', with expected unit 'Gigajoules (GJ)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-130a.1 'Total energy consumed', under 'Energy Management', with expected unit 'Gigajoules (GJ)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-130a.1 'Total energy consumed'; retain every reported year and label.",
+        "When RT-EE-130a.1 'Total energy consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-130a.1 'Total energy consumed', including: Total energy consumed; Energy consumption; RT-EE-130a.1 Total energy consumed.",
+        "Disambiguate RT-EE-130a.1 'Total energy consumed' from sibling metrics sharing RT-EE-130a.1: Percentage of energy it consumed that was supplied from grid electricity; Percentage of energy it consumed that was renewable energy.",
+        "Find disclosures for RT-EE-130a.1 Total energy consumed with unit Gigajoules (GJ) related to Energy Management.",
         "Retrieve exact report evidence for RT-EE-130a.1 Total energy consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-130a.1 Total energy consumed with unit Gigajoules (GJ).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-130a.1 Total energy consumed related to Energy Management.",
@@ -40,7 +52,10 @@
         "Management",
         "Gigajoules (GJ)",
         "GJ",
-        "gigajoules"
+        "gigajoules",
+        "Energy consumption",
+        "RT-EE-130a.1 Total energy consumed",
+        "gigajoule"
       ],
       "negative_anchor_terms": [
         "Percentage of energy it consumed that was supplied from grid electricity",
@@ -61,7 +76,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -69,24 +86,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total energy consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "energy",
         "expected_units": [
           "Gigajoules (GJ)",
           "GJ",
-          "gigajoules"
+          "MWh",
+          "kWh",
+          "MJ",
+          "kJ"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total energy consumed' (RT-EE-130a.1, expected unit: Gigajoules (GJ)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of energy it consumed that was supplied from grid electricity; Percentage of energy it consumed that was renewable energy."
     },
     {
       "metric_id": "RT-EE-130a.1.02",
@@ -114,10 +183,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of energy it consumed that was supplied from grid electricity",
+        "Percent of energy it consumed that was supplied from grid electricity",
+        "RT-EE-130a.1 Percentage of energy it consumed that was supplied from grid electricity",
+        "energy consumed",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was supplied",
+        "supplied grid",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for RT-EE-130a.1 Percentage of energy it consumed that was supplied from grid electricity with unit Percentage (%) related to Energy Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-130a.1 'Percentage of energy it consumed that was supplied from grid electricity', under 'Energy Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-130a.1 'Percentage of energy it consumed that was supplied from grid electricity', under 'Energy Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-130a.1 'Percentage of energy it consumed that was supplied from grid electricity'; retain every reported year and label.",
+        "When RT-EE-130a.1 'Percentage of energy it consumed that was supplied from grid electricity' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-130a.1 'Percentage of energy it consumed that was supplied from grid electricity', including: Percentage of energy it consumed that was supplied from grid electricity; Percent of energy it consumed that was supplied from grid electricity; RT-EE-130a.1 Percentage of energy it consumed that was supplied from grid electricity.",
+        "Disambiguate RT-EE-130a.1 'Percentage of energy it consumed that was supplied from grid electricity' from sibling metrics sharing RT-EE-130a.1: Total energy consumed; Percentage of energy it consumed that was renewable energy.",
+        "Find disclosures for RT-EE-130a.1 Percentage of energy it consumed that was supplied from grid electricity with unit Percentage (%) related to Energy Management.",
         "Retrieve exact report evidence for RT-EE-130a.1 Percentage of energy it consumed that was supplied from grid electricity, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-130a.1 Percentage of energy it consumed that was supplied from grid electricity with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-130a.1 Percentage of energy it consumed that was supplied from grid electricity related to Energy Management.",
@@ -136,7 +223,16 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of energy it consumed that was supplied from grid electricity",
+        "RT-EE-130a.1 Percentage of energy it consumed that was supplied from grid electricity",
+        "energy consumed",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was supplied",
+        "supplied grid"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
@@ -163,7 +259,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -171,11 +269,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of energy it consumed that was supplied from grid electricity', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -187,9 +311,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of energy it consumed that was supplied from grid electricity' (RT-EE-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total energy consumed; Percentage of energy it consumed that was renewable energy."
     },
     {
       "metric_id": "RT-EE-130a.1.03",
@@ -215,10 +362,27 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of energy it consumed that was renewable energy",
+        "Percent of energy it consumed that was renewable energy",
+        "RT-EE-130a.1 Percentage of energy it consumed that was renewable energy",
+        "energy consumed",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was renewable",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for RT-EE-130a.1 Percentage of energy it consumed that was renewable energy with unit Percentage (%) related to Energy Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-130a.1 'Percentage of energy it consumed that was renewable energy', under 'Energy Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-130a.1 'Percentage of energy it consumed that was renewable energy', under 'Energy Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-130a.1 'Percentage of energy it consumed that was renewable energy'; retain every reported year and label.",
+        "When RT-EE-130a.1 'Percentage of energy it consumed that was renewable energy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-130a.1 'Percentage of energy it consumed that was renewable energy', including: Percentage of energy it consumed that was renewable energy; Percent of energy it consumed that was renewable energy; RT-EE-130a.1 Percentage of energy it consumed that was renewable energy.",
+        "Disambiguate RT-EE-130a.1 'Percentage of energy it consumed that was renewable energy' from sibling metrics sharing RT-EE-130a.1: Total energy consumed; Percentage of energy it consumed that was supplied from grid electricity.",
+        "Find disclosures for RT-EE-130a.1 Percentage of energy it consumed that was renewable energy with unit Percentage (%) related to Energy Management.",
         "Retrieve exact report evidence for RT-EE-130a.1 Percentage of energy it consumed that was renewable energy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-130a.1 Percentage of energy it consumed that was renewable energy with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-130a.1 Percentage of energy it consumed that was renewable energy related to Energy Management.",
@@ -235,7 +399,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of energy it consumed that was renewable energy",
+        "RT-EE-130a.1 Percentage of energy it consumed that was renewable energy",
+        "energy consumed",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was renewable"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
@@ -262,7 +434,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -270,11 +444,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of energy it consumed that was renewable energy', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -286,9 +486,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of energy it consumed that was renewable energy' (RT-EE-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total energy consumed; Percentage of energy it consumed that was supplied from grid electricity."
     },
     {
       "metric_id": "RT-EE-150a.1.01",
@@ -315,10 +538,26 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Amount of hazardous waste generated",
+        "RT-EE-150a.1 Amount of hazardous waste generated",
+        "hazardous waste",
+        "waste generated",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Amount of hazardous waste generated, (2) percentage recycled",
+        "The entity shall disclose (1) the total weight of hazardous waste generated, in metric tonnes"
       ],
-      "dense_query": "Find disclosures for RT-EE-150a.1 Amount of hazardous waste generated with unit Metric tonnes (t) related to Hazardous Waste Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.1 'Amount of hazardous waste generated', under 'Hazardous Waste Management', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.1 'Amount of hazardous waste generated', under 'Hazardous Waste Management', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-150a.1 'Amount of hazardous waste generated'; retain every reported year and label.",
+        "When RT-EE-150a.1 'Amount of hazardous waste generated' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-150a.1 'Amount of hazardous waste generated', including: Amount of hazardous waste generated; RT-EE-150a.1 Amount of hazardous waste generated.",
+        "Disambiguate RT-EE-150a.1 'Amount of hazardous waste generated' from sibling metrics sharing RT-EE-150a.1: Percentage of hazardous waste recycled.",
+        "Find disclosures for RT-EE-150a.1 Amount of hazardous waste generated with unit Metric tonnes (t) related to Hazardous Waste Management.",
         "Retrieve exact report evidence for RT-EE-150a.1 Amount of hazardous waste generated, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-150a.1 Amount of hazardous waste generated with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-150a.1 Amount of hazardous waste generated related to Hazardous Waste Management.",
@@ -334,7 +573,15 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "RT-EE-150a.1 Amount of hazardous waste generated",
+        "hazardous waste",
+        "waste generated",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Percentage of hazardous waste recycled"
@@ -350,7 +597,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -358,30 +607,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Amount of hazardous waste generated', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Amount of hazardous waste generated' (RT-EE-150a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of hazardous waste recycled."
     },
     {
       "metric_id": "RT-EE-150a.1.02",
@@ -406,10 +701,23 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of hazardous waste recycled",
+        "Percent of hazardous waste recycled",
+        "RT-EE-150a.1 Percentage of hazardous waste recycled",
+        "hazardous waste",
+        "waste recycled",
+        "(1) Amount of hazardous waste generated, (2) percentage recycled",
+        "The entity shall disclose (1) the total weight of hazardous waste generated, in metric tonnes"
       ],
-      "dense_query": "Find disclosures for RT-EE-150a.1 Percentage of hazardous waste recycled with unit Percentage (%) related to Hazardous Waste Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.1 'Percentage of hazardous waste recycled', under 'Hazardous Waste Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.1 'Percentage of hazardous waste recycled', under 'Hazardous Waste Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-150a.1 'Percentage of hazardous waste recycled'; retain every reported year and label.",
+        "When RT-EE-150a.1 'Percentage of hazardous waste recycled' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-150a.1 'Percentage of hazardous waste recycled', including: Percentage of hazardous waste recycled; Percent of hazardous waste recycled; RT-EE-150a.1 Percentage of hazardous waste recycled.",
+        "Disambiguate RT-EE-150a.1 'Percentage of hazardous waste recycled' from sibling metrics sharing RT-EE-150a.1: Amount of hazardous waste generated.",
+        "Find disclosures for RT-EE-150a.1 Percentage of hazardous waste recycled with unit Percentage (%) related to Hazardous Waste Management.",
         "Retrieve exact report evidence for RT-EE-150a.1 Percentage of hazardous waste recycled, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-150a.1 Percentage of hazardous waste recycled with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-150a.1 Percentage of hazardous waste recycled related to Hazardous Waste Management.",
@@ -425,7 +733,11 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of hazardous waste recycled",
+        "RT-EE-150a.1 Percentage of hazardous waste recycled",
+        "hazardous waste",
+        "waste recycled"
       ],
       "negative_anchor_terms": [
         "Amount of hazardous waste generated"
@@ -441,7 +753,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -449,11 +763,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of hazardous waste recycled', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -465,9 +805,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of hazardous waste recycled' (RT-EE-150a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Amount of hazardous waste generated."
     },
     {
       "metric_id": "RT-EE-150a.2.01",
@@ -481,7 +844,8 @@
       "aliases": [
         "Number of reportable spills",
         "Count of reportable spills",
-        "RT-EE-150a.2 Number of reportable spills"
+        "RT-EE-150a.2 Number of reportable spills",
+        "Total number of reportable spills"
       ],
       "bm25_terms": [
         "RT-EE-150a.2",
@@ -493,10 +857,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of reportable spills",
+        "Count of reportable spills",
+        "RT-EE-150a.2 Number of reportable spills",
+        "Total number of reportable spills",
+        "reportable spills",
+        "(1) Number and aggregate quantity of reportable spills, (2) quantity",
+        "The entity shall disclose (1) the total number and quantity (in kilogrammes) of reportable spills, where"
       ],
-      "dense_query": "Find disclosures for RT-EE-150a.2 Number of reportable spills with unit Number related to Hazardous Waste Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.2 'Number of reportable spills', under 'Hazardous Waste Management', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.2 'Number of reportable spills', under 'Hazardous Waste Management', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-150a.2 'Number of reportable spills'; retain every reported year and label.",
+        "When RT-EE-150a.2 'Number of reportable spills' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-150a.2 'Number of reportable spills', including: Number of reportable spills; Count of reportable spills; RT-EE-150a.2 Number of reportable spills; Total number of reportable spills.",
+        "Disambiguate RT-EE-150a.2 'Number of reportable spills' from sibling metrics sharing RT-EE-150a.2: Aggregate quantity of reportable spills; Quantity of reportable spills recovered.",
+        "Find disclosures for RT-EE-150a.2 Number of reportable spills with unit Number related to Hazardous Waste Management.",
         "Retrieve exact report evidence for RT-EE-150a.2 Number of reportable spills, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-150a.2 Number of reportable spills with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-150a.2 Number of reportable spills related to Hazardous Waste Management.",
@@ -512,7 +889,11 @@
         "Management",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of reportable spills",
+        "RT-EE-150a.2 Number of reportable spills",
+        "Total number of reportable spills",
+        "reportable spills"
       ],
       "negative_anchor_terms": [
         "Aggregate quantity of reportable spills",
@@ -533,7 +914,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -541,24 +924,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of reportable spills'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of reportable spills' (RT-EE-150a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Aggregate quantity of reportable spills; Quantity of reportable spills recovered."
     },
     {
       "metric_id": "RT-EE-150a.2.02",
@@ -584,10 +1015,25 @@
         "Management",
         "Kilogrammes",
         "kg",
-        "Kilogrammes (kg)"
+        "Kilogrammes (kg)",
+        "Aggregate quantity of reportable spills",
+        "RT-EE-150a.2 Aggregate quantity of reportable spills",
+        "Aggregate quantity",
+        "quantity reportable",
+        "reportable spills",
+        "kilogram",
+        "kilograms",
+        "(1) Number and aggregate quantity of reportable spills, (2) quantity",
+        "The entity shall disclose (1) the total number and quantity (in kilogrammes) of reportable spills, where"
       ],
-      "dense_query": "Find disclosures for RT-EE-150a.2 Aggregate quantity of reportable spills with unit Kilogrammes (kg) related to Hazardous Waste Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.2 'Aggregate quantity of reportable spills', under 'Hazardous Waste Management', with expected unit 'Kilogrammes (kg)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.2 'Aggregate quantity of reportable spills', under 'Hazardous Waste Management', with expected unit 'Kilogrammes (kg)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-150a.2 'Aggregate quantity of reportable spills'; retain every reported year and label.",
+        "When RT-EE-150a.2 'Aggregate quantity of reportable spills' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-150a.2 'Aggregate quantity of reportable spills', including: Aggregate quantity of reportable spills; RT-EE-150a.2 Aggregate quantity of reportable spills.",
+        "Disambiguate RT-EE-150a.2 'Aggregate quantity of reportable spills' from sibling metrics sharing RT-EE-150a.2: Number of reportable spills; Quantity of reportable spills recovered.",
+        "Find disclosures for RT-EE-150a.2 Aggregate quantity of reportable spills with unit Kilogrammes (kg) related to Hazardous Waste Management.",
         "Retrieve exact report evidence for RT-EE-150a.2 Aggregate quantity of reportable spills, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-150a.2 Aggregate quantity of reportable spills with unit Kilogrammes (kg).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-150a.2 Aggregate quantity of reportable spills related to Hazardous Waste Management.",
@@ -603,7 +1049,14 @@
         "Hazardous",
         "Waste",
         "Management",
-        "Kilogrammes (kg)"
+        "Kilogrammes (kg)",
+        "RT-EE-150a.2 Aggregate quantity of reportable spills",
+        "Aggregate quantity",
+        "quantity reportable",
+        "reportable spills",
+        "kg",
+        "kilogram",
+        "kilograms"
       ],
       "negative_anchor_terms": [
         "Number of reportable spills",
@@ -624,7 +1077,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -632,22 +1087,78 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Aggregate quantity of reportable spills', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "mass",
         "expected_units": [
-          "Kilogrammes (kg)"
+          "Kilogrammes (kg)",
+          "metric tonnes",
+          "metric tons",
+          "tonnes",
+          "tons",
+          "t",
+          "kg",
+          "kilograms"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Aggregate quantity of reportable spills' (RT-EE-150a.2, expected unit: Kilogrammes (kg)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of reportable spills; Quantity of reportable spills recovered."
     },
     {
       "metric_id": "RT-EE-150a.2.03",
@@ -673,10 +1184,25 @@
         "Management",
         "Kilogrammes",
         "kg",
-        "Kilogrammes (kg)"
+        "Kilogrammes (kg)",
+        "Quantity of reportable spills recovered",
+        "RT-EE-150a.2 Quantity of reportable spills recovered",
+        "Quantity reportable",
+        "reportable spills",
+        "spills recovered",
+        "kilogram",
+        "kilograms",
+        "(1) Number and aggregate quantity of reportable spills, (2) quantity",
+        "The entity shall disclose (1) the total number and quantity (in kilogrammes) of reportable spills, where"
       ],
-      "dense_query": "Find disclosures for RT-EE-150a.2 Quantity of reportable spills recovered with unit Kilogrammes (kg) related to Hazardous Waste Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.2 'Quantity of reportable spills recovered', under 'Hazardous Waste Management', with expected unit 'Kilogrammes (kg)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-150a.2 'Quantity of reportable spills recovered', under 'Hazardous Waste Management', with expected unit 'Kilogrammes (kg)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-150a.2 'Quantity of reportable spills recovered'; retain every reported year and label.",
+        "When RT-EE-150a.2 'Quantity of reportable spills recovered' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-150a.2 'Quantity of reportable spills recovered', including: Quantity of reportable spills recovered; RT-EE-150a.2 Quantity of reportable spills recovered.",
+        "Disambiguate RT-EE-150a.2 'Quantity of reportable spills recovered' from sibling metrics sharing RT-EE-150a.2: Number of reportable spills; Aggregate quantity of reportable spills.",
+        "Find disclosures for RT-EE-150a.2 Quantity of reportable spills recovered with unit Kilogrammes (kg) related to Hazardous Waste Management.",
         "Retrieve exact report evidence for RT-EE-150a.2 Quantity of reportable spills recovered, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-150a.2 Quantity of reportable spills recovered with unit Kilogrammes (kg).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-150a.2 Quantity of reportable spills recovered related to Hazardous Waste Management.",
@@ -692,7 +1218,14 @@
         "Hazardous",
         "Waste",
         "Management",
-        "Kilogrammes (kg)"
+        "Kilogrammes (kg)",
+        "RT-EE-150a.2 Quantity of reportable spills recovered",
+        "Quantity reportable",
+        "reportable spills",
+        "spills recovered",
+        "kg",
+        "kilogram",
+        "kilograms"
       ],
       "negative_anchor_terms": [
         "Number of reportable spills",
@@ -713,7 +1246,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -721,22 +1256,78 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Quantity of reportable spills recovered', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "mass",
         "expected_units": [
-          "Kilogrammes (kg)"
+          "Kilogrammes (kg)",
+          "metric tonnes",
+          "metric tons",
+          "tonnes",
+          "tons",
+          "t",
+          "kg",
+          "kilograms"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Quantity of reportable spills recovered' (RT-EE-150a.2, expected unit: Kilogrammes (kg)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of reportable spills; Aggregate quantity of reportable spills."
     },
     {
       "metric_id": "RT-EE-250a.1.01",
@@ -750,7 +1341,8 @@
       "aliases": [
         "Number of recalls issued",
         "Count of recalls issued",
-        "RT-EE-250a.1 Number of recalls issued"
+        "RT-EE-250a.1 Number of recalls issued",
+        "Total number of recalls issued"
       ],
       "bm25_terms": [
         "RT-EE-250a.1",
@@ -761,10 +1353,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of recalls issued",
+        "Count of recalls issued",
+        "RT-EE-250a.1 Number of recalls issued",
+        "Total number of recalls issued",
+        "recalls issued",
+        "(1) Number of recalls issued, (2) total units recalled",
+        "The entity shall disclose (1) the total number of product recalls it issued during the reporting period and (2) the"
       ],
-      "dense_query": "Find disclosures for RT-EE-250a.1 Number of recalls issued with unit Number related to Product Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-250a.1 'Number of recalls issued', under 'Product Safety', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-250a.1 'Number of recalls issued', under 'Product Safety', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-250a.1 'Number of recalls issued'; retain every reported year and label.",
+        "When RT-EE-250a.1 'Number of recalls issued' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-250a.1 'Number of recalls issued', including: Number of recalls issued; Count of recalls issued; RT-EE-250a.1 Number of recalls issued; Total number of recalls issued.",
+        "Disambiguate RT-EE-250a.1 'Number of recalls issued' from sibling metrics sharing RT-EE-250a.1: Total units recalled.",
+        "Find disclosures for RT-EE-250a.1 Number of recalls issued with unit Number related to Product Safety.",
         "Retrieve exact report evidence for RT-EE-250a.1 Number of recalls issued, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-250a.1 Number of recalls issued with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-250a.1 Number of recalls issued related to Product Safety.",
@@ -779,7 +1384,11 @@
         "Safety",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of recalls issued",
+        "RT-EE-250a.1 Number of recalls issued",
+        "Total number of recalls issued",
+        "recalls issued"
       ],
       "negative_anchor_terms": [
         "Total units recalled",
@@ -798,7 +1407,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -806,24 +1417,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of recalls issued'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of recalls issued' (RT-EE-250a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total units recalled."
     },
     {
       "metric_id": "RT-EE-250a.1.02",
@@ -848,10 +1507,20 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Total units recalled",
+        "RT-EE-250a.1 Total units recalled",
+        "(1) Number of recalls issued, (2) total units recalled",
+        "The entity shall disclose (1) the total number of product recalls it issued during the reporting period and (2) the"
       ],
-      "dense_query": "Find disclosures for RT-EE-250a.1 Total units recalled with unit Number related to Product Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-250a.1 'Total units recalled', under 'Product Safety', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-250a.1 'Total units recalled', under 'Product Safety', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-250a.1 'Total units recalled'; retain every reported year and label.",
+        "When RT-EE-250a.1 'Total units recalled' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-250a.1 'Total units recalled', including: Total units recalled; RT-EE-250a.1 Total units recalled.",
+        "Disambiguate RT-EE-250a.1 'Total units recalled' from sibling metrics sharing RT-EE-250a.1: Number of recalls issued.",
+        "Find disclosures for RT-EE-250a.1 Total units recalled with unit Number related to Product Safety.",
         "Retrieve exact report evidence for RT-EE-250a.1 Total units recalled, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-250a.1 Total units recalled with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-250a.1 Total units recalled related to Product Safety.",
@@ -867,7 +1536,8 @@
         "Safety",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "RT-EE-250a.1 Total units recalled"
       ],
       "negative_anchor_terms": [
         "Number of recalls issued"
@@ -883,7 +1553,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -891,24 +1563,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total units recalled'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total units recalled' (RT-EE-250a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of recalls issued."
     },
     {
       "metric_id": "RT-EE-250a.2",
@@ -938,10 +1658,30 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "Monetary losses as a result of legal proceedings associated with product safety",
+        "RT-EE-250a.2 Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated product",
+        "product safety",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with product safety"
       ],
-      "dense_query": "Find disclosures for RT-EE-250a.2 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency related to Product Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-250a.2 'Total amount of monetary losses as a result of legal proceedings associated with product safety', under 'Product Safety', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-250a.2 'Total amount of monetary losses as a result of legal proceedings associated with product safety', under 'Product Safety', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-250a.2 'Total amount of monetary losses as a result of legal proceedings associated with product safety'; retain every reported year and label.",
+        "When RT-EE-250a.2 'Total amount of monetary losses as a result of legal proceedings associated with product safety' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-250a.2 'Total amount of monetary losses as a result of legal proceedings associated with product safety', including: Total amount of monetary losses as a result of legal proceedings associated with product safety; Monetary losses as a result of legal proceedings associated with product safety; RT-EE-250a.2 Total amount of monetary losses as a result of legal proceedings associated with product safety.",
+        "Find disclosures for RT-EE-250a.2 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency related to Product Safety.",
         "Retrieve exact report evidence for RT-EE-250a.2 Total amount of monetary losses as a result of legal proceedings associated with product safety, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-250a.2 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-250a.2 Total amount of monetary losses as a result of legal proceedings associated with product safety related to Product Safety.",
@@ -961,7 +1701,18 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with product safety",
+        "RT-EE-250a.2 Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated product",
+        "product safety",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -975,7 +1726,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -983,25 +1736,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with product safety', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with product safety' (RT-EE-250a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RT-EE-410a.1",
@@ -1030,10 +1832,28 @@
         "Management",
         "%",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of products by revenue that contain IEC 62474 declarable substances",
+        "Percent of products by revenue that contain IEC 62474 declarable substances",
+        "RT-EE-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances",
+        "products revenue",
+        "revenue that",
+        "that",
+        "that contain",
+        "contain IEC",
+        "IEC declarable",
+        "declarable substances",
+        "Percentage (%) by revenue",
+        "percentage",
+        "Percentage of products by revenue that contain IEC 62474"
       ],
-      "dense_query": "Find disclosures for RT-EE-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances with unit Percentage (%) by revenue related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances', under 'Product Lifecycle Management', with expected unit 'Percentage (%) by revenue'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances', under 'Product Lifecycle Management', with expected unit 'Percentage (%) by revenue'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances'; retain every reported year and label.",
+        "When RT-EE-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances', including: Percentage of products by revenue that contain IEC 62474 declarable substances; Percent of products by revenue that contain IEC 62474 declarable substances; RT-EE-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances.",
+        "Find disclosures for RT-EE-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances with unit Percentage (%) by revenue related to Product Lifecycle Management.",
         "Retrieve exact report evidence for RT-EE-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances with unit Percentage (%) by revenue.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances related to Product Lifecycle Management.",
@@ -1054,7 +1874,17 @@
         "Percentage (%) by revenue",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percent of products by revenue that contain IEC 62474 declarable substances",
+        "RT-EE-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances",
+        "products revenue",
+        "revenue that",
+        "that",
+        "that contain",
+        "contain IEC",
+        "IEC declarable",
+        "declarable substances",
+        "percentage"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1063,7 +1893,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1071,29 +1903,75 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of products by revenue that contain IEC 62474 declarable substances', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "mixed",
+        "value_type": "percentage",
         "expected_units": [
           "Percentage (%) by revenue",
           "Percentage (%)",
           "%",
           "percent",
-          "percentage",
-          "reporting currency",
-          "monetary amount",
-          "presentation currency"
+          "percentage"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Extract each required component separately and preserve its original unit, denominator, category, and reporting-period context."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of products by revenue that contain IEC 62474 declarable substances' (RT-EE-410a.1, expected unit: Percentage (%) by revenue). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RT-EE-410a.2",
@@ -1123,10 +2001,30 @@
         "Management",
         "%",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of eligible products, by revenue, certified to an energy efficiency certification",
+        "Percent of eligible products, by revenue, certified to an energy efficiency certification",
+        "RT-EE-410a.2 Percentage of eligible products, by revenue, certified to an energy efficiency certification",
+        "eligible products",
+        "products revenue",
+        "revenue certified",
+        "certified energy",
+        "energy efficiency",
+        "efficiency certification",
+        "Percentage of eligible products",
+        "by revenue",
+        "certified to an energy efficiency certification",
+        "Percentage (%) by revenue",
+        "percentage",
+        "Percentage of eligible products, by revenue, certified to an energy"
       ],
-      "dense_query": "Find disclosures for RT-EE-410a.2 Percentage of eligible products, by revenue, certified to an energy efficiency certification with unit Percentage (%) by revenue related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-410a.2 'Percentage of eligible products, by revenue, certified to an energy efficiency certification', under 'Product Lifecycle Management', with expected unit 'Percentage (%) by revenue'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-410a.2 'Percentage of eligible products, by revenue, certified to an energy efficiency certification', under 'Product Lifecycle Management', with expected unit 'Percentage (%) by revenue'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-410a.2 'Percentage of eligible products, by revenue, certified to an energy efficiency certification'; retain every reported year and label.",
+        "When RT-EE-410a.2 'Percentage of eligible products, by revenue, certified to an energy efficiency certification' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-410a.2 'Percentage of eligible products, by revenue, certified to an energy efficiency certification', including: Percentage of eligible products, by revenue, certified to an energy efficiency certification; Percent of eligible products, by revenue, certified to an energy efficiency certification; RT-EE-410a.2 Percentage of eligible products, by revenue, certified to an energy efficiency certification.",
+        "Find disclosures for RT-EE-410a.2 Percentage of eligible products, by revenue, certified to an energy efficiency certification with unit Percentage (%) by revenue related to Product Lifecycle Management.",
         "Retrieve exact report evidence for RT-EE-410a.2 Percentage of eligible products, by revenue, certified to an energy efficiency certification, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-410a.2 Percentage of eligible products, by revenue, certified to an energy efficiency certification with unit Percentage (%) by revenue.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-410a.2 Percentage of eligible products, by revenue, certified to an energy efficiency certification related to Product Lifecycle Management.",
@@ -1148,7 +2046,19 @@
         "Percentage (%) by revenue",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percent of eligible products, by revenue, certified to an energy efficiency certification",
+        "RT-EE-410a.2 Percentage of eligible products, by revenue, certified to an energy efficiency certification",
+        "eligible products",
+        "products revenue",
+        "revenue certified",
+        "certified energy",
+        "energy efficiency",
+        "efficiency certification",
+        "Percentage of eligible products",
+        "by revenue",
+        "certified to an energy efficiency certification",
+        "percentage"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1157,7 +2067,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1165,29 +2077,75 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of eligible products, by revenue, certified to an energy efficiency certification', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "mixed",
+        "value_type": "percentage",
         "expected_units": [
           "Percentage (%) by revenue",
           "Percentage (%)",
           "%",
           "percent",
-          "percentage",
-          "reporting currency",
-          "monetary amount",
-          "presentation currency"
+          "percentage"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Extract each required component separately and preserve its original unit, denominator, category, and reporting-period context."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of eligible products, by revenue, certified to an energy efficiency certification' (RT-EE-410a.2, expected unit: Percentage (%) by revenue). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RT-EE-410a.3",
@@ -1219,10 +2177,29 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Revenue from renewable energy-related and energy efficiency-related products",
+        "RT-EE-410a.3 Revenue from renewable energy-related and energy efficiency-related products",
+        "Revenue renewable",
+        "renewable energy-related",
+        "energy-related energy",
+        "energy efficiency-related",
+        "efficiency-related products",
+        "Revenue from renewable energy-related",
+        "energy efficiency-related products",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Revenue from renewable energy-related and energy efficiency",
+        "related products"
       ],
-      "dense_query": "Find disclosures for RT-EE-410a.3 Revenue from renewable energy-related and energy efficiency-related products with unit Presentation currency related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-410a.3 'Revenue from renewable energy-related and energy efficiency-related products', under 'Product Lifecycle Management', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-410a.3 'Revenue from renewable energy-related and energy efficiency-related products', under 'Product Lifecycle Management', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-410a.3 'Revenue from renewable energy-related and energy efficiency-related products'; retain every reported year and label.",
+        "When RT-EE-410a.3 'Revenue from renewable energy-related and energy efficiency-related products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-410a.3 'Revenue from renewable energy-related and energy efficiency-related products', including: Revenue from renewable energy-related and energy efficiency-related products; RT-EE-410a.3 Revenue from renewable energy-related and energy efficiency-related products.",
+        "Find disclosures for RT-EE-410a.3 Revenue from renewable energy-related and energy efficiency-related products with unit Presentation currency related to Product Lifecycle Management.",
         "Retrieve exact report evidence for RT-EE-410a.3 Revenue from renewable energy-related and energy efficiency-related products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-410a.3 Revenue from renewable energy-related and energy efficiency-related products with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-410a.3 Revenue from renewable energy-related and energy efficiency-related products related to Product Lifecycle Management.",
@@ -1244,7 +2221,17 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "RT-EE-410a.3 Revenue from renewable energy-related and energy efficiency-related products",
+        "Revenue renewable",
+        "renewable energy-related",
+        "energy-related energy",
+        "energy efficiency-related",
+        "efficiency-related products",
+        "Revenue from renewable energy-related",
+        "energy efficiency-related products",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "grid electricity",
@@ -1262,7 +2249,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1270,25 +2259,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Revenue from renewable energy-related and energy efficiency-related products', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Revenue from renewable energy-related and energy efficiency-related products' (RT-EE-410a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RT-EE-440a.1",
@@ -1301,7 +2339,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of the management of risks associated with the use of critical materials",
-        "RT-EE-440a.1 Description of the management of risks associated with the use of critical materials"
+        "RT-EE-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials"
       ],
       "bm25_terms": [
         "RT-EE-440a.1",
@@ -1310,10 +2349,26 @@
         "risks",
         "critical",
         "materials",
-        "Sourcing"
+        "Sourcing",
+        "Description of the management of risks associated with the use of critical materials",
+        "RT-EE-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials",
+        "management risks",
+        "risks associated",
+        "associated",
+        "associated use",
+        "use",
+        "use critical",
+        "critical materials",
+        "Description of the management of risks associated with the use of"
       ],
-      "dense_query": "Find disclosures for RT-EE-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-440a.1 'Description of the management of risks associated with the use of critical materials', under 'Materials Sourcing'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-440a.1 'Description of the management of risks associated with the use of critical materials', under 'Materials Sourcing'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers RT-EE-440a.1 'Description of the management of risks associated with the use of critical materials'.",
+        "When RT-EE-440a.1 'Description of the management of risks associated with the use of critical materials' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-440a.1 'Description of the management of risks associated with the use of critical materials', including: Description of the management of risks associated with the use of critical materials; RT-EE-440a.1 Description of the management of risks associated with the use of critical materials; the management of risks associated with the use of critical materials.",
+        "Find disclosures for RT-EE-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
         "Retrieve exact report evidence for RT-EE-440a.1 Description of the management of risks associated with the use of critical materials, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-440a.1 Description of the management of risks associated with the use of critical materials.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
@@ -1327,7 +2382,16 @@
         "risks",
         "critical",
         "materials",
-        "Sourcing"
+        "Sourcing",
+        "RT-EE-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials",
+        "management risks",
+        "risks associated",
+        "associated",
+        "associated use",
+        "use",
+        "use critical",
+        "critical materials"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1337,7 +2401,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1349,20 +2415,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of the management of risks associated with the use of critical materials'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of the management of risks associated with the use of critical materials' (RT-EE-440a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RT-EE-510a.1.01",
@@ -1376,7 +2490,8 @@
       "aliases": [
         "Description of policies and practices for prevention of: (1) corruption and bribery",
         "Description of policies and practices for prevention of: corruption and bribery",
-        "RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery"
+        "RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery",
+        "policies and practices for prevention of: (1) corruption and bribery"
       ],
       "bm25_terms": [
         "RT-EE-510a.1",
@@ -1387,10 +2502,28 @@
         "corruption",
         "bribery",
         "Business",
-        "Ethics"
+        "Ethics",
+        "Description of policies and practices for prevention of: (1) corruption and bribery",
+        "Description of policies and practices for prevention of: corruption and bribery",
+        "RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery",
+        "policies and practices for prevention of: (1) corruption and bribery",
+        "policies practices",
+        "practices prevention",
+        "prevention corruption",
+        "corruption bribery",
+        "Description of policies",
+        "practices for prevention of",
+        "Description of policies and practices for prevention of",
+        "(1) corruption and bribery and (2) anti-competitive behaviour"
       ],
-      "dense_query": "Find disclosures for RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery related to Business Ethics.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-510a.1 'Description of policies and practices for prevention of: (1) corruption and bribery', under 'Business Ethics'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-510a.1 'Description of policies and practices for prevention of: (1) corruption and bribery', under 'Business Ethics'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers RT-EE-510a.1 'Description of policies and practices for prevention of: (1) corruption and bribery'.",
+        "When RT-EE-510a.1 'Description of policies and practices for prevention of: (1) corruption and bribery' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-510a.1 'Description of policies and practices for prevention of: (1) corruption and bribery', including: Description of policies and practices for prevention of: (1) corruption and bribery; Description of policies and practices for prevention of: corruption and bribery; RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery; policies and practices for prevention of: (1) corruption and bribery.",
+        "Disambiguate RT-EE-510a.1 'Description of policies and practices for prevention of: (1) corruption and bribery' from sibling metrics sharing RT-EE-510a.1: Description of policies and practices for prevention of: (2) anti-competitive behaviour.",
+        "Find disclosures for RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery related to Business Ethics.",
         "Retrieve exact report evidence for RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery related to Business Ethics.",
@@ -1406,7 +2539,16 @@
         "corruption",
         "bribery",
         "Business",
-        "Ethics"
+        "Ethics",
+        "Description of policies and practices for prevention of: corruption and bribery",
+        "RT-EE-510a.1 Description of policies and practices for prevention of: (1) corruption and bribery",
+        "policies and practices for prevention of: (1) corruption and bribery",
+        "policies practices",
+        "practices prevention",
+        "prevention corruption",
+        "corruption bribery",
+        "Description of policies",
+        "practices for prevention of"
       ],
       "negative_anchor_terms": [
         "Description of policies and practices for prevention of: (2) anti-competitive behaviour"
@@ -1423,7 +2565,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1435,20 +2579,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies and practices for prevention of: (1) corruption and bribery'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies and practices for prevention of: (1) corruption and bribery' (RT-EE-510a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Description of policies and practices for prevention of: (2) anti-competitive behaviour."
     },
     {
       "metric_id": "RT-EE-510a.1.02",
@@ -1462,7 +2654,8 @@
       "aliases": [
         "Description of policies and practices for prevention of: (2) anti-competitive behaviour",
         "Description of policies and practices for prevention of: anti-competitive behaviour",
-        "RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour"
+        "RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour",
+        "policies and practices for prevention of: (2) anti-competitive behaviour"
       ],
       "bm25_terms": [
         "RT-EE-510a.1",
@@ -1473,10 +2666,28 @@
         "anti-competitive",
         "behaviour",
         "Business",
-        "Ethics"
+        "Ethics",
+        "Description of policies and practices for prevention of: (2) anti-competitive behaviour",
+        "Description of policies and practices for prevention of: anti-competitive behaviour",
+        "RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour",
+        "policies and practices for prevention of: (2) anti-competitive behaviour",
+        "policies practices",
+        "practices prevention",
+        "prevention anti-competitive",
+        "anti-competitive behaviour",
+        "Description of policies",
+        "practices for prevention of",
+        "Description of policies and practices for prevention of",
+        "(1) corruption and bribery and (2) anti-competitive behaviour"
       ],
-      "dense_query": "Find disclosures for RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour related to Business Ethics.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-510a.1 'Description of policies and practices for prevention of: (2) anti-competitive behaviour', under 'Business Ethics'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-510a.1 'Description of policies and practices for prevention of: (2) anti-competitive behaviour', under 'Business Ethics'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers RT-EE-510a.1 'Description of policies and practices for prevention of: (2) anti-competitive behaviour'.",
+        "When RT-EE-510a.1 'Description of policies and practices for prevention of: (2) anti-competitive behaviour' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-510a.1 'Description of policies and practices for prevention of: (2) anti-competitive behaviour', including: Description of policies and practices for prevention of: (2) anti-competitive behaviour; Description of policies and practices for prevention of: anti-competitive behaviour; RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour; policies and practices for prevention of: (2) anti-competitive behaviour.",
+        "Disambiguate RT-EE-510a.1 'Description of policies and practices for prevention of: (2) anti-competitive behaviour' from sibling metrics sharing RT-EE-510a.1: Description of policies and practices for prevention of: (1) corruption and bribery.",
+        "Find disclosures for RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour related to Business Ethics.",
         "Retrieve exact report evidence for RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour related to Business Ethics.",
@@ -1492,7 +2703,16 @@
         "anti-competitive",
         "behaviour",
         "Business",
-        "Ethics"
+        "Ethics",
+        "Description of policies and practices for prevention of: anti-competitive behaviour",
+        "RT-EE-510a.1 Description of policies and practices for prevention of: (2) anti-competitive behaviour",
+        "policies and practices for prevention of: (2) anti-competitive behaviour",
+        "policies practices",
+        "practices prevention",
+        "prevention anti-competitive",
+        "anti-competitive behaviour",
+        "Description of policies",
+        "practices for prevention of"
       ],
       "negative_anchor_terms": [
         "Description of policies and practices for prevention of: (1) corruption and bribery"
@@ -1509,7 +2729,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1521,20 +2743,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies and practices for prevention of: (2) anti-competitive behaviour'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies and practices for prevention of: (2) anti-competitive behaviour' (RT-EE-510a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Description of policies and practices for prevention of: (1) corruption and bribery."
     },
     {
       "metric_id": "RT-EE-510a.2",
@@ -1566,10 +2836,30 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption",
+        "Monetary losses as a result of legal proceedings associated with bribery or corruption",
+        "RT-EE-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated bribery",
+        "bribery corruption",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with bribery or corruption"
       ],
-      "dense_query": "Find disclosures for RT-EE-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption with unit Presentation currency related to Business Ethics.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption', under 'Business Ethics', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption', under 'Business Ethics', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption'; retain every reported year and label.",
+        "When RT-EE-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption', including: Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption; Monetary losses as a result of legal proceedings associated with bribery or corruption; RT-EE-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption.",
+        "Find disclosures for RT-EE-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption with unit Presentation currency related to Business Ethics.",
         "Retrieve exact report evidence for RT-EE-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption related to Business Ethics.",
@@ -1591,7 +2881,18 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with bribery or corruption",
+        "RT-EE-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated bribery",
+        "bribery corruption",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1605,7 +2906,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1613,25 +2916,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with bribery or corruption' (RT-EE-510a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RT-EE-510a.3",
@@ -1664,10 +3016,31 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "RT-EE-510a.3 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour regulations",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with anti-competitive behaviour regulations"
       ],
-      "dense_query": "Find disclosures for RT-EE-510a.3 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency related to Business Ethics.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-510a.3 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', under 'Business Ethics', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-510a.3 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', under 'Business Ethics', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-510a.3 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations'; retain every reported year and label.",
+        "When RT-EE-510a.3 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-510a.3 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', including: Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations; Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations; RT-EE-510a.3 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations.",
+        "Find disclosures for RT-EE-510a.3 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency related to Business Ethics.",
         "Retrieve exact report evidence for RT-EE-510a.3 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-510a.3 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-510a.3 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations related to Business Ethics.",
@@ -1690,7 +3063,19 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "RT-EE-510a.3 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour regulations",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1704,7 +3089,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1712,25 +3099,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations' (RT-EE-510a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RT-EE-000.A",
@@ -1744,7 +3180,8 @@
       "aliases": [
         "Number of units produced by product category",
         "Count of units produced by product category",
-        "RT-EE-000.A Number of units produced by product category"
+        "RT-EE-000.A Number of units produced by product category",
+        "Total number of units produced by product category"
       ],
       "bm25_terms": [
         "RT-EE-000.A",
@@ -1755,14 +3192,27 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of units produced by product category",
+        "Count of units produced by product category",
+        "RT-EE-000.A Number of units produced by product category",
+        "Total number of units produced by product category",
+        "units produced",
+        "produced product",
+        "Note to RT-EE-000.A – Production should be disclosed as number of units produced by product category, where relevant product"
       ],
-      "dense_query": "Find disclosures for RT-EE-000.A Number of units produced by product category with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-000.A 'Number of units produced by product category', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-000.A 'Number of units produced by product category', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-000.A 'Number of units produced by product category'; retain every reported year and label.",
+        "When RT-EE-000.A 'Number of units produced by product category' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-000.A 'Number of units produced by product category', including: Number of units produced by product category; Count of units produced by product category; RT-EE-000.A Number of units produced by product category; Total number of units produced by product category.",
+        "Find disclosures for RT-EE-000.A Number of units produced by product category with unit Number.",
         "Retrieve exact report evidence for RT-EE-000.A Number of units produced by product category, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-000.A Number of units produced by product category with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-000.A Number of units produced by product category.",
-        "Find numeric table rows or performance metrics reporting RT-EE-000.A Number of units produced by product category for the reporting period."
+        "Find numeric table rows or performance metrics reporting RT-EE-000.A Number of units produced by product category for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: product_type."
       ],
       "anchor_terms": [
         "RT-EE-000.A",
@@ -1773,7 +3223,12 @@
         "category",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of units produced by product category",
+        "RT-EE-000.A Number of units produced by product category",
+        "Total number of units produced by product category",
+        "units produced",
+        "produced product"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1782,7 +3237,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1790,24 +3247,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of units produced by product category'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "product_type"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of units produced by product category' (RT-EE-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. Preserve separate reported values and source labels for the variable dimensions: product_type."
     },
     {
       "metric_id": "RT-EE-000.B",
@@ -1821,7 +3328,8 @@
       "aliases": [
         "Number of employees",
         "Count of employees",
-        "RT-EE-000.B Number of employees"
+        "RT-EE-000.B Number of employees",
+        "Total number of employees"
       ],
       "bm25_terms": [
         "RT-EE-000.B",
@@ -1829,10 +3337,19 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of employees",
+        "Count of employees",
+        "RT-EE-000.B Number of employees",
+        "Total number of employees"
       ],
-      "dense_query": "Find disclosures for RT-EE-000.B Number of employees with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RT-EE-000.B 'Number of employees', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RT-EE-000.B 'Number of employees', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RT-EE-000.B 'Number of employees'; retain every reported year and label.",
+        "When RT-EE-000.B 'Number of employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RT-EE-000.B 'Number of employees', including: Number of employees; Count of employees; RT-EE-000.B Number of employees; Total number of employees.",
+        "Find disclosures for RT-EE-000.B Number of employees with unit Number.",
         "Retrieve exact report evidence for RT-EE-000.B Number of employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RT-EE-000.B Number of employees with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RT-EE-000.B Number of employees.",
@@ -1844,7 +3361,10 @@
         "employees",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of employees",
+        "RT-EE-000.B Number of employees",
+        "Total number of employees"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1853,7 +3373,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1861,24 +3383,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of employees'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of employees' (RT-EE-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

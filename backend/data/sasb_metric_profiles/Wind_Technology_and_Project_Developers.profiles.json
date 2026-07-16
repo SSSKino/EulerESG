@@ -26,10 +26,26 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "Total recordable incident rate (TRIR) for (a) direct employees",
+        "RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "recordable incident",
+        "incident rate",
+        "rate TRIR",
+        "TRIR direct",
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR) and (2) fatality rate for (a)",
+        "direct employees and (b) contract employees"
       ],
-      "dense_query": "Find disclosures for RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees'; retain every reported year and label.",
+        "When RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees', including: (1) Total recordable incident rate (TRIR) for (a) direct employees; Total recordable incident rate (TRIR) for (a) direct employees; RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees.",
+        "Disambiguate RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees' from sibling metrics sharing RR-WT-320a.1: (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees.",
+        "Find disclosures for RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees related to Workforce Health & Safety.",
@@ -37,6 +53,7 @@
       ],
       "anchor_terms": [
         "RR-WT-320a.1",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
         "Total recordable incident rate (TRIR) for (a) direct employees",
         "Total recordable incident rate",
         "TRIR",
@@ -48,13 +65,22 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "recordable incident",
+        "incident rate",
+        "rate TRIR",
+        "TRIR direct",
+        "direct employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (b) contract employees",
         "Fatality rate for (a) direct employees",
         "Fatality rate for (b) contract employees",
-        "contract employees"
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "(2) Fatality rate for (a) direct employees",
+        "(2) Fatality rate for (b) contract employees"
       ],
       "similar_metric_warnings": [
         {
@@ -75,7 +101,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -83,23 +111,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total recordable incident rate (TRIR) for (a) direct employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total recordable incident rate (TRIR) for (a) direct employees' (RR-WT-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees."
     },
     {
       "metric_id": "RR-WT-320a.1.02",
@@ -127,10 +203,26 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "Total recordable incident rate (TRIR) for (b) contract employees",
+        "RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "recordable incident",
+        "incident rate",
+        "rate TRIR",
+        "TRIR contract",
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR) and (2) fatality rate for (a)",
+        "direct employees and (b) contract employees"
       ],
-      "dense_query": "Find disclosures for RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees'; retain every reported year and label.",
+        "When RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees', including: (1) Total recordable incident rate (TRIR) for (b) contract employees; Total recordable incident rate (TRIR) for (b) contract employees; RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees.",
+        "Disambiguate RR-WT-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees' from sibling metrics sharing RR-WT-320a.1: (1) Total recordable incident rate (TRIR) for (a) direct employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees.",
+        "Find disclosures for RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees related to Workforce Health & Safety.",
@@ -138,6 +230,7 @@
       ],
       "anchor_terms": [
         "RR-WT-320a.1",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
         "Total recordable incident rate (TRIR) for (b) contract employees",
         "Total recordable incident rate",
         "TRIR",
@@ -149,13 +242,22 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "RR-WT-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "recordable incident",
+        "incident rate",
+        "rate TRIR",
+        "TRIR contract",
+        "contract employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (a) direct employees",
         "Fatality rate for (a) direct employees",
         "Fatality rate for (b) contract employees",
-        "direct employees"
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "(2) Fatality rate for (a) direct employees",
+        "(2) Fatality rate for (b) contract employees"
       ],
       "similar_metric_warnings": [
         {
@@ -176,7 +278,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -184,23 +288,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total recordable incident rate (TRIR) for (b) contract employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total recordable incident rate (TRIR) for (b) contract employees' (RR-WT-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (a) direct employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees."
     },
     {
       "metric_id": "RR-WT-320a.1.03",
@@ -225,10 +377,24 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(2) Fatality rate for (a) direct employees",
+        "Fatality rate for (a) direct employees",
+        "RR-WT-320a.1 (2) Fatality rate for (a) direct employees",
+        "Fatality rate",
+        "rate direct",
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR) and (2) fatality rate for (a)",
+        "direct employees and (b) contract employees"
       ],
-      "dense_query": "Find disclosures for RR-WT-320a.1 (2) Fatality rate for (a) direct employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-320a.1 '(2) Fatality rate for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-320a.1 '(2) Fatality rate for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-320a.1 '(2) Fatality rate for (a) direct employees'; retain every reported year and label.",
+        "When RR-WT-320a.1 '(2) Fatality rate for (a) direct employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-320a.1 '(2) Fatality rate for (a) direct employees', including: (2) Fatality rate for (a) direct employees; Fatality rate for (a) direct employees; RR-WT-320a.1 (2) Fatality rate for (a) direct employees.",
+        "Disambiguate RR-WT-320a.1 '(2) Fatality rate for (a) direct employees' from sibling metrics sharing RR-WT-320a.1: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (b) contract employees.",
+        "Find disclosures for RR-WT-320a.1 (2) Fatality rate for (a) direct employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for RR-WT-320a.1 (2) Fatality rate for (a) direct employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-320a.1 (2) Fatality rate for (a) direct employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-320a.1 (2) Fatality rate for (a) direct employees related to Workforce Health & Safety.",
@@ -236,6 +402,7 @@
       ],
       "anchor_terms": [
         "RR-WT-320a.1",
+        "(2) Fatality rate for (a) direct employees",
         "Fatality rate for (a) direct employees",
         "Fatality",
         "rate",
@@ -244,13 +411,20 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "RR-WT-320a.1 (2) Fatality rate for (a) direct employees",
+        "Fatality rate",
+        "rate direct",
+        "direct employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (a) direct employees",
         "Total recordable incident rate (TRIR) for (b) contract employees",
         "Fatality rate for (b) contract employees",
-        "contract employees"
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "(2) Fatality rate for (b) contract employees"
       ],
       "similar_metric_warnings": [
         {
@@ -271,7 +445,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -279,23 +455,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Fatality rate for (a) direct employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Fatality rate for (a) direct employees' (RR-WT-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (b) contract employees."
     },
     {
       "metric_id": "RR-WT-320a.1.04",
@@ -320,10 +544,24 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(2) Fatality rate for (b) contract employees",
+        "Fatality rate for (b) contract employees",
+        "RR-WT-320a.1 (2) Fatality rate for (b) contract employees",
+        "Fatality rate",
+        "rate contract",
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR) and (2) fatality rate for (a)",
+        "direct employees and (b) contract employees"
       ],
-      "dense_query": "Find disclosures for RR-WT-320a.1 (2) Fatality rate for (b) contract employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-320a.1 '(2) Fatality rate for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-320a.1 '(2) Fatality rate for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-320a.1 '(2) Fatality rate for (b) contract employees'; retain every reported year and label.",
+        "When RR-WT-320a.1 '(2) Fatality rate for (b) contract employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-320a.1 '(2) Fatality rate for (b) contract employees', including: (2) Fatality rate for (b) contract employees; Fatality rate for (b) contract employees; RR-WT-320a.1 (2) Fatality rate for (b) contract employees.",
+        "Disambiguate RR-WT-320a.1 '(2) Fatality rate for (b) contract employees' from sibling metrics sharing RR-WT-320a.1: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees.",
+        "Find disclosures for RR-WT-320a.1 (2) Fatality rate for (b) contract employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for RR-WT-320a.1 (2) Fatality rate for (b) contract employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-320a.1 (2) Fatality rate for (b) contract employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-320a.1 (2) Fatality rate for (b) contract employees related to Workforce Health & Safety.",
@@ -331,6 +569,7 @@
       ],
       "anchor_terms": [
         "RR-WT-320a.1",
+        "(2) Fatality rate for (b) contract employees",
         "Fatality rate for (b) contract employees",
         "Fatality",
         "rate",
@@ -339,13 +578,20 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "RR-WT-320a.1 (2) Fatality rate for (b) contract employees",
+        "Fatality rate",
+        "rate contract",
+        "contract employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (a) direct employees",
         "Total recordable incident rate (TRIR) for (b) contract employees",
         "Fatality rate for (a) direct employees",
-        "direct employees"
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "(2) Fatality rate for (a) direct employees"
       ],
       "similar_metric_warnings": [
         {
@@ -366,7 +612,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -374,23 +622,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Fatality rate for (b) contract employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Fatality rate for (b) contract employees' (RR-WT-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees."
     },
     {
       "metric_id": "RR-WT-410a.1",
@@ -420,10 +716,30 @@
         "Project",
         "Development",
         "dB",
-        "dB(A)"
+        "dB(A)",
+        "Average A-weighted sound power level of wind turbines, by wind turbine class",
+        "RR-WT-410a.1 Average A-weighted sound power level of wind turbines, by wind turbine class",
+        "Average",
+        "Average A-weighted",
+        "A-weighted sound",
+        "sound power",
+        "power level",
+        "level wind",
+        "wind turbines",
+        "turbines wind",
+        "wind turbine",
+        "turbine class",
+        "Average A-weighted sound power level of wind turbines",
+        "by wind turbine class",
+        "Average A-weighted sound power level of wind turbines, by wind"
       ],
-      "dense_query": "Find disclosures for RR-WT-410a.1 Average A-weighted sound power level of wind turbines, by wind turbine class with unit dB(A) related to Ecological Impacts of Project Development.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-410a.1 'Average A-weighted sound power level of wind turbines, by wind turbine class', under 'Ecological Impacts of Project Development', with expected unit 'dB(A)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-410a.1 'Average A-weighted sound power level of wind turbines, by wind turbine class', under 'Ecological Impacts of Project Development', with expected unit 'dB(A)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-410a.1 'Average A-weighted sound power level of wind turbines, by wind turbine class'; retain every reported year and label.",
+        "When RR-WT-410a.1 'Average A-weighted sound power level of wind turbines, by wind turbine class' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-410a.1 'Average A-weighted sound power level of wind turbines, by wind turbine class', including: Average A-weighted sound power level of wind turbines, by wind turbine class; RR-WT-410a.1 Average A-weighted sound power level of wind turbines, by wind turbine class.",
+        "Find disclosures for RR-WT-410a.1 Average A-weighted sound power level of wind turbines, by wind turbine class with unit dB(A) related to Ecological Impacts of Project Development.",
         "Retrieve exact report evidence for RR-WT-410a.1 Average A-weighted sound power level of wind turbines, by wind turbine class, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-410a.1 Average A-weighted sound power level of wind turbines, by wind turbine class with unit dB(A).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-410a.1 Average A-weighted sound power level of wind turbines, by wind turbine class related to Ecological Impacts of Project Development.",
@@ -444,7 +760,20 @@
         "Impacts",
         "Project",
         "Development",
-        "dB(A)"
+        "dB(A)",
+        "RR-WT-410a.1 Average A-weighted sound power level of wind turbines, by wind turbine class",
+        "Average",
+        "Average A-weighted",
+        "A-weighted sound",
+        "sound power",
+        "power level",
+        "level wind",
+        "wind turbines",
+        "turbines wind",
+        "wind turbine",
+        "turbine class",
+        "Average A-weighted sound power level of wind turbines",
+        "by wind turbine class"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -453,7 +782,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -461,22 +792,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Average A-weighted sound power level of wind turbines, by wind turbine class', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "number",
         "expected_units": [
           "dB(A)"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Average A-weighted sound power level of wind turbines, by wind turbine class' (RR-WT-410a.1, expected unit: dB(A)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-410a.2",
@@ -505,10 +885,28 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Backlog cancellations associated with community or ecological impacts",
+        "RR-WT-410a.2 Backlog cancellations associated with community or ecological impacts",
+        "Backlog cancellations",
+        "cancellations associated",
+        "associated",
+        "associated community",
+        "community ecological",
+        "ecological impacts",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Backlog cancellations associated with community or ecological",
+        "The entity shall disclose the quantity of orders in its turbine order backlog subject to cancellation during the"
       ],
-      "dense_query": "Find disclosures for RR-WT-410a.2 Backlog cancellations associated with community or ecological impacts with unit Presentation currency related to Ecological Impacts of Project Development.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-410a.2 'Backlog cancellations associated with community or ecological impacts', under 'Ecological Impacts of Project Development', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-410a.2 'Backlog cancellations associated with community or ecological impacts', under 'Ecological Impacts of Project Development', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-410a.2 'Backlog cancellations associated with community or ecological impacts'; retain every reported year and label.",
+        "When RR-WT-410a.2 'Backlog cancellations associated with community or ecological impacts' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-410a.2 'Backlog cancellations associated with community or ecological impacts', including: Backlog cancellations associated with community or ecological impacts; RR-WT-410a.2 Backlog cancellations associated with community or ecological impacts.",
+        "Find disclosures for RR-WT-410a.2 Backlog cancellations associated with community or ecological impacts with unit Presentation currency related to Ecological Impacts of Project Development.",
         "Retrieve exact report evidence for RR-WT-410a.2 Backlog cancellations associated with community or ecological impacts, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-410a.2 Backlog cancellations associated with community or ecological impacts with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-410a.2 Backlog cancellations associated with community or ecological impacts related to Ecological Impacts of Project Development.",
@@ -527,7 +925,16 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "RR-WT-410a.2 Backlog cancellations associated with community or ecological impacts",
+        "Backlog cancellations",
+        "cancellations associated",
+        "associated",
+        "associated community",
+        "community ecological",
+        "ecological impacts",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -536,7 +943,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -544,25 +953,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Backlog cancellations associated with community or ecological impacts', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Backlog cancellations associated with community or ecological impacts' (RR-WT-410a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-410a.3",
@@ -575,7 +1033,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of efforts to address ecological and community impacts of wind energy production through turbine design",
-        "RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design"
+        "RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design",
+        "efforts to address ecological and community impacts of wind energy production through turbine design"
       ],
       "bm25_terms": [
         "RR-WT-410a.3",
@@ -591,10 +1050,33 @@
         "turbine",
         "design",
         "Project",
-        "Development"
+        "Development",
+        "Description of efforts to address ecological and community impacts of wind energy production through turbine design",
+        "RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design",
+        "efforts to address ecological and community impacts of wind energy production through turbine design",
+        "efforts address",
+        "address ecological",
+        "ecological community",
+        "community impacts",
+        "impacts wind",
+        "wind energy",
+        "energy production",
+        "production through",
+        "through",
+        "through turbine",
+        "turbine design",
+        "Description of efforts to address ecological",
+        "community impacts of wind energy production through turbine design",
+        "Description of efforts to address ecological and community",
+        "impacts of wind energy production through turbine design"
       ],
-      "dense_query": "Find disclosures for RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design related to Ecological Impacts of Project Development.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-410a.3 'Description of efforts to address ecological and community impacts of wind energy production through turbine design', under 'Ecological Impacts of Project Development'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-410a.3 'Description of efforts to address ecological and community impacts of wind energy production through turbine design', under 'Ecological Impacts of Project Development'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers RR-WT-410a.3 'Description of efforts to address ecological and community impacts of wind energy production through turbine design'.",
+        "When RR-WT-410a.3 'Description of efforts to address ecological and community impacts of wind energy production through turbine design' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-410a.3 'Description of efforts to address ecological and community impacts of wind energy production through turbine design', including: Description of efforts to address ecological and community impacts of wind energy production through turbine design; RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design; efforts to address ecological and community impacts of wind energy production through turbine design.",
+        "Find disclosures for RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design related to Ecological Impacts of Project Development.",
         "Retrieve exact report evidence for RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design related to Ecological Impacts of Project Development.",
@@ -614,7 +1096,22 @@
         "production",
         "turbine",
         "design",
-        "Project"
+        "Project",
+        "RR-WT-410a.3 Description of efforts to address ecological and community impacts of wind energy production through turbine design",
+        "efforts to address ecological and community impacts of wind energy production through turbine design",
+        "efforts address",
+        "address ecological",
+        "ecological community",
+        "community impacts",
+        "impacts wind",
+        "wind energy",
+        "energy production",
+        "production through",
+        "through",
+        "through turbine",
+        "turbine design",
+        "Description of efforts to address ecological",
+        "community impacts of wind energy production through turbine design"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -624,7 +1121,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -636,20 +1135,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of efforts to address ecological and community impacts of wind energy production through turbine design'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of efforts to address ecological and community impacts of wind energy production through turbine design' (RR-WT-410a.3). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-440a.1",
@@ -662,7 +1209,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of the management of risks associated with the use of critical materials",
-        "RR-WT-440a.1 Description of the management of risks associated with the use of critical materials"
+        "RR-WT-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials"
       ],
       "bm25_terms": [
         "RR-WT-440a.1",
@@ -671,10 +1219,26 @@
         "risks",
         "critical",
         "materials",
-        "Sourcing"
+        "Sourcing",
+        "Description of the management of risks associated with the use of critical materials",
+        "RR-WT-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials",
+        "management risks",
+        "risks associated",
+        "associated",
+        "associated use",
+        "use",
+        "use critical",
+        "critical materials",
+        "Description of the management of risks associated with the use of"
       ],
-      "dense_query": "Find disclosures for RR-WT-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-440a.1 'Description of the management of risks associated with the use of critical materials', under 'Materials Sourcing'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-440a.1 'Description of the management of risks associated with the use of critical materials', under 'Materials Sourcing'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers RR-WT-440a.1 'Description of the management of risks associated with the use of critical materials'.",
+        "When RR-WT-440a.1 'Description of the management of risks associated with the use of critical materials' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-440a.1 'Description of the management of risks associated with the use of critical materials', including: Description of the management of risks associated with the use of critical materials; RR-WT-440a.1 Description of the management of risks associated with the use of critical materials; the management of risks associated with the use of critical materials.",
+        "Find disclosures for RR-WT-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
         "Retrieve exact report evidence for RR-WT-440a.1 Description of the management of risks associated with the use of critical materials, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-440a.1 Description of the management of risks associated with the use of critical materials.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
@@ -688,7 +1252,16 @@
         "risks",
         "critical",
         "materials",
-        "Sourcing"
+        "Sourcing",
+        "RR-WT-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials",
+        "management risks",
+        "risks associated",
+        "associated",
+        "associated use",
+        "use",
+        "use critical",
+        "critical materials"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -698,7 +1271,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -710,20 +1285,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of the management of risks associated with the use of critical materials'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of the management of risks associated with the use of critical materials' (RR-WT-440a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-440b.1",
@@ -752,10 +1375,28 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Top five materials consumed, by weight",
+        "RR-WT-440b.1 Top five materials consumed, by weight",
+        "Top five",
+        "five materials",
+        "materials consumed",
+        "consumed weight",
+        "Top five materials consumed",
+        "by weight",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "For each of the following wind turbine classes, the entity shall disclose the weight, in metric tonnes, of the five"
       ],
-      "dense_query": "Find disclosures for RR-WT-440b.1 Top five materials consumed, by weight with unit Metric tonnes (t) related to Materials Efficiency.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-440b.1 'Top five materials consumed, by weight', under 'Materials Efficiency', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-440b.1 'Top five materials consumed, by weight', under 'Materials Efficiency', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-440b.1 'Top five materials consumed, by weight'; retain every reported year and label.",
+        "When RR-WT-440b.1 'Top five materials consumed, by weight' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-440b.1 'Top five materials consumed, by weight', including: Top five materials consumed, by weight; RR-WT-440b.1 Top five materials consumed, by weight.",
+        "Find disclosures for RR-WT-440b.1 Top five materials consumed, by weight with unit Metric tonnes (t) related to Materials Efficiency.",
         "Retrieve exact report evidence for RR-WT-440b.1 Top five materials consumed, by weight, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-440b.1 Top five materials consumed, by weight with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-440b.1 Top five materials consumed, by weight related to Materials Efficiency.",
@@ -773,7 +1414,19 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "RR-WT-440b.1 Top five materials consumed, by weight",
+        "Top five",
+        "five materials",
+        "materials consumed",
+        "consumed weight",
+        "Top five materials consumed",
+        "by weight",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -782,7 +1435,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -790,30 +1445,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Top five materials consumed, by weight', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Top five materials consumed, by weight' (RR-WT-440b.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-440b.2",
@@ -841,10 +1542,37 @@
         "Efficiency",
         "tonnes",
         "megawatts",
-        "MW"
+        "MW",
+        "Average top head mass per turbine capacity, by wind turbine class",
+        "RR-WT-440b.2 Average top head mass per turbine capacity, by wind turbine class",
+        "Average",
+        "Average top",
+        "top head",
+        "head mass",
+        "mass turbine",
+        "turbine capacity",
+        "capacity wind",
+        "wind turbine",
+        "turbine class",
+        "Average top head mass per turbine capacity",
+        "by wind turbine class",
+        "Metric tonnes per megawatts (t/MW)",
+        "MWh",
+        "megawatt-hour",
+        "megawatt-hours",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "For each of the following wind turbine classes, the entity shall disclose the average top head mass per turbine"
       ],
-      "dense_query": "Find disclosures for RR-WT-440b.2 Average top head mass per turbine capacity, by wind turbine class with unit Metric tonnes per megawatts (t/MW) related to Materials Efficiency.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-440b.2 'Average top head mass per turbine capacity, by wind turbine class', under 'Materials Efficiency', with expected unit 'Metric tonnes per megawatts (t/MW)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-440b.2 'Average top head mass per turbine capacity, by wind turbine class', under 'Materials Efficiency', with expected unit 'Metric tonnes per megawatts (t/MW)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-440b.2 'Average top head mass per turbine capacity, by wind turbine class'; retain every reported year and label.",
+        "When RR-WT-440b.2 'Average top head mass per turbine capacity, by wind turbine class' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-440b.2 'Average top head mass per turbine capacity, by wind turbine class', including: Average top head mass per turbine capacity, by wind turbine class; RR-WT-440b.2 Average top head mass per turbine capacity, by wind turbine class.",
+        "Find disclosures for RR-WT-440b.2 Average top head mass per turbine capacity, by wind turbine class with unit Metric tonnes per megawatts (t/MW) related to Materials Efficiency.",
         "Retrieve exact report evidence for RR-WT-440b.2 Average top head mass per turbine capacity, by wind turbine class, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-440b.2 Average top head mass per turbine capacity, by wind turbine class with unit Metric tonnes per megawatts (t/MW).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-440b.2 Average top head mass per turbine capacity, by wind turbine class related to Materials Efficiency.",
@@ -862,7 +1590,29 @@
         "class",
         "Materials",
         "Efficiency",
-        "Metric tonnes per megawatts (t/MW)"
+        "Metric tonnes per megawatts (t/MW)",
+        "RR-WT-440b.2 Average top head mass per turbine capacity, by wind turbine class",
+        "Average",
+        "Average top",
+        "top head",
+        "head mass",
+        "mass turbine",
+        "turbine capacity",
+        "capacity wind",
+        "wind turbine",
+        "turbine class",
+        "Average top head mass per turbine capacity",
+        "by wind turbine class",
+        "MWh",
+        "megawatt-hour",
+        "megawatt-hours",
+        "MW",
+        "megawatts",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -871,7 +1621,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -879,22 +1631,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Average top head mass per turbine capacity, by wind turbine class', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
-          "Metric tonnes per megawatts (t/MW)"
+          "Metric tonnes per megawatts (t/MW)",
+          "metric tonnes",
+          "metric tons",
+          "tonnes",
+          "tons",
+          "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Average top head mass per turbine capacity, by wind turbine class' (RR-WT-440b.2, expected unit: Metric tonnes per megawatts (t/MW)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-440b.3",
@@ -907,7 +1713,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of approach to optimise materials efficiency of wind turbine design",
-        "RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design"
+        "RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design",
+        "approach to optimise materials efficiency of wind turbine design"
       ],
       "bm25_terms": [
         "RR-WT-440b.3",
@@ -918,10 +1725,24 @@
         "efficiency",
         "wind",
         "turbine",
-        "design"
+        "design",
+        "Description of approach to optimise materials efficiency of wind turbine design",
+        "RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design",
+        "approach to optimise materials efficiency of wind turbine design",
+        "optimise materials",
+        "materials efficiency",
+        "efficiency wind",
+        "wind turbine",
+        "turbine design",
+        "Description of approach to optimise materials efficiency of wind"
       ],
-      "dense_query": "Find disclosures for RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design related to Materials Efficiency.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-440b.3 'Description of approach to optimise materials efficiency of wind turbine design', under 'Materials Efficiency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-440b.3 'Description of approach to optimise materials efficiency of wind turbine design', under 'Materials Efficiency'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers RR-WT-440b.3 'Description of approach to optimise materials efficiency of wind turbine design'.",
+        "When RR-WT-440b.3 'Description of approach to optimise materials efficiency of wind turbine design' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-440b.3 'Description of approach to optimise materials efficiency of wind turbine design', including: Description of approach to optimise materials efficiency of wind turbine design; RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design; approach to optimise materials efficiency of wind turbine design.",
+        "Find disclosures for RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design related to Materials Efficiency.",
         "Retrieve exact report evidence for RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design related to Materials Efficiency.",
@@ -937,7 +1758,14 @@
         "efficiency",
         "wind",
         "turbine",
-        "design"
+        "design",
+        "RR-WT-440b.3 Description of approach to optimise materials efficiency of wind turbine design",
+        "approach to optimise materials efficiency of wind turbine design",
+        "optimise materials",
+        "materials efficiency",
+        "efficiency wind",
+        "wind turbine",
+        "turbine design"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -947,7 +1775,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -959,20 +1789,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of approach to optimise materials efficiency of wind turbine design'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of approach to optimise materials efficiency of wind turbine design' (RR-WT-440b.3). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-000.A",
@@ -986,7 +1864,8 @@
       "aliases": [
         "Number of delivered wind turbines, by wind turbine class",
         "Count of delivered wind turbines, by wind turbine class",
-        "RR-WT-000.A Number of delivered wind turbines, by wind turbine class"
+        "RR-WT-000.A Number of delivered wind turbines, by wind turbine class",
+        "Total number of delivered wind turbines, by wind turbine class"
       ],
       "bm25_terms": [
         "RR-WT-000.A",
@@ -998,10 +1877,28 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of delivered wind turbines, by wind turbine class",
+        "Count of delivered wind turbines, by wind turbine class",
+        "RR-WT-000.A Number of delivered wind turbines, by wind turbine class",
+        "Total number of delivered wind turbines, by wind turbine class",
+        "delivered wind",
+        "wind turbines",
+        "turbines wind",
+        "wind turbine",
+        "turbine class",
+        "Number of delivered wind turbines",
+        "by wind turbine class",
+        "RR-WT-000.A. Number of delivered wind turbines, by wind turbine class",
+        "Note to RR-WT-000.A – Wind turbine class is defined by the International Electrotechnical Commission’s IEC 61400-1. Wind turbine class"
       ],
-      "dense_query": "Find disclosures for RR-WT-000.A Number of delivered wind turbines, by wind turbine class with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-000.A 'Number of delivered wind turbines, by wind turbine class', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-000.A 'Number of delivered wind turbines, by wind turbine class', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-000.A 'Number of delivered wind turbines, by wind turbine class'; retain every reported year and label.",
+        "When RR-WT-000.A 'Number of delivered wind turbines, by wind turbine class' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-000.A 'Number of delivered wind turbines, by wind turbine class', including: Number of delivered wind turbines, by wind turbine class; Count of delivered wind turbines, by wind turbine class; RR-WT-000.A Number of delivered wind turbines, by wind turbine class; Total number of delivered wind turbines, by wind turbine class.",
+        "Find disclosures for RR-WT-000.A Number of delivered wind turbines, by wind turbine class with unit Number.",
         "Retrieve exact report evidence for RR-WT-000.A Number of delivered wind turbines, by wind turbine class, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-000.A Number of delivered wind turbines, by wind turbine class with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-000.A Number of delivered wind turbines, by wind turbine class.",
@@ -1017,7 +1914,17 @@
         "class",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of delivered wind turbines, by wind turbine class",
+        "RR-WT-000.A Number of delivered wind turbines, by wind turbine class",
+        "Total number of delivered wind turbines, by wind turbine class",
+        "delivered wind",
+        "wind turbines",
+        "turbines wind",
+        "wind turbine",
+        "turbine class",
+        "Number of delivered wind turbines",
+        "by wind turbine class"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1026,7 +1933,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1034,24 +1943,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of delivered wind turbines, by wind turbine class'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of delivered wind turbines, by wind turbine class' (RR-WT-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-000.B",
@@ -1077,10 +2034,31 @@
         "class",
         "Megawatts",
         "MW",
-        "Megawatts (MW)"
+        "Megawatts (MW)",
+        "Aggregate capacity of delivered wind turbines, by wind turbine class",
+        "RR-WT-000.B Aggregate capacity of delivered wind turbines, by wind turbine class",
+        "Aggregate capacity",
+        "capacity delivered",
+        "delivered wind",
+        "wind turbines",
+        "turbines wind",
+        "wind turbine",
+        "turbine class",
+        "Aggregate capacity of delivered wind turbines",
+        "by wind turbine class",
+        "MWh",
+        "megawatt-hour",
+        "megawatt-hours",
+        "RR-WT-000.B. Aggregate capacity of delivered wind turbines, by wind turbine class",
+        "Note to RR-WT-000.B – Wind turbine class is defined by the International Electrotechnical Commission’s IEC 61400-1. Wind turbine class"
       ],
-      "dense_query": "Find disclosures for RR-WT-000.B Aggregate capacity of delivered wind turbines, by wind turbine class with unit Megawatts (MW).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-000.B 'Aggregate capacity of delivered wind turbines, by wind turbine class', with expected unit 'Megawatts (MW)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-000.B 'Aggregate capacity of delivered wind turbines, by wind turbine class', with expected unit 'Megawatts (MW)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-000.B 'Aggregate capacity of delivered wind turbines, by wind turbine class'; retain every reported year and label.",
+        "When RR-WT-000.B 'Aggregate capacity of delivered wind turbines, by wind turbine class' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-000.B 'Aggregate capacity of delivered wind turbines, by wind turbine class', including: Aggregate capacity of delivered wind turbines, by wind turbine class; RR-WT-000.B Aggregate capacity of delivered wind turbines, by wind turbine class.",
+        "Find disclosures for RR-WT-000.B Aggregate capacity of delivered wind turbines, by wind turbine class with unit Megawatts (MW).",
         "Retrieve exact report evidence for RR-WT-000.B Aggregate capacity of delivered wind turbines, by wind turbine class, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-000.B Aggregate capacity of delivered wind turbines, by wind turbine class with unit Megawatts (MW).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-000.B Aggregate capacity of delivered wind turbines, by wind turbine class.",
@@ -1096,7 +2074,22 @@
         "turbines",
         "turbine",
         "class",
-        "Megawatts (MW)"
+        "Megawatts (MW)",
+        "RR-WT-000.B Aggregate capacity of delivered wind turbines, by wind turbine class",
+        "Aggregate capacity",
+        "capacity delivered",
+        "delivered wind",
+        "wind turbines",
+        "turbines wind",
+        "wind turbine",
+        "turbine class",
+        "Aggregate capacity of delivered wind turbines",
+        "by wind turbine class",
+        "MWh",
+        "megawatt-hour",
+        "megawatt-hours",
+        "MW",
+        "megawatts"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1105,7 +2098,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1113,22 +2108,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Aggregate capacity of delivered wind turbines, by wind turbine class', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "capacity",
         "expected_units": [
           "Megawatts (MW)"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the capacity value, scale, reporting year, and unit when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Aggregate capacity of delivered wind turbines, by wind turbine class' (RR-WT-000.B, expected unit: Megawatts (MW)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-000.C",
@@ -1152,10 +2196,23 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Amount of turbine backlog",
+        "RR-WT-000.C Amount of turbine backlog",
+        "turbine backlog",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "RR-WT-000.C. Amount of turbine backlog",
+        "Note to RR-WT-000.C – Turbine backlog is defined by the entity, consistent with its existing public disclosure of order backlog. Turbine"
       ],
-      "dense_query": "Find disclosures for RR-WT-000.C Amount of turbine backlog with unit Presentation currency.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-000.C 'Amount of turbine backlog', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-000.C 'Amount of turbine backlog', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-000.C 'Amount of turbine backlog'; retain every reported year and label.",
+        "When RR-WT-000.C 'Amount of turbine backlog' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-000.C 'Amount of turbine backlog', including: Amount of turbine backlog; RR-WT-000.C Amount of turbine backlog.",
+        "Find disclosures for RR-WT-000.C Amount of turbine backlog with unit Presentation currency.",
         "Retrieve exact report evidence for RR-WT-000.C Amount of turbine backlog, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-000.C Amount of turbine backlog with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-000.C Amount of turbine backlog.",
@@ -1169,7 +2226,11 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "RR-WT-000.C Amount of turbine backlog",
+        "turbine backlog",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1178,7 +2239,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1186,25 +2249,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Amount of turbine backlog', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Amount of turbine backlog' (RR-WT-000.C, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-WT-000.D",
@@ -1227,10 +2339,25 @@
         "backlog",
         "Megawatts",
         "MW",
-        "Megawatts (MW)"
+        "Megawatts (MW)",
+        "Aggregate capacity of turbine backlog",
+        "RR-WT-000.D Aggregate capacity of turbine backlog",
+        "Aggregate capacity",
+        "capacity turbine",
+        "turbine backlog",
+        "MWh",
+        "megawatt-hour",
+        "megawatt-hours",
+        "RR-WT-000.D. Aggregate capacity of turbine backlog",
+        "Note to RR-WT-000.D – Turbine backlog is defined by the entity, consistent with its existing public disclosure of order backlog. Turbine"
       ],
-      "dense_query": "Find disclosures for RR-WT-000.D Aggregate capacity of turbine backlog with unit Megawatts (MW).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-WT-000.D 'Aggregate capacity of turbine backlog', with expected unit 'Megawatts (MW)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-WT-000.D 'Aggregate capacity of turbine backlog', with expected unit 'Megawatts (MW)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-WT-000.D 'Aggregate capacity of turbine backlog'; retain every reported year and label.",
+        "When RR-WT-000.D 'Aggregate capacity of turbine backlog' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-WT-000.D 'Aggregate capacity of turbine backlog', including: Aggregate capacity of turbine backlog; RR-WT-000.D Aggregate capacity of turbine backlog.",
+        "Find disclosures for RR-WT-000.D Aggregate capacity of turbine backlog with unit Megawatts (MW).",
         "Retrieve exact report evidence for RR-WT-000.D Aggregate capacity of turbine backlog, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-WT-000.D Aggregate capacity of turbine backlog with unit Megawatts (MW).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-WT-000.D Aggregate capacity of turbine backlog.",
@@ -1243,7 +2370,16 @@
         "capacity",
         "turbine",
         "backlog",
-        "Megawatts (MW)"
+        "Megawatts (MW)",
+        "RR-WT-000.D Aggregate capacity of turbine backlog",
+        "Aggregate capacity",
+        "capacity turbine",
+        "turbine backlog",
+        "MWh",
+        "megawatt-hour",
+        "megawatt-hours",
+        "MW",
+        "megawatts"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1252,7 +2388,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1260,22 +2398,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Aggregate capacity of turbine backlog', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "capacity",
         "expected_units": [
           "Megawatts (MW)"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the capacity value, scale, reporting year, and unit when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Aggregate capacity of turbine backlog' (RR-WT-000.D, expected unit: Megawatts (MW)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

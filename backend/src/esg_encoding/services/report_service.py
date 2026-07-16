@@ -252,7 +252,9 @@ def _sync_upload_report_body(
 
         try:
             for scope_index, (scope_key, params) in enumerate(scopes_list, 1):
+                scope_started = time.perf_counter()
                 _emit_upload_progress(progress_cb, "assessment_scope", f"Analyzing scope {scope_index}/{len(scopes_list)}: {scope_key}.", 55 + 35 * ((scope_index - 1) / max(1, len(scopes_list))), file_id=file_info.get("file_id"), scope_key=scope_key, scope_index=scope_index, total_scopes=len(scopes_list))
+                metrics_started = time.perf_counter()
                 if fw == "GRI":
                     metrics = processor.load_gri_metrics_by_sector_topic(
                         params["griSector"], params["griTopic"]
@@ -282,12 +284,20 @@ def _sync_upload_report_body(
 
                 metrics = _prepare_metrics_for_retrieval(processor, metrics)
                 system_components["current_metrics"] = metrics
-                logger.info(f"Loaded metrics for scope_key={scope_key} ({fw})")
+                logger.info(
+                    f"Loaded metrics for scope_key={scope_key} ({fw}), "
+                    f"count={len(metrics.metrics)}, elapsed={time.perf_counter() - metrics_started:.2f}s"
+                )
 
+                retrieval_started = time.perf_counter()
                 retrieval_results = retrieve_metric_collection(
                     report_content, metrics, config=system_components.get("config")
                 )
-                t_start = time.time()
+                logger.info(
+                    f"Metric retrieval scope={scope_key} took "
+                    f"{time.perf_counter() - retrieval_started:.2f}s"
+                )
+                t_start = time.perf_counter()
                 assessment = disclosure_engine.analyze_compliance(
                     retrieval_results,
                     report_content,
@@ -298,7 +308,8 @@ def _sync_upload_report_body(
                     semi_industry=semi_for_disclosure,
                 )
                 logger.info(
-                    f"Disclosure inference scope={scope_key} took {time.time() - t_start:.2f}s"
+                    f"Disclosure inference scope={scope_key} took "
+                    f"{time.perf_counter() - t_start:.2f}s"
                 )
                 last_assessment = assessment
 
@@ -386,6 +397,10 @@ def _sync_upload_report_body(
                     fw,
                     manifest_rows,
                     expected_scope_keys=expected_scope_keys,
+                )
+                logger.info(
+                    f"Compliance scope={scope_key} completed in "
+                    f"{time.perf_counter() - scope_started:.2f}s"
                 )
                 _emit_upload_progress(progress_cb, "assessment_scope_done", f"Completed scope {scope_index}/{len(scopes_list)}: {scope_key}.", 55 + 35 * (scope_index / max(1, len(scopes_list))), file_id=file_info.get("file_id"), scope_key=scope_key, scope_index=scope_index, total_scopes=len(scopes_list))
 

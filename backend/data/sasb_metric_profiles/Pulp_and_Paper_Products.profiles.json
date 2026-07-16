@@ -31,10 +31,30 @@
         "CO2-e",
         "metric tonnes CO2-e",
         "CO2",
-        "equivalent"
+        "equivalent",
+        "Gross global Scope 1 emissions",
+        "Scope 1 GHG emissions",
+        "Gross Scope 1 greenhouse gas emissions",
+        "RR-PP-110a.1 Gross global Scope 1 emissions",
+        "Gross",
+        "Gross global",
+        "global",
+        "global Scope",
+        "Scope emissions",
+        "Metric tonnes (t) CO₂-e",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "The entity shall disclose its gross global Scope 1 greenhouse gas (GHG) emissions to the atmosphere of the"
       ],
-      "dense_query": "Find disclosures for RR-PP-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-110a.1 'Gross global Scope 1 emissions', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-110a.1 'Gross global Scope 1 emissions', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-110a.1 'Gross global Scope 1 emissions'; retain every reported year and label.",
+        "When RR-PP-110a.1 'Gross global Scope 1 emissions' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-110a.1 'Gross global Scope 1 emissions', including: Gross global Scope 1 emissions; Scope 1 GHG emissions; Gross Scope 1 greenhouse gas emissions; RR-PP-110a.1 Gross global Scope 1 emissions.",
+        "Find disclosures for RR-PP-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for RR-PP-110a.1 Gross global Scope 1 emissions, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-110a.1 Gross global Scope 1 emissions related to Greenhouse Gas Emissions.",
@@ -53,7 +73,20 @@
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
         "metric tonnes CO2-e",
-        "tonnes CO2 equivalent"
+        "tonnes CO2 equivalent",
+        "Scope 1 GHG emissions",
+        "Gross Scope 1 greenhouse gas emissions",
+        "RR-PP-110a.1 Gross global Scope 1 emissions",
+        "Gross",
+        "Gross global",
+        "global",
+        "global Scope",
+        "Scope emissions",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Scope 2",
@@ -73,7 +106,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -81,30 +116,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Gross global Scope 1 emissions', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
-          "Metric tonnes (t)",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Gross global Scope 1 emissions' (RR-PP-110a.1, expected unit: Metric tonnes (t) CO₂-e). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-PP-110a.2",
@@ -139,10 +220,31 @@
         "against",
         "those",
         "Greenhouse",
-        "Gas"
+        "Gas",
+        "Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "RR-PP-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "long- short-term",
+        "short-term strategy",
+        "strategy plan",
+        "plan manage",
+        "manage Scope",
+        "Scope emissions",
+        "emissions emissions",
+        "emissions reduction",
+        "reduction targets",
+        "targets analysis",
+        "analysis performance",
+        "performance against",
+        "Discussion of long- and short-term strategy or plan to manage",
+        "Scope 1 emissions, emissions reduction targets, and an analysis of performance"
       ],
-      "dense_query": "Find disclosures for RR-PP-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', under 'Greenhouse Gas Emissions'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', under 'Greenhouse Gas Emissions'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers RR-PP-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets'.",
+        "When RR-PP-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', including: Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets; RR-PP-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets.",
+        "Find disclosures for RR-PP-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for RR-PP-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
@@ -162,7 +264,24 @@
         "manage",
         "Scope",
         "emissions",
-        "reduction"
+        "reduction",
+        "RR-PP-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "long- short-term",
+        "short-term strategy",
+        "strategy plan",
+        "plan manage",
+        "manage Scope",
+        "Scope emissions",
+        "emissions emissions",
+        "emissions reduction",
+        "reduction targets",
+        "targets",
+        "targets analysis",
+        "analysis",
+        "analysis performance",
+        "performance",
+        "performance against",
+        "against"
       ],
       "negative_anchor_terms": [
         "Scope 2",
@@ -183,7 +302,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -195,20 +316,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets' (RR-PP-110a.2, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-PP-120a.1.01",
@@ -240,10 +409,32 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "Air emissions of the following pollutants: NOx (excluding N2O)",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants NOx",
+        "NOx excluding",
+        "excluding N2O",
+        "Air emissions of the following pollutants",
+        "NOx (excluding N2O",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(2) SO2, (3) volatile organic compounds (VOCs), (4) particulate matter (PM), and"
       ],
-      "dense_query": "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)'; retain every reported year and label.",
+        "When RR-PP-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)', including: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: NOx (excluding N2O); RR-PP-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O).",
+        "Disambiguate RR-PP-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)' from sibling metrics sharing RR-PP-120a.1: Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: (4) particulate matter (PM); Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs).",
+        "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) with unit Metric tonnes (t) related to Air Quality.",
         "Retrieve exact report evidence for RR-PP-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) related to Air Quality.",
@@ -263,7 +454,22 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: NOx (excluding N2O)",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants NOx",
+        "NOx excluding",
+        "excluding N2O",
+        "Air emissions of the following pollutants",
+        "NOx (excluding N2O",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Air emissions of the following pollutants: (2) SO2",
@@ -294,7 +500,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -302,30 +510,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Air emissions of the following pollutants: (1) NOx (excluding N2O)', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Air emissions of the following pollutants: (1) NOx (excluding N2O)' (RR-PP-120a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: (4) particulate matter (PM); Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)."
     },
     {
       "metric_id": "RR-PP-120a.1.02",
@@ -355,10 +609,30 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: (2) SO2",
+        "Air emissions of the following pollutants: SO2",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (2) SO2",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants SO2",
+        "Air emissions of the following pollutants",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "(2) SO2, (3) volatile organic compounds (VOCs), (4) particulate matter (PM), and"
       ],
-      "dense_query": "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (2) SO2 with unit Metric tonnes (t) related to Air Quality.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (2) SO2', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (2) SO2', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-120a.1 'Air emissions of the following pollutants: (2) SO2'; retain every reported year and label.",
+        "When RR-PP-120a.1 'Air emissions of the following pollutants: (2) SO2' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-120a.1 'Air emissions of the following pollutants: (2) SO2', including: Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: SO2; RR-PP-120a.1 Air emissions of the following pollutants: (2) SO2.",
+        "Disambiguate RR-PP-120a.1 'Air emissions of the following pollutants: (2) SO2' from sibling metrics sharing RR-PP-120a.1: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: (4) particulate matter (PM); Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs).",
+        "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (2) SO2 with unit Metric tonnes (t) related to Air Quality.",
         "Retrieve exact report evidence for RR-PP-120a.1 Air emissions of the following pollutants: (2) SO2, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-120a.1 Air emissions of the following pollutants: (2) SO2 with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-120a.1 Air emissions of the following pollutants: (2) SO2 related to Air Quality.",
@@ -376,7 +650,19 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: SO2",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (2) SO2",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants SO2",
+        "Air emissions of the following pollutants",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
@@ -407,7 +693,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -415,30 +703,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Air emissions of the following pollutants: (2) SO2', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Air emissions of the following pollutants: (2) SO2' (RR-PP-120a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: (4) particulate matter (PM); Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)."
     },
     {
       "metric_id": "RR-PP-120a.1.03",
@@ -471,10 +805,34 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "Air emissions of the following pollutants: volatile organic compounds (VOCs)",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants volatile",
+        "volatile organic",
+        "organic compounds",
+        "compounds VOCs",
+        "Air emissions of the following pollutants",
+        "volatile organic compounds (VOCs",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "(2) SO2, (3) volatile organic compounds (VOCs), (4) particulate matter (PM), and"
       ],
-      "dense_query": "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-120a.1 'Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)'; retain every reported year and label.",
+        "When RR-PP-120a.1 'Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-120a.1 'Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)', including: Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: volatile organic compounds (VOCs); RR-PP-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs).",
+        "Disambiguate RR-PP-120a.1 'Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)' from sibling metrics sharing RR-PP-120a.1: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: (4) particulate matter (PM); Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs).",
+        "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs) with unit Metric tonnes (t) related to Air Quality.",
         "Retrieve exact report evidence for RR-PP-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs) with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs) related to Air Quality.",
@@ -495,7 +853,23 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: volatile organic compounds (VOCs)",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants volatile",
+        "volatile organic",
+        "organic compounds",
+        "compounds VOCs",
+        "Air emissions of the following pollutants",
+        "volatile organic compounds (VOCs",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
@@ -526,7 +900,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -534,30 +910,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Air emissions of the following pollutants: (3) volatile organic compounds (VOCs)' (RR-PP-120a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: (4) particulate matter (PM); Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)."
     },
     {
       "metric_id": "RR-PP-120a.1.04",
@@ -589,10 +1011,32 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: (4) particulate matter (PM)",
+        "Air emissions of the following pollutants: particulate matter (PM)",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants particulate",
+        "particulate matter",
+        "Air emissions of the following pollutants",
+        "particulate matter (PM",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "(2) SO2, (3) volatile organic compounds (VOCs), (4) particulate matter (PM), and"
       ],
-      "dense_query": "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (4) particulate matter (PM)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (4) particulate matter (PM)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-120a.1 'Air emissions of the following pollutants: (4) particulate matter (PM)'; retain every reported year and label.",
+        "When RR-PP-120a.1 'Air emissions of the following pollutants: (4) particulate matter (PM)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-120a.1 'Air emissions of the following pollutants: (4) particulate matter (PM)', including: Air emissions of the following pollutants: (4) particulate matter (PM); Air emissions of the following pollutants: particulate matter (PM); RR-PP-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM).",
+        "Disambiguate RR-PP-120a.1 'Air emissions of the following pollutants: (4) particulate matter (PM)' from sibling metrics sharing RR-PP-120a.1: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs).",
+        "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM) with unit Metric tonnes (t) related to Air Quality.",
         "Retrieve exact report evidence for RR-PP-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM) with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM) related to Air Quality.",
@@ -612,7 +1056,21 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: particulate matter (PM)",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (4) particulate matter (PM)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants particulate",
+        "particulate matter",
+        "Air emissions of the following pollutants",
+        "particulate matter (PM",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
@@ -643,7 +1101,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -651,30 +1111,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Air emissions of the following pollutants: (4) particulate matter (PM)', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Air emissions of the following pollutants: (4) particulate matter (PM)' (RR-PP-120a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)."
     },
     {
       "metric_id": "RR-PP-120a.1.05",
@@ -705,10 +1211,34 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+        "Air emissions of the following pollutants: hazardous air pollutants (HAPs)",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants hazardous",
+        "hazardous air",
+        "air pollutants",
+        "pollutants HAPs",
+        "Air emissions of the following pollutants",
+        "hazardous air pollutants (HAPs",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "(2) SO2, (3) volatile organic compounds (VOCs), (4) particulate matter (PM), and"
       ],
-      "dense_query": "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-120a.1 'Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-120a.1 'Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)'; retain every reported year and label.",
+        "When RR-PP-120a.1 'Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-120a.1 'Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)', including: Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs); Air emissions of the following pollutants: hazardous air pollutants (HAPs); RR-PP-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs).",
+        "Disambiguate RR-PP-120a.1 'Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)' from sibling metrics sharing RR-PP-120a.1: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: (4) particulate matter (PM).",
+        "Find disclosures for RR-PP-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs) with unit Metric tonnes (t) related to Air Quality.",
         "Retrieve exact report evidence for RR-PP-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs) with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs) related to Air Quality.",
@@ -727,7 +1257,23 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: hazardous air pollutants (HAPs)",
+        "RR-PP-120a.1 Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants hazardous",
+        "hazardous air",
+        "air pollutants",
+        "pollutants HAPs",
+        "Air emissions of the following pollutants",
+        "hazardous air pollutants (HAPs",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
@@ -758,7 +1304,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -766,30 +1314,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Air emissions of the following pollutants: (5) hazardous air pollutants (HAPs)' (RR-PP-120a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: (2) SO2; Air emissions of the following pollutants: (3) volatile organic compounds (VOCs); Air emissions of the following pollutants: (4) particulate matter (PM)."
     },
     {
       "metric_id": "RR-PP-130a.1.01",
@@ -814,10 +1408,23 @@
         "Management",
         "Gigajoules",
         "GJ",
-        "Gigajoules (GJ)"
+        "Gigajoules (GJ)",
+        "(1) Total energy consumed",
+        "Total energy consumed",
+        "(1) Energy consumption",
+        "RR-PP-130a.1 (1) Total energy consumed",
+        "gigajoule",
+        "(1) Total energy consumed, (2) percentage grid electricity",
+        "(3) percentage from biomass, (4) percentage from other renewable energy and"
       ],
-      "dense_query": "Find disclosures for RR-PP-130a.1 (1) Total energy consumed with unit Gigajoules (GJ) related to Energy Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(1) Total energy consumed', under 'Energy Management', with expected unit 'Gigajoules (GJ)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(1) Total energy consumed', under 'Energy Management', with expected unit 'Gigajoules (GJ)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-130a.1 '(1) Total energy consumed'; retain every reported year and label.",
+        "When RR-PP-130a.1 '(1) Total energy consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-130a.1 '(1) Total energy consumed', including: (1) Total energy consumed; Total energy consumed; (1) Energy consumption; RR-PP-130a.1 (1) Total energy consumed.",
+        "Disambiguate RR-PP-130a.1 '(1) Total energy consumed' from sibling metrics sharing RR-PP-130a.1: (2) Percentage of energy consumed that was supplied from grid electricity; (3) Percentage of energy consumed that was supplied by biomass; (4) Percentage from other renewable energy; (5) Total self-generated energy.",
+        "Find disclosures for RR-PP-130a.1 (1) Total energy consumed with unit Gigajoules (GJ) related to Energy Management.",
         "Retrieve exact report evidence for RR-PP-130a.1 (1) Total energy consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-130a.1 (1) Total energy consumed with unit Gigajoules (GJ).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-130a.1 (1) Total energy consumed related to Energy Management.",
@@ -825,6 +1432,7 @@
       ],
       "anchor_terms": [
         "RR-PP-130a.1",
+        "(1) Total energy consumed",
         "Total energy consumed",
         "energy consumed",
         "energy",
@@ -832,13 +1440,20 @@
         "Management",
         "Gigajoules (GJ)",
         "GJ",
-        "gigajoules"
+        "gigajoules",
+        "(1) Energy consumption",
+        "RR-PP-130a.1 (1) Total energy consumed",
+        "gigajoule"
       ],
       "negative_anchor_terms": [
         "Percentage of energy consumed that was supplied from grid electricity",
         "Percentage of energy consumed that was supplied by biomass",
         "Percentage from other renewable energy",
-        "Total self-generated energy"
+        "Total self-generated energy",
+        "(2) Percentage of energy consumed that was supplied from grid electricity",
+        "(3) Percentage of energy consumed that was supplied by biomass",
+        "(4) Percentage from other renewable energy",
+        "(5) Total self-generated energy"
       ],
       "similar_metric_warnings": [
         {
@@ -863,7 +1478,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -871,24 +1488,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total energy consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "energy",
         "expected_units": [
           "Gigajoules (GJ)",
           "GJ",
-          "gigajoules"
+          "MWh",
+          "kWh",
+          "MJ",
+          "kJ"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total energy consumed' (RR-PP-130a.1, expected unit: Gigajoules (GJ)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of energy consumed that was supplied from grid electricity; (3) Percentage of energy consumed that was supplied by biomass; (4) Percentage from other renewable energy; (5) Total self-generated energy."
     },
     {
       "metric_id": "RR-PP-130a.1.02",
@@ -902,7 +1571,8 @@
       "aliases": [
         "(2) Percentage of energy consumed that was supplied from grid electricity",
         "Percentage of energy consumed that was supplied from grid electricity",
-        "RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity"
+        "RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity",
+        "(2) Percent of energy consumed that was supplied from grid electricity"
       ],
       "bm25_terms": [
         "RR-PP-130a.1",
@@ -917,10 +1587,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of energy consumed that was supplied from grid electricity",
+        "Percentage of energy consumed that was supplied from grid electricity",
+        "RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity",
+        "(2) Percent of energy consumed that was supplied from grid electricity",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was supplied",
+        "supplied grid",
+        "(1) Total energy consumed, (2) percentage grid electricity",
+        "(3) percentage from biomass, (4) percentage from other renewable energy and"
       ],
-      "dense_query": "Find disclosures for RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity with unit Percentage (%) related to Energy Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(2) Percentage of energy consumed that was supplied from grid electricity', under 'Energy Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(2) Percentage of energy consumed that was supplied from grid electricity', under 'Energy Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-130a.1 '(2) Percentage of energy consumed that was supplied from grid electricity'; retain every reported year and label.",
+        "When RR-PP-130a.1 '(2) Percentage of energy consumed that was supplied from grid electricity' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-130a.1 '(2) Percentage of energy consumed that was supplied from grid electricity', including: (2) Percentage of energy consumed that was supplied from grid electricity; Percentage of energy consumed that was supplied from grid electricity; RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity; (2) Percent of energy consumed that was supplied from grid electricity.",
+        "Disambiguate RR-PP-130a.1 '(2) Percentage of energy consumed that was supplied from grid electricity' from sibling metrics sharing RR-PP-130a.1: (1) Total energy consumed; (3) Percentage of energy consumed that was supplied by biomass; (4) Percentage from other renewable energy; (5) Total self-generated energy.",
+        "Find disclosures for RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity with unit Percentage (%) related to Energy Management.",
         "Retrieve exact report evidence for RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity related to Energy Management.",
@@ -928,6 +1616,7 @@
       ],
       "anchor_terms": [
         "RR-PP-130a.1",
+        "(2) Percentage of energy consumed that was supplied from grid electricity",
         "Percentage of energy consumed that was supplied from grid electricity",
         "grid electricity",
         "energy consumed",
@@ -940,7 +1629,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "RR-PP-130a.1 (2) Percentage of energy consumed that was supplied from grid electricity",
+        "(2) Percent of energy consumed that was supplied from grid electricity",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was supplied",
+        "supplied grid"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
@@ -948,7 +1645,11 @@
         "Percentage from other renewable energy",
         "Total self-generated energy",
         "renewable energy",
-        "fuel consumed"
+        "fuel consumed",
+        "(1) Total energy consumed",
+        "(3) Percentage of energy consumed that was supplied by biomass",
+        "(4) Percentage from other renewable energy",
+        "(5) Total self-generated energy"
       ],
       "similar_metric_warnings": [
         {
@@ -977,7 +1678,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -985,11 +1688,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of energy consumed that was supplied from grid electricity', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1001,9 +1730,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of energy consumed that was supplied from grid electricity' (RR-PP-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (3) Percentage of energy consumed that was supplied by biomass; (4) Percentage from other renewable energy; (5) Total self-generated energy."
     },
     {
       "metric_id": "RR-PP-130a.1.03",
@@ -1017,7 +1769,8 @@
       "aliases": [
         "(3) Percentage of energy consumed that was supplied by biomass",
         "Percentage of energy consumed that was supplied by biomass",
-        "RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass"
+        "RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass",
+        "(3) Percent of energy consumed that was supplied by biomass"
       ],
       "bm25_terms": [
         "RR-PP-130a.1",
@@ -1030,10 +1783,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(3) Percentage of energy consumed that was supplied by biomass",
+        "Percentage of energy consumed that was supplied by biomass",
+        "RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass",
+        "(3) Percent of energy consumed that was supplied by biomass",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was supplied",
+        "supplied biomass",
+        "(1) Total energy consumed, (2) percentage grid electricity",
+        "(3) percentage from biomass, (4) percentage from other renewable energy and"
       ],
-      "dense_query": "Find disclosures for RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass with unit Percentage (%) related to Energy Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(3) Percentage of energy consumed that was supplied by biomass', under 'Energy Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(3) Percentage of energy consumed that was supplied by biomass', under 'Energy Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-130a.1 '(3) Percentage of energy consumed that was supplied by biomass'; retain every reported year and label.",
+        "When RR-PP-130a.1 '(3) Percentage of energy consumed that was supplied by biomass' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-130a.1 '(3) Percentage of energy consumed that was supplied by biomass', including: (3) Percentage of energy consumed that was supplied by biomass; Percentage of energy consumed that was supplied by biomass; RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass; (3) Percent of energy consumed that was supplied by biomass.",
+        "Disambiguate RR-PP-130a.1 '(3) Percentage of energy consumed that was supplied by biomass' from sibling metrics sharing RR-PP-130a.1: (1) Total energy consumed; (2) Percentage of energy consumed that was supplied from grid electricity; (4) Percentage from other renewable energy; (5) Total self-generated energy.",
+        "Find disclosures for RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass with unit Percentage (%) related to Energy Management.",
         "Retrieve exact report evidence for RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass related to Energy Management.",
@@ -1041,6 +1812,7 @@
       ],
       "anchor_terms": [
         "RR-PP-130a.1",
+        "(3) Percentage of energy consumed that was supplied by biomass",
         "Percentage of energy consumed that was supplied by biomass",
         "energy consumed",
         "energy",
@@ -1051,13 +1823,25 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "RR-PP-130a.1 (3) Percentage of energy consumed that was supplied by biomass",
+        "(3) Percent of energy consumed that was supplied by biomass",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was supplied",
+        "supplied biomass"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
         "Percentage of energy consumed that was supplied from grid electricity",
         "Percentage from other renewable energy",
-        "Total self-generated energy"
+        "Total self-generated energy",
+        "(1) Total energy consumed",
+        "(2) Percentage of energy consumed that was supplied from grid electricity",
+        "(4) Percentage from other renewable energy",
+        "(5) Total self-generated energy"
       ],
       "similar_metric_warnings": [
         {
@@ -1082,7 +1866,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1090,11 +1876,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage of energy consumed that was supplied by biomass', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1106,9 +1918,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage of energy consumed that was supplied by biomass' (RR-PP-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (2) Percentage of energy consumed that was supplied from grid electricity; (4) Percentage from other renewable energy; (5) Total self-generated energy."
     },
     {
       "metric_id": "RR-PP-130a.1.04",
@@ -1122,7 +1957,8 @@
       "aliases": [
         "(4) Percentage from other renewable energy",
         "Percentage from other renewable energy",
-        "RR-PP-130a.1 (4) Percentage from other renewable energy"
+        "RR-PP-130a.1 (4) Percentage from other renewable energy",
+        "(4) Percent from other renewable energy"
       ],
       "bm25_terms": [
         "RR-PP-130a.1",
@@ -1134,10 +1970,23 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(4) Percentage from other renewable energy",
+        "Percentage from other renewable energy",
+        "RR-PP-130a.1 (4) Percentage from other renewable energy",
+        "(4) Percent from other renewable energy",
+        "other renewable",
+        "(1) Total energy consumed, (2) percentage grid electricity",
+        "(3) percentage from biomass, (4) percentage from other renewable energy and"
       ],
-      "dense_query": "Find disclosures for RR-PP-130a.1 (4) Percentage from other renewable energy with unit Percentage (%) related to Energy Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(4) Percentage from other renewable energy', under 'Energy Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(4) Percentage from other renewable energy', under 'Energy Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-130a.1 '(4) Percentage from other renewable energy'; retain every reported year and label.",
+        "When RR-PP-130a.1 '(4) Percentage from other renewable energy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-130a.1 '(4) Percentage from other renewable energy', including: (4) Percentage from other renewable energy; Percentage from other renewable energy; RR-PP-130a.1 (4) Percentage from other renewable energy; (4) Percent from other renewable energy.",
+        "Disambiguate RR-PP-130a.1 '(4) Percentage from other renewable energy' from sibling metrics sharing RR-PP-130a.1: (1) Total energy consumed; (2) Percentage of energy consumed that was supplied from grid electricity; (3) Percentage of energy consumed that was supplied by biomass; (5) Total self-generated energy.",
+        "Find disclosures for RR-PP-130a.1 (4) Percentage from other renewable energy with unit Percentage (%) related to Energy Management.",
         "Retrieve exact report evidence for RR-PP-130a.1 (4) Percentage from other renewable energy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-130a.1 (4) Percentage from other renewable energy with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-130a.1 (4) Percentage from other renewable energy related to Energy Management.",
@@ -1145,6 +1994,7 @@
       ],
       "anchor_terms": [
         "RR-PP-130a.1",
+        "(4) Percentage from other renewable energy",
         "Percentage from other renewable energy",
         "renewable energy",
         "other",
@@ -1154,7 +2004,10 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "RR-PP-130a.1 (4) Percentage from other renewable energy",
+        "(4) Percent from other renewable energy",
+        "other renewable"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
@@ -1162,7 +2015,11 @@
         "Percentage of energy consumed that was supplied by biomass",
         "Total self-generated energy",
         "grid electricity",
-        "non-renewable energy"
+        "non-renewable energy",
+        "(1) Total energy consumed",
+        "(2) Percentage of energy consumed that was supplied from grid electricity",
+        "(3) Percentage of energy consumed that was supplied by biomass",
+        "(5) Total self-generated energy"
       ],
       "similar_metric_warnings": [
         {
@@ -1191,7 +2048,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1199,11 +2058,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(4) Percentage from other renewable energy', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1215,9 +2100,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(4) Percentage from other renewable energy' (RR-PP-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (2) Percentage of energy consumed that was supplied from grid electricity; (3) Percentage of energy consumed that was supplied by biomass; (5) Total self-generated energy."
     },
     {
       "metric_id": "RR-PP-130a.1.05",
@@ -1240,10 +2148,23 @@
         "Management",
         "Gigajoules",
         "GJ",
-        "Gigajoules (GJ)"
+        "Gigajoules (GJ)",
+        "(5) Total self-generated energy",
+        "Total self-generated energy",
+        "RR-PP-130a.1 (5) Total self-generated energy",
+        "self-generated energy",
+        "gigajoule",
+        "(1) Total energy consumed, (2) percentage grid electricity",
+        "(3) percentage from biomass, (4) percentage from other renewable energy and"
       ],
-      "dense_query": "Find disclosures for RR-PP-130a.1 (5) Total self-generated energy with unit Gigajoules (GJ) related to Energy Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(5) Total self-generated energy', under 'Energy Management', with expected unit 'Gigajoules (GJ)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-130a.1 '(5) Total self-generated energy', under 'Energy Management', with expected unit 'Gigajoules (GJ)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-130a.1 '(5) Total self-generated energy'; retain every reported year and label.",
+        "When RR-PP-130a.1 '(5) Total self-generated energy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-130a.1 '(5) Total self-generated energy', including: (5) Total self-generated energy; Total self-generated energy; RR-PP-130a.1 (5) Total self-generated energy.",
+        "Disambiguate RR-PP-130a.1 '(5) Total self-generated energy' from sibling metrics sharing RR-PP-130a.1: (1) Total energy consumed; (2) Percentage of energy consumed that was supplied from grid electricity; (3) Percentage of energy consumed that was supplied by biomass; (4) Percentage from other renewable energy.",
+        "Find disclosures for RR-PP-130a.1 (5) Total self-generated energy with unit Gigajoules (GJ) related to Energy Management.",
         "Retrieve exact report evidence for RR-PP-130a.1 (5) Total self-generated energy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-130a.1 (5) Total self-generated energy with unit Gigajoules (GJ).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-130a.1 (5) Total self-generated energy related to Energy Management.",
@@ -1251,19 +2172,27 @@
       ],
       "anchor_terms": [
         "RR-PP-130a.1",
+        "(5) Total self-generated energy",
         "Total self-generated energy",
         "self-generated",
         "energy",
         "Management",
         "Gigajoules (GJ)",
         "GJ",
-        "gigajoules"
+        "gigajoules",
+        "RR-PP-130a.1 (5) Total self-generated energy",
+        "self-generated energy",
+        "gigajoule"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
         "Percentage of energy consumed that was supplied from grid electricity",
         "Percentage of energy consumed that was supplied by biomass",
-        "Percentage from other renewable energy"
+        "Percentage from other renewable energy",
+        "(1) Total energy consumed",
+        "(2) Percentage of energy consumed that was supplied from grid electricity",
+        "(3) Percentage of energy consumed that was supplied by biomass",
+        "(4) Percentage from other renewable energy"
       ],
       "similar_metric_warnings": [
         {
@@ -1288,7 +2217,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1296,24 +2227,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(5) Total self-generated energy', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "energy",
         "expected_units": [
           "Gigajoules (GJ)",
           "GJ",
-          "gigajoules"
+          "MWh",
+          "kWh",
+          "MJ",
+          "kJ"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(5) Total self-generated energy' (RR-PP-130a.1, expected unit: Gigajoules (GJ)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (2) Percentage of energy consumed that was supplied from grid electricity; (3) Percentage of energy consumed that was supplied by biomass; (4) Percentage from other renewable energy."
     },
     {
       "metric_id": "RR-PP-140a.1.01",
@@ -1340,10 +2323,25 @@
         "metres",
         "thousand m3",
         "m3",
-        "meters"
+        "meters",
+        "Total water withdrawn",
+        "Water withdrawal",
+        "RR-PP-140a.1 Total water withdrawn",
+        "Thousand cubic metres (m³)",
+        "m?",
+        "cubic metres",
+        "cubic meters",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of"
       ],
-      "dense_query": "Find disclosures for RR-PP-140a.1 Total water withdrawn with unit Thousand cubic metres (m³) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.1 'Total water withdrawn', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.1 'Total water withdrawn', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-140a.1 'Total water withdrawn'; retain every reported year and label.",
+        "When RR-PP-140a.1 'Total water withdrawn' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-140a.1 'Total water withdrawn', including: Total water withdrawn; Water withdrawal; RR-PP-140a.1 Total water withdrawn.",
+        "Disambiguate RR-PP-140a.1 'Total water withdrawn' from sibling metrics sharing RR-PP-140a.1: Total water consumed; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed.",
+        "Find disclosures for RR-PP-140a.1 Total water withdrawn with unit Thousand cubic metres (m³) related to Water Management.",
         "Retrieve exact report evidence for RR-PP-140a.1 Total water withdrawn, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-140a.1 Total water withdrawn with unit Thousand cubic metres (m³).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-140a.1 Total water withdrawn related to Water Management.",
@@ -1359,7 +2357,13 @@
         "Thousand cubic metres (m³)",
         "thousand m3",
         "thousand cubic meters",
-        "thousand cubic metres"
+        "thousand cubic metres",
+        "Water withdrawal",
+        "RR-PP-140a.1 Total water withdrawn",
+        "m3",
+        "m?",
+        "cubic metres",
+        "cubic meters"
       ],
       "negative_anchor_terms": [
         "Total water consumed",
@@ -1392,7 +2396,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1400,25 +2406,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total water withdrawn', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "volume",
         "expected_units": [
           "Thousand cubic metres (m³)",
-          "thousand m3",
-          "thousand cubic meters",
-          "thousand cubic metres"
+          "m3",
+          "m?",
+          "cubic metres",
+          "cubic meters",
+          "litres",
+          "liters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total water withdrawn' (RR-PP-140a.1, expected unit: Thousand cubic metres (m³)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total water consumed; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed."
     },
     {
       "metric_id": "RR-PP-140a.1.02",
@@ -1443,10 +2501,25 @@
         "Thousand",
         "cubic",
         "metres",
-        "m3"
+        "m3",
+        "Total water consumed",
+        "Water consumption",
+        "RR-PP-140a.1 Total water consumed",
+        "Thousand cubic metres (m3)",
+        "m?",
+        "cubic metres",
+        "cubic meters",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of"
       ],
-      "dense_query": "Find disclosures for RR-PP-140a.1 Total water consumed with unit Thousand cubic metres (m3) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.1 'Total water consumed', under 'Water Management', with expected unit 'Thousand cubic metres (m3)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.1 'Total water consumed', under 'Water Management', with expected unit 'Thousand cubic metres (m3)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-140a.1 'Total water consumed'; retain every reported year and label.",
+        "When RR-PP-140a.1 'Total water consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-140a.1 'Total water consumed', including: Total water consumed; Water consumption; RR-PP-140a.1 Total water consumed.",
+        "Disambiguate RR-PP-140a.1 'Total water consumed' from sibling metrics sharing RR-PP-140a.1: Total water withdrawn; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed.",
+        "Find disclosures for RR-PP-140a.1 Total water consumed with unit Thousand cubic metres (m3) related to Water Management.",
         "Retrieve exact report evidence for RR-PP-140a.1 Total water consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-140a.1 Total water consumed with unit Thousand cubic metres (m3).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-140a.1 Total water consumed related to Water Management.",
@@ -1459,7 +2532,13 @@
         "water",
         "consumed",
         "Management",
-        "Thousand cubic metres (m3)"
+        "Thousand cubic metres (m3)",
+        "Water consumption",
+        "RR-PP-140a.1 Total water consumed",
+        "m3",
+        "m?",
+        "cubic metres",
+        "cubic meters"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -1492,7 +2571,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1500,22 +2581,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total water consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "volume",
         "expected_units": [
-          "Thousand cubic metres (m3)"
+          "Thousand cubic metres (m3)",
+          "m3",
+          "m?",
+          "cubic metres",
+          "cubic meters",
+          "litres",
+          "liters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total water consumed' (RR-PP-140a.1, expected unit: Thousand cubic metres (m3)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total water withdrawn; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed."
     },
     {
       "metric_id": "RR-PP-140a.1.03",
@@ -1546,10 +2682,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percent of the total water withdrawn",
+        "RR-PP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "withdrawn locations",
+        "locations High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "Stress water",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of"
       ],
-      "dense_query": "Find disclosures for RR-PP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn with unit Percentage (%) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn', under 'Water Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn', under 'Water Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn'; retain every reported year and label.",
+        "When RR-PP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn', including: Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percent of the total water withdrawn; RR-PP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn.",
+        "Disambiguate RR-PP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn' from sibling metrics sharing RR-PP-140a.1: Total water withdrawn; Total water consumed; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed.",
+        "Find disclosures for RR-PP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn with unit Percentage (%) related to Water Management.",
         "Retrieve exact report evidence for RR-PP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn related to Water Management.",
@@ -1571,7 +2726,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percent of the total water withdrawn",
+        "RR-PP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "withdrawn locations",
+        "locations High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "Stress water"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -1604,7 +2769,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1612,11 +2779,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1628,9 +2821,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn' (RR-PP-140a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total water withdrawn; Total water consumed; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed."
     },
     {
       "metric_id": "RR-PP-140a.1.04",
@@ -1661,10 +2877,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percent of the total water consumed",
+        "RR-PP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "consumed locations",
+        "locations High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "Stress water",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of"
       ],
-      "dense_query": "Find disclosures for RR-PP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed with unit Percentage (%) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed', under 'Water Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed', under 'Water Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed'; retain every reported year and label.",
+        "When RR-PP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed', including: Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed; Water consumed in locations with High or Extremely High Baseline Water Stress as a percent of the total water consumed; RR-PP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed.",
+        "Disambiguate RR-PP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed' from sibling metrics sharing RR-PP-140a.1: Total water withdrawn; Total water consumed; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn.",
+        "Find disclosures for RR-PP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed with unit Percentage (%) related to Water Management.",
         "Retrieve exact report evidence for RR-PP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed related to Water Management.",
@@ -1686,7 +2921,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percent of the total water consumed",
+        "RR-PP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "consumed locations",
+        "locations High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "Stress water"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -1719,7 +2964,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1727,11 +2974,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1743,9 +3016,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed' (RR-PP-140a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total water withdrawn; Total water consumed; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn."
     },
     {
       "metric_id": "RR-PP-140a.2",
@@ -1758,7 +3054,8 @@
       "disclosure_type": "mixed",
       "aliases": [
         "Description of water management risks and discussion of strategies and practices to mitigate those risks",
-        "RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks"
+        "RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management risks and discussion of strategies and practices to mitigate those risks"
       ],
       "bm25_terms": [
         "RR-PP-140a.2",
@@ -1770,10 +3067,30 @@
         "strategies",
         "practices",
         "mitigate",
-        "those"
+        "those",
+        "Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management",
+        "management risks",
+        "risks strategies",
+        "strategies practices",
+        "practices mitigate",
+        "mitigate those",
+        "those risks",
+        "Description of water management risks",
+        "discussion of strategies",
+        "practices to mitigate those risks",
+        "Description of water management risks and discussion of",
+        "strategies and practices to mitigate those risks"
       ],
-      "dense_query": "Find disclosures for RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks', under 'Water Management'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks', under 'Water Management'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers RR-PP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks'.",
+        "When RR-PP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks', including: Description of water management risks and discussion of strategies and practices to mitigate those risks; RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks; water management risks and discussion of strategies and practices to mitigate those risks.",
+        "Find disclosures for RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks related to Water Management.",
         "Retrieve exact report evidence for RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks related to Water Management.",
@@ -1790,7 +3107,19 @@
         "strategies",
         "practices",
         "mitigate",
-        "those"
+        "those",
+        "RR-PP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management",
+        "management risks",
+        "risks strategies",
+        "strategies practices",
+        "practices mitigate",
+        "mitigate those",
+        "those risks",
+        "Description of water management risks",
+        "discussion of strategies",
+        "practices to mitigate those risks"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1800,7 +3129,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1812,20 +3143,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of water management risks and discussion of strategies and practices to mitigate those risks'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of water management risks and discussion of strategies and practices to mitigate those risks' (RR-PP-140a.2, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-PP-430a.1.01",
@@ -1840,7 +3219,8 @@
         "Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard",
         "Percentage of wood fibre sourced from third-party certified forestlands and percentage to each standard",
         "Percent of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard",
-        "RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard"
+        "RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard",
+        "Percent of wood fibre sourced from (1) third-party certified forestlands and Percent to each standard"
       ],
       "bm25_terms": [
         "RR-PP-430a.1",
@@ -1857,10 +3237,35 @@
         "%",
         "weight",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard",
+        "Percentage of wood fibre sourced from third-party certified forestlands and percentage to each standard",
+        "Percent of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard",
+        "RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard",
+        "Percent of wood fibre sourced from (1) third-party certified forestlands and Percent to each standard",
+        "wood fibre",
+        "fibre sourced",
+        "sourced third-party",
+        "third-party certified",
+        "certified forestlands",
+        "forestlands each",
+        "each",
+        "each standard",
+        "Percentage of wood fibre sourced from (1) third-party certified forestlands",
+        "percentage to each standard",
+        "Percentage (%) by weight",
+        "percentage",
+        "Percentage of wood fibre sourced from (1) third-party certified",
+        "forestlands and percentage to each standard and (2) meeting other fibre sourcing"
       ],
-      "dense_query": "Find disclosures for RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard with unit Percentage (%) by weight related to Supply Chain Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-430a.1 'Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard', under 'Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-430a.1 'Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard', under 'Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-430a.1 'Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard'; retain every reported year and label.",
+        "When RR-PP-430a.1 'Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-430a.1 'Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard', including: Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard; Percentage of wood fibre sourced from third-party certified forestlands and percentage to each standard; Percent of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard; RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard; Percent of wood fibre sourced from (1) third-party certified forestlands and Percent to each standard.",
+        "Disambiguate RR-PP-430a.1 'Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard' from sibling metrics sharing RR-PP-430a.1: Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard.",
+        "Find disclosures for RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard with unit Percentage (%) by weight related to Supply Chain Management.",
         "Retrieve exact report evidence for RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard with unit Percentage (%) by weight.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard related to Supply Chain Management.",
@@ -1882,7 +3287,22 @@
         "Percentage (%) by weight",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percentage of wood fibre sourced from third-party certified forestlands and percentage to each standard",
+        "Percent of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard",
+        "RR-PP-430a.1 Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard",
+        "Percent of wood fibre sourced from (1) third-party certified forestlands and Percent to each standard",
+        "wood fibre",
+        "fibre sourced",
+        "sourced third-party",
+        "third-party certified",
+        "certified forestlands",
+        "forestlands each",
+        "each",
+        "each standard",
+        "Percentage of wood fibre sourced from (1) third-party certified forestlands",
+        "percentage to each standard",
+        "percentage"
       ],
       "negative_anchor_terms": [
         "Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard"
@@ -1898,7 +3318,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1906,11 +3328,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1923,9 +3371,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard' (RR-PP-430a.1, expected unit: Percentage (%) by weight). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard."
     },
     {
       "metric_id": "RR-PP-430a.1.02",
@@ -1940,7 +3411,8 @@
         "Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard",
         "Percentage of wood fibre sourced from meeting other fibre sourcing standards and percentage to each standard",
         "Percent of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard",
-        "RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard"
+        "RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard",
+        "Percent of wood fibre sourced from (2) meeting other fibre sourcing standards and Percent to each standard"
       ],
       "bm25_terms": [
         "RR-PP-430a.1",
@@ -1958,10 +3430,37 @@
         "%",
         "weight",
         "Percentage (%)",
-        "percent"
+        "percent",
+        "Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard",
+        "Percentage of wood fibre sourced from meeting other fibre sourcing standards and percentage to each standard",
+        "Percent of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard",
+        "RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard",
+        "Percent of wood fibre sourced from (2) meeting other fibre sourcing standards and Percent to each standard",
+        "wood fibre",
+        "fibre sourced",
+        "sourced meeting",
+        "meeting other",
+        "other fibre",
+        "fibre sourcing",
+        "sourcing standards",
+        "standards each",
+        "each",
+        "each standard",
+        "Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards",
+        "percentage to each standard",
+        "Percentage (%) by weight",
+        "percentage",
+        "Percentage of wood fibre sourced from (1) third-party certified",
+        "forestlands and percentage to each standard and (2) meeting other fibre sourcing"
       ],
-      "dense_query": "Find disclosures for RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard with unit Percentage (%) by weight related to Supply Chain Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-430a.1 'Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard', under 'Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-430a.1 'Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard', under 'Supply Chain Management', with expected unit 'Percentage (%) by weight'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-430a.1 'Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard'; retain every reported year and label.",
+        "When RR-PP-430a.1 'Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-430a.1 'Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard', including: Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard; Percentage of wood fibre sourced from meeting other fibre sourcing standards and percentage to each standard; Percent of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard; RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard; Percent of wood fibre sourced from (2) meeting other fibre sourcing standards and Percent to each standard.",
+        "Disambiguate RR-PP-430a.1 'Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard' from sibling metrics sharing RR-PP-430a.1: Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard.",
+        "Find disclosures for RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard with unit Percentage (%) by weight related to Supply Chain Management.",
         "Retrieve exact report evidence for RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard with unit Percentage (%) by weight.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard related to Supply Chain Management.",
@@ -1984,7 +3483,24 @@
         "Percentage (%) by weight",
         "Percentage (%)",
         "%",
-        "percent"
+        "percent",
+        "Percentage of wood fibre sourced from meeting other fibre sourcing standards and percentage to each standard",
+        "Percent of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard",
+        "RR-PP-430a.1 Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard",
+        "Percent of wood fibre sourced from (2) meeting other fibre sourcing standards and Percent to each standard",
+        "wood fibre",
+        "fibre sourced",
+        "sourced meeting",
+        "meeting other",
+        "other fibre",
+        "fibre sourcing",
+        "sourcing standards",
+        "standards each",
+        "each",
+        "each standard",
+        "Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards",
+        "percentage to each standard",
+        "percentage"
       ],
       "negative_anchor_terms": [
         "Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard"
@@ -2000,7 +3516,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2008,11 +3526,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -2025,9 +3569,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of wood fibre sourced from (2) meeting other fibre sourcing standards and percentage to each standard' (RR-PP-430a.1, expected unit: Percentage (%) by weight). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of wood fibre sourced from (1) third-party certified forestlands and percentage to each standard."
     },
     {
       "metric_id": "RR-PP-430a.2",
@@ -2057,10 +3624,27 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Amount of recycled and recovered fibre procured",
+        "RR-PP-430a.2 Amount of recycled and recovered fibre procured",
+        "recycled recovered",
+        "recovered fibre",
+        "fibre procured",
+        "Amount of recycled",
+        "recovered fibre procured",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "The entity shall disclose the amount of recycled and recovered fibre procured in metric tonnes from suppliers as"
       ],
-      "dense_query": "Find disclosures for RR-PP-430a.2 Amount of recycled and recovered fibre procured with unit Metric tonnes (t) related to Supply Chain Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-430a.2 'Amount of recycled and recovered fibre procured', under 'Supply Chain Management', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-430a.2 'Amount of recycled and recovered fibre procured', under 'Supply Chain Management', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-430a.2 'Amount of recycled and recovered fibre procured'; retain every reported year and label.",
+        "When RR-PP-430a.2 'Amount of recycled and recovered fibre procured' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-430a.2 'Amount of recycled and recovered fibre procured', including: Amount of recycled and recovered fibre procured; RR-PP-430a.2 Amount of recycled and recovered fibre procured.",
+        "Find disclosures for RR-PP-430a.2 Amount of recycled and recovered fibre procured with unit Metric tonnes (t) related to Supply Chain Management.",
         "Retrieve exact report evidence for RR-PP-430a.2 Amount of recycled and recovered fibre procured, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-430a.2 Amount of recycled and recovered fibre procured with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-430a.2 Amount of recycled and recovered fibre procured related to Supply Chain Management.",
@@ -2079,7 +3663,18 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "RR-PP-430a.2 Amount of recycled and recovered fibre procured",
+        "recycled recovered",
+        "recovered fibre",
+        "fibre procured",
+        "Amount of recycled",
+        "recovered fibre procured",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2088,7 +3683,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2096,30 +3693,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Amount of recycled and recovered fibre procured', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Amount of recycled and recovered fibre procured' (RR-PP-430a.2, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-PP-000.A",
@@ -2141,10 +3784,21 @@
         "Air-dried",
         "tonnes",
         "Metric tonnes (t)",
-        "metric tonnes"
+        "metric tonnes",
+        "Pulp production",
+        "RR-PP-000.A Pulp production",
+        "Air-dried metric tonnes (t)",
+        "metric tons",
+        "tons",
+        "t"
       ],
-      "dense_query": "Find disclosures for RR-PP-000.A Pulp production with unit Air-dried metric tonnes (t).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-000.A 'Pulp production', with expected unit 'Air-dried metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-000.A 'Pulp production', with expected unit 'Air-dried metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-000.A 'Pulp production'; retain every reported year and label.",
+        "When RR-PP-000.A 'Pulp production' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-000.A 'Pulp production', including: Pulp production; RR-PP-000.A Pulp production.",
+        "Find disclosures for RR-PP-000.A Pulp production with unit Air-dried metric tonnes (t).",
         "Retrieve exact report evidence for RR-PP-000.A Pulp production, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-000.A Pulp production with unit Air-dried metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-000.A Pulp production.",
@@ -2158,7 +3812,11 @@
         "Air-dried metric tonnes (t)",
         "Metric tonnes (t)",
         "metric tonnes",
-        "tonnes"
+        "tonnes",
+        "RR-PP-000.A Pulp production",
+        "metric tons",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2167,7 +3825,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2175,26 +3835,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Pulp production', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Air-dried metric tonnes (t)",
-          "Metric tonnes (t)",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Pulp production' (RR-PP-000.A, expected unit: Air-dried metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-PP-000.B",
@@ -2216,10 +3926,21 @@
         "Air-dried",
         "tonnes",
         "Metric tonnes (t)",
-        "metric tonnes"
+        "metric tonnes",
+        "Paper production",
+        "RR-PP-000.B Paper production",
+        "Air-dried metric tonnes (t)",
+        "metric tons",
+        "tons",
+        "t"
       ],
-      "dense_query": "Find disclosures for RR-PP-000.B Paper production with unit Air-dried metric tonnes (t).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-000.B 'Paper production', with expected unit 'Air-dried metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-000.B 'Paper production', with expected unit 'Air-dried metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-000.B 'Paper production'; retain every reported year and label.",
+        "When RR-PP-000.B 'Paper production' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-000.B 'Paper production', including: Paper production; RR-PP-000.B Paper production.",
+        "Find disclosures for RR-PP-000.B Paper production with unit Air-dried metric tonnes (t).",
         "Retrieve exact report evidence for RR-PP-000.B Paper production, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-000.B Paper production with unit Air-dried metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-000.B Paper production.",
@@ -2233,7 +3954,11 @@
         "Air-dried metric tonnes (t)",
         "Metric tonnes (t)",
         "metric tonnes",
-        "tonnes"
+        "tonnes",
+        "RR-PP-000.B Paper production",
+        "metric tons",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2242,7 +3967,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2250,26 +3977,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Paper production', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Air-dried metric tonnes (t)",
-          "Metric tonnes (t)",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Paper production' (RR-PP-000.B, expected unit: Air-dried metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "RR-PP-000.C",
@@ -2295,10 +4072,24 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Total wood fibre sourced",
+        "RR-PP-000.C Total wood fibre sourced",
+        "wood fibre",
+        "fibre sourced",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "Note to RR-PP-000.C – The scope of wood-fibre-based raw materials includes all inputs processed to be sold as a finished good"
       ],
-      "dense_query": "Find disclosures for RR-PP-000.C Total wood fibre sourced with unit Metric tonnes (t).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric RR-PP-000.C 'Total wood fibre sourced', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric RR-PP-000.C 'Total wood fibre sourced', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for RR-PP-000.C 'Total wood fibre sourced'; retain every reported year and label.",
+        "When RR-PP-000.C 'Total wood fibre sourced' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for RR-PP-000.C 'Total wood fibre sourced', including: Total wood fibre sourced; RR-PP-000.C Total wood fibre sourced.",
+        "Find disclosures for RR-PP-000.C Total wood fibre sourced with unit Metric tonnes (t).",
         "Retrieve exact report evidence for RR-PP-000.C Total wood fibre sourced, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches RR-PP-000.C Total wood fibre sourced with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for RR-PP-000.C Total wood fibre sourced.",
@@ -2313,7 +4104,15 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "RR-PP-000.C Total wood fibre sourced",
+        "wood fibre",
+        "fibre sourced",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2322,7 +4121,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2330,30 +4131,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total wood fibre sourced', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total wood fibre sourced' (RR-PP-000.C, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

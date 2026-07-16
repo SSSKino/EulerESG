@@ -27,10 +27,25 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of (a) halts related to public release of information",
+        "Number of (a) halts related to public release of information",
+        "FN-EX-410a.1 (1) Number of (a) halts related to public release of information",
+        "halts related",
+        "related",
+        "related public",
+        "public release",
+        "(1) Number and (2) average duration of (a) halts related to public",
+        "release of information and (b) pauses related to volatility"
       ],
-      "dense_query": "Find disclosures for FN-EX-410a.1 (1) Number of (a) halts related to public release of information with unit Number related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.1 '(1) Number of (a) halts related to public release of information', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.1 '(1) Number of (a) halts related to public release of information', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-410a.1 '(1) Number of (a) halts related to public release of information'; retain every reported year and label.",
+        "When FN-EX-410a.1 '(1) Number of (a) halts related to public release of information' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-410a.1 '(1) Number of (a) halts related to public release of information', including: (1) Number of (a) halts related to public release of information; Number of (a) halts related to public release of information; FN-EX-410a.1 (1) Number of (a) halts related to public release of information.",
+        "Disambiguate FN-EX-410a.1 '(1) Number of (a) halts related to public release of information' from sibling metrics sharing FN-EX-410a.1: (2) Average duration of (a) halts related to public release of information; (1) Number of (b) pauses related to volatility; (2) Average duration of (b) pauses related to volatility.",
+        "Find disclosures for FN-EX-410a.1 (1) Number of (a) halts related to public release of information with unit Number related to Promoting Transparent & Efficient Capital Markets.",
         "Retrieve exact report evidence for FN-EX-410a.1 (1) Number of (a) halts related to public release of information, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-410a.1 (1) Number of (a) halts related to public release of information with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.1 (1) Number of (a) halts related to public release of information related to Promoting Transparent & Efficient Capital Markets.",
@@ -38,6 +53,7 @@
       ],
       "anchor_terms": [
         "FN-EX-410a.1",
+        "(1) Number of (a) halts related to public release of information",
         "Number of (a) halts related to public release of information",
         "halts",
         "public",
@@ -49,12 +65,20 @@
         "Markets",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-EX-410a.1 (1) Number of (a) halts related to public release of information",
+        "halts related",
+        "related",
+        "related public",
+        "public release"
       ],
       "negative_anchor_terms": [
         "Average duration of (a) halts related to public release of information",
         "Number of (b) pauses related to volatility",
-        "Average duration of (b) pauses related to volatility"
+        "Average duration of (b) pauses related to volatility",
+        "(2) Average duration of (a) halts related to public release of information",
+        "(1) Number of (b) pauses related to volatility",
+        "(2) Average duration of (b) pauses related to volatility"
       ],
       "similar_metric_warnings": [
         {
@@ -75,7 +99,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -83,24 +109,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of (a) halts related to public release of information'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of (a) halts related to public release of information' (FN-EX-410a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Average duration of (a) halts related to public release of information; (1) Number of (b) pauses related to volatility; (2) Average duration of (b) pauses related to volatility."
     },
     {
       "metric_id": "FN-EX-410a.1.02",
@@ -127,10 +201,28 @@
         "Efficient",
         "Capital",
         "Markets",
-        "Minutes"
+        "Minutes",
+        "(2) Average duration of (a) halts related to public release of information",
+        "Average duration of (a) halts related to public release of information",
+        "FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information",
+        "Average",
+        "Average duration",
+        "duration halts",
+        "halts related",
+        "related",
+        "related public",
+        "public release",
+        "(1) Number and (2) average duration of (a) halts related to public",
+        "release of information and (b) pauses related to volatility"
       ],
-      "dense_query": "Find disclosures for FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information with unit Minutes related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.1 '(2) Average duration of (a) halts related to public release of information', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Minutes'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.1 '(2) Average duration of (a) halts related to public release of information', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Minutes'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-410a.1 '(2) Average duration of (a) halts related to public release of information'; retain every reported year and label.",
+        "When FN-EX-410a.1 '(2) Average duration of (a) halts related to public release of information' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-410a.1 '(2) Average duration of (a) halts related to public release of information', including: (2) Average duration of (a) halts related to public release of information; Average duration of (a) halts related to public release of information; FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information.",
+        "Disambiguate FN-EX-410a.1 '(2) Average duration of (a) halts related to public release of information' from sibling metrics sharing FN-EX-410a.1: (1) Number of (a) halts related to public release of information; (1) Number of (b) pauses related to volatility; (2) Average duration of (b) pauses related to volatility.",
+        "Find disclosures for FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information with unit Minutes related to Promoting Transparent & Efficient Capital Markets.",
         "Retrieve exact report evidence for FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information with unit Minutes.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information related to Promoting Transparent & Efficient Capital Markets.",
@@ -138,6 +230,7 @@
       ],
       "anchor_terms": [
         "FN-EX-410a.1",
+        "(2) Average duration of (a) halts related to public release of information",
         "Average duration of (a) halts related to public release of information",
         "duration",
         "halts",
@@ -148,12 +241,23 @@
         "Efficient",
         "Capital",
         "Markets",
-        "Minutes"
+        "Minutes",
+        "FN-EX-410a.1 (2) Average duration of (a) halts related to public release of information",
+        "Average",
+        "Average duration",
+        "duration halts",
+        "halts related",
+        "related",
+        "related public",
+        "public release"
       ],
       "negative_anchor_terms": [
         "Number of (a) halts related to public release of information",
         "Number of (b) pauses related to volatility",
-        "Average duration of (b) pauses related to volatility"
+        "Average duration of (b) pauses related to volatility",
+        "(1) Number of (a) halts related to public release of information",
+        "(1) Number of (b) pauses related to volatility",
+        "(2) Average duration of (b) pauses related to volatility"
       ],
       "similar_metric_warnings": [
         {
@@ -174,7 +278,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -182,11 +288,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Average duration of (a) halts related to public release of information', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "number",
@@ -195,9 +327,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Average duration of (a) halts related to public release of information' (FN-EX-410a.1, expected unit: Minutes). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of (a) halts related to public release of information; (1) Number of (b) pauses related to volatility; (2) Average duration of (b) pauses related to volatility."
     },
     {
       "metric_id": "FN-EX-410a.1.03",
@@ -225,10 +380,24 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of (b) pauses related to volatility",
+        "Number of (b) pauses related to volatility",
+        "FN-EX-410a.1 (1) Number of (b) pauses related to volatility",
+        "pauses related",
+        "related",
+        "related volatility",
+        "(1) Number and (2) average duration of (a) halts related to public",
+        "release of information and (b) pauses related to volatility"
       ],
-      "dense_query": "Find disclosures for FN-EX-410a.1 (1) Number of (b) pauses related to volatility with unit Number related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.1 '(1) Number of (b) pauses related to volatility', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.1 '(1) Number of (b) pauses related to volatility', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-410a.1 '(1) Number of (b) pauses related to volatility'; retain every reported year and label.",
+        "When FN-EX-410a.1 '(1) Number of (b) pauses related to volatility' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-410a.1 '(1) Number of (b) pauses related to volatility', including: (1) Number of (b) pauses related to volatility; Number of (b) pauses related to volatility; FN-EX-410a.1 (1) Number of (b) pauses related to volatility.",
+        "Disambiguate FN-EX-410a.1 '(1) Number of (b) pauses related to volatility' from sibling metrics sharing FN-EX-410a.1: (1) Number of (a) halts related to public release of information; (2) Average duration of (a) halts related to public release of information; (2) Average duration of (b) pauses related to volatility.",
+        "Find disclosures for FN-EX-410a.1 (1) Number of (b) pauses related to volatility with unit Number related to Promoting Transparent & Efficient Capital Markets.",
         "Retrieve exact report evidence for FN-EX-410a.1 (1) Number of (b) pauses related to volatility, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-410a.1 (1) Number of (b) pauses related to volatility with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.1 (1) Number of (b) pauses related to volatility related to Promoting Transparent & Efficient Capital Markets.",
@@ -236,6 +405,7 @@
       ],
       "anchor_terms": [
         "FN-EX-410a.1",
+        "(1) Number of (b) pauses related to volatility",
         "Number of (b) pauses related to volatility",
         "pauses",
         "volatility",
@@ -246,12 +416,19 @@
         "Markets",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-EX-410a.1 (1) Number of (b) pauses related to volatility",
+        "pauses related",
+        "related",
+        "related volatility"
       ],
       "negative_anchor_terms": [
         "Number of (a) halts related to public release of information",
         "Average duration of (a) halts related to public release of information",
-        "Average duration of (b) pauses related to volatility"
+        "Average duration of (b) pauses related to volatility",
+        "(1) Number of (a) halts related to public release of information",
+        "(2) Average duration of (a) halts related to public release of information",
+        "(2) Average duration of (b) pauses related to volatility"
       ],
       "similar_metric_warnings": [
         {
@@ -272,7 +449,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -280,24 +459,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of (b) pauses related to volatility'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of (b) pauses related to volatility' (FN-EX-410a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of (a) halts related to public release of information; (2) Average duration of (a) halts related to public release of information; (2) Average duration of (b) pauses related to volatility."
     },
     {
       "metric_id": "FN-EX-410a.1.04",
@@ -323,10 +550,27 @@
         "Efficient",
         "Capital",
         "Markets",
-        "Minutes"
+        "Minutes",
+        "(2) Average duration of (b) pauses related to volatility",
+        "Average duration of (b) pauses related to volatility",
+        "FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility",
+        "Average",
+        "Average duration",
+        "duration pauses",
+        "pauses related",
+        "related",
+        "related volatility",
+        "(1) Number and (2) average duration of (a) halts related to public",
+        "release of information and (b) pauses related to volatility"
       ],
-      "dense_query": "Find disclosures for FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility with unit Minutes related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.1 '(2) Average duration of (b) pauses related to volatility', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Minutes'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.1 '(2) Average duration of (b) pauses related to volatility', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Minutes'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-410a.1 '(2) Average duration of (b) pauses related to volatility'; retain every reported year and label.",
+        "When FN-EX-410a.1 '(2) Average duration of (b) pauses related to volatility' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-410a.1 '(2) Average duration of (b) pauses related to volatility', including: (2) Average duration of (b) pauses related to volatility; Average duration of (b) pauses related to volatility; FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility.",
+        "Disambiguate FN-EX-410a.1 '(2) Average duration of (b) pauses related to volatility' from sibling metrics sharing FN-EX-410a.1: (1) Number of (a) halts related to public release of information; (2) Average duration of (a) halts related to public release of information; (1) Number of (b) pauses related to volatility.",
+        "Find disclosures for FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility with unit Minutes related to Promoting Transparent & Efficient Capital Markets.",
         "Retrieve exact report evidence for FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility with unit Minutes.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility related to Promoting Transparent & Efficient Capital Markets.",
@@ -334,6 +578,7 @@
       ],
       "anchor_terms": [
         "FN-EX-410a.1",
+        "(2) Average duration of (b) pauses related to volatility",
         "Average duration of (b) pauses related to volatility",
         "duration",
         "pauses",
@@ -343,12 +588,22 @@
         "Efficient",
         "Capital",
         "Markets",
-        "Minutes"
+        "Minutes",
+        "FN-EX-410a.1 (2) Average duration of (b) pauses related to volatility",
+        "Average",
+        "Average duration",
+        "duration pauses",
+        "pauses related",
+        "related",
+        "related volatility"
       ],
       "negative_anchor_terms": [
         "Number of (a) halts related to public release of information",
         "Average duration of (a) halts related to public release of information",
-        "Number of (b) pauses related to volatility"
+        "Number of (b) pauses related to volatility",
+        "(1) Number of (a) halts related to public release of information",
+        "(2) Average duration of (a) halts related to public release of information",
+        "(1) Number of (b) pauses related to volatility"
       ],
       "similar_metric_warnings": [
         {
@@ -369,7 +624,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -377,11 +634,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Average duration of (b) pauses related to volatility', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "number",
@@ -390,9 +673,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Average duration of (b) pauses related to volatility' (FN-EX-410a.1, expected unit: Minutes). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of (a) halts related to public release of information; (2) Average duration of (a) halts related to public release of information; (1) Number of (b) pauses related to volatility."
     },
     {
       "metric_id": "FN-EX-410a.2",
@@ -423,10 +729,23 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of trades generated from automated trading systems",
+        "Percent of trades generated from automated trading systems",
+        "FN-EX-410a.2 Percentage of trades generated from automated trading systems",
+        "trades generated",
+        "generated automated",
+        "automated trading",
+        "trading systems",
+        "The entity shall disclose the percentage of its total trades generated by automated or algorithmic trading systems"
       ],
-      "dense_query": "Find disclosures for FN-EX-410a.2 Percentage of trades generated from automated trading systems with unit Percentage (%) related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.2 'Percentage of trades generated from automated trading systems', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.2 'Percentage of trades generated from automated trading systems', under 'Promoting Transparent & Efficient Capital Markets', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-410a.2 'Percentage of trades generated from automated trading systems'; retain every reported year and label.",
+        "When FN-EX-410a.2 'Percentage of trades generated from automated trading systems' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-410a.2 'Percentage of trades generated from automated trading systems', including: Percentage of trades generated from automated trading systems; Percent of trades generated from automated trading systems; FN-EX-410a.2 Percentage of trades generated from automated trading systems.",
+        "Find disclosures for FN-EX-410a.2 Percentage of trades generated from automated trading systems with unit Percentage (%) related to Promoting Transparent & Efficient Capital Markets.",
         "Retrieve exact report evidence for FN-EX-410a.2 Percentage of trades generated from automated trading systems, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-410a.2 Percentage of trades generated from automated trading systems with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.2 Percentage of trades generated from automated trading systems related to Promoting Transparent & Efficient Capital Markets.",
@@ -448,7 +767,13 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of trades generated from automated trading systems",
+        "FN-EX-410a.2 Percentage of trades generated from automated trading systems",
+        "trades generated",
+        "generated automated",
+        "automated trading",
+        "trading systems"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -457,7 +782,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -465,11 +792,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of trades generated from automated trading systems', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -481,9 +834,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of trades generated from automated trading systems' (FN-EX-410a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-EX-410a.3",
@@ -496,7 +872,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of alert policy regarding timing and nature of public release of information",
-        "FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information"
+        "FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information",
+        "alert policy regarding timing and nature of public release of information"
       ],
       "bm25_terms": [
         "FN-EX-410a.3",
@@ -512,10 +889,28 @@
         "Transparent",
         "Efficient",
         "Capital",
-        "Markets"
+        "Markets",
+        "Description of alert policy regarding timing and nature of public release of information",
+        "FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information",
+        "alert policy regarding timing and nature of public release of information",
+        "alert policy",
+        "policy regarding",
+        "regarding timing",
+        "timing nature",
+        "nature public",
+        "public release",
+        "Description of alert policy regarding timing",
+        "nature of public release of information",
+        "Description of alert policy regarding timing and nature of public",
+        "release of information"
       ],
-      "dense_query": "Find disclosures for FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.3 'Description of alert policy regarding timing and nature of public release of information', under 'Promoting Transparent & Efficient Capital Markets'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.3 'Description of alert policy regarding timing and nature of public release of information', under 'Promoting Transparent & Efficient Capital Markets'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers FN-EX-410a.3 'Description of alert policy regarding timing and nature of public release of information'.",
+        "When FN-EX-410a.3 'Description of alert policy regarding timing and nature of public release of information' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-410a.3 'Description of alert policy regarding timing and nature of public release of information', including: Description of alert policy regarding timing and nature of public release of information; FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information; alert policy regarding timing and nature of public release of information.",
+        "Find disclosures for FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information related to Promoting Transparent & Efficient Capital Markets.",
         "Retrieve exact report evidence for FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information related to Promoting Transparent & Efficient Capital Markets.",
@@ -535,7 +930,17 @@
         "Promoting",
         "Transparent",
         "Efficient",
-        "Capital"
+        "Capital",
+        "FN-EX-410a.3 Description of alert policy regarding timing and nature of public release of information",
+        "alert policy regarding timing and nature of public release of information",
+        "alert policy",
+        "policy regarding",
+        "regarding timing",
+        "timing nature",
+        "nature public",
+        "public release",
+        "Description of alert policy regarding timing",
+        "nature of public release of information"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -545,7 +950,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -557,20 +964,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of alert policy regarding timing and nature of public release of information'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of alert policy regarding timing and nature of public release of information' (FN-EX-410a.3). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-EX-410a.4",
@@ -583,7 +1038,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
-        "FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information"
+        "FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+        "policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information"
       ],
       "bm25_terms": [
         "FN-EX-410a.4",
@@ -601,10 +1057,34 @@
         "Transparent",
         "Efficient",
         "Capital",
-        "Markets"
+        "Markets",
+        "Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+        "FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+        "policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+        "policy encourage",
+        "encourage require",
+        "require listed",
+        "listed entities",
+        "entities",
+        "entities publicly",
+        "publicly disclose",
+        "disclose",
+        "disclose environmental",
+        "environmental social",
+        "social governance",
+        "governance ESG",
+        "Description of policy to encourage or require listed entities to publicly disclose environmental",
+        "governance (ESG) information",
+        "Description of policy to encourage or require listed entities to",
+        "publicly disclose environmental, social, and governance (ESG) information"
       ],
-      "dense_query": "Find disclosures for FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information related to Promoting Transparent & Efficient Capital Markets.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.4 'Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information', under 'Promoting Transparent & Efficient Capital Markets'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-410a.4 'Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information', under 'Promoting Transparent & Efficient Capital Markets'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers FN-EX-410a.4 'Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information'.",
+        "When FN-EX-410a.4 'Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-410a.4 'Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information', including: Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information; FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information; policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information.",
+        "Find disclosures for FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information related to Promoting Transparent & Efficient Capital Markets.",
         "Retrieve exact report evidence for FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information related to Promoting Transparent & Efficient Capital Markets.",
@@ -624,7 +1104,23 @@
         "governance",
         "ESG",
         "Promoting",
-        "Transparent"
+        "Transparent",
+        "FN-EX-410a.4 Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+        "policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information",
+        "policy encourage",
+        "encourage require",
+        "require listed",
+        "listed entities",
+        "entities",
+        "entities publicly",
+        "publicly disclose",
+        "disclose",
+        "disclose environmental",
+        "environmental social",
+        "social governance",
+        "governance ESG",
+        "Description of policy to encourage or require listed entities to publicly disclose environmental",
+        "governance (ESG) information"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -634,7 +1130,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -646,20 +1144,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policy to encourage or require listed entities to publicly disclose environmental, social, and governance (ESG) information' (FN-EX-410a.4). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-EX-510a.1",
@@ -699,10 +1245,38 @@
         "regulations",
         "Presentation",
         "currency",
-        "reporting currency"
+        "reporting currency",
+        "Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+        "Monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+        "FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated fraud",
+        "fraud insider",
+        "insider trading",
+        "trading antitrust",
+        "antitrust anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour market",
+        "Managing",
+        "Conflicts",
+        "Interest",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with fraud, insider trading, antitrust, anti-competitive behaviour"
       ],
-      "dense_query": "Find disclosures for FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations with unit Presentation currency related to Managing Conflicts of Interest.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-510a.1 'Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations', under 'Managing Conflicts of Interest', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-510a.1 'Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations', under 'Managing Conflicts of Interest', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-510a.1 'Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations'; retain every reported year and label.",
+        "When FN-EX-510a.1 'Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-510a.1 'Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations', including: Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations; Monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations; FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations.",
+        "Find disclosures for FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations with unit Presentation currency related to Managing Conflicts of Interest.",
         "Retrieve exact report evidence for FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations related to Managing Conflicts of Interest.",
@@ -726,7 +1300,23 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+        "FN-EX-510a.1 Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated fraud",
+        "fraud insider",
+        "insider trading",
+        "trading antitrust",
+        "antitrust anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour market",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -740,7 +1330,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -748,25 +1340,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with fraud, insider trading, antitrust, anti-competitive behaviour, market manipulation, malpractice, or other related financial industry laws or regulations' (FN-EX-510a.1, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-EX-510a.2",
@@ -789,10 +1430,25 @@
         "assessing",
         "conflicts",
         "interest",
-        "Managing"
+        "Managing",
+        "Discussion of processes for identifying and assessing conflicts of interest",
+        "FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest",
+        "processes identifying",
+        "identifying assessing",
+        "assessing conflicts",
+        "conflicts interest",
+        "Discussion of processes for identifying",
+        "assessing conflicts of interest",
+        "Discussion of processes for identifying and assessing conflicts of",
+        "The entity shall describe its processes for identifying and assessing conflicts of interest, such as the use of"
       ],
-      "dense_query": "Find disclosures for FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest related to Managing Conflicts of Interest.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-510a.2 'Discussion of processes for identifying and assessing conflicts of interest', under 'Managing Conflicts of Interest'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-510a.2 'Discussion of processes for identifying and assessing conflicts of interest', under 'Managing Conflicts of Interest'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers FN-EX-510a.2 'Discussion of processes for identifying and assessing conflicts of interest'.",
+        "When FN-EX-510a.2 'Discussion of processes for identifying and assessing conflicts of interest' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-510a.2 'Discussion of processes for identifying and assessing conflicts of interest', including: Discussion of processes for identifying and assessing conflicts of interest; FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest.",
+        "Find disclosures for FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest related to Managing Conflicts of Interest.",
         "Retrieve exact report evidence for FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest related to Managing Conflicts of Interest.",
@@ -807,7 +1463,14 @@
         "assessing",
         "conflicts",
         "interest",
-        "Managing"
+        "Managing",
+        "FN-EX-510a.2 Discussion of processes for identifying and assessing conflicts of interest",
+        "processes identifying",
+        "identifying assessing",
+        "assessing conflicts",
+        "conflicts interest",
+        "Discussion of processes for identifying",
+        "assessing conflicts of interest"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -817,7 +1480,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -829,20 +1494,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of processes for identifying and assessing conflicts of interest'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of processes for identifying and assessing conflicts of interest' (FN-EX-510a.2). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-EX-550a.1.01",
@@ -871,10 +1584,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of significant market disruptions",
+        "Number of significant market disruptions",
+        "FN-EX-550a.1 (1) Number of significant market disruptions",
+        "significant market",
+        "market disruptions",
+        "(1) Number of significant market disruptions and (2) duration of",
+        "The entity shall disclose the (1) number and (2) duration in hours of significant market disruptions"
       ],
-      "dense_query": "Find disclosures for FN-EX-550a.1 (1) Number of significant market disruptions with unit Number related to Managing Business Continuity & Technology Risks.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.1 '(1) Number of significant market disruptions', under 'Managing Business Continuity & Technology Risks', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.1 '(1) Number of significant market disruptions', under 'Managing Business Continuity & Technology Risks', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-550a.1 '(1) Number of significant market disruptions'; retain every reported year and label.",
+        "When FN-EX-550a.1 '(1) Number of significant market disruptions' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-550a.1 '(1) Number of significant market disruptions', including: (1) Number of significant market disruptions; Number of significant market disruptions; FN-EX-550a.1 (1) Number of significant market disruptions.",
+        "Disambiguate FN-EX-550a.1 '(1) Number of significant market disruptions' from sibling metrics sharing FN-EX-550a.1: (2) Duration of downtime.",
+        "Find disclosures for FN-EX-550a.1 (1) Number of significant market disruptions with unit Number related to Managing Business Continuity & Technology Risks.",
         "Retrieve exact report evidence for FN-EX-550a.1 (1) Number of significant market disruptions, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-550a.1 (1) Number of significant market disruptions with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.1 (1) Number of significant market disruptions related to Managing Business Continuity & Technology Risks.",
@@ -882,6 +1608,7 @@
       ],
       "anchor_terms": [
         "FN-EX-550a.1",
+        "(1) Number of significant market disruptions",
         "Number of significant market disruptions",
         "significant",
         "market",
@@ -893,10 +1620,14 @@
         "Risks",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-EX-550a.1 (1) Number of significant market disruptions",
+        "significant market",
+        "market disruptions"
       ],
       "negative_anchor_terms": [
-        "Duration of downtime"
+        "Duration of downtime",
+        "(2) Duration of downtime"
       ],
       "similar_metric_warnings": [
         {
@@ -909,7 +1640,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -917,24 +1650,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of significant market disruptions'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of significant market disruptions' (FN-EX-550a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Duration of downtime."
     },
     {
       "metric_id": "FN-EX-550a.1.02",
@@ -960,10 +1741,23 @@
         "Technology",
         "Risks",
         "Hours",
-        "Hours (h)"
+        "Hours (h)",
+        "(2) Duration of downtime",
+        "Duration of downtime",
+        "FN-EX-550a.1 (2) Duration of downtime",
+        "Duration downtime",
+        "hr",
+        "(1) Number of significant market disruptions and (2) duration of",
+        "The entity shall disclose the (1) number and (2) duration in hours of significant market disruptions"
       ],
-      "dense_query": "Find disclosures for FN-EX-550a.1 (2) Duration of downtime with unit Hours (h) related to Managing Business Continuity & Technology Risks.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.1 '(2) Duration of downtime', under 'Managing Business Continuity & Technology Risks', with expected unit 'Hours (h)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.1 '(2) Duration of downtime', under 'Managing Business Continuity & Technology Risks', with expected unit 'Hours (h)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-550a.1 '(2) Duration of downtime'; retain every reported year and label.",
+        "When FN-EX-550a.1 '(2) Duration of downtime' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-550a.1 '(2) Duration of downtime', including: (2) Duration of downtime; Duration of downtime; FN-EX-550a.1 (2) Duration of downtime.",
+        "Disambiguate FN-EX-550a.1 '(2) Duration of downtime' from sibling metrics sharing FN-EX-550a.1: (1) Number of significant market disruptions.",
+        "Find disclosures for FN-EX-550a.1 (2) Duration of downtime with unit Hours (h) related to Managing Business Continuity & Technology Risks.",
         "Retrieve exact report evidence for FN-EX-550a.1 (2) Duration of downtime, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-550a.1 (2) Duration of downtime with unit Hours (h).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.1 (2) Duration of downtime related to Managing Business Continuity & Technology Risks.",
@@ -971,6 +1765,7 @@
       ],
       "anchor_terms": [
         "FN-EX-550a.1",
+        "(2) Duration of downtime",
         "Duration of downtime",
         "Duration",
         "downtime",
@@ -979,10 +1774,15 @@
         "Continuity",
         "Technology",
         "Risks",
-        "Hours (h)"
+        "Hours (h)",
+        "FN-EX-550a.1 (2) Duration of downtime",
+        "Duration downtime",
+        "hours",
+        "hr"
       ],
       "negative_anchor_terms": [
-        "Number of significant market disruptions"
+        "Number of significant market disruptions",
+        "(1) Number of significant market disruptions"
       ],
       "similar_metric_warnings": [
         {
@@ -995,7 +1795,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1003,22 +1805,75 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Duration of downtime', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "duration",
         "expected_units": [
-          "Hours (h)"
+          "Hours (h)",
+          "days",
+          "hours",
+          "months",
+          "years"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Duration of downtime' (FN-EX-550a.1, expected unit: Hours (h)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of significant market disruptions."
     },
     {
       "metric_id": "FN-EX-550a.2.01",
@@ -1046,10 +1901,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of data breaches",
+        "Number of data breaches",
+        "FN-EX-550a.2 (1) Number of data breaches",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of customers affected"
       ],
-      "dense_query": "Find disclosures for FN-EX-550a.2 (1) Number of data breaches with unit Number related to Managing Business Continuity & Technology Risks.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.2 '(1) Number of data breaches', under 'Managing Business Continuity & Technology Risks', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.2 '(1) Number of data breaches', under 'Managing Business Continuity & Technology Risks', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-550a.2 '(1) Number of data breaches'; retain every reported year and label.",
+        "When FN-EX-550a.2 '(1) Number of data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-550a.2 '(1) Number of data breaches', including: (1) Number of data breaches; Number of data breaches; FN-EX-550a.2 (1) Number of data breaches.",
+        "Disambiguate FN-EX-550a.2 '(1) Number of data breaches' from sibling metrics sharing FN-EX-550a.2: (2) Percentage of data breaches that were personal data breaches; (3) Number of unique customers affected by personal data breaches.",
+        "Find disclosures for FN-EX-550a.2 (1) Number of data breaches with unit Number related to Managing Business Continuity & Technology Risks.",
         "Retrieve exact report evidence for FN-EX-550a.2 (1) Number of data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-550a.2 (1) Number of data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.2 (1) Number of data breaches related to Managing Business Continuity & Technology Risks.",
@@ -1057,6 +1923,7 @@
       ],
       "anchor_terms": [
         "FN-EX-550a.2",
+        "(1) Number of data breaches",
         "Number of data breaches",
         "data breach",
         "breaches",
@@ -1067,14 +1934,17 @@
         "Risks",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-EX-550a.2 (1) Number of data breaches"
       ],
       "negative_anchor_terms": [
         "Percentage of data breaches that were personal data breaches",
         "Number of unique customers affected by personal data breaches",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(2) Percentage of data breaches that were personal data breaches",
+        "(3) Number of unique customers affected by personal data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -1091,7 +1961,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1099,24 +1971,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of data breaches' (FN-EX-550a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of data breaches that were personal data breaches; (3) Number of unique customers affected by personal data breaches."
     },
     {
       "metric_id": "FN-EX-550a.2.02",
@@ -1130,7 +2050,8 @@
       "aliases": [
         "(2) Percentage of data breaches that were personal data breaches",
         "Percentage of data breaches that were personal data breaches",
-        "FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches"
+        "FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches",
+        "(2) Percent of data breaches that were personal data breaches"
       ],
       "bm25_terms": [
         "FN-EX-550a.2",
@@ -1146,10 +2067,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of data breaches that were personal data breaches",
+        "Percentage of data breaches that were personal data breaches",
+        "FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches",
+        "(2) Percent of data breaches that were personal data breaches",
+        "breaches that",
+        "that",
+        "that were",
+        "were",
+        "were personal",
+        "personal breaches",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of customers affected"
       ],
-      "dense_query": "Find disclosures for FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches with unit Percentage (%) related to Managing Business Continuity & Technology Risks.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.2 '(2) Percentage of data breaches that were personal data breaches', under 'Managing Business Continuity & Technology Risks', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.2 '(2) Percentage of data breaches that were personal data breaches', under 'Managing Business Continuity & Technology Risks', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-550a.2 '(2) Percentage of data breaches that were personal data breaches'; retain every reported year and label.",
+        "When FN-EX-550a.2 '(2) Percentage of data breaches that were personal data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-550a.2 '(2) Percentage of data breaches that were personal data breaches', including: (2) Percentage of data breaches that were personal data breaches; Percentage of data breaches that were personal data breaches; FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches; (2) Percent of data breaches that were personal data breaches.",
+        "Disambiguate FN-EX-550a.2 '(2) Percentage of data breaches that were personal data breaches' from sibling metrics sharing FN-EX-550a.2: (1) Number of data breaches; (3) Number of unique customers affected by personal data breaches.",
+        "Find disclosures for FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches with unit Percentage (%) related to Managing Business Continuity & Technology Risks.",
         "Retrieve exact report evidence for FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches related to Managing Business Continuity & Technology Risks.",
@@ -1157,6 +2096,7 @@
       ],
       "anchor_terms": [
         "FN-EX-550a.2",
+        "(2) Percentage of data breaches that were personal data breaches",
         "Percentage of data breaches that were personal data breaches",
         "data breach",
         "personal data",
@@ -1170,14 +2110,24 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "FN-EX-550a.2 (2) Percentage of data breaches that were personal data breaches",
+        "(2) Percent of data breaches that were personal data breaches",
+        "breaches that",
+        "that",
+        "that were",
+        "were",
+        "were personal",
+        "personal breaches"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
         "Number of unique customers affected by personal data breaches",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(3) Number of unique customers affected by personal data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -1194,7 +2144,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1202,11 +2154,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of data breaches that were personal data breaches', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1218,9 +2196,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of data breaches that were personal data breaches' (FN-EX-550a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (3) Number of unique customers affected by personal data breaches."
     },
     {
       "metric_id": "FN-EX-550a.2.03",
@@ -1253,10 +2254,25 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of unique customers affected by personal data breaches",
+        "Number of unique customers affected by personal data breaches",
+        "FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches",
+        "unique customers",
+        "customers affected",
+        "affected personal",
+        "personal breaches",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of customers affected"
       ],
-      "dense_query": "Find disclosures for FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches with unit Number related to Managing Business Continuity & Technology Risks.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.2 '(3) Number of unique customers affected by personal data breaches', under 'Managing Business Continuity & Technology Risks', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.2 '(3) Number of unique customers affected by personal data breaches', under 'Managing Business Continuity & Technology Risks', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-550a.2 '(3) Number of unique customers affected by personal data breaches'; retain every reported year and label.",
+        "When FN-EX-550a.2 '(3) Number of unique customers affected by personal data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-550a.2 '(3) Number of unique customers affected by personal data breaches', including: (3) Number of unique customers affected by personal data breaches; Number of unique customers affected by personal data breaches; FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches.",
+        "Disambiguate FN-EX-550a.2 '(3) Number of unique customers affected by personal data breaches' from sibling metrics sharing FN-EX-550a.2: (1) Number of data breaches; (2) Percentage of data breaches that were personal data breaches.",
+        "Find disclosures for FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches with unit Number related to Managing Business Continuity & Technology Risks.",
         "Retrieve exact report evidence for FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches related to Managing Business Continuity & Technology Risks.",
@@ -1264,6 +2280,7 @@
       ],
       "anchor_terms": [
         "FN-EX-550a.2",
+        "(3) Number of unique customers affected by personal data breaches",
         "Number of unique customers affected by personal data breaches",
         "data breach",
         "personal data",
@@ -1279,14 +2296,21 @@
         "Risks",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-EX-550a.2 (3) Number of unique customers affected by personal data breaches",
+        "unique customers",
+        "customers affected",
+        "affected personal",
+        "personal breaches"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
         "Percentage of data breaches that were personal data breaches",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches that were personal data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -1303,7 +2327,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1311,24 +2337,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of unique customers affected by personal data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of unique customers affected by personal data breaches' (FN-EX-550a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches that were personal data breaches."
     },
     {
       "metric_id": "FN-EX-550a.3",
@@ -1341,7 +2415,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of efforts to prevent technology errors, security breaches, and market disruptions",
-        "FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions"
+        "FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions",
+        "efforts to prevent technology errors, security breaches, and market disruptions"
       ],
       "bm25_terms": [
         "FN-EX-550a.3",
@@ -1357,10 +2432,28 @@
         "Managing",
         "Business",
         "Continuity",
-        "Risks"
+        "Risks",
+        "Description of efforts to prevent technology errors, security breaches, and market disruptions",
+        "FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions",
+        "efforts to prevent technology errors, security breaches, and market disruptions",
+        "efforts prevent",
+        "prevent technology",
+        "technology errors",
+        "errors security",
+        "security breaches",
+        "breaches market",
+        "market disruptions",
+        "Description of efforts to prevent technology errors",
+        "Description of efforts to prevent technology errors, security",
+        "breaches, and market disruptions"
       ],
-      "dense_query": "Find disclosures for FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions related to Managing Business Continuity & Technology Risks.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.3 'Description of efforts to prevent technology errors, security breaches, and market disruptions', under 'Managing Business Continuity & Technology Risks'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-550a.3 'Description of efforts to prevent technology errors, security breaches, and market disruptions', under 'Managing Business Continuity & Technology Risks'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers FN-EX-550a.3 'Description of efforts to prevent technology errors, security breaches, and market disruptions'.",
+        "When FN-EX-550a.3 'Description of efforts to prevent technology errors, security breaches, and market disruptions' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-550a.3 'Description of efforts to prevent technology errors, security breaches, and market disruptions', including: Description of efforts to prevent technology errors, security breaches, and market disruptions; FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions; efforts to prevent technology errors, security breaches, and market disruptions.",
+        "Find disclosures for FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions related to Managing Business Continuity & Technology Risks.",
         "Retrieve exact report evidence for FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions related to Managing Business Continuity & Technology Risks.",
@@ -1380,7 +2473,17 @@
         "disruptions",
         "Managing",
         "Business",
-        "Continuity"
+        "Continuity",
+        "FN-EX-550a.3 Description of efforts to prevent technology errors, security breaches, and market disruptions",
+        "efforts to prevent technology errors, security breaches, and market disruptions",
+        "efforts prevent",
+        "prevent technology",
+        "technology errors",
+        "errors security",
+        "security breaches",
+        "breaches market",
+        "market disruptions",
+        "Description of efforts to prevent technology errors"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1390,7 +2493,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1402,20 +2507,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of efforts to prevent technology errors, security breaches, and market disruptions'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of efforts to prevent technology errors, security breaches, and market disruptions' (FN-EX-550a.3). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "FN-EX-000.A",
@@ -1441,14 +2594,31 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Average daily number of trades executed, by product or asset class",
+        "FN-EX-000.A Average daily number of trades executed, by product or asset class",
+        "Average",
+        "Average daily",
+        "daily trades",
+        "trades executed",
+        "executed product",
+        "product asset",
+        "asset class",
+        "Average daily number of trades executed",
+        "by product or asset class"
       ],
-      "dense_query": "Find disclosures for FN-EX-000.A Average daily number of trades executed, by product or asset class with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-000.A 'Average daily number of trades executed, by product or asset class', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-000.A 'Average daily number of trades executed, by product or asset class', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-000.A 'Average daily number of trades executed, by product or asset class'; retain every reported year and label.",
+        "When FN-EX-000.A 'Average daily number of trades executed, by product or asset class' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-000.A 'Average daily number of trades executed, by product or asset class', including: Average daily number of trades executed, by product or asset class; FN-EX-000.A Average daily number of trades executed, by product or asset class.",
+        "Find disclosures for FN-EX-000.A Average daily number of trades executed, by product or asset class with unit Number.",
         "Retrieve exact report evidence for FN-EX-000.A Average daily number of trades executed, by product or asset class, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-000.A Average daily number of trades executed, by product or asset class with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-000.A Average daily number of trades executed, by product or asset class.",
-        "Find numeric table rows or performance metrics reporting FN-EX-000.A Average daily number of trades executed, by product or asset class for the reporting period."
+        "Find numeric table rows or performance metrics reporting FN-EX-000.A Average daily number of trades executed, by product or asset class for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: product_type."
       ],
       "anchor_terms": [
         "FN-EX-000.A",
@@ -1461,7 +2631,17 @@
         "class",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "FN-EX-000.A Average daily number of trades executed, by product or asset class",
+        "Average",
+        "Average daily",
+        "daily trades",
+        "trades executed",
+        "executed product",
+        "product asset",
+        "asset class",
+        "Average daily number of trades executed",
+        "by product or asset class"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1470,7 +2650,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1478,24 +2660,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Average daily number of trades executed, by product or asset class'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "product_type"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Average daily number of trades executed, by product or asset class' (FN-EX-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. Preserve separate reported values and source labels for the variable dimensions: product_type."
     },
     {
       "metric_id": "FN-EX-000.B",
@@ -1523,14 +2755,34 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Average daily volume traded, by product or asset class",
+        "FN-EX-000.B Average daily volume traded, by product or asset class",
+        "Average",
+        "Average daily",
+        "daily volume",
+        "volume traded",
+        "traded product",
+        "product asset",
+        "asset class",
+        "Average daily volume traded",
+        "by product or asset class",
+        "Presentation currency",
+        "USD",
+        "dollars"
       ],
-      "dense_query": "Find disclosures for FN-EX-000.B Average daily volume traded, by product or asset class with unit Presentation currency.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric FN-EX-000.B 'Average daily volume traded, by product or asset class', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric FN-EX-000.B 'Average daily volume traded, by product or asset class', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for FN-EX-000.B 'Average daily volume traded, by product or asset class'; retain every reported year and label.",
+        "When FN-EX-000.B 'Average daily volume traded, by product or asset class' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for FN-EX-000.B 'Average daily volume traded, by product or asset class', including: Average daily volume traded, by product or asset class; FN-EX-000.B Average daily volume traded, by product or asset class.",
+        "Find disclosures for FN-EX-000.B Average daily volume traded, by product or asset class with unit Presentation currency.",
         "Retrieve exact report evidence for FN-EX-000.B Average daily volume traded, by product or asset class, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches FN-EX-000.B Average daily volume traded, by product or asset class with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for FN-EX-000.B Average daily volume traded, by product or asset class.",
-        "Find numeric table rows or performance metrics reporting FN-EX-000.B Average daily volume traded, by product or asset class for the reporting period."
+        "Find numeric table rows or performance metrics reporting FN-EX-000.B Average daily volume traded, by product or asset class for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: product_type."
       ],
       "anchor_terms": [
         "FN-EX-000.B",
@@ -1544,7 +2796,19 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "FN-EX-000.B Average daily volume traded, by product or asset class",
+        "Average",
+        "Average daily",
+        "daily volume",
+        "volume traded",
+        "traded product",
+        "product asset",
+        "asset class",
+        "Average daily volume traded",
+        "by product or asset class",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1553,7 +2817,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1561,25 +2827,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Average daily volume traded, by product or asset class', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "product_type"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Average daily volume traded, by product or asset class' (FN-EX-000.B, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. Preserve separate reported values and source labels for the variable dimensions: product_type."
     }
   ]
 }

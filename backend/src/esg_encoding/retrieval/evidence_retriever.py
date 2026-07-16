@@ -11,6 +11,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
 
+from ..content_extractor import enrich_document_with_pdf_links
 from ..models import ProcessingConfig, ReportContent
 from .dual_channel import DualChannelRetriever
 from .metric_profile import (
@@ -81,6 +82,7 @@ def retrieve_evidence(
     config: Optional[ProcessingConfig] = None,
 ):
     """Retrieve evidence from one report through a single stable interface."""
+    enrich_document_with_pdf_links(report_content.document_content)
     config = config or _get_default_config(top_k)
     config.top_k = int(top_k or config.top_k or 50)
     config.use_keyword_retrieval = bool(use_keyword)
@@ -98,6 +100,7 @@ def retrieve_metric_collection(
     config: Optional[ProcessingConfig] = None,
 ):
     """Retrieve evidence for every metric in a MetricCollection."""
+    enrich_document_with_pdf_links(report_content.document_content)
     config = config or _get_default_config(getattr(ProcessingConfig(), "top_k", 50))
     retriever = DualChannelRetriever(config)
     return retriever.retrieve_for_collection(report_content, metric_collection)

@@ -78,6 +78,13 @@ class RetrievalResult(BaseModel):
     retrieval_type: str = Field(..., description="Retrieval type (keyword/semantic)")
     matched_keywords: List[str] = Field(default_factory=list, description="Matched keywords")
     metric_id: str = Field(..., description="Related metric ID")
+    link_source_page: Optional[int] = Field(default=None, description="Page containing an internal PDF link")
+    link_target_page: Optional[int] = Field(default=None, description="Internal PDF page followed for this result")
+    link_anchor_text: Optional[str] = Field(default=None, description="Visible PDF link anchor text")
+    link_source_segment_id: Optional[str] = Field(
+        default=None,
+        description="Report segment containing the internal PDF link",
+    )
 
 
 class MetricRetrievalResult(BaseModel):
@@ -166,6 +173,12 @@ class ProcessingConfig(BaseModel):
     # Retrieval configuration
     top_k: int = Field(default=10, description="Number of retrieval results")
     similarity_threshold: float = Field(default=0.3, description="Similarity threshold")
+    target_year: Optional[int] = Field(
+        default=None,
+        ge=1900,
+        le=2100,
+        description="Optional year projected into the legacy scalar value field",
+    )
     
     # LLM configuration
     llm_api_key: Optional[str] = Field(default=None, description="LLM API key")
@@ -211,8 +224,27 @@ class DisclosureAnalysis(BaseModel):
         default=None,
         description="Metric-specific numeric disclosure only; otherwise 'n/a'",
     )
+    year_values: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description=(
+            "All metric-specific annual values retained as one metric result; "
+            "each item may contain year, value, unit, page, context and evidence_segment_id"
+        ),
+    )
+    selected_year: Optional[int] = Field(
+        default=None,
+        description="Year currently projected into value/page/context for backward compatibility",
+    )
     context: Optional[str] = Field(default=None, description="Evidence context/excerpt for the found value")
     page: Optional[int] = Field(default=None, description="Page number where value/context is found")
+    evidence_sources: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Public evidence provenance without internal paths or worker details",
+    )
+    derived_calculation: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Validated formula, operands and result when a value is strictly derived",
+    )
 
 
 class ComplianceAssessment(BaseModel):

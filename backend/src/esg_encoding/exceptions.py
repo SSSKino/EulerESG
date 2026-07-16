@@ -31,6 +31,28 @@ class ESGEncodingError(Exception):
         return self.message
 
 
+class DisclosureAnalysisError(ESGEncodingError):
+    """Raised when disclosure inference cannot produce a valid conclusion."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        metric_id: Optional[str] = None,
+        metric_name: Optional[str] = None,
+        error_type: str = "analysis_failed",
+    ) -> None:
+        details = {
+            "error_type": error_type,
+            "metric_id": metric_id,
+            "metric_name": metric_name,
+        }
+        super().__init__(message, "DISCLOSURE_ANALYSIS_ERROR", details)
+        self.metric_id = metric_id
+        self.metric_name = metric_name
+        self.error_type = error_type
+
+
 class ContentExtractionError(ESGEncodingError):
     """内容提取异常"""
     

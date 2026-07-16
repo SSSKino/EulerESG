@@ -1,0 +1,276 @@
+from __future__ import annotations
+
+import os
+import threading
+import time
+from types import MethodType, SimpleNamespace
+import unittest
+from unittest.mock import patch
+
+from esg_encoding.disclosure_inference import DisclosureInferenceEngine
+from esg_encoding.models import (
+    DocumentContent,
+    ProcessingConfig,
+    ReportContent,
+    RetrievalResult,
+    TextSegment,
+)
+from esg_encoding.retrieval.keyword import KeywordRetriever
+from esg_encoding.retrieval.reranker import _QwenReranker
+from esg_encoding.retrieval.semantic import SemanticRetriever
+from esg_encoding.services.common import (
+    _apply_assessment_year_selection,
+    _prepare_metrics_for_retrieval,
+)
+
+
+def _report(segments: list[TextSegment]) -> ReportContent:
+    document = DocumentContent(
+        document_id="performance-test",
+        file_path="performance-test.pdf",
+        segments=segments,
+        markdown_content="",
+    )
+    return ReportContent(
+        document_id=document.document_id,
+        document_content=document,
+        embeddings=[],
+    )
+
+
+def _metric(index: int):
+    return SimpleNamespace(
+        metric_id=f"metric-{index}",
+        metric_name=f"Metric {index}",
+        metric_code=f"TC-X-{index}",
+        sasb_category="Quantitative",
+        sasb_topic="",
+        sasb_type="Quantitative",
+        unit="%",
+        definition="",
+    )
+
+
+class QwenRerankerBatchTests(unittest.TestCase):
+    def test_compute_score_honors_batch_and_text_limits(self):
+        reranker = object.__new__(_QwenReranker)
+        reranker.batch_size = 8
+        reranker.max_instruction_chars = 9
+        reranker.max_query_chars = 7
+        reranker.max_passage_chars = 11
+        batches: list[list[str]] = []
+
+        def score_batch(formatted):
+            values = list(formatted)
+            batches.append(values)
+            return [0.75] * len(values)
+
+        reranker._score_formatted_batch = score_batch
+        scores = reranker.compute_score(
+            [["q" * 30, "d" * 40] for _ in range(18)],
+            normalize=True,
+            instruction="i" * 20,
+        )
+
+        self.assertEqual([len(batch) for batch in batches], [8, 8, 2])
+        self.assertEqual(scores, [0.75] * 18)
+        first = batches[0][0]
+        self.assertIn("<Instruct>: " + "i" * 9, first)
+        self.assertIn("<Query>: " + "q" * 7, first)
+        self.assertTrue(first.endswith("<Document>: " + "d" * 11))
+
+    def test_long_passages_reduce_microbatch_without_changing_score_order(self):
+        reranker = object.__new__(_QwenReranker)
+        reranker.batch_size = 8
+        reranker.max_instruction_chars = 20
+        reranker.max_query_chars = 20
+        reranker.max_passage_chars = 40960
+        reranker.max_padded_chars_per_batch = 200
+        batch_sizes: list[int] = []
+
+        def score_batch(formatted):
+            values = list(formatted)
+            batch_sizes.append(len(values))
+            return [float(value.rsplit("IDX_", 1)[1]) for value in values]
+
+        reranker._score_formatted_batch = score_batch
+        docs = ["x" * 10 + "IDX_0", "x" * 10 + "IDX_1", "x" * 120 + "IDX_2", "x" * 10 + "IDX_3"]
+        scores = reranker.compute_score(
+            [["q", document] for document in docs],
+            normalize=True,
+            instruction="i",
+        )
+
+        self.assertEqual(batch_sizes, [2, 1, 1])
+        self.assertEqual(scores, [0.0, 1.0, 2.0, 3.0])
+
+    def test_unified_reranker_scores_every_retrieval_channel_once(self):
+        channel_types = [
+            "rrf:exact_code",
+            "rrf:exact_alias",
+            "rrf:bm25",
+            "rrf:semantic",
+            "rrf:linked_page+bm25",
+        ]
+        candidates = [
+            RetrievalResult(
+                segment_id=f"candidate-{index}",
+                content=f"Candidate evidence {index}",
+                page_number=index + 1,
+                score=0.2,
+                retrieval_type=retrieval_type,
+                metric_id="metric-1",
+            )
+            for index, retrieval_type in enumerate(channel_types)
+        ]
+        seen_pairs = []
+
+        def compute_score(pairs, normalize=True, instruction=None):
+            seen_pairs.extend(pairs)
+            return [0.1 * (index + 1) for index in range(len(pairs))]
+
+        retriever = object.__new__(SemanticRetriever)
+        retriever.config = SimpleNamespace(use_reranker=True)
+        retriever.reranker = SimpleNamespace(compute_score=compute_score)
+        retriever._reranker_initialized = True
+        retriever._reranker_lock = threading.Lock()
+
+        reranked = retriever.rerank_candidates(candidates, _metric(1))
+
+        self.assertEqual(len(seen_pairs), len(channel_types))
+        self.assertEqual(
+            {pair[1].split("Retrieval channels: ", 1)[1].splitlines()[0] for pair in seen_pairs},
+            set(channel_types),
+        )
+        self.assertNotIn("Expected unit", seen_pairs[0][0])
+        self.assertNotIn("%", seen_pairs[0][0])
+        self.assertTrue(all("qwen_unified_rerank" in item.retrieval_type for item in reranked))
+        self.assertEqual(reranked[0].segment_id, "candidate-4")
+
+
+class RetrievalCacheTests(unittest.TestCase):
+    def test_bm25_corpus_is_tokenized_once_per_report(self):
+        segments = [
+            TextSegment(
+                segment_id=f"segment-{index}",
+                content=f"Energy disclosure {index}",
+                page_number=1,
+                position_y=float(index),
+            )
+            for index in range(3)
+        ]
+        report = _report(segments)
+        retriever = KeywordRetriever(ProcessingConfig())
+        original = retriever._segment_tokens
+        calls = 0
+
+        def counted(segment):
+            nonlocal calls
+            calls += 1
+            return original(segment)
+
+        retriever._segment_tokens = counted
+        first = retriever._get_bm25_corpus(report)
+        second = retriever._get_bm25_corpus(report)
+
+        self.assertEqual(calls, 3)
+        self.assertIs(first[1], second[1])
+
+
+class MetricPreparationTests(unittest.TestCase):
+    def test_profiled_metrics_skip_unused_llm_expansion(self):
+        metrics = SimpleNamespace(metrics=[_metric(1), _metric(2)])
+        processor = SimpleNamespace(process_metric_collection=lambda value: self.fail("unexpected expansion"))
+        with patch.dict(os.environ, {"REPORT_SKIP_PROFILED_METRIC_EXPANSION": "true"}):
+            with patch("esg_encoding.services.common.find_metric_profile", return_value=object()):
+                prepared = _prepare_metrics_for_retrieval(processor, metrics)
+        self.assertIs(prepared, metrics)
+
+
+class DisclosureConcurrencyTests(unittest.TestCase):
+    def test_metric_analysis_is_parallel_and_result_order_is_stable(self):
+        engine = object.__new__(DisclosureInferenceEngine)
+        metrics = [_metric(index) for index in range(16)]
+        collection = SimpleNamespace(metrics=metrics)
+        report = _report(
+            [
+                TextSegment(
+                    segment_id="report-segment",
+                    content="Report content",
+                    page_number=1,
+                    position_y=1,
+                )
+            ]
+        )
+        worker_names: set[str] = set()
+        worker_lock = threading.Lock()
+        active_workers = 0
+        max_active_workers = 0
+
+        def fake_analysis(self, metric, retrieval_result, report_content):
+            nonlocal active_workers, max_active_workers
+            with worker_lock:
+                worker_names.add(threading.current_thread().name)
+                active_workers += 1
+                max_active_workers = max(max_active_workers, active_workers)
+            time.sleep(0.05)
+            with worker_lock:
+                active_workers -= 1
+            return self._not_disclosed_analysis_for_metric(metric, "test")
+
+        engine._analyze_collection_metric = MethodType(fake_analysis, engine)
+        with patch.dict(os.environ, {"REPORT_DISCLOSURE_LLM_CONCURRENCY": "8"}):
+            assessment = engine.analyze_compliance(
+                [],
+                report,
+                all_metrics=collection,
+                framework="SASB",
+            )
+
+        self.assertEqual(max_active_workers, 8)
+        self.assertEqual(len(worker_names), 8)
+        self.assertEqual(
+            [analysis.metric_id for analysis in assessment.metric_analyses],
+            [metric.metric_id for metric in metrics],
+        )
+
+
+class AssessmentYearSelectionTests(unittest.TestCase):
+    def _payload(self):
+        return {
+            "metric_analyses": [
+                {
+                    "metric_id": "employee-engagement",
+                    "disclosure_status": "fully_disclosed",
+                    "value": 87,
+                    "page": 108,
+                    "context": "FY2024: 87%",
+                    "year_values": [
+                        {"year": 2022, "value": 81, "unit": "%", "page": 106, "context": "FY2022: 81%"},
+                        {"year": 2023, "value": 84, "unit": "%", "page": 107, "context": "FY2023: 84%"},
+                        {"year": 2024, "value": 87, "unit": "%", "page": 108, "context": "FY2024: 87%"},
+                    ],
+                }
+            ]
+        }
+
+    def test_requested_year_is_projected_without_removing_other_years(self):
+        payload = _apply_assessment_year_selection(self._payload(), 2023)
+        metric = payload["metric_analyses"][0]
+        self.assertEqual(metric["value"], 84)
+        self.assertEqual(metric["page"], 107)
+        self.assertEqual(metric["selected_year"], 2023)
+        self.assertEqual(metric["year_selection_status"], "selected")
+        self.assertEqual(len(metric["year_values"]), 3)
+
+    def test_missing_requested_year_does_not_fall_back_to_latest(self):
+        payload = _apply_assessment_year_selection(self._payload(), 2021)
+        metric = payload["metric_analyses"][0]
+        self.assertEqual(metric["value"], "n/a")
+        self.assertIsNone(metric["page"])
+        self.assertEqual(metric["selected_year"], 2021)
+        self.assertEqual(metric["year_selection_status"], "not_available")
+
+
+if __name__ == "__main__":
+    unittest.main()

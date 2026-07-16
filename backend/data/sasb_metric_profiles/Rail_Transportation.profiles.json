@@ -31,10 +31,30 @@
         "CO2-e",
         "metric tonnes CO2-e",
         "CO2",
-        "equivalent"
+        "equivalent",
+        "Gross global Scope 1 emissions",
+        "Scope 1 GHG emissions",
+        "Gross Scope 1 greenhouse gas emissions",
+        "TR-RA-110a.1 Gross global Scope 1 emissions",
+        "Gross",
+        "Gross global",
+        "global",
+        "global Scope",
+        "Scope emissions",
+        "Metric tonnes (t) CO₂-e",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "The entity shall disclose its gross global Scope 1 greenhouse gas (GHG) emissions to the atmosphere of the"
       ],
-      "dense_query": "Find disclosures for TR-RA-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-110a.1 'Gross global Scope 1 emissions', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-110a.1 'Gross global Scope 1 emissions', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-110a.1 'Gross global Scope 1 emissions'; retain every reported year and label.",
+        "When TR-RA-110a.1 'Gross global Scope 1 emissions' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-110a.1 'Gross global Scope 1 emissions', including: Gross global Scope 1 emissions; Scope 1 GHG emissions; Gross Scope 1 greenhouse gas emissions; TR-RA-110a.1 Gross global Scope 1 emissions.",
+        "Find disclosures for TR-RA-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-RA-110a.1 Gross global Scope 1 emissions, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-110a.1 Gross global Scope 1 emissions related to Greenhouse Gas Emissions.",
@@ -53,7 +73,20 @@
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
         "metric tonnes CO2-e",
-        "tonnes CO2 equivalent"
+        "tonnes CO2 equivalent",
+        "Scope 1 GHG emissions",
+        "Gross Scope 1 greenhouse gas emissions",
+        "TR-RA-110a.1 Gross global Scope 1 emissions",
+        "Gross",
+        "Gross global",
+        "global",
+        "global Scope",
+        "Scope emissions",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Scope 2",
@@ -73,7 +106,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -81,30 +116,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Gross global Scope 1 emissions', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
-          "Metric tonnes (t)",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Gross global Scope 1 emissions' (TR-RA-110a.1, expected unit: Metric tonnes (t) CO₂-e). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-110a.2",
@@ -139,10 +220,31 @@
         "against",
         "those",
         "Greenhouse",
-        "Gas"
+        "Gas",
+        "Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "TR-RA-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "long- short-term",
+        "short-term strategy",
+        "strategy plan",
+        "plan manage",
+        "manage Scope",
+        "Scope emissions",
+        "emissions emissions",
+        "emissions reduction",
+        "reduction targets",
+        "targets analysis",
+        "analysis performance",
+        "performance against",
+        "Discussion of long- and short-term strategy or plan to manage",
+        "Scope 1 emissions, emissions reduction targets, and an analysis of performance"
       ],
-      "dense_query": "Find disclosures for TR-RA-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', under 'Greenhouse Gas Emissions'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', under 'Greenhouse Gas Emissions'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers TR-RA-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets'.",
+        "When TR-RA-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', including: Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets; TR-RA-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets.",
+        "Find disclosures for TR-RA-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-RA-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
@@ -162,7 +264,24 @@
         "manage",
         "Scope",
         "emissions",
-        "reduction"
+        "reduction",
+        "TR-RA-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "long- short-term",
+        "short-term strategy",
+        "strategy plan",
+        "plan manage",
+        "manage Scope",
+        "Scope emissions",
+        "emissions emissions",
+        "emissions reduction",
+        "reduction targets",
+        "targets",
+        "targets analysis",
+        "analysis",
+        "analysis performance",
+        "performance",
+        "performance against",
+        "against"
       ],
       "negative_anchor_terms": [
         "Scope 2",
@@ -183,7 +302,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -195,20 +316,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets' (TR-RA-110a.2, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-110a.3.01",
@@ -234,10 +403,21 @@
         "Emissions",
         "Gigajoules",
         "GJ",
-        "Gigajoules (GJ)"
+        "Gigajoules (GJ)",
+        "Total fuel consumed",
+        "TR-RA-110a.3 Total fuel consumed",
+        "gigajoule",
+        "Total fuel consumed, percentage renewable",
+        "The entity shall disclose the total amount of fuel consumed from all sources as an aggregate figure, in gigajoules"
       ],
-      "dense_query": "Find disclosures for TR-RA-110a.3 Total fuel consumed with unit Gigajoules (GJ) related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-110a.3 'Total fuel consumed', under 'Greenhouse Gas Emissions', with expected unit 'Gigajoules (GJ)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-110a.3 'Total fuel consumed', under 'Greenhouse Gas Emissions', with expected unit 'Gigajoules (GJ)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-110a.3 'Total fuel consumed'; retain every reported year and label.",
+        "When TR-RA-110a.3 'Total fuel consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-110a.3 'Total fuel consumed', including: Total fuel consumed; TR-RA-110a.3 Total fuel consumed.",
+        "Disambiguate TR-RA-110a.3 'Total fuel consumed' from sibling metrics sharing TR-RA-110a.3: Percentage of fuel consumed that was renewable fuel.",
+        "Find disclosures for TR-RA-110a.3 Total fuel consumed with unit Gigajoules (GJ) related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-RA-110a.3 Total fuel consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-110a.3 Total fuel consumed with unit Gigajoules (GJ).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-110a.3 Total fuel consumed related to Greenhouse Gas Emissions.",
@@ -255,7 +435,9 @@
         "Emissions",
         "Gigajoules (GJ)",
         "GJ",
-        "gigajoules"
+        "gigajoules",
+        "TR-RA-110a.3 Total fuel consumed",
+        "gigajoule"
       ],
       "negative_anchor_terms": [
         "Percentage of fuel consumed that was renewable fuel",
@@ -273,7 +455,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -281,24 +465,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total fuel consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "energy",
         "expected_units": [
           "Gigajoules (GJ)",
           "GJ",
-          "gigajoules"
+          "MWh",
+          "kWh",
+          "MJ",
+          "kJ"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total fuel consumed' (TR-RA-110a.3, expected unit: Gigajoules (GJ)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of fuel consumed that was renewable fuel."
     },
     {
       "metric_id": "TR-RA-110a.3.02",
@@ -328,10 +564,26 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of fuel consumed that was renewable fuel",
+        "Percent of fuel consumed that was renewable fuel",
+        "TR-RA-110a.3 Percentage of fuel consumed that was renewable fuel",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was renewable",
+        "Total fuel consumed, percentage renewable",
+        "The entity shall disclose the total amount of fuel consumed from all sources as an aggregate figure, in gigajoules"
       ],
-      "dense_query": "Find disclosures for TR-RA-110a.3 Percentage of fuel consumed that was renewable fuel with unit Percentage (%) related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-110a.3 'Percentage of fuel consumed that was renewable fuel', under 'Greenhouse Gas Emissions', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-110a.3 'Percentage of fuel consumed that was renewable fuel', under 'Greenhouse Gas Emissions', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-110a.3 'Percentage of fuel consumed that was renewable fuel'; retain every reported year and label.",
+        "When TR-RA-110a.3 'Percentage of fuel consumed that was renewable fuel' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-110a.3 'Percentage of fuel consumed that was renewable fuel', including: Percentage of fuel consumed that was renewable fuel; Percent of fuel consumed that was renewable fuel; TR-RA-110a.3 Percentage of fuel consumed that was renewable fuel.",
+        "Disambiguate TR-RA-110a.3 'Percentage of fuel consumed that was renewable fuel' from sibling metrics sharing TR-RA-110a.3: Total fuel consumed.",
+        "Find disclosures for TR-RA-110a.3 Percentage of fuel consumed that was renewable fuel with unit Percentage (%) related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-RA-110a.3 Percentage of fuel consumed that was renewable fuel, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-110a.3 Percentage of fuel consumed that was renewable fuel with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-110a.3 Percentage of fuel consumed that was renewable fuel related to Greenhouse Gas Emissions.",
@@ -352,7 +604,14 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of fuel consumed that was renewable fuel",
+        "TR-RA-110a.3 Percentage of fuel consumed that was renewable fuel",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was renewable"
       ],
       "negative_anchor_terms": [
         "Total fuel consumed",
@@ -370,7 +629,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -378,11 +639,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of fuel consumed that was renewable fuel', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -394,9 +681,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of fuel consumed that was renewable fuel' (TR-RA-110a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total fuel consumed."
     },
     {
       "metric_id": "TR-RA-120a.1.01",
@@ -428,10 +738,32 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "Air emissions of the following pollutants: NOx (excluding N2O)",
+        "TR-RA-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants NOx",
+        "NOx excluding",
+        "excluding N2O",
+        "Air emissions of the following pollutants",
+        "NOx (excluding N2O",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "and (2) particulate matter (PM10)"
       ],
-      "dense_query": "Find disclosures for TR-RA-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)'; retain every reported year and label.",
+        "When TR-RA-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)', including: Air emissions of the following pollutants: (1) NOx (excluding N2O); Air emissions of the following pollutants: NOx (excluding N2O); TR-RA-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O).",
+        "Disambiguate TR-RA-120a.1 'Air emissions of the following pollutants: (1) NOx (excluding N2O)' from sibling metrics sharing TR-RA-120a.1: Air emissions of the following pollutants: (2) particulate matter (PM10).",
+        "Find disclosures for TR-RA-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) with unit Metric tonnes (t) related to Air Quality.",
         "Retrieve exact report evidence for TR-RA-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O) related to Air Quality.",
@@ -451,7 +783,22 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: NOx (excluding N2O)",
+        "TR-RA-120a.1 Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants NOx",
+        "NOx excluding",
+        "excluding N2O",
+        "Air emissions of the following pollutants",
+        "NOx (excluding N2O",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Air emissions of the following pollutants: (2) particulate matter (PM10)"
@@ -467,7 +814,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -475,30 +824,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Air emissions of the following pollutants: (1) NOx (excluding N2O)', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Air emissions of the following pollutants: (1) NOx (excluding N2O)' (TR-RA-120a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Air emissions of the following pollutants: (2) particulate matter (PM10)."
     },
     {
       "metric_id": "TR-RA-120a.1.02",
@@ -530,10 +925,33 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: (2) particulate matter (PM10)",
+        "Air emissions of the following pollutants: particulate matter (PM10)",
+        "TR-RA-120a.1 Air emissions of the following pollutants: (2) particulate matter (PM10)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants particulate",
+        "particulate matter",
+        "matter PM10",
+        "Air emissions of the following pollutants",
+        "particulate matter (PM10",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "Air emissions of the following pollutants: (1) NOx (excluding N2O)",
+        "and (2) particulate matter (PM10)"
       ],
-      "dense_query": "Find disclosures for TR-RA-120a.1 Air emissions of the following pollutants: (2) particulate matter (PM10) with unit Metric tonnes (t) related to Air Quality.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-120a.1 'Air emissions of the following pollutants: (2) particulate matter (PM10)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-120a.1 'Air emissions of the following pollutants: (2) particulate matter (PM10)', under 'Air Quality', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-120a.1 'Air emissions of the following pollutants: (2) particulate matter (PM10)'; retain every reported year and label.",
+        "When TR-RA-120a.1 'Air emissions of the following pollutants: (2) particulate matter (PM10)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-120a.1 'Air emissions of the following pollutants: (2) particulate matter (PM10)', including: Air emissions of the following pollutants: (2) particulate matter (PM10); Air emissions of the following pollutants: particulate matter (PM10); TR-RA-120a.1 Air emissions of the following pollutants: (2) particulate matter (PM10).",
+        "Disambiguate TR-RA-120a.1 'Air emissions of the following pollutants: (2) particulate matter (PM10)' from sibling metrics sharing TR-RA-120a.1: Air emissions of the following pollutants: (1) NOx (excluding N2O).",
+        "Find disclosures for TR-RA-120a.1 Air emissions of the following pollutants: (2) particulate matter (PM10) with unit Metric tonnes (t) related to Air Quality.",
         "Retrieve exact report evidence for TR-RA-120a.1 Air emissions of the following pollutants: (2) particulate matter (PM10), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-120a.1 Air emissions of the following pollutants: (2) particulate matter (PM10) with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-120a.1 Air emissions of the following pollutants: (2) particulate matter (PM10) related to Air Quality.",
@@ -553,7 +971,22 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Air emissions of the following pollutants: particulate matter (PM10)",
+        "TR-RA-120a.1 Air emissions of the following pollutants: (2) particulate matter (PM10)",
+        "emissions following",
+        "following",
+        "following pollutants",
+        "pollutants particulate",
+        "particulate matter",
+        "matter PM10",
+        "Air emissions of the following pollutants",
+        "particulate matter (PM10",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Air emissions of the following pollutants: (1) NOx (excluding N2O)"
@@ -569,7 +1002,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -577,30 +1012,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Air emissions of the following pollutants: (2) particulate matter (PM10)', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Air emissions of the following pollutants: (2) particulate matter (PM10)' (TR-RA-120a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Air emissions of the following pollutants: (1) NOx (excluding N2O)."
     },
     {
       "metric_id": "TR-RA-320a.1.01",
@@ -628,10 +1109,26 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "Total recordable incident rate (TRIR) for (a) direct employees",
+        "TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "recordable incident",
+        "incident rate",
+        "rate TRIR",
+        "TRIR direct",
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR), (2) fatality rate, and",
+        "(3) near miss frequency rate (NMFR) for (a) direct employees and (b) contract"
       ],
-      "dense_query": "Find disclosures for TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees'; retain every reported year and label.",
+        "When TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees', including: (1) Total recordable incident rate (TRIR) for (a) direct employees; Total recordable incident rate (TRIR) for (a) direct employees; TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees.",
+        "Disambiguate TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (a) direct employees' from sibling metrics sharing TR-RA-320a.1: (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees; (3) Near miss frequency rate (NMFR) for (a) direct employees; (3) near miss frequency rate (NMFR) for (b) contract employees.",
+        "Find disclosures for TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees related to Workforce Health & Safety.",
@@ -639,6 +1136,7 @@
       ],
       "anchor_terms": [
         "TR-RA-320a.1",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
         "Total recordable incident rate (TRIR) for (a) direct employees",
         "Total recordable incident rate",
         "TRIR",
@@ -650,7 +1148,13 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "recordable incident",
+        "incident rate",
+        "rate TRIR",
+        "TRIR direct",
+        "direct employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (b) contract employees",
@@ -658,7 +1162,12 @@
         "Fatality rate for (b) contract employees",
         "Near miss frequency rate (NMFR) for (a) direct employees",
         "near miss frequency rate (NMFR) for (b) contract employees",
-        "contract employees"
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "(2) Fatality rate for (a) direct employees",
+        "(2) Fatality rate for (b) contract employees",
+        "(3) Near miss frequency rate (NMFR) for (a) direct employees",
+        "(3) near miss frequency rate (NMFR) for (b) contract employees"
       ],
       "similar_metric_warnings": [
         {
@@ -676,6 +1185,10 @@
         {
           "confusing_with": "TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees",
           "difference": "This profile is only for \"(1) Total recordable incident rate (TRIR) for (a) direct employees\"; do not treat evidence for \"(3) Near miss frequency rate (NMFR) for (a) direct employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees",
+          "difference": "The canonical target is '(1) Total recordable incident rate (TRIR) for (a) direct employees' (Rate). Do not substitute '(3) near miss frequency rate (NMFR) for (b) contract employees' (Rate); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -683,7 +1196,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -691,23 +1206,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total recordable incident rate (TRIR) for (a) direct employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total recordable incident rate (TRIR) for (a) direct employees' (TR-RA-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees; (3) Near miss frequency rate (NMFR) for (a) direct employees; (3) near miss frequency rate (NMFR) for (b) contract employees."
     },
     {
       "metric_id": "TR-RA-320a.1.02",
@@ -735,10 +1298,26 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "Total recordable incident rate (TRIR) for (b) contract employees",
+        "TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "recordable incident",
+        "incident rate",
+        "rate TRIR",
+        "TRIR contract",
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR), (2) fatality rate, and",
+        "(3) near miss frequency rate (NMFR) for (a) direct employees and (b) contract"
       ],
-      "dense_query": "Find disclosures for TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees'; retain every reported year and label.",
+        "When TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees', including: (1) Total recordable incident rate (TRIR) for (b) contract employees; Total recordable incident rate (TRIR) for (b) contract employees; TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees.",
+        "Disambiguate TR-RA-320a.1 '(1) Total recordable incident rate (TRIR) for (b) contract employees' from sibling metrics sharing TR-RA-320a.1: (1) Total recordable incident rate (TRIR) for (a) direct employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees; (3) Near miss frequency rate (NMFR) for (a) direct employees; (3) near miss frequency rate (NMFR) for (b) contract employees.",
+        "Find disclosures for TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees related to Workforce Health & Safety.",
@@ -746,6 +1325,7 @@
       ],
       "anchor_terms": [
         "TR-RA-320a.1",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
         "Total recordable incident rate (TRIR) for (b) contract employees",
         "Total recordable incident rate",
         "TRIR",
@@ -757,7 +1337,13 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "TR-RA-320a.1 (1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "recordable incident",
+        "incident rate",
+        "rate TRIR",
+        "TRIR contract",
+        "contract employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (a) direct employees",
@@ -765,7 +1351,12 @@
         "Fatality rate for (b) contract employees",
         "Near miss frequency rate (NMFR) for (a) direct employees",
         "near miss frequency rate (NMFR) for (b) contract employees",
-        "direct employees"
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "(2) Fatality rate for (a) direct employees",
+        "(2) Fatality rate for (b) contract employees",
+        "(3) Near miss frequency rate (NMFR) for (a) direct employees",
+        "(3) near miss frequency rate (NMFR) for (b) contract employees"
       ],
       "similar_metric_warnings": [
         {
@@ -783,6 +1374,10 @@
         {
           "confusing_with": "TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees",
           "difference": "This profile is only for \"(1) Total recordable incident rate (TRIR) for (b) contract employees\"; do not treat evidence for \"(3) Near miss frequency rate (NMFR) for (a) direct employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees",
+          "difference": "The canonical target is '(1) Total recordable incident rate (TRIR) for (b) contract employees' (Rate). Do not substitute '(3) near miss frequency rate (NMFR) for (b) contract employees' (Rate); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -790,7 +1385,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -798,23 +1395,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total recordable incident rate (TRIR) for (b) contract employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total recordable incident rate (TRIR) for (b) contract employees' (TR-RA-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (a) direct employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees; (3) Near miss frequency rate (NMFR) for (a) direct employees; (3) near miss frequency rate (NMFR) for (b) contract employees."
     },
     {
       "metric_id": "TR-RA-320a.1.03",
@@ -839,10 +1484,24 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(2) Fatality rate for (a) direct employees",
+        "Fatality rate for (a) direct employees",
+        "TR-RA-320a.1 (2) Fatality rate for (a) direct employees",
+        "Fatality rate",
+        "rate direct",
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR), (2) fatality rate, and",
+        "(3) near miss frequency rate (NMFR) for (a) direct employees and (b) contract"
       ],
-      "dense_query": "Find disclosures for TR-RA-320a.1 (2) Fatality rate for (a) direct employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(2) Fatality rate for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(2) Fatality rate for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-320a.1 '(2) Fatality rate for (a) direct employees'; retain every reported year and label.",
+        "When TR-RA-320a.1 '(2) Fatality rate for (a) direct employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-320a.1 '(2) Fatality rate for (a) direct employees', including: (2) Fatality rate for (a) direct employees; Fatality rate for (a) direct employees; TR-RA-320a.1 (2) Fatality rate for (a) direct employees.",
+        "Disambiguate TR-RA-320a.1 '(2) Fatality rate for (a) direct employees' from sibling metrics sharing TR-RA-320a.1: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (b) contract employees; (3) Near miss frequency rate (NMFR) for (a) direct employees; (3) near miss frequency rate (NMFR) for (b) contract employees.",
+        "Find disclosures for TR-RA-320a.1 (2) Fatality rate for (a) direct employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for TR-RA-320a.1 (2) Fatality rate for (a) direct employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-320a.1 (2) Fatality rate for (a) direct employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-320a.1 (2) Fatality rate for (a) direct employees related to Workforce Health & Safety.",
@@ -850,6 +1509,7 @@
       ],
       "anchor_terms": [
         "TR-RA-320a.1",
+        "(2) Fatality rate for (a) direct employees",
         "Fatality rate for (a) direct employees",
         "Fatality",
         "rate",
@@ -858,7 +1518,11 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "TR-RA-320a.1 (2) Fatality rate for (a) direct employees",
+        "Fatality rate",
+        "rate direct",
+        "direct employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (a) direct employees",
@@ -866,7 +1530,12 @@
         "Fatality rate for (b) contract employees",
         "Near miss frequency rate (NMFR) for (a) direct employees",
         "near miss frequency rate (NMFR) for (b) contract employees",
-        "contract employees"
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "(2) Fatality rate for (b) contract employees",
+        "(3) Near miss frequency rate (NMFR) for (a) direct employees",
+        "(3) near miss frequency rate (NMFR) for (b) contract employees"
       ],
       "similar_metric_warnings": [
         {
@@ -884,6 +1553,10 @@
         {
           "confusing_with": "TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees",
           "difference": "This profile is only for \"(2) Fatality rate for (a) direct employees\"; do not treat evidence for \"(3) Near miss frequency rate (NMFR) for (a) direct employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees",
+          "difference": "The canonical target is '(2) Fatality rate for (a) direct employees' (Rate). Do not substitute '(3) near miss frequency rate (NMFR) for (b) contract employees' (Rate); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -891,7 +1564,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -899,23 +1574,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Fatality rate for (a) direct employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Fatality rate for (a) direct employees' (TR-RA-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (b) contract employees; (3) Near miss frequency rate (NMFR) for (a) direct employees; (3) near miss frequency rate (NMFR) for (b) contract employees."
     },
     {
       "metric_id": "TR-RA-320a.1.04",
@@ -940,10 +1663,24 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(2) Fatality rate for (b) contract employees",
+        "Fatality rate for (b) contract employees",
+        "TR-RA-320a.1 (2) Fatality rate for (b) contract employees",
+        "Fatality rate",
+        "rate contract",
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR), (2) fatality rate, and",
+        "(3) near miss frequency rate (NMFR) for (a) direct employees and (b) contract"
       ],
-      "dense_query": "Find disclosures for TR-RA-320a.1 (2) Fatality rate for (b) contract employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(2) Fatality rate for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(2) Fatality rate for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-320a.1 '(2) Fatality rate for (b) contract employees'; retain every reported year and label.",
+        "When TR-RA-320a.1 '(2) Fatality rate for (b) contract employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-320a.1 '(2) Fatality rate for (b) contract employees', including: (2) Fatality rate for (b) contract employees; Fatality rate for (b) contract employees; TR-RA-320a.1 (2) Fatality rate for (b) contract employees.",
+        "Disambiguate TR-RA-320a.1 '(2) Fatality rate for (b) contract employees' from sibling metrics sharing TR-RA-320a.1: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (3) Near miss frequency rate (NMFR) for (a) direct employees; (3) near miss frequency rate (NMFR) for (b) contract employees.",
+        "Find disclosures for TR-RA-320a.1 (2) Fatality rate for (b) contract employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for TR-RA-320a.1 (2) Fatality rate for (b) contract employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-320a.1 (2) Fatality rate for (b) contract employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-320a.1 (2) Fatality rate for (b) contract employees related to Workforce Health & Safety.",
@@ -951,6 +1688,7 @@
       ],
       "anchor_terms": [
         "TR-RA-320a.1",
+        "(2) Fatality rate for (b) contract employees",
         "Fatality rate for (b) contract employees",
         "Fatality",
         "rate",
@@ -959,7 +1697,11 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "TR-RA-320a.1 (2) Fatality rate for (b) contract employees",
+        "Fatality rate",
+        "rate contract",
+        "contract employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (a) direct employees",
@@ -967,7 +1709,12 @@
         "Fatality rate for (a) direct employees",
         "Near miss frequency rate (NMFR) for (a) direct employees",
         "near miss frequency rate (NMFR) for (b) contract employees",
-        "direct employees"
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "(2) Fatality rate for (a) direct employees",
+        "(3) Near miss frequency rate (NMFR) for (a) direct employees",
+        "(3) near miss frequency rate (NMFR) for (b) contract employees"
       ],
       "similar_metric_warnings": [
         {
@@ -985,6 +1732,10 @@
         {
           "confusing_with": "TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees",
           "difference": "This profile is only for \"(2) Fatality rate for (b) contract employees\"; do not treat evidence for \"(3) Near miss frequency rate (NMFR) for (a) direct employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees",
+          "difference": "The canonical target is '(2) Fatality rate for (b) contract employees' (Rate). Do not substitute '(3) near miss frequency rate (NMFR) for (b) contract employees' (Rate); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -992,7 +1743,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1000,23 +1753,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Fatality rate for (b) contract employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Fatality rate for (b) contract employees' (TR-RA-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (3) Near miss frequency rate (NMFR) for (a) direct employees; (3) near miss frequency rate (NMFR) for (b) contract employees."
     },
     {
       "metric_id": "TR-RA-320a.1.05",
@@ -1044,10 +1845,27 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(3) Near miss frequency rate (NMFR) for (a) direct employees",
+        "Near miss frequency rate (NMFR) for (a) direct employees",
+        "TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees",
+        "Near miss",
+        "miss frequency",
+        "frequency rate",
+        "rate NMFR",
+        "NMFR direct",
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR), (2) fatality rate, and",
+        "(3) near miss frequency rate (NMFR) for (a) direct employees and (b) contract"
       ],
-      "dense_query": "Find disclosures for TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(3) Near miss frequency rate (NMFR) for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(3) Near miss frequency rate (NMFR) for (a) direct employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-320a.1 '(3) Near miss frequency rate (NMFR) for (a) direct employees'; retain every reported year and label.",
+        "When TR-RA-320a.1 '(3) Near miss frequency rate (NMFR) for (a) direct employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-320a.1 '(3) Near miss frequency rate (NMFR) for (a) direct employees', including: (3) Near miss frequency rate (NMFR) for (a) direct employees; Near miss frequency rate (NMFR) for (a) direct employees; TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees.",
+        "Disambiguate TR-RA-320a.1 '(3) Near miss frequency rate (NMFR) for (a) direct employees' from sibling metrics sharing TR-RA-320a.1: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees; (3) near miss frequency rate (NMFR) for (b) contract employees.",
+        "Find disclosures for TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees related to Workforce Health & Safety.",
@@ -1055,6 +1873,7 @@
       ],
       "anchor_terms": [
         "TR-RA-320a.1",
+        "(3) Near miss frequency rate (NMFR) for (a) direct employees",
         "Near miss frequency rate (NMFR) for (a) direct employees",
         "Near",
         "miss",
@@ -1066,7 +1885,14 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees",
+        "Near miss",
+        "miss frequency",
+        "frequency rate",
+        "rate NMFR",
+        "NMFR direct",
+        "direct employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (a) direct employees",
@@ -1074,7 +1900,12 @@
         "Fatality rate for (a) direct employees",
         "Fatality rate for (b) contract employees",
         "near miss frequency rate (NMFR) for (b) contract employees",
-        "contract employees"
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "(2) Fatality rate for (a) direct employees",
+        "(2) Fatality rate for (b) contract employees",
+        "(3) near miss frequency rate (NMFR) for (b) contract employees"
       ],
       "similar_metric_warnings": [
         {
@@ -1092,6 +1923,10 @@
         {
           "confusing_with": "TR-RA-320a.1 (2) Fatality rate for (b) contract employees",
           "difference": "This profile is only for \"(3) Near miss frequency rate (NMFR) for (a) direct employees\"; do not treat evidence for \"(2) Fatality rate for (b) contract employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees",
+          "difference": "The canonical target is '(3) Near miss frequency rate (NMFR) for (a) direct employees' (Rate). Do not substitute '(3) near miss frequency rate (NMFR) for (b) contract employees' (Rate); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1099,7 +1934,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1107,23 +1944,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Near miss frequency rate (NMFR) for (a) direct employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Near miss frequency rate (NMFR) for (a) direct employees' (TR-RA-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees; (3) near miss frequency rate (NMFR) for (b) contract employees."
     },
     {
       "metric_id": "TR-RA-320a.1.06",
@@ -1151,10 +2036,27 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "(3) near miss frequency rate (NMFR) for (b) contract employees",
+        "near miss frequency rate (NMFR) for (b) contract employees",
+        "TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees",
+        "near miss",
+        "miss frequency",
+        "frequency rate",
+        "rate NMFR",
+        "NMFR contract",
+        "contract employees",
+        "(1) Total recordable incident rate (TRIR), (2) fatality rate, and",
+        "(3) near miss frequency rate (NMFR) for (a) direct employees and (b) contract"
       ],
-      "dense_query": "Find disclosures for TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees with unit Rate related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(3) near miss frequency rate (NMFR) for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-320a.1 '(3) near miss frequency rate (NMFR) for (b) contract employees', under 'Workforce Health & Safety', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-320a.1 '(3) near miss frequency rate (NMFR) for (b) contract employees'; retain every reported year and label.",
+        "When TR-RA-320a.1 '(3) near miss frequency rate (NMFR) for (b) contract employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-320a.1 '(3) near miss frequency rate (NMFR) for (b) contract employees', including: (3) near miss frequency rate (NMFR) for (b) contract employees; near miss frequency rate (NMFR) for (b) contract employees; TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees.",
+        "Disambiguate TR-RA-320a.1 '(3) near miss frequency rate (NMFR) for (b) contract employees' from sibling metrics sharing TR-RA-320a.1: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees; (3) Near miss frequency rate (NMFR) for (a) direct employees.",
+        "Find disclosures for TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees with unit Rate related to Workforce Health & Safety.",
         "Retrieve exact report evidence for TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees related to Workforce Health & Safety.",
@@ -1162,6 +2064,7 @@
       ],
       "anchor_terms": [
         "TR-RA-320a.1",
+        "(3) near miss frequency rate (NMFR) for (b) contract employees",
         "near miss frequency rate (NMFR) for (b) contract employees",
         "near",
         "miss",
@@ -1173,7 +2076,14 @@
         "Workforce",
         "Health",
         "Safety",
-        "ratio"
+        "ratio",
+        "TR-RA-320a.1 (3) near miss frequency rate (NMFR) for (b) contract employees",
+        "near miss",
+        "miss frequency",
+        "frequency rate",
+        "rate NMFR",
+        "NMFR contract",
+        "contract employees"
       ],
       "negative_anchor_terms": [
         "Total recordable incident rate (TRIR) for (a) direct employees",
@@ -1181,7 +2091,12 @@
         "Fatality rate for (a) direct employees",
         "Fatality rate for (b) contract employees",
         "Near miss frequency rate (NMFR) for (a) direct employees",
-        "direct employees"
+        "direct employees",
+        "(1) Total recordable incident rate (TRIR) for (a) direct employees",
+        "(1) Total recordable incident rate (TRIR) for (b) contract employees",
+        "(2) Fatality rate for (a) direct employees",
+        "(2) Fatality rate for (b) contract employees",
+        "(3) Near miss frequency rate (NMFR) for (a) direct employees"
       ],
       "similar_metric_warnings": [
         {
@@ -1199,6 +2114,10 @@
         {
           "confusing_with": "TR-RA-320a.1 (2) Fatality rate for (b) contract employees",
           "difference": "This profile is only for \"(3) near miss frequency rate (NMFR) for (b) contract employees\"; do not treat evidence for \"(2) Fatality rate for (b) contract employees\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "TR-RA-320a.1 (3) Near miss frequency rate (NMFR) for (a) direct employees",
+          "difference": "The canonical target is '(3) near miss frequency rate (NMFR) for (b) contract employees' (Rate). Do not substitute '(3) Near miss frequency rate (NMFR) for (a) direct employees' (Rate); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1206,7 +2125,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1214,23 +2135,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) near miss frequency rate (NMFR) for (b) contract employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) near miss frequency rate (NMFR) for (b) contract employees' (TR-RA-320a.1, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total recordable incident rate (TRIR) for (a) direct employees; (1) Total recordable incident rate (TRIR) for (b) contract employees; (2) Fatality rate for (a) direct employees; (2) Fatality rate for (b) contract employees; (3) Near miss frequency rate (NMFR) for (a) direct employees."
     },
     {
       "metric_id": "TR-RA-520a.1",
@@ -1262,10 +2231,31 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "TR-RA-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour regulations",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with anti-competitive behaviour regulations"
       ],
-      "dense_query": "Find disclosures for TR-RA-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency related to Competitive Behaviour.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', under 'Competitive Behaviour', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', under 'Competitive Behaviour', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations'; retain every reported year and label.",
+        "When TR-RA-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', including: Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations; Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations; TR-RA-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations.",
+        "Find disclosures for TR-RA-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency related to Competitive Behaviour.",
         "Retrieve exact report evidence for TR-RA-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations related to Competitive Behaviour.",
@@ -1287,7 +2277,19 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "TR-RA-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour regulations",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1301,7 +2303,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1309,25 +2313,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations' (TR-RA-520a.1, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-540a.1",
@@ -1341,7 +2394,8 @@
       "aliases": [
         "Number of accidents and incidents",
         "Count of accidents and incidents",
-        "TR-RA-540a.1 Number of accidents and incidents"
+        "TR-RA-540a.1 Number of accidents and incidents",
+        "Total number of accidents and incidents"
       ],
       "bm25_terms": [
         "TR-RA-540a.1",
@@ -1353,10 +2407,22 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of accidents and incidents",
+        "Count of accidents and incidents",
+        "TR-RA-540a.1 Number of accidents and incidents",
+        "Total number of accidents and incidents",
+        "accidents incidents",
+        "Number of accidents",
+        "The entity shall disclose the total number of accidents and incidents involving the entity"
       ],
-      "dense_query": "Find disclosures for TR-RA-540a.1 Number of accidents and incidents with unit Number related to Accident & Safety Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.1 'Number of accidents and incidents', under 'Accident & Safety Management', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.1 'Number of accidents and incidents', under 'Accident & Safety Management', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-540a.1 'Number of accidents and incidents'; retain every reported year and label.",
+        "When TR-RA-540a.1 'Number of accidents and incidents' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-540a.1 'Number of accidents and incidents', including: Number of accidents and incidents; Count of accidents and incidents; TR-RA-540a.1 Number of accidents and incidents; Total number of accidents and incidents.",
+        "Find disclosures for TR-RA-540a.1 Number of accidents and incidents with unit Number related to Accident & Safety Management.",
         "Retrieve exact report evidence for TR-RA-540a.1 Number of accidents and incidents, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-540a.1 Number of accidents and incidents with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-540a.1 Number of accidents and incidents related to Accident & Safety Management.",
@@ -1372,7 +2438,12 @@
         "Management",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of accidents and incidents",
+        "TR-RA-540a.1 Number of accidents and incidents",
+        "Total number of accidents and incidents",
+        "accidents incidents",
+        "Number of accidents"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1381,7 +2452,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1389,24 +2462,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of accidents and incidents'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of accidents and incidents' (TR-RA-540a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-540a.2.01",
@@ -1421,7 +2542,8 @@
         "Number of (1) accident releases",
         "Number of accident releases",
         "Count of (1) accident releases",
-        "TR-RA-540a.2 Number of (1) accident releases"
+        "TR-RA-540a.2 Number of (1) accident releases",
+        "Total number of (1) accident releases"
       ],
       "bm25_terms": [
         "TR-RA-540a.2",
@@ -1432,10 +2554,24 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of (1) accident releases",
+        "Number of accident releases",
+        "Count of (1) accident releases",
+        "TR-RA-540a.2 Number of (1) accident releases",
+        "Total number of (1) accident releases",
+        "accident releases",
+        "Number of (1) accident releases and (2) non-accident releases",
+        "The entity shall disclose (1) the total number of accident releases of hazardous material"
       ],
-      "dense_query": "Find disclosures for TR-RA-540a.2 Number of (1) accident releases with unit Number related to Accident & Safety Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.2 'Number of (1) accident releases', under 'Accident & Safety Management', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.2 'Number of (1) accident releases', under 'Accident & Safety Management', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-540a.2 'Number of (1) accident releases'; retain every reported year and label.",
+        "When TR-RA-540a.2 'Number of (1) accident releases' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-540a.2 'Number of (1) accident releases', including: Number of (1) accident releases; Number of accident releases; Count of (1) accident releases; TR-RA-540a.2 Number of (1) accident releases; Total number of (1) accident releases.",
+        "Disambiguate TR-RA-540a.2 'Number of (1) accident releases' from sibling metrics sharing TR-RA-540a.2: Number of (2) non-accident releases (NARs).",
+        "Find disclosures for TR-RA-540a.2 Number of (1) accident releases with unit Number related to Accident & Safety Management.",
         "Retrieve exact report evidence for TR-RA-540a.2 Number of (1) accident releases, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-540a.2 Number of (1) accident releases with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-540a.2 Number of (1) accident releases related to Accident & Safety Management.",
@@ -1450,7 +2586,12 @@
         "Management",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of accident releases",
+        "Count of (1) accident releases",
+        "TR-RA-540a.2 Number of (1) accident releases",
+        "Total number of (1) accident releases",
+        "accident releases"
       ],
       "negative_anchor_terms": [
         "Number of (2) non-accident releases (NARs)"
@@ -1466,7 +2607,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1474,24 +2617,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of (1) accident releases'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of (1) accident releases' (TR-RA-540a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of (2) non-accident releases (NARs)."
     },
     {
       "metric_id": "TR-RA-540a.2.02",
@@ -1499,14 +2690,15 @@
       "metric": "Number of (2) non-accident releases (NARs)",
       "topic": "Accident & Safety Management",
       "unit": "Number",
-      "definition": "TR-RA-540a.2. Number of (1) accident releases and (2) non-accident releases\n(NARs)\n1\nThe entity shall disclose (1) the total number of accident releases of hazardous material.\n1.1\nHazardous material is defined as a substance or material that an applicable jurisdictional legal or regulatory\nauthority has determined can pose an unreasonable risk to health, safety and property when transported in\ncommerce (including explosives; radioactive materials; infectious substances; flammable or combustible\nliquids, solids or gases; toxic, oxidising or corrosive materials; and compressed gases) and has been\ndesignated as hazardous under applicable jurisdictional laws or regulations.\n1.1.1\nThe scope of hazardous materials includes hazardous substances, hazardous wastes, marine\npollutants, elevated temperature materials, and materials designated as hazardous by the\napplicable jurisdictional legal and regulatory frameworks where the materials were generated.\n1.1.2\nThe entity may use definitions of hazardous waste from the United Nations Environment\nProgramme’s (UNEP) Basel Convention on the Control of Transboundary Movements of Hazardous\nWastes and their Disposal.\n1.2\nAn accident release is defined as a release of hazardous material required to be reported to applicable\njurisdictional legal or regulatory authorities.\n2\nThe entity shall disclose (2) the total number of non-accident releases (NARs) of hazardous material.\n2.1\nA NAR is defined as the unintentional release of a hazardous material while in transportation, including\nloading and unloading while in railroad possession, that is not caused by derailment, collision or other rail-\nrelated accidents.\n2.1.1\nNARs consist of leaks, splashes and other releases from improperly secured or defective valves,\nfittings and tank shells.\n2.1.2\nNARs include venting of non-atmospheric gases from safety relief devices.\n2.1.3\nNARs exclude normal safety venting of atmospheric gases such as carbon dioxide and nitrogen.\n3\nIf relevant, the entity may provide a disaggregation of spills and releases by type, such as hydrocarbons and\nhazardous substances.\nNote to TR-RA-540a.2\n1\nThe entity shall discuss its processes and procedures to manage non-accident and accident releases.\n1.1\nRelevant processes and procedures may include the use of management systems, safety technologies,\nemployee training, work shift limits and safe-arrival pay incentives.\nNote to TR-RA-540a.2 – The disclosure shall include a discussion of the entity’s processes and procedures to manage non-accident and\naccident releases.\n",
+      "definition": "TR-RA-540a.2. Number of (1) accident releases and (2) non-accident releases\n(NARs)\n1\nThe entity shall disclose (1) the total number of accident releases of hazardous material.\n1.1\nHazardous material is defined as a substance or material that an applicable jurisdictional legal or regulatory\nauthority has determined can pose an unreasonable risk to health, safety and property when transported in\ncommerce (including explosives; radioactive materials; infectious substances; flammable or combustible\nliquids, solids or gases; toxic, oxidising or corrosive materials; and compressed gases) and has been\ndesignated as hazardous under applicable jurisdictional laws or regulations.\n1.1.1\nThe scope of hazardous materials includes hazardous substances, hazardous wastes, marine\npollutants, elevated temperature materials, and materials designated as hazardous by the\napplicable jurisdictional legal and regulatory frameworks where the materials were generated.\n1.1.2\nThe entity may use definitions of hazardous waste from the United Nations Environment\nProgramme’s (UNEP) Basel Convention on the Control of Transboundary Movements of Hazardous\nWastes and their Disposal.\n1.2\nAn accident release is defined as a release of hazardous material required to be reported to applicable\njurisdictional legal or regulatory authorities.\n2\nThe entity shall disclose (2) the total number of non-accident releases (NARs) of hazardous material.\n2.1\nA NAR is defined as the unintentional release of a hazardous material while in transportation, including\nloading and unloading while in railroad possession, that is not caused by derailment, collision or other rail-\nrelated accidents.\n2.1.1\nNARs consist of leaks, splashes and other releases from improperly secured or defective valves,\nfittings and tank shells.\n2.1.2\nNARs include venting of non-atmospheric gases from safety relief devices.\n2.1.3\nNARs exclude normal safety venting of atmospheric gases such as carbon dioxide and nitrogen.\n3\nIf relevant, the entity may provide a disaggregation of spills and releases by type, such as hydrocarbons and\nhazardous substances.\nNote to TR-RA-540a.2\n1\nThe entity shall discuss its processes and procedures to manage non-accident and accident releases.\n1.1\nRelevant processes and procedures may include the use of management systems, safety technologies,\nemployee training, work shift limits and safe-arrival pay incentives.\nNote to TR-RA-540a.2 – The disclosure shall include a discussion of the entity’s processes and procedures to manage non-accident and\naccident releases.",
       "type": "Sustainability Disclosure Topics & Metrics",
       "disclosure_type": "quantitative",
       "aliases": [
         "Number of (2) non-accident releases (NARs)",
         "Number of non-accident releases (NARs)",
         "Count of (2) non-accident releases (NARs)",
-        "TR-RA-540a.2 Number of (2) non-accident releases (NARs)"
+        "TR-RA-540a.2 Number of (2) non-accident releases (NARs)",
+        "Total number of (2) non-accident releases (NARs)"
       ],
       "bm25_terms": [
         "TR-RA-540a.2",
@@ -1519,10 +2711,26 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of (2) non-accident releases (NARs)",
+        "Number of non-accident releases (NARs)",
+        "Count of (2) non-accident releases (NARs)",
+        "TR-RA-540a.2 Number of (2) non-accident releases (NARs)",
+        "Total number of (2) non-accident releases (NARs)",
+        "non-accident releases",
+        "releases NARs",
+        "Number of (2) non-accident releases (NARs",
+        "Number of (1) accident releases and (2) non-accident releases",
+        "The entity shall disclose (1) the total number of accident releases of hazardous material"
       ],
-      "dense_query": "Find disclosures for TR-RA-540a.2 Number of (2) non-accident releases (NARs) with unit Number related to Accident & Safety Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.2 'Number of (2) non-accident releases (NARs)', under 'Accident & Safety Management', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.2 'Number of (2) non-accident releases (NARs)', under 'Accident & Safety Management', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-540a.2 'Number of (2) non-accident releases (NARs)'; retain every reported year and label.",
+        "When TR-RA-540a.2 'Number of (2) non-accident releases (NARs)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-540a.2 'Number of (2) non-accident releases (NARs)', including: Number of (2) non-accident releases (NARs); Number of non-accident releases (NARs); Count of (2) non-accident releases (NARs); TR-RA-540a.2 Number of (2) non-accident releases (NARs); Total number of (2) non-accident releases (NARs).",
+        "Disambiguate TR-RA-540a.2 'Number of (2) non-accident releases (NARs)' from sibling metrics sharing TR-RA-540a.2: Number of (1) accident releases.",
+        "Find disclosures for TR-RA-540a.2 Number of (2) non-accident releases (NARs) with unit Number related to Accident & Safety Management.",
         "Retrieve exact report evidence for TR-RA-540a.2 Number of (2) non-accident releases (NARs), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-540a.2 Number of (2) non-accident releases (NARs) with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-540a.2 Number of (2) non-accident releases (NARs) related to Accident & Safety Management.",
@@ -1539,7 +2747,14 @@
         "Management",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of non-accident releases (NARs)",
+        "Count of (2) non-accident releases (NARs)",
+        "TR-RA-540a.2 Number of (2) non-accident releases (NARs)",
+        "Total number of (2) non-accident releases (NARs)",
+        "non-accident releases",
+        "releases NARs",
+        "Number of (2) non-accident releases (NARs"
       ],
       "negative_anchor_terms": [
         "Number of (1) accident releases"
@@ -1555,7 +2770,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1563,24 +2780,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of (2) non-accident releases (NARs)'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of (2) non-accident releases (NARs)' (TR-RA-540a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of (1) accident releases."
     },
     {
       "metric_id": "TR-RA-540a.3",
@@ -1594,7 +2859,8 @@
       "aliases": [
         "Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
         "Count of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
-        "TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction"
+        "TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
+        "Total number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction"
       ],
       "bm25_terms": [
         "TR-RA-540a.3",
@@ -1614,14 +2880,41 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
+        "Count of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
+        "TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
+        "Total number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
+        "rail safety",
+        "safety standard",
+        "standard defects",
+        "defects cited",
+        "cited relevant",
+        "relevant authorities",
+        "authorities that",
+        "that",
+        "that may",
+        "may",
+        "may result",
+        "result",
+        "result fines",
+        "fines other",
+        "other penalties",
+        "Number of rail safety standard defects cited by relevant authorities",
+        "that may result in fines or other penalties by jurisdiction"
       ],
-      "dense_query": "Find disclosures for TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction with unit Number related to Accident & Safety Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.3 'Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction', under 'Accident & Safety Management', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.3 'Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction', under 'Accident & Safety Management', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-540a.3 'Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction'; retain every reported year and label.",
+        "When TR-RA-540a.3 'Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-540a.3 'Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction', including: Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction; Count of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction; TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction; Total number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction.",
+        "Find disclosures for TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction with unit Number related to Accident & Safety Management.",
         "Retrieve exact report evidence for TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction related to Accident & Safety Management.",
-        "Find numeric table rows or performance metrics reporting TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction for the reporting period."
+        "Find numeric table rows or performance metrics reporting TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: jurisdiction."
       ],
       "anchor_terms": [
         "TR-RA-540a.3",
@@ -1640,7 +2933,25 @@
         "Accident",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
+        "TR-RA-540a.3 Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
+        "Total number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction",
+        "rail safety",
+        "safety standard",
+        "standard defects",
+        "defects cited",
+        "cited relevant",
+        "relevant authorities",
+        "authorities that",
+        "that",
+        "that may",
+        "may",
+        "may result",
+        "result",
+        "result fines",
+        "fines other",
+        "other penalties"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1649,7 +2960,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1657,24 +2970,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "jurisdiction"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of rail safety standard defects cited by relevant authorities that may result in fines or other penalties by jurisdiction' (TR-RA-540a.3, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. Preserve separate reported values and source labels for the variable dimensions: jurisdiction."
     },
     {
       "metric_id": "TR-RA-540a.4",
@@ -1700,10 +3063,22 @@
         "Safety",
         "Management",
         "Rate",
-        "ratio"
+        "ratio",
+        "Frequency of internal railway integrity inspections",
+        "TR-RA-540a.4 Frequency of internal railway integrity inspections",
+        "Frequency internal",
+        "internal railway",
+        "railway integrity",
+        "integrity inspections",
+        "The entity shall disclose the frequency with which it conducts inspections of its tracks"
       ],
-      "dense_query": "Find disclosures for TR-RA-540a.4 Frequency of internal railway integrity inspections with unit Rate related to Accident & Safety Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.4 'Frequency of internal railway integrity inspections', under 'Accident & Safety Management', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-540a.4 'Frequency of internal railway integrity inspections', under 'Accident & Safety Management', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-540a.4 'Frequency of internal railway integrity inspections'; retain every reported year and label.",
+        "When TR-RA-540a.4 'Frequency of internal railway integrity inspections' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-540a.4 'Frequency of internal railway integrity inspections', including: Frequency of internal railway integrity inspections; TR-RA-540a.4 Frequency of internal railway integrity inspections.",
+        "Find disclosures for TR-RA-540a.4 Frequency of internal railway integrity inspections with unit Rate related to Accident & Safety Management.",
         "Retrieve exact report evidence for TR-RA-540a.4 Frequency of internal railway integrity inspections, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-540a.4 Frequency of internal railway integrity inspections with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-540a.4 Frequency of internal railway integrity inspections related to Accident & Safety Management.",
@@ -1721,7 +3096,12 @@
         "Safety",
         "Management",
         "Rate",
-        "ratio"
+        "ratio",
+        "TR-RA-540a.4 Frequency of internal railway integrity inspections",
+        "Frequency internal",
+        "internal railway",
+        "railway integrity",
+        "integrity inspections"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1730,7 +3110,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1738,23 +3120,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Frequency of internal railway integrity inspections', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Frequency of internal railway integrity inspections' (TR-RA-540a.4, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-000.A",
@@ -1768,7 +3198,8 @@
       "aliases": [
         "Number of carloads transported",
         "Count of carloads transported",
-        "TR-RA-000.A Number of carloads transported"
+        "TR-RA-000.A Number of carloads transported",
+        "Total number of carloads transported"
       ],
       "bm25_terms": [
         "TR-RA-000.A",
@@ -1777,10 +3208,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of carloads transported",
+        "Count of carloads transported",
+        "TR-RA-000.A Number of carloads transported",
+        "Total number of carloads transported",
+        "carloads transported",
+        "Note to TR-RA-000.A – The scope of disclosure includes all carloads the entity transported in conjunction with the shipping of freight"
       ],
-      "dense_query": "Find disclosures for TR-RA-000.A Number of carloads transported with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-000.A 'Number of carloads transported', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-000.A 'Number of carloads transported', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-000.A 'Number of carloads transported'; retain every reported year and label.",
+        "When TR-RA-000.A 'Number of carloads transported' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-000.A 'Number of carloads transported', including: Number of carloads transported; Count of carloads transported; TR-RA-000.A Number of carloads transported; Total number of carloads transported.",
+        "Find disclosures for TR-RA-000.A Number of carloads transported with unit Number.",
         "Retrieve exact report evidence for TR-RA-000.A Number of carloads transported, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-000.A Number of carloads transported with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-000.A Number of carloads transported.",
@@ -1793,7 +3235,11 @@
         "transported",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of carloads transported",
+        "TR-RA-000.A Number of carloads transported",
+        "Total number of carloads transported",
+        "carloads transported"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1802,7 +3248,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1810,24 +3258,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of carloads transported'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of carloads transported' (TR-RA-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-000.B",
@@ -1841,7 +3337,8 @@
       "aliases": [
         "Number of intermodal units transported",
         "Count of intermodal units transported",
-        "TR-RA-000.B Number of intermodal units transported"
+        "TR-RA-000.B Number of intermodal units transported",
+        "Total number of intermodal units transported"
       ],
       "bm25_terms": [
         "TR-RA-000.B",
@@ -1851,10 +3348,22 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of intermodal units transported",
+        "Count of intermodal units transported",
+        "TR-RA-000.B Number of intermodal units transported",
+        "Total number of intermodal units transported",
+        "intermodal units",
+        "units transported",
+        "Note to TR-RA-000.B – Intermodal units include shipping containers and truck trailers that can be transported across modes of"
       ],
-      "dense_query": "Find disclosures for TR-RA-000.B Number of intermodal units transported with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-000.B 'Number of intermodal units transported', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-000.B 'Number of intermodal units transported', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-000.B 'Number of intermodal units transported'; retain every reported year and label.",
+        "When TR-RA-000.B 'Number of intermodal units transported' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-000.B 'Number of intermodal units transported', including: Number of intermodal units transported; Count of intermodal units transported; TR-RA-000.B Number of intermodal units transported; Total number of intermodal units transported.",
+        "Find disclosures for TR-RA-000.B Number of intermodal units transported with unit Number.",
         "Retrieve exact report evidence for TR-RA-000.B Number of intermodal units transported, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-000.B Number of intermodal units transported with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-000.B Number of intermodal units transported.",
@@ -1868,7 +3377,12 @@
         "transported",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of intermodal units transported",
+        "TR-RA-000.B Number of intermodal units transported",
+        "Total number of intermodal units transported",
+        "intermodal units",
+        "units transported"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1877,7 +3391,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1885,24 +3401,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of intermodal units transported'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of intermodal units transported' (TR-RA-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-000.C",
@@ -1920,10 +3484,20 @@
       "bm25_terms": [
         "TR-RA-000.C",
         "Track",
-        "kilometres"
+        "kilometres",
+        "Track kilometres",
+        "TR-RA-000.C Track kilometres",
+        "km",
+        "kilometers",
+        "Note to TR-RA-000.C – Track kilometres include route kilometres (the total extent of routes available for trains to operate) and consider"
       ],
-      "dense_query": "Find disclosures for TR-RA-000.C Track kilometres with unit Kilometres.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-000.C 'Track kilometres', with expected unit 'Kilometres'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-000.C 'Track kilometres', with expected unit 'Kilometres'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-000.C 'Track kilometres'; retain every reported year and label.",
+        "When TR-RA-000.C 'Track kilometres' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-000.C 'Track kilometres', including: Track kilometres; TR-RA-000.C Track kilometres.",
+        "Find disclosures for TR-RA-000.C Track kilometres with unit Kilometres.",
         "Retrieve exact report evidence for TR-RA-000.C Track kilometres, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-000.C Track kilometres with unit Kilometres.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-000.C Track kilometres.",
@@ -1933,7 +3507,10 @@
         "TR-RA-000.C",
         "Track kilometres",
         "Track",
-        "kilometres"
+        "kilometres",
+        "TR-RA-000.C Track kilometres",
+        "km",
+        "kilometers"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1942,7 +3519,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1950,22 +3529,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Track kilometres', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "distance",
         "expected_units": [
-          "Kilometres"
+          "Kilometres",
+          "km",
+          "kilometers",
+          "miles"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Track kilometres' (TR-RA-000.C, expected unit: Kilometres). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-000.D",
@@ -1988,10 +3619,21 @@
         "Litres/RTK",
         "Litres",
         "litres per RTK",
-        "L/RTK"
+        "L/RTK",
+        "Revenue tonne-kilometres (RTK)",
+        "TR-RA-000.D Revenue tonne-kilometres (RTK)",
+        "Revenue tonne-kilometres",
+        "tonne-kilometres RTK",
+        "Revenue tonne-kilometres (RTK",
+        "Note to TR-RA-000.D – A revenue tonne-kilometre (RTK) is defined as one metric tonne of revenue traffic transported one kilometre"
       ],
-      "dense_query": "Find disclosures for TR-RA-000.D Revenue tonne-kilometres (RTK) with unit RTK.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-000.D 'Revenue tonne-kilometres (RTK)', with expected unit 'RTK'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-000.D 'Revenue tonne-kilometres (RTK)', with expected unit 'RTK'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-000.D 'Revenue tonne-kilometres (RTK)'; retain every reported year and label.",
+        "When TR-RA-000.D 'Revenue tonne-kilometres (RTK)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-000.D 'Revenue tonne-kilometres (RTK)', including: Revenue tonne-kilometres (RTK); TR-RA-000.D Revenue tonne-kilometres (RTK).",
+        "Find disclosures for TR-RA-000.D Revenue tonne-kilometres (RTK) with unit RTK.",
         "Retrieve exact report evidence for TR-RA-000.D Revenue tonne-kilometres (RTK), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-000.D Revenue tonne-kilometres (RTK) with unit RTK.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-000.D Revenue tonne-kilometres (RTK).",
@@ -2005,7 +3647,11 @@
         "RTK",
         "Litres/RTK",
         "litres per RTK",
-        "L/RTK"
+        "L/RTK",
+        "TR-RA-000.D Revenue tonne-kilometres (RTK)",
+        "Revenue tonne-kilometres",
+        "tonne-kilometres RTK",
+        "Revenue tonne-kilometres (RTK"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2014,7 +3660,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2022,25 +3670,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Revenue tonne-kilometres (RTK)', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "mixed",
+        "value_type": "transport_activity",
         "expected_units": [
-          "RTK",
-          "Litres/RTK",
-          "litres per RTK",
-          "L/RTK"
+          "RTK"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Extract each required component separately and preserve its original unit, denominator, category, and reporting-period context."
+        "normalization_notes": "Preserve the transport-activity value, reporting year, transport-mode label, and RTK unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Revenue tonne-kilometres (RTK)' (TR-RA-000.D, expected unit: RTK). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-RA-000.E",
@@ -2054,7 +3748,8 @@
       "aliases": [
         "Number of employees",
         "Count of employees",
-        "TR-RA-000.E Number of employees"
+        "TR-RA-000.E Number of employees",
+        "Total number of employees"
       ],
       "bm25_terms": [
         "TR-RA-000.E",
@@ -2062,10 +3757,19 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of employees",
+        "Count of employees",
+        "TR-RA-000.E Number of employees",
+        "Total number of employees"
       ],
-      "dense_query": "Find disclosures for TR-RA-000.E Number of employees with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-RA-000.E 'Number of employees', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-RA-000.E 'Number of employees', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-RA-000.E 'Number of employees'; retain every reported year and label.",
+        "When TR-RA-000.E 'Number of employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-RA-000.E 'Number of employees', including: Number of employees; Count of employees; TR-RA-000.E Number of employees; Total number of employees.",
+        "Find disclosures for TR-RA-000.E Number of employees with unit Number.",
         "Retrieve exact report evidence for TR-RA-000.E Number of employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-RA-000.E Number of employees with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-RA-000.E Number of employees.",
@@ -2077,7 +3781,10 @@
         "employees",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of employees",
+        "TR-RA-000.E Number of employees",
+        "Total number of employees"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2086,7 +3793,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2094,24 +3803,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of employees'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of employees' (TR-RA-000.E, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

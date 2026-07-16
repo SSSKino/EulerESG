@@ -35,6 +35,10 @@ class PaddleOCRModelLoadError(RuntimeError):
     """
 
 
+class PageBatchIncompleteError(RuntimeError):
+    """PaddleOCR-VL returned fewer, extra, or empty page results for a batch."""
+
+
 READY_MARKER_NAME = ".paddleocr_vl_preflight_ok.json"
 
 
@@ -654,7 +658,14 @@ def parse_page_batch(
     pipeline = get_pipeline()
     model_ready_seconds = time.monotonic() - model_wait_started
     predict_options = _prediction_options()
+    expected_result_count = end_page - start_page + 1
+    if expected_result_count <= 0:
+        raise ValueError(
+            f"Invalid page batch range: start_page={start_page}, end_page={end_page}"
+        )
+
     batch_markdown_parts: List[str] = []
+    empty_markdown_pages: List[int] = []
     result_count = 0
 
     logger.info(
@@ -678,8 +689,14 @@ def parse_page_batch(
     first_result_seconds: float | None = None
     try:
         results = pipeline.predict(str(source), **predict_options)
-        local_count = 0
         for local_count, res in enumerate(results, 1):
+            result_count = local_count
+            if local_count > expected_result_count:
+                raise PageBatchIncompleteError(
+                    f"PaddleOCR-VL returned too many page results for batch {safe_batch}: "
+                    f"expected={expected_result_count}, returned_at_least={local_count}, "
+                    f"pages={start_page}-{end_page}"
+                )
             if first_result_seconds is None:
                 first_result_seconds = time.monotonic() - predict_started
                 logger.info(
@@ -691,14 +708,15 @@ def parse_page_batch(
                     end_page,
                     first_result_seconds,
                 )
-            page_no = min(end_page, start_page + local_count - 1)
+            page_no = start_page + local_count - 1
             page_dir = persist_dir / f"page_{page_no:04d}_part_{local_count:02d}"
             md = _save_result_markdown(res, page_dir)
             if md.strip():
                 batch_markdown_parts.append(
                     f"\n\n<!-- Page {page_no} | PaddleOCR-VL batch {unit_index}/{total_units} part {local_count} -->\n\n{md.strip()}"
                 )
-        result_count = local_count
+            else:
+                empty_markdown_pages.append(page_no)
     finally:
         close_results = getattr(results, "close", None)
         if callable(close_results):
@@ -719,6 +737,14 @@ def parse_page_batch(
         result_count,
         predict_seconds,
     )
+
+    if result_count != expected_result_count or empty_markdown_pages:
+        raise PageBatchIncompleteError(
+            f"Incomplete PaddleOCR-VL page batch {safe_batch}: "
+            f"expected={expected_result_count}, returned={result_count}, "
+            f"nonempty_markdown={len(batch_markdown_parts)}, "
+            f"empty_pages={empty_markdown_pages}, pages={start_page}-{end_page}"
+        )
 
     markdown = "\n".join(batch_markdown_parts).strip()
     if not markdown:
@@ -741,7 +767,9 @@ def parse_page_batch(
         "start_page": start_page,
         "end_page": end_page,
         "total_pages": total_pages or end_page,
+        "expected_result_count": expected_result_count,
         "result_count": result_count,
+        "returned_pages": list(range(start_page, end_page + 1)),
         "elapsed_seconds": elapsed,
         "model_ready_seconds": model_ready_seconds,
         "predict_seconds": predict_seconds,

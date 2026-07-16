@@ -11,7 +11,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of approach to identifying and addressing data security risks",
-        "SV-PS-230a.1 Description of approach to identifying and addressing data security risks"
+        "SV-PS-230a.1 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks"
       ],
       "bm25_terms": [
         "SV-PS-230a.1",
@@ -20,10 +21,25 @@
         "identifying",
         "addressing",
         "security",
-        "risks"
+        "risks",
+        "Description of approach to identifying and addressing data security risks",
+        "SV-PS-230a.1 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks",
+        "identifying addressing",
+        "addressing security",
+        "security risks",
+        "Description of approach to identifying",
+        "addressing data security risks",
+        "Description of approach to identifying and addressing data security",
+        "The entity shall describe its approach to identifying information system vulnerabilities that may pose a data"
       ],
-      "dense_query": "Find disclosures for SV-PS-230a.1 Description of approach to identifying and addressing data security risks related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.1 'Description of approach to identifying and addressing data security risks', under 'Data Security'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.1 'Description of approach to identifying and addressing data security risks', under 'Data Security'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers SV-PS-230a.1 'Description of approach to identifying and addressing data security risks'.",
+        "When SV-PS-230a.1 'Description of approach to identifying and addressing data security risks' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-230a.1 'Description of approach to identifying and addressing data security risks', including: Description of approach to identifying and addressing data security risks; SV-PS-230a.1 Description of approach to identifying and addressing data security risks; approach to identifying and addressing data security risks.",
+        "Find disclosures for SV-PS-230a.1 Description of approach to identifying and addressing data security risks related to Data Security.",
         "Retrieve exact report evidence for SV-PS-230a.1 Description of approach to identifying and addressing data security risks, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-230a.1 Description of approach to identifying and addressing data security risks.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-230a.1 Description of approach to identifying and addressing data security risks related to Data Security.",
@@ -37,7 +53,14 @@
         "identifying",
         "addressing",
         "security",
-        "risks"
+        "risks",
+        "SV-PS-230a.1 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks",
+        "identifying addressing",
+        "addressing security",
+        "security risks",
+        "Description of approach to identifying",
+        "addressing data security risks"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -47,7 +70,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -59,20 +84,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of approach to identifying and addressing data security risks'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of approach to identifying and addressing data security risks' (SV-PS-230a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-PS-230a.2",
@@ -85,7 +158,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of policies and practices relating to collection, usage, and retention of customer information",
-        "SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information"
+        "SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information",
+        "policies and practices relating to collection, usage, and retention of customer information"
       ],
       "bm25_terms": [
         "SV-PS-230a.2",
@@ -96,10 +170,30 @@
         "usage",
         "retention",
         "customer",
-        "Security"
+        "Security",
+        "Description of policies and practices relating to collection, usage, and retention of customer information",
+        "SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information",
+        "policies and practices relating to collection, usage, and retention of customer information",
+        "policies practices",
+        "practices relating",
+        "relating",
+        "relating collection",
+        "collection usage",
+        "usage retention",
+        "retention customer",
+        "Description of policies",
+        "practices relating to collection",
+        "retention of customer information",
+        "Description of policies and practices relating to collection, usage",
+        "and retention of customer information"
       ],
-      "dense_query": "Find disclosures for SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.2 'Description of policies and practices relating to collection, usage, and retention of customer information', under 'Data Security'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.2 'Description of policies and practices relating to collection, usage, and retention of customer information', under 'Data Security'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers SV-PS-230a.2 'Description of policies and practices relating to collection, usage, and retention of customer information'.",
+        "When SV-PS-230a.2 'Description of policies and practices relating to collection, usage, and retention of customer information' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-230a.2 'Description of policies and practices relating to collection, usage, and retention of customer information', including: Description of policies and practices relating to collection, usage, and retention of customer information; SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information; policies and practices relating to collection, usage, and retention of customer information.",
+        "Find disclosures for SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information related to Data Security.",
         "Retrieve exact report evidence for SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information related to Data Security.",
@@ -115,7 +209,19 @@
         "usage",
         "retention",
         "customer",
-        "Security"
+        "Security",
+        "SV-PS-230a.2 Description of policies and practices relating to collection, usage, and retention of customer information",
+        "policies and practices relating to collection, usage, and retention of customer information",
+        "policies practices",
+        "practices relating",
+        "relating",
+        "relating collection",
+        "collection usage",
+        "usage retention",
+        "retention customer",
+        "Description of policies",
+        "practices relating to collection",
+        "retention of customer information"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -125,7 +231,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -137,20 +245,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies and practices relating to collection, usage, and retention of customer information'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies and practices relating to collection, usage, and retention of customer information' (SV-PS-230a.2). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-PS-230a.3.01",
@@ -174,10 +330,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of data breaches",
+        "Number of data breaches",
+        "SV-PS-230a.3 (1) Number of data breaches",
+        "(1) Number of data breaches, (2) percentage that (a) involve",
+        "customers’ confidential business information and (b) are personal data breaches"
       ],
-      "dense_query": "Find disclosures for SV-PS-230a.3 (1) Number of data breaches with unit Number related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(1) Number of data breaches', under 'Data Security', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(1) Number of data breaches', under 'Data Security', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-230a.3 '(1) Number of data breaches'; retain every reported year and label.",
+        "When SV-PS-230a.3 '(1) Number of data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-230a.3 '(1) Number of data breaches', including: (1) Number of data breaches; Number of data breaches; SV-PS-230a.3 (1) Number of data breaches.",
+        "Disambiguate SV-PS-230a.3 '(1) Number of data breaches' from sibling metrics sharing SV-PS-230a.3: (2) Percentage of data breaches (a) involve customers' confidential business information; (2) Percentage of data breaches (b) are personal data breaches; (3) Number of (a) customers affected by data breaches; (3) Number of (b) individuals affected by data breaches.",
+        "Find disclosures for SV-PS-230a.3 (1) Number of data breaches with unit Number related to Data Security.",
         "Retrieve exact report evidence for SV-PS-230a.3 (1) Number of data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-230a.3 (1) Number of data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-230a.3 (1) Number of data breaches related to Data Security.",
@@ -185,13 +352,15 @@
       ],
       "anchor_terms": [
         "SV-PS-230a.3",
+        "(1) Number of data breaches",
         "Number of data breaches",
         "data breach",
         "breaches",
         "Security",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "SV-PS-230a.3 (1) Number of data breaches"
       ],
       "negative_anchor_terms": [
         "Percentage of data breaches (a) involve customers' confidential business information",
@@ -200,7 +369,11 @@
         "Number of (b) individuals affected by data breaches",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(2) Percentage of data breaches (a) involve customers' confidential business information",
+        "(2) Percentage of data breaches (b) are personal data breaches",
+        "(3) Number of (a) customers affected by data breaches",
+        "(3) Number of (b) individuals affected by data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -225,7 +398,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -233,24 +408,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of data breaches' (SV-PS-230a.3, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of data breaches (a) involve customers' confidential business information; (2) Percentage of data breaches (b) are personal data breaches; (3) Number of (a) customers affected by data breaches; (3) Number of (b) individuals affected by data breaches."
     },
     {
       "metric_id": "SV-PS-230a.3.02",
@@ -264,7 +487,8 @@
       "aliases": [
         "(2) Percentage of data breaches (a) involve customers' confidential business information",
         "Percentage of data breaches (a) involve customers' confidential business information",
-        "SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information"
+        "SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information",
+        "(2) Percent of data breaches (a) involve customers' confidential business information"
       ],
       "bm25_terms": [
         "SV-PS-230a.3",
@@ -278,10 +502,27 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of data breaches (a) involve customers' confidential business information",
+        "Percentage of data breaches (a) involve customers' confidential business information",
+        "SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information",
+        "(2) Percent of data breaches (a) involve customers' confidential business information",
+        "breaches involve",
+        "involve customers'",
+        "customers'",
+        "customers' confidential",
+        "confidential business",
+        "(1) Number of data breaches, (2) percentage that (a) involve",
+        "customers’ confidential business information and (b) are personal data breaches"
       ],
-      "dense_query": "Find disclosures for SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information with unit Percentage (%) related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(2) Percentage of data breaches (a) involve customers' confidential business information', under 'Data Security', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(2) Percentage of data breaches (a) involve customers' confidential business information', under 'Data Security', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-230a.3 '(2) Percentage of data breaches (a) involve customers' confidential business information'; retain every reported year and label.",
+        "When SV-PS-230a.3 '(2) Percentage of data breaches (a) involve customers' confidential business information' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-230a.3 '(2) Percentage of data breaches (a) involve customers' confidential business information', including: (2) Percentage of data breaches (a) involve customers' confidential business information; Percentage of data breaches (a) involve customers' confidential business information; SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information; (2) Percent of data breaches (a) involve customers' confidential business information.",
+        "Disambiguate SV-PS-230a.3 '(2) Percentage of data breaches (a) involve customers' confidential business information' from sibling metrics sharing SV-PS-230a.3: (1) Number of data breaches; (2) Percentage of data breaches (b) are personal data breaches; (3) Number of (a) customers affected by data breaches; (3) Number of (b) individuals affected by data breaches.",
+        "Find disclosures for SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information with unit Percentage (%) related to Data Security.",
         "Retrieve exact report evidence for SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information related to Data Security.",
@@ -289,6 +530,7 @@
       ],
       "anchor_terms": [
         "SV-PS-230a.3",
+        "(2) Percentage of data breaches (a) involve customers' confidential business information",
         "Percentage of data breaches (a) involve customers' confidential business information",
         "data breach",
         "breaches",
@@ -300,7 +542,14 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-PS-230a.3 (2) Percentage of data breaches (a) involve customers' confidential business information",
+        "(2) Percent of data breaches (a) involve customers' confidential business information",
+        "breaches involve",
+        "involve customers'",
+        "customers'",
+        "customers' confidential",
+        "confidential business"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
@@ -309,7 +558,11 @@
         "Number of (b) individuals affected by data breaches",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches (b) are personal data breaches",
+        "(3) Number of (a) customers affected by data breaches",
+        "(3) Number of (b) individuals affected by data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -334,7 +587,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -342,11 +597,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of data breaches (a) involve customers' confidential business information', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -358,9 +639,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of data breaches (a) involve customers' confidential business information' (SV-PS-230a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches (b) are personal data breaches; (3) Number of (a) customers affected by data breaches; (3) Number of (b) individuals affected by data breaches."
     },
     {
       "metric_id": "SV-PS-230a.3.03",
@@ -374,7 +678,8 @@
       "aliases": [
         "(2) Percentage of data breaches (b) are personal data breaches",
         "Percentage of data breaches (b) are personal data breaches",
-        "SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches"
+        "SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches",
+        "(2) Percent of data breaches (b) are personal data breaches"
       ],
       "bm25_terms": [
         "SV-PS-230a.3",
@@ -386,10 +691,26 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of data breaches (b) are personal data breaches",
+        "Percentage of data breaches (b) are personal data breaches",
+        "SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches",
+        "(2) Percent of data breaches (b) are personal data breaches",
+        "breaches are",
+        "are",
+        "are personal",
+        "personal breaches",
+        "(1) Number of data breaches, (2) percentage that (a) involve",
+        "customers’ confidential business information and (b) are personal data breaches"
       ],
-      "dense_query": "Find disclosures for SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches with unit Percentage (%) related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(2) Percentage of data breaches (b) are personal data breaches', under 'Data Security', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(2) Percentage of data breaches (b) are personal data breaches', under 'Data Security', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-230a.3 '(2) Percentage of data breaches (b) are personal data breaches'; retain every reported year and label.",
+        "When SV-PS-230a.3 '(2) Percentage of data breaches (b) are personal data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-230a.3 '(2) Percentage of data breaches (b) are personal data breaches', including: (2) Percentage of data breaches (b) are personal data breaches; Percentage of data breaches (b) are personal data breaches; SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches; (2) Percent of data breaches (b) are personal data breaches.",
+        "Disambiguate SV-PS-230a.3 '(2) Percentage of data breaches (b) are personal data breaches' from sibling metrics sharing SV-PS-230a.3: (1) Number of data breaches; (2) Percentage of data breaches (a) involve customers' confidential business information; (3) Number of (a) customers affected by data breaches; (3) Number of (b) individuals affected by data breaches.",
+        "Find disclosures for SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches with unit Percentage (%) related to Data Security.",
         "Retrieve exact report evidence for SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches related to Data Security.",
@@ -397,6 +718,7 @@
       ],
       "anchor_terms": [
         "SV-PS-230a.3",
+        "(2) Percentage of data breaches (b) are personal data breaches",
         "Percentage of data breaches (b) are personal data breaches",
         "data breach",
         "personal data",
@@ -406,7 +728,13 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-PS-230a.3 (2) Percentage of data breaches (b) are personal data breaches",
+        "(2) Percent of data breaches (b) are personal data breaches",
+        "breaches are",
+        "are",
+        "are personal",
+        "personal breaches"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
@@ -415,7 +743,11 @@
         "Number of (b) individuals affected by data breaches",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches (a) involve customers' confidential business information",
+        "(3) Number of (a) customers affected by data breaches",
+        "(3) Number of (b) individuals affected by data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -440,7 +772,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -448,11 +782,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of data breaches (b) are personal data breaches', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -464,9 +824,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of data breaches (b) are personal data breaches' (SV-PS-230a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches (a) involve customers' confidential business information; (3) Number of (a) customers affected by data breaches; (3) Number of (b) individuals affected by data breaches."
     },
     {
       "metric_id": "SV-PS-230a.3.04",
@@ -492,10 +875,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of (a) customers affected by data breaches",
+        "Number of (a) customers affected by data breaches",
+        "SV-PS-230a.3 (3) Number of (a) customers affected by data breaches",
+        "customers affected",
+        "affected breaches",
+        "(1) Number of data breaches, (2) percentage that (a) involve",
+        "customers’ confidential business information and (b) are personal data breaches"
       ],
-      "dense_query": "Find disclosures for SV-PS-230a.3 (3) Number of (a) customers affected by data breaches with unit Number related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(3) Number of (a) customers affected by data breaches', under 'Data Security', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(3) Number of (a) customers affected by data breaches', under 'Data Security', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-230a.3 '(3) Number of (a) customers affected by data breaches'; retain every reported year and label.",
+        "When SV-PS-230a.3 '(3) Number of (a) customers affected by data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-230a.3 '(3) Number of (a) customers affected by data breaches', including: (3) Number of (a) customers affected by data breaches; Number of (a) customers affected by data breaches; SV-PS-230a.3 (3) Number of (a) customers affected by data breaches.",
+        "Disambiguate SV-PS-230a.3 '(3) Number of (a) customers affected by data breaches' from sibling metrics sharing SV-PS-230a.3: (1) Number of data breaches; (2) Percentage of data breaches (a) involve customers' confidential business information; (2) Percentage of data breaches (b) are personal data breaches; (3) Number of (b) individuals affected by data breaches.",
+        "Find disclosures for SV-PS-230a.3 (3) Number of (a) customers affected by data breaches with unit Number related to Data Security.",
         "Retrieve exact report evidence for SV-PS-230a.3 (3) Number of (a) customers affected by data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-230a.3 (3) Number of (a) customers affected by data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-230a.3 (3) Number of (a) customers affected by data breaches related to Data Security.",
@@ -503,6 +899,7 @@
       ],
       "anchor_terms": [
         "SV-PS-230a.3",
+        "(3) Number of (a) customers affected by data breaches",
         "Number of (a) customers affected by data breaches",
         "data breach",
         "customers",
@@ -511,7 +908,10 @@
         "Security",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "SV-PS-230a.3 (3) Number of (a) customers affected by data breaches",
+        "customers affected",
+        "affected breaches"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
@@ -520,7 +920,11 @@
         "Number of (b) individuals affected by data breaches",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches (a) involve customers' confidential business information",
+        "(2) Percentage of data breaches (b) are personal data breaches",
+        "(3) Number of (b) individuals affected by data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -545,7 +949,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -553,24 +959,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of (a) customers affected by data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of (a) customers affected by data breaches' (SV-PS-230a.3, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches (a) involve customers' confidential business information; (2) Percentage of data breaches (b) are personal data breaches; (3) Number of (b) individuals affected by data breaches."
     },
     {
       "metric_id": "SV-PS-230a.3.05",
@@ -596,10 +1050,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of (b) individuals affected by data breaches",
+        "Number of (b) individuals affected by data breaches",
+        "SV-PS-230a.3 (3) Number of (b) individuals affected by data breaches",
+        "individuals affected",
+        "affected breaches",
+        "(1) Number of data breaches, (2) percentage that (a) involve",
+        "customers’ confidential business information and (b) are personal data breaches"
       ],
-      "dense_query": "Find disclosures for SV-PS-230a.3 (3) Number of (b) individuals affected by data breaches with unit Number related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(3) Number of (b) individuals affected by data breaches', under 'Data Security', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-230a.3 '(3) Number of (b) individuals affected by data breaches', under 'Data Security', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-230a.3 '(3) Number of (b) individuals affected by data breaches'; retain every reported year and label.",
+        "When SV-PS-230a.3 '(3) Number of (b) individuals affected by data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-230a.3 '(3) Number of (b) individuals affected by data breaches', including: (3) Number of (b) individuals affected by data breaches; Number of (b) individuals affected by data breaches; SV-PS-230a.3 (3) Number of (b) individuals affected by data breaches.",
+        "Disambiguate SV-PS-230a.3 '(3) Number of (b) individuals affected by data breaches' from sibling metrics sharing SV-PS-230a.3: (1) Number of data breaches; (2) Percentage of data breaches (a) involve customers' confidential business information; (2) Percentage of data breaches (b) are personal data breaches; (3) Number of (a) customers affected by data breaches.",
+        "Find disclosures for SV-PS-230a.3 (3) Number of (b) individuals affected by data breaches with unit Number related to Data Security.",
         "Retrieve exact report evidence for SV-PS-230a.3 (3) Number of (b) individuals affected by data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-230a.3 (3) Number of (b) individuals affected by data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-230a.3 (3) Number of (b) individuals affected by data breaches related to Data Security.",
@@ -607,6 +1074,7 @@
       ],
       "anchor_terms": [
         "SV-PS-230a.3",
+        "(3) Number of (b) individuals affected by data breaches",
         "Number of (b) individuals affected by data breaches",
         "data breach",
         "individuals",
@@ -615,7 +1083,10 @@
         "Security",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "SV-PS-230a.3 (3) Number of (b) individuals affected by data breaches",
+        "individuals affected",
+        "affected breaches"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
@@ -624,7 +1095,11 @@
         "Number of (a) customers affected by data breaches",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches (a) involve customers' confidential business information",
+        "(2) Percentage of data breaches (b) are personal data breaches",
+        "(3) Number of (a) customers affected by data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -649,7 +1124,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -657,24 +1134,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of (b) individuals affected by data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of (b) individuals affected by data breaches' (SV-PS-230a.3, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches (a) involve customers' confidential business information; (2) Percentage of data breaches (b) are personal data breaches; (3) Number of (a) customers affected by data breaches."
     },
     {
       "metric_id": "SV-PS-330a.1.01",
@@ -704,10 +1229,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (1) gender representation for (a) executive management",
+        "Percentage of gender representation for (a) executive management",
+        "Percent of (1) gender representation for (a) executive management",
+        "SV-PS-330a.1 Percentage of (1) gender representation for (a) executive management",
+        "representation executive",
+        "executive management",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, and (c) all other"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.1 Percentage of (1) gender representation for (a) executive management with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (1) gender representation for (a) executive management', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (1) gender representation for (a) executive management', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.1 'Percentage of (1) gender representation for (a) executive management'; retain every reported year and label.",
+        "When SV-PS-330a.1 'Percentage of (1) gender representation for (a) executive management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.1 'Percentage of (1) gender representation for (a) executive management', including: Percentage of (1) gender representation for (a) executive management; Percentage of gender representation for (a) executive management; Percent of (1) gender representation for (a) executive management; SV-PS-330a.1 Percentage of (1) gender representation for (a) executive management.",
+        "Disambiguate SV-PS-330a.1 'Percentage of (1) gender representation for (a) executive management' from sibling metrics sharing SV-PS-330a.1: Percentage of (1) gender representation for (b) non-executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (b) non-executive management; Percentage of (2) diversity group representation for (c) all other employees.",
+        "Find disclosures for SV-PS-330a.1 Percentage of (1) gender representation for (a) executive management with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.1 Percentage of (1) gender representation for (a) executive management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.1 Percentage of (1) gender representation for (a) executive management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.1 Percentage of (1) gender representation for (a) executive management related to Workforce Diversity & Engagement.",
@@ -727,7 +1266,12 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of gender representation for (a) executive management",
+        "Percent of (1) gender representation for (a) executive management",
+        "SV-PS-330a.1 Percentage of (1) gender representation for (a) executive management",
+        "representation executive",
+        "executive management"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) gender representation for (b) non-executive management",
@@ -753,6 +1297,10 @@
         {
           "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management",
           "difference": "This profile is only for \"Percentage of (1) gender representation for (a) executive management\"; do not treat evidence for \"Percentage of (2) diversity group representation for (b) non-executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees",
+          "difference": "The canonical target is 'Percentage of (1) gender representation for (a) executive management' (Percentage (%)). Do not substitute 'Percentage of (2) diversity group representation for (c) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -760,7 +1308,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -768,11 +1318,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (1) gender representation for (a) executive management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -784,9 +1360,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (1) gender representation for (a) executive management' (SV-PS-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) gender representation for (b) non-executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (b) non-executive management; Percentage of (2) diversity group representation for (c) all other employees."
     },
     {
       "metric_id": "SV-PS-330a.1.02",
@@ -816,10 +1415,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (1) gender representation for (b) non-executive management",
+        "Percentage of gender representation for (b) non-executive management",
+        "Percent of (1) gender representation for (b) non-executive management",
+        "SV-PS-330a.1 Percentage of (1) gender representation for (b) non-executive management",
+        "representation non-executive",
+        "non-executive management",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, and (c) all other"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.1 Percentage of (1) gender representation for (b) non-executive management with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (1) gender representation for (b) non-executive management', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (1) gender representation for (b) non-executive management', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.1 'Percentage of (1) gender representation for (b) non-executive management'; retain every reported year and label.",
+        "When SV-PS-330a.1 'Percentage of (1) gender representation for (b) non-executive management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.1 'Percentage of (1) gender representation for (b) non-executive management', including: Percentage of (1) gender representation for (b) non-executive management; Percentage of gender representation for (b) non-executive management; Percent of (1) gender representation for (b) non-executive management; SV-PS-330a.1 Percentage of (1) gender representation for (b) non-executive management.",
+        "Disambiguate SV-PS-330a.1 'Percentage of (1) gender representation for (b) non-executive management' from sibling metrics sharing SV-PS-330a.1: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (b) non-executive management; Percentage of (2) diversity group representation for (c) all other employees.",
+        "Find disclosures for SV-PS-330a.1 Percentage of (1) gender representation for (b) non-executive management with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.1 Percentage of (1) gender representation for (b) non-executive management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.1 Percentage of (1) gender representation for (b) non-executive management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.1 Percentage of (1) gender representation for (b) non-executive management related to Workforce Diversity & Engagement.",
@@ -839,7 +1452,12 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of gender representation for (b) non-executive management",
+        "Percent of (1) gender representation for (b) non-executive management",
+        "SV-PS-330a.1 Percentage of (1) gender representation for (b) non-executive management",
+        "representation non-executive",
+        "non-executive management"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) gender representation for (a) executive management",
@@ -865,6 +1483,10 @@
         {
           "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management",
           "difference": "This profile is only for \"Percentage of (1) gender representation for (b) non-executive management\"; do not treat evidence for \"Percentage of (2) diversity group representation for (b) non-executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees",
+          "difference": "The canonical target is 'Percentage of (1) gender representation for (b) non-executive management' (Percentage (%)). Do not substitute 'Percentage of (2) diversity group representation for (c) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -872,7 +1494,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -880,11 +1504,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (1) gender representation for (b) non-executive management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -896,9 +1546,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (1) gender representation for (b) non-executive management' (SV-PS-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (b) non-executive management; Percentage of (2) diversity group representation for (c) all other employees."
     },
     {
       "metric_id": "SV-PS-330a.1.03",
@@ -928,10 +1601,26 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (1) gender representation for (c) all other employees",
+        "Percentage of gender representation for (c) all other employees",
+        "Percent of (1) gender representation for (c) all other employees",
+        "SV-PS-330a.1 Percentage of (1) gender representation for (c) all other employees",
+        "representation all",
+        "all",
+        "all other",
+        "other employees",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, and (c) all other"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.1 Percentage of (1) gender representation for (c) all other employees with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (1) gender representation for (c) all other employees', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (1) gender representation for (c) all other employees', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.1 'Percentage of (1) gender representation for (c) all other employees'; retain every reported year and label.",
+        "When SV-PS-330a.1 'Percentage of (1) gender representation for (c) all other employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.1 'Percentage of (1) gender representation for (c) all other employees', including: Percentage of (1) gender representation for (c) all other employees; Percentage of gender representation for (c) all other employees; Percent of (1) gender representation for (c) all other employees; SV-PS-330a.1 Percentage of (1) gender representation for (c) all other employees.",
+        "Disambiguate SV-PS-330a.1 'Percentage of (1) gender representation for (c) all other employees' from sibling metrics sharing SV-PS-330a.1: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (b) non-executive management; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (b) non-executive management; Percentage of (2) diversity group representation for (c) all other employees.",
+        "Find disclosures for SV-PS-330a.1 Percentage of (1) gender representation for (c) all other employees with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.1 Percentage of (1) gender representation for (c) all other employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.1 Percentage of (1) gender representation for (c) all other employees with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.1 Percentage of (1) gender representation for (c) all other employees related to Workforce Diversity & Engagement.",
@@ -951,7 +1640,14 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of gender representation for (c) all other employees",
+        "Percent of (1) gender representation for (c) all other employees",
+        "SV-PS-330a.1 Percentage of (1) gender representation for (c) all other employees",
+        "representation all",
+        "all",
+        "all other",
+        "other employees"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) gender representation for (a) executive management",
@@ -977,6 +1673,10 @@
         {
           "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management",
           "difference": "This profile is only for \"Percentage of (1) gender representation for (c) all other employees\"; do not treat evidence for \"Percentage of (2) diversity group representation for (b) non-executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees",
+          "difference": "The canonical target is 'Percentage of (1) gender representation for (c) all other employees' (Percentage (%)). Do not substitute 'Percentage of (2) diversity group representation for (c) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -984,7 +1684,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -992,11 +1694,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (1) gender representation for (c) all other employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1008,9 +1736,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (1) gender representation for (c) all other employees' (SV-PS-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (b) non-executive management; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (b) non-executive management; Percentage of (2) diversity group representation for (c) all other employees."
     },
     {
       "metric_id": "SV-PS-330a.1.04",
@@ -1040,14 +1791,30 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (2) diversity group representation for (a) executive management",
+        "Percentage of diversity group representation for (a) executive management",
+        "Percent of (2) diversity group representation for (a) executive management",
+        "SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management",
+        "group representation",
+        "representation executive",
+        "executive management",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, and (c) all other"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (2) diversity group representation for (a) executive management', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (2) diversity group representation for (a) executive management', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.1 'Percentage of (2) diversity group representation for (a) executive management'; retain every reported year and label.",
+        "When SV-PS-330a.1 'Percentage of (2) diversity group representation for (a) executive management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.1 'Percentage of (2) diversity group representation for (a) executive management', including: Percentage of (2) diversity group representation for (a) executive management; Percentage of diversity group representation for (a) executive management; Percent of (2) diversity group representation for (a) executive management; SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management.",
+        "Disambiguate SV-PS-330a.1 'Percentage of (2) diversity group representation for (a) executive management' from sibling metrics sharing SV-PS-330a.1: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (b) non-executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (b) non-executive management; Percentage of (2) diversity group representation for (c) all other employees.",
+        "Find disclosures for SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management related to Workforce Diversity & Engagement.",
-        "Find numeric table rows or performance metrics reporting SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management for the reporting period."
+        "Find numeric table rows or performance metrics reporting SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: group."
       ],
       "anchor_terms": [
         "SV-PS-330a.1",
@@ -1063,7 +1830,13 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of diversity group representation for (a) executive management",
+        "Percent of (2) diversity group representation for (a) executive management",
+        "SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management",
+        "group representation",
+        "representation executive",
+        "executive management"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) gender representation for (a) executive management",
@@ -1089,6 +1862,10 @@
         {
           "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management",
           "difference": "This profile is only for \"Percentage of (2) diversity group representation for (a) executive management\"; do not treat evidence for \"Percentage of (2) diversity group representation for (b) non-executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees",
+          "difference": "The canonical target is 'Percentage of (2) diversity group representation for (a) executive management' (Percentage (%)). Do not substitute 'Percentage of (2) diversity group representation for (c) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1096,7 +1873,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1104,11 +1883,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (2) diversity group representation for (a) executive management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1120,9 +1925,34 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "group"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (2) diversity group representation for (a) executive management' (SV-PS-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (b) non-executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (b) non-executive management; Percentage of (2) diversity group representation for (c) all other employees. Preserve separate reported values and source labels for the variable dimensions: group."
     },
     {
       "metric_id": "SV-PS-330a.1.05",
@@ -1152,14 +1982,30 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (2) diversity group representation for (b) non-executive management",
+        "Percentage of diversity group representation for (b) non-executive management",
+        "Percent of (2) diversity group representation for (b) non-executive management",
+        "SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management",
+        "group representation",
+        "representation non-executive",
+        "non-executive management",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, and (c) all other"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (2) diversity group representation for (b) non-executive management', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (2) diversity group representation for (b) non-executive management', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.1 'Percentage of (2) diversity group representation for (b) non-executive management'; retain every reported year and label.",
+        "When SV-PS-330a.1 'Percentage of (2) diversity group representation for (b) non-executive management' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.1 'Percentage of (2) diversity group representation for (b) non-executive management', including: Percentage of (2) diversity group representation for (b) non-executive management; Percentage of diversity group representation for (b) non-executive management; Percent of (2) diversity group representation for (b) non-executive management; SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management.",
+        "Disambiguate SV-PS-330a.1 'Percentage of (2) diversity group representation for (b) non-executive management' from sibling metrics sharing SV-PS-330a.1: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (b) non-executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (c) all other employees.",
+        "Find disclosures for SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management related to Workforce Diversity & Engagement.",
-        "Find numeric table rows or performance metrics reporting SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management for the reporting period."
+        "Find numeric table rows or performance metrics reporting SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: group."
       ],
       "anchor_terms": [
         "SV-PS-330a.1",
@@ -1175,7 +2021,13 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of diversity group representation for (b) non-executive management",
+        "Percent of (2) diversity group representation for (b) non-executive management",
+        "SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management",
+        "group representation",
+        "representation non-executive",
+        "non-executive management"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) gender representation for (a) executive management",
@@ -1201,6 +2053,10 @@
         {
           "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management",
           "difference": "This profile is only for \"Percentage of (2) diversity group representation for (b) non-executive management\"; do not treat evidence for \"Percentage of (2) diversity group representation for (a) executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees",
+          "difference": "The canonical target is 'Percentage of (2) diversity group representation for (b) non-executive management' (Percentage (%)). Do not substitute 'Percentage of (2) diversity group representation for (c) all other employees' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1208,7 +2064,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1216,11 +2074,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (2) diversity group representation for (b) non-executive management', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1232,9 +2116,34 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "group"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (2) diversity group representation for (b) non-executive management' (SV-PS-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (b) non-executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (c) all other employees. Preserve separate reported values and source labels for the variable dimensions: group."
     },
     {
       "metric_id": "SV-PS-330a.1.06",
@@ -1264,14 +2173,32 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of (2) diversity group representation for (c) all other employees",
+        "Percentage of diversity group representation for (c) all other employees",
+        "Percent of (2) diversity group representation for (c) all other employees",
+        "SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees",
+        "group representation",
+        "representation all",
+        "all",
+        "all other",
+        "other employees",
+        "Percentage of (1) gender and (2) diversity group representation for",
+        "(a) executive management, (b) non-executive management, and (c) all other"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (2) diversity group representation for (c) all other employees', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.1 'Percentage of (2) diversity group representation for (c) all other employees', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.1 'Percentage of (2) diversity group representation for (c) all other employees'; retain every reported year and label.",
+        "When SV-PS-330a.1 'Percentage of (2) diversity group representation for (c) all other employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.1 'Percentage of (2) diversity group representation for (c) all other employees', including: Percentage of (2) diversity group representation for (c) all other employees; Percentage of diversity group representation for (c) all other employees; Percent of (2) diversity group representation for (c) all other employees; SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees.",
+        "Disambiguate SV-PS-330a.1 'Percentage of (2) diversity group representation for (c) all other employees' from sibling metrics sharing SV-PS-330a.1: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (b) non-executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (b) non-executive management.",
+        "Find disclosures for SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees related to Workforce Diversity & Engagement.",
-        "Find numeric table rows or performance metrics reporting SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees for the reporting period."
+        "Find numeric table rows or performance metrics reporting SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: group."
       ],
       "anchor_terms": [
         "SV-PS-330a.1",
@@ -1287,7 +2214,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of diversity group representation for (c) all other employees",
+        "Percent of (2) diversity group representation for (c) all other employees",
+        "SV-PS-330a.1 Percentage of (2) diversity group representation for (c) all other employees",
+        "group representation",
+        "representation all",
+        "all",
+        "all other",
+        "other employees"
       ],
       "negative_anchor_terms": [
         "Percentage of (1) gender representation for (a) executive management",
@@ -1313,6 +2248,10 @@
         {
           "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (a) executive management",
           "difference": "This profile is only for \"Percentage of (2) diversity group representation for (c) all other employees\"; do not treat evidence for \"Percentage of (2) diversity group representation for (a) executive management\" as a match unless the same row or sentence explicitly discloses the current metric component."
+        },
+        {
+          "confusing_with": "SV-PS-330a.1 Percentage of (2) diversity group representation for (b) non-executive management",
+          "difference": "The canonical target is 'Percentage of (2) diversity group representation for (c) all other employees' (Percentage (%)). Do not substitute 'Percentage of (2) diversity group representation for (b) non-executive management' (Percentage (%)); a shared Code, index reference, or nearby sibling value is insufficient unless the evidence explicitly labels the current component."
         }
       ],
       "preferred_chunk_types": [
@@ -1320,7 +2259,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1328,11 +2269,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of (2) diversity group representation for (c) all other employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1344,9 +2311,34 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "group"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of (2) diversity group representation for (c) all other employees' (SV-PS-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of (1) gender representation for (a) executive management; Percentage of (1) gender representation for (b) non-executive management; Percentage of (1) gender representation for (c) all other employees; Percentage of (2) diversity group representation for (a) executive management; Percentage of (2) diversity group representation for (b) non-executive management. Preserve separate reported values and source labels for the variable dimensions: group."
     },
     {
       "metric_id": "SV-PS-330a.2.01",
@@ -1374,10 +2366,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(1) Voluntary turnover rate for employees",
+        "Voluntary turnover rate for employees",
+        "SV-PS-330a.2 (1) Voluntary turnover rate for employees",
+        "Voluntary turnover",
+        "turnover rate",
+        "rate employees",
+        "(1) Voluntary and (2) involuntary turnover rate for employees",
+        "The entity shall disclose the employee turnover rate as a percentage for all employees"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.2 (1) Voluntary turnover rate for employees with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.2 '(1) Voluntary turnover rate for employees', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.2 '(1) Voluntary turnover rate for employees', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.2 '(1) Voluntary turnover rate for employees'; retain every reported year and label.",
+        "When SV-PS-330a.2 '(1) Voluntary turnover rate for employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.2 '(1) Voluntary turnover rate for employees', including: (1) Voluntary turnover rate for employees; Voluntary turnover rate for employees; SV-PS-330a.2 (1) Voluntary turnover rate for employees.",
+        "Disambiguate SV-PS-330a.2 '(1) Voluntary turnover rate for employees' from sibling metrics sharing SV-PS-330a.2: (2) Involuntary turnover rate for employees.",
+        "Find disclosures for SV-PS-330a.2 (1) Voluntary turnover rate for employees with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.2 (1) Voluntary turnover rate for employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.2 (1) Voluntary turnover rate for employees with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.2 (1) Voluntary turnover rate for employees related to Workforce Diversity & Engagement.",
@@ -1385,6 +2391,7 @@
       ],
       "anchor_terms": [
         "SV-PS-330a.2",
+        "(1) Voluntary turnover rate for employees",
         "Voluntary turnover rate for employees",
         "Voluntary",
         "turnover",
@@ -1396,10 +2403,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-PS-330a.2 (1) Voluntary turnover rate for employees",
+        "Voluntary turnover",
+        "turnover rate",
+        "rate employees"
       ],
       "negative_anchor_terms": [
-        "Involuntary turnover rate for employees"
+        "Involuntary turnover rate for employees",
+        "(2) Involuntary turnover rate for employees"
       ],
       "similar_metric_warnings": [
         {
@@ -1412,7 +2424,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1420,11 +2434,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Voluntary turnover rate for employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1436,9 +2476,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Voluntary turnover rate for employees' (SV-PS-330a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Involuntary turnover rate for employees."
     },
     {
       "metric_id": "SV-PS-330a.2.02",
@@ -1466,10 +2529,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Involuntary turnover rate for employees",
+        "Involuntary turnover rate for employees",
+        "SV-PS-330a.2 (2) Involuntary turnover rate for employees",
+        "Involuntary turnover",
+        "turnover rate",
+        "rate employees",
+        "(1) Voluntary and (2) involuntary turnover rate for employees",
+        "The entity shall disclose the employee turnover rate as a percentage for all employees"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.2 (2) Involuntary turnover rate for employees with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.2 '(2) Involuntary turnover rate for employees', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.2 '(2) Involuntary turnover rate for employees', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.2 '(2) Involuntary turnover rate for employees'; retain every reported year and label.",
+        "When SV-PS-330a.2 '(2) Involuntary turnover rate for employees' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.2 '(2) Involuntary turnover rate for employees', including: (2) Involuntary turnover rate for employees; Involuntary turnover rate for employees; SV-PS-330a.2 (2) Involuntary turnover rate for employees.",
+        "Disambiguate SV-PS-330a.2 '(2) Involuntary turnover rate for employees' from sibling metrics sharing SV-PS-330a.2: (1) Voluntary turnover rate for employees.",
+        "Find disclosures for SV-PS-330a.2 (2) Involuntary turnover rate for employees with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.2 (2) Involuntary turnover rate for employees, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.2 (2) Involuntary turnover rate for employees with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.2 (2) Involuntary turnover rate for employees related to Workforce Diversity & Engagement.",
@@ -1477,6 +2554,7 @@
       ],
       "anchor_terms": [
         "SV-PS-330a.2",
+        "(2) Involuntary turnover rate for employees",
         "Involuntary turnover rate for employees",
         "Involuntary",
         "turnover",
@@ -1488,10 +2566,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-PS-330a.2 (2) Involuntary turnover rate for employees",
+        "Involuntary turnover",
+        "turnover rate",
+        "rate employees"
       ],
       "negative_anchor_terms": [
-        "Voluntary turnover rate for employees"
+        "Voluntary turnover rate for employees",
+        "(1) Voluntary turnover rate for employees"
       ],
       "similar_metric_warnings": [
         {
@@ -1504,7 +2587,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1512,11 +2597,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Involuntary turnover rate for employees', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1528,9 +2639,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Involuntary turnover rate for employees' (SV-PS-330a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Voluntary turnover rate for employees."
     },
     {
       "metric_id": "SV-PS-330a.3",
@@ -1543,7 +2677,8 @@
       "disclosure_type": "quantitative",
       "aliases": [
         "Employee engagement as a percentage",
-        "SV-PS-330a.3 Employee engagement as a percentage"
+        "SV-PS-330a.3 Employee engagement as a percentage",
+        "Employee engagement as a Percent"
       ],
       "bm25_terms": [
         "SV-PS-330a.3",
@@ -1554,10 +2689,20 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Employee engagement as a percentage",
+        "SV-PS-330a.3 Employee engagement as a percentage",
+        "Employee engagement as a Percent",
+        "Employee engagement",
+        "The entity shall disclose employee engagement as a percentage"
       ],
-      "dense_query": "Find disclosures for SV-PS-330a.3 Employee engagement as a percentage with unit Percentage (%) related to Workforce Diversity & Engagement.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.3 'Employee engagement as a percentage', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-330a.3 'Employee engagement as a percentage', under 'Workforce Diversity & Engagement', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-330a.3 'Employee engagement as a percentage'; retain every reported year and label.",
+        "When SV-PS-330a.3 'Employee engagement as a percentage' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-330a.3 'Employee engagement as a percentage', including: Employee engagement as a percentage; SV-PS-330a.3 Employee engagement as a percentage; Employee engagement as a Percent.",
+        "Find disclosures for SV-PS-330a.3 Employee engagement as a percentage with unit Percentage (%) related to Workforce Diversity & Engagement.",
         "Retrieve exact report evidence for SV-PS-330a.3 Employee engagement as a percentage, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-330a.3 Employee engagement as a percentage with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-330a.3 Employee engagement as a percentage related to Workforce Diversity & Engagement.",
@@ -1573,7 +2718,10 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-PS-330a.3 Employee engagement as a percentage",
+        "Employee engagement as a Percent",
+        "Employee engagement"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1582,7 +2730,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1590,11 +2740,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Employee engagement as a percentage', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1606,9 +2782,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Employee engagement as a percentage' (SV-PS-330a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-PS-510a.1",
@@ -1621,7 +2820,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of approach to ensuring professional integrity",
-        "SV-PS-510a.1 Description of approach to ensuring professional integrity"
+        "SV-PS-510a.1 Description of approach to ensuring professional integrity",
+        "approach to ensuring professional integrity"
       ],
       "bm25_terms": [
         "SV-PS-510a.1",
@@ -1629,10 +2829,21 @@
         "approach",
         "ensuring",
         "professional",
-        "integrity"
+        "integrity",
+        "Description of approach to ensuring professional integrity",
+        "SV-PS-510a.1 Description of approach to ensuring professional integrity",
+        "approach to ensuring professional integrity",
+        "ensuring professional",
+        "professional integrity",
+        "The entity shall describe its policies to ensure professional integrity"
       ],
-      "dense_query": "Find disclosures for SV-PS-510a.1 Description of approach to ensuring professional integrity related to Professional Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-510a.1 'Description of approach to ensuring professional integrity', under 'Professional Integrity'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-510a.1 'Description of approach to ensuring professional integrity', under 'Professional Integrity'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers SV-PS-510a.1 'Description of approach to ensuring professional integrity'.",
+        "When SV-PS-510a.1 'Description of approach to ensuring professional integrity' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-510a.1 'Description of approach to ensuring professional integrity', including: Description of approach to ensuring professional integrity; SV-PS-510a.1 Description of approach to ensuring professional integrity; approach to ensuring professional integrity.",
+        "Find disclosures for SV-PS-510a.1 Description of approach to ensuring professional integrity related to Professional Integrity.",
         "Retrieve exact report evidence for SV-PS-510a.1 Description of approach to ensuring professional integrity, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-510a.1 Description of approach to ensuring professional integrity.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-510a.1 Description of approach to ensuring professional integrity related to Professional Integrity.",
@@ -1645,7 +2856,11 @@
         "approach",
         "ensuring",
         "professional",
-        "integrity"
+        "integrity",
+        "SV-PS-510a.1 Description of approach to ensuring professional integrity",
+        "approach to ensuring professional integrity",
+        "ensuring professional",
+        "professional integrity"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1655,7 +2870,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1667,20 +2884,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of approach to ensuring professional integrity'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of approach to ensuring professional integrity' (SV-PS-510a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-PS-510a.2",
@@ -1710,10 +2975,30 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with professional integrity",
+        "Monetary losses as a result of legal proceedings associated with professional integrity",
+        "SV-PS-510a.2 Total amount of monetary losses as a result of legal proceedings associated with professional integrity",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated professional",
+        "professional integrity",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with professional integrity"
       ],
-      "dense_query": "Find disclosures for SV-PS-510a.2 Total amount of monetary losses as a result of legal proceedings associated with professional integrity with unit Presentation currency related to Professional Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with professional integrity', under 'Professional Integrity', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with professional integrity', under 'Professional Integrity', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with professional integrity'; retain every reported year and label.",
+        "When SV-PS-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with professional integrity' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with professional integrity', including: Total amount of monetary losses as a result of legal proceedings associated with professional integrity; Monetary losses as a result of legal proceedings associated with professional integrity; SV-PS-510a.2 Total amount of monetary losses as a result of legal proceedings associated with professional integrity.",
+        "Find disclosures for SV-PS-510a.2 Total amount of monetary losses as a result of legal proceedings associated with professional integrity with unit Presentation currency related to Professional Integrity.",
         "Retrieve exact report evidence for SV-PS-510a.2 Total amount of monetary losses as a result of legal proceedings associated with professional integrity, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-510a.2 Total amount of monetary losses as a result of legal proceedings associated with professional integrity with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-510a.2 Total amount of monetary losses as a result of legal proceedings associated with professional integrity related to Professional Integrity.",
@@ -1733,7 +3018,18 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with professional integrity",
+        "SV-PS-510a.2 Total amount of monetary losses as a result of legal proceedings associated with professional integrity",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated professional",
+        "professional integrity",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1747,7 +3043,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1755,25 +3053,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with professional integrity', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with professional integrity' (SV-PS-510a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-PS-000.A.01",
@@ -1788,7 +3135,8 @@
         "Number of employees by: (1) full-time and part-time",
         "Number of employees by: full-time and part-time",
         "Count of employees by: (1) full-time and part-time",
-        "SV-PS-000.A Number of employees by: (1) full-time and part-time"
+        "SV-PS-000.A Number of employees by: (1) full-time and part-time",
+        "Total number of employees by: (1) full-time and part-time"
       ],
       "bm25_terms": [
         "SV-PS-000.A",
@@ -1798,10 +3146,25 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of employees by: (1) full-time and part-time",
+        "Number of employees by: full-time and part-time",
+        "Count of employees by: (1) full-time and part-time",
+        "SV-PS-000.A Number of employees by: (1) full-time and part-time",
+        "Total number of employees by: (1) full-time and part-time",
+        "employees full-time",
+        "full-time part-time",
+        "Number of employees by",
+        "(2) temporary, and (3) contract"
       ],
-      "dense_query": "Find disclosures for SV-PS-000.A Number of employees by: (1) full-time and part-time with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-000.A 'Number of employees by: (1) full-time and part-time', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-000.A 'Number of employees by: (1) full-time and part-time', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-000.A 'Number of employees by: (1) full-time and part-time'; retain every reported year and label.",
+        "When SV-PS-000.A 'Number of employees by: (1) full-time and part-time' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-000.A 'Number of employees by: (1) full-time and part-time', including: Number of employees by: (1) full-time and part-time; Number of employees by: full-time and part-time; Count of employees by: (1) full-time and part-time; SV-PS-000.A Number of employees by: (1) full-time and part-time; Total number of employees by: (1) full-time and part-time.",
+        "Disambiguate SV-PS-000.A 'Number of employees by: (1) full-time and part-time' from sibling metrics sharing SV-PS-000.A: Number of employees by: (2) temporary; Number of employees by: (3) contract.",
+        "Find disclosures for SV-PS-000.A Number of employees by: (1) full-time and part-time with unit Number.",
         "Retrieve exact report evidence for SV-PS-000.A Number of employees by: (1) full-time and part-time, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-000.A Number of employees by: (1) full-time and part-time with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-000.A Number of employees by: (1) full-time and part-time.",
@@ -1815,7 +3178,14 @@
         "part-time",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of employees by: full-time and part-time",
+        "Count of employees by: (1) full-time and part-time",
+        "SV-PS-000.A Number of employees by: (1) full-time and part-time",
+        "Total number of employees by: (1) full-time and part-time",
+        "employees full-time",
+        "full-time part-time",
+        "Number of employees by"
       ],
       "negative_anchor_terms": [
         "Number of employees by: (2) temporary",
@@ -1836,7 +3206,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1844,24 +3216,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of employees by: (1) full-time and part-time'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of employees by: (1) full-time and part-time' (SV-PS-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of employees by: (2) temporary; Number of employees by: (3) contract."
     },
     {
       "metric_id": "SV-PS-000.A.02",
@@ -1876,7 +3296,8 @@
         "Number of employees by: (2) temporary",
         "Number of employees by: temporary",
         "Count of employees by: (2) temporary",
-        "SV-PS-000.A Number of employees by: (2) temporary"
+        "SV-PS-000.A Number of employees by: (2) temporary",
+        "Total number of employees by: (2) temporary"
       ],
       "bm25_terms": [
         "SV-PS-000.A",
@@ -1885,10 +3306,25 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of employees by: (2) temporary",
+        "Number of employees by: temporary",
+        "Count of employees by: (2) temporary",
+        "SV-PS-000.A Number of employees by: (2) temporary",
+        "Total number of employees by: (2) temporary",
+        "employees temporary",
+        "Number of employees by",
+        "Number of employees by: (1) full-time and part-time",
+        "(2) temporary, and (3) contract"
       ],
-      "dense_query": "Find disclosures for SV-PS-000.A Number of employees by: (2) temporary with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-000.A 'Number of employees by: (2) temporary', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-000.A 'Number of employees by: (2) temporary', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-000.A 'Number of employees by: (2) temporary'; retain every reported year and label.",
+        "When SV-PS-000.A 'Number of employees by: (2) temporary' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-000.A 'Number of employees by: (2) temporary', including: Number of employees by: (2) temporary; Number of employees by: temporary; Count of employees by: (2) temporary; SV-PS-000.A Number of employees by: (2) temporary; Total number of employees by: (2) temporary.",
+        "Disambiguate SV-PS-000.A 'Number of employees by: (2) temporary' from sibling metrics sharing SV-PS-000.A: Number of employees by: (1) full-time and part-time; Number of employees by: (3) contract.",
+        "Find disclosures for SV-PS-000.A Number of employees by: (2) temporary with unit Number.",
         "Retrieve exact report evidence for SV-PS-000.A Number of employees by: (2) temporary, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-000.A Number of employees by: (2) temporary with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-000.A Number of employees by: (2) temporary.",
@@ -1901,7 +3337,13 @@
         "temporary",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of employees by: temporary",
+        "Count of employees by: (2) temporary",
+        "SV-PS-000.A Number of employees by: (2) temporary",
+        "Total number of employees by: (2) temporary",
+        "employees temporary",
+        "Number of employees by"
       ],
       "negative_anchor_terms": [
         "Number of employees by: (1) full-time and part-time",
@@ -1922,7 +3364,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1930,24 +3374,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of employees by: (2) temporary'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of employees by: (2) temporary' (SV-PS-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of employees by: (1) full-time and part-time; Number of employees by: (3) contract."
     },
     {
       "metric_id": "SV-PS-000.A.03",
@@ -1962,7 +3454,8 @@
         "Number of employees by: (3) contract",
         "Number of employees by: contract",
         "Count of employees by: (3) contract",
-        "SV-PS-000.A Number of employees by: (3) contract"
+        "SV-PS-000.A Number of employees by: (3) contract",
+        "Total number of employees by: (3) contract"
       ],
       "bm25_terms": [
         "SV-PS-000.A",
@@ -1971,10 +3464,25 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of employees by: (3) contract",
+        "Number of employees by: contract",
+        "Count of employees by: (3) contract",
+        "SV-PS-000.A Number of employees by: (3) contract",
+        "Total number of employees by: (3) contract",
+        "employees contract",
+        "Number of employees by",
+        "Number of employees by: (1) full-time and part-time",
+        "(2) temporary, and (3) contract"
       ],
-      "dense_query": "Find disclosures for SV-PS-000.A Number of employees by: (3) contract with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-000.A 'Number of employees by: (3) contract', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-000.A 'Number of employees by: (3) contract', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-000.A 'Number of employees by: (3) contract'; retain every reported year and label.",
+        "When SV-PS-000.A 'Number of employees by: (3) contract' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-000.A 'Number of employees by: (3) contract', including: Number of employees by: (3) contract; Number of employees by: contract; Count of employees by: (3) contract; SV-PS-000.A Number of employees by: (3) contract; Total number of employees by: (3) contract.",
+        "Disambiguate SV-PS-000.A 'Number of employees by: (3) contract' from sibling metrics sharing SV-PS-000.A: Number of employees by: (1) full-time and part-time; Number of employees by: (2) temporary.",
+        "Find disclosures for SV-PS-000.A Number of employees by: (3) contract with unit Number.",
         "Retrieve exact report evidence for SV-PS-000.A Number of employees by: (3) contract, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-000.A Number of employees by: (3) contract with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-000.A Number of employees by: (3) contract.",
@@ -1987,7 +3495,13 @@
         "contract",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of employees by: contract",
+        "Count of employees by: (3) contract",
+        "SV-PS-000.A Number of employees by: (3) contract",
+        "Total number of employees by: (3) contract",
+        "employees contract",
+        "Number of employees by"
       ],
       "negative_anchor_terms": [
         "Number of employees by: (1) full-time and part-time",
@@ -2009,7 +3523,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2017,24 +3533,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of employees by: (3) contract'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of employees by: (3) contract' (SV-PS-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of employees by: (1) full-time and part-time; Number of employees by: (2) temporary."
     },
     {
       "metric_id": "SV-PS-000.B.01",
@@ -2053,10 +3617,22 @@
         "SV-PS-000.B",
         "Employee",
         "hours",
-        "worked"
+        "worked",
+        "Employee hours worked",
+        "SV-PS-000.B Employee hours worked",
+        "Employee hours",
+        "hours worked",
+        "hr",
+        "Employee hours worked, percentage billable"
       ],
-      "dense_query": "Find disclosures for SV-PS-000.B Employee hours worked with unit Hours.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-000.B 'Employee hours worked', with expected unit 'Hours'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-000.B 'Employee hours worked', with expected unit 'Hours'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-000.B 'Employee hours worked'; retain every reported year and label.",
+        "When SV-PS-000.B 'Employee hours worked' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-000.B 'Employee hours worked', including: Employee hours worked; SV-PS-000.B Employee hours worked.",
+        "Disambiguate SV-PS-000.B 'Employee hours worked' from sibling metrics sharing SV-PS-000.B: Percentage billable.",
+        "Find disclosures for SV-PS-000.B Employee hours worked with unit Hours.",
         "Retrieve exact report evidence for SV-PS-000.B Employee hours worked, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-000.B Employee hours worked with unit Hours.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-000.B Employee hours worked.",
@@ -2067,7 +3643,11 @@
         "Employee hours worked",
         "Employee",
         "hours",
-        "worked"
+        "worked",
+        "SV-PS-000.B Employee hours worked",
+        "Employee hours",
+        "hours worked",
+        "hr"
       ],
       "negative_anchor_terms": [
         "Percentage billable"
@@ -2083,7 +3663,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2091,22 +3673,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Employee hours worked', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "duration",
         "expected_units": [
-          "Hours"
+          "Hours",
+          "days",
+          "months",
+          "years"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Employee hours worked' (SV-PS-000.B, expected unit: Hours). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage billable."
     },
     {
       "metric_id": "SV-PS-000.B.02",
@@ -2119,7 +3753,8 @@
       "disclosure_type": "quantitative",
       "aliases": [
         "Percentage billable",
-        "SV-PS-000.B Percentage billable"
+        "SV-PS-000.B Percentage billable",
+        "Percent billable"
       ],
       "bm25_terms": [
         "SV-PS-000.B",
@@ -2127,10 +3762,20 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage billable",
+        "SV-PS-000.B Percentage billable",
+        "Percent billable",
+        "Employee hours worked, percentage billable"
       ],
-      "dense_query": "Find disclosures for SV-PS-000.B Percentage billable with unit Percentage (%).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-PS-000.B 'Percentage billable', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-PS-000.B 'Percentage billable', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-PS-000.B 'Percentage billable'; retain every reported year and label.",
+        "When SV-PS-000.B 'Percentage billable' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-PS-000.B 'Percentage billable', including: Percentage billable; SV-PS-000.B Percentage billable; Percent billable.",
+        "Disambiguate SV-PS-000.B 'Percentage billable' from sibling metrics sharing SV-PS-000.B: Employee hours worked.",
+        "Find disclosures for SV-PS-000.B Percentage billable with unit Percentage (%).",
         "Retrieve exact report evidence for SV-PS-000.B Percentage billable, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-PS-000.B Percentage billable with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-PS-000.B Percentage billable.",
@@ -2143,7 +3788,9 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-PS-000.B Percentage billable",
+        "Percent billable"
       ],
       "negative_anchor_terms": [
         "Employee hours worked"
@@ -2159,7 +3806,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2167,11 +3816,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage billable', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -2183,9 +3858,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage billable' (SV-PS-000.B, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Employee hours worked."
     }
   ]
 }

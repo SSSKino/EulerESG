@@ -79,6 +79,7 @@ from ..report_encoder import ReportEncoder
 from ..metric_processor import MetricProcessor
 from ..retrieval.dual_channel import DualChannelRetriever
 from ..retrieval.evidence_retriever import retrieve_metric_collection
+from ..retrieval.metric_profile import find_metric_profile
 from ..disclosure_inference import DisclosureInferenceEngine, COMPLIANCE_VALUE_NA
 from ..chat.chatbot import ESGChatbot
 from ..retrieval.hipporag.patch import enable_hipporag
@@ -474,6 +475,12 @@ def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
     type_name = getattr(analysis, "type", "") or ""
     metric_code = getattr(analysis, "metric_code", "") or getattr(analysis, "metric_id", "") or ""
     metric_name = getattr(analysis, "metric_name", "") or ""
+    year_values = [
+        dict(item)
+        for item in (getattr(analysis, "year_values", None) or [])
+        if isinstance(item, dict)
+    ]
+    selected_year = getattr(analysis, "selected_year", None)
 
     return {
         "metric_id": analysis.metric_id,
@@ -488,6 +495,8 @@ def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
         "definition": definition,
         "page": page,
         "value": value,
+        "year_values": year_values,
+        "selected_year": selected_year,
         "context": context,
         "Metric": metric_name,
         "Category": category,
@@ -497,11 +506,15 @@ def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
         "Type": type_name,
         "Definition": definition,
         "Value": value,
+        "Year Values": year_values,
+        "Selected Year": selected_year,
         "Page": page,
         "Context": context,
         "Disclosure Status": disclosure_status,
         "LLM Analysis": reasoning,
         "evidence_segments": list(getattr(analysis, "evidence_segments", None) or []),
+        "evidence_sources": list(getattr(analysis, "evidence_sources", None) or []),
+        "derived_calculation": getattr(analysis, "derived_calculation", None),
         "improvement_suggestions": list(
             getattr(analysis, "improvement_suggestions", None) or []
         ),
@@ -575,8 +588,12 @@ def _apply_partial_disclosure_json_rules(metric_rows: Optional[List[dict]]) -> N
         elif "not" in s:
             m["page"] = None
             m["value"] = COMPLIANCE_VALUE_NA
+            m["year_values"] = []
+            m["selected_year"] = None
 
         m["Value"] = m.get("value")
+        m["Year Values"] = m.get("year_values") or []
+        m["Selected Year"] = m.get("selected_year")
         m["Page"] = m.get("page")
         m["Context"] = m.get("context")
         m["Disclosure Status"] = m.get("disclosure_status")
@@ -654,11 +671,15 @@ def _metric_result_overlay_from_analysis(analysis: DisclosureAnalysis) -> Dict[s
     """Fields written back to canonical SASB metric rows for backend/frontend display."""
     return {
         "Value": getattr(analysis, "value", None),
+        "Year Values": list(getattr(analysis, "year_values", None) or []),
+        "Selected Year": getattr(analysis, "selected_year", None),
         "Page": getattr(analysis, "page", None),
         "Context": getattr(analysis, "context", None),
         "Disclosure Status": _analysis_status_value(analysis),
         "LLM Analysis": getattr(analysis, "reasoning", "") or "",
         "evidence_segments": list(getattr(analysis, "evidence_segments", None) or []),
+        "evidence_sources": list(getattr(analysis, "evidence_sources", None) or []),
+        "derived_calculation": getattr(analysis, "derived_calculation", None),
         "improvement_suggestions": list(getattr(analysis, "improvement_suggestions", None) or []),
         "metric_id": getattr(analysis, "metric_id", "") or "",
         "metric_name": getattr(analysis, "metric_name", "") or "",
@@ -666,6 +687,8 @@ def _metric_result_overlay_from_analysis(analysis: DisclosureAnalysis) -> Dict[s
         "disclosure_status": _analysis_status_value(analysis),
         "reasoning": getattr(analysis, "reasoning", "") or "",
         "value": getattr(analysis, "value", None),
+        "year_values": list(getattr(analysis, "year_values", None) or []),
+        "selected_year": getattr(analysis, "selected_year", None),
         "page": getattr(analysis, "page", None),
         "context": getattr(analysis, "context", None),
         "unit": getattr(analysis, "unit", "") or "",
@@ -688,11 +711,15 @@ def _default_not_disclosed_overlay(row: dict, index: int) -> Dict[str, Any]:
     metric_id = f"{code}.{index + 1:02d}" if code else re.sub(r"[^a-z0-9]+", "_", f"{metric}_{topic}_{unit}".lower()).strip("_")
     return {
         "Value": COMPLIANCE_VALUE_NA,
+        "Year Values": [],
+        "Selected Year": None,
         "Page": None,
         "Context": "",
         "Disclosure Status": "not_disclosed",
         "LLM Analysis": "No relevant metric content found",
         "evidence_segments": [],
+        "evidence_sources": [],
+        "derived_calculation": None,
         "improvement_suggestions": [],
         "metric_id": metric_id,
         "metric_name": metric,
@@ -700,6 +727,8 @@ def _default_not_disclosed_overlay(row: dict, index: int) -> Dict[str, Any]:
         "disclosure_status": "not_disclosed",
         "reasoning": "No relevant metric content found",
         "value": COMPLIANCE_VALUE_NA,
+        "year_values": [],
+        "selected_year": None,
         "page": None,
         "context": "",
         "unit": unit,
@@ -867,6 +896,17 @@ def _prepare_metrics_for_retrieval(
     """Ensure framework metrics are retrieval-ready before running dual-channel recall."""
     if not getattr(metrics, "metrics", None):
         return metrics
+    skip_profiled = str(
+        os.getenv("REPORT_SKIP_PROFILED_METRIC_EXPANSION", "true") or "true"
+    ).strip().lower() in {"1", "true", "yes", "y", "on"}
+    if skip_profiled:
+        profiled = [metric for metric in metrics.metrics if find_metric_profile(metric) is not None]
+        if len(profiled) == len(metrics.metrics):
+            logger.info(
+                f"Skipping metric LLM semantic expansion: all {len(profiled)} metrics "
+                "have generated retrieval profiles"
+            )
+            return metrics
     return processor.process_metric_collection(metrics)
 
 
@@ -997,6 +1037,8 @@ def _load_specific_report_context(file_id: str):
                         disclosure_status=d["disclosure_status"],
                         reasoning=d.get("reasoning", d.get("LLM Analysis", d.get("Reasoning", d.get("Analysis", "")))),
                         evidence_segments=d.get("evidence_segments", []) or [],
+                        evidence_sources=d.get("evidence_sources", []) or [],
+                        derived_calculation=d.get("derived_calculation"),
                         improvement_suggestions=d.get("improvement_suggestions", []) or [],
                         category=d.get("category", d.get("Category", "")),
                         topic=d.get("topic", d.get("Topic", "")),
@@ -1004,6 +1046,8 @@ def _load_specific_report_context(file_id: str):
                         type=d.get("type", d.get("Type", "")),
                         definition=d.get("definition", d.get("Definition", "")),
                         value=d.get("value", d.get("Value")),
+                        year_values=d.get("year_values", d.get("Year Values", [])) or [],
+                        selected_year=d.get("selected_year", d.get("Selected Year")),
                         context=d.get("context", d.get("Context")),
                         page=d.get("page", d.get("Page")),
                     ))
@@ -1221,6 +1265,8 @@ def _load_latest_assessment_for_chat():
                 disclosure_status=status,
                 reasoning=item.get("reasoning", item.get("LLM Analysis", item.get("Reasoning", item.get("Analysis", "")))),
                 evidence_segments=item.get("evidence_segments", []),
+                evidence_sources=item.get("evidence_sources", []),
+                derived_calculation=item.get("derived_calculation"),
                 improvement_suggestions=item.get("improvement_suggestions", []),
                 category=item.get("category", item.get("Category", "")),
                 topic=item.get("topic", item.get("Topic", "")),
@@ -1228,6 +1274,8 @@ def _load_latest_assessment_for_chat():
                 type=item.get("type", item.get("Type", "")),
                 definition=item.get("definition", item.get("Definition", "")),
                 value=item.get("value", item.get("Value")),
+                year_values=item.get("year_values", item.get("Year Values", [])) or [],
+                selected_year=item.get("selected_year", item.get("Selected Year")),
                 context=item.get("context", item.get("Context")),
                 page=item.get("page", item.get("Page"))
             )
@@ -1487,8 +1535,40 @@ def _normalize_assessment_payload(payload: dict) -> dict:
                 a["value"] = a.get("data")
         if "page" not in a and "Page" in a:
             a["page"] = a.get("Page")
+        if "year_values" not in a and "Year Values" in a:
+            a["year_values"] = a.get("Year Values")
+        if "selected_year" not in a and "Selected Year" in a:
+            a["selected_year"] = a.get("Selected Year")
         a.setdefault("page", None)
         a.setdefault("value", None)
+        raw_year_values = a.get("year_values")
+        normalized_year_values: List[Dict[str, Any]] = []
+        if isinstance(raw_year_values, list):
+            seen_year_values = set()
+            for raw_year_value in raw_year_values:
+                if not isinstance(raw_year_value, dict):
+                    continue
+                try:
+                    year = int(raw_year_value.get("year"))
+                except (TypeError, ValueError):
+                    continue
+                value = raw_year_value.get("value")
+                if not 1900 <= year <= 2100 or isinstance(value, bool) or not isinstance(value, (int, float)):
+                    continue
+                unit_key = str(raw_year_value.get("unit") or raw_year_value.get("raw_unit") or "").strip().lower()
+                key = (year, float(value), unit_key)
+                if key in seen_year_values:
+                    continue
+                seen_year_values.add(key)
+                item = dict(raw_year_value)
+                item["year"] = year
+                normalized_year_values.append(item)
+        a["year_values"] = sorted(normalized_year_values, key=lambda item: int(item["year"]))
+        try:
+            selected_year = int(a.get("selected_year")) if a.get("selected_year") is not None else None
+        except (TypeError, ValueError):
+            selected_year = None
+        a["selected_year"] = selected_year if selected_year is not None and 1900 <= selected_year <= 2100 else None
         a.setdefault("unit", a.get("Unit"))
         a.setdefault(
             "context",
@@ -1504,6 +1584,8 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         a.setdefault("reasoning", a.get("LLM Analysis") or a.get("Reasoning") or a.get("Analysis") or "")
         a.setdefault("disclosure_status", a.get("Disclosure Status") or a.get("Model Disclosure Status") or a.get("status") or "")
         a.setdefault("evidence_segments", [])
+        a.setdefault("evidence_sources", [])
+        a.setdefault("derived_calculation", None)
         a.setdefault("improvement_suggestions", [])
         a.setdefault("metric_name", a.get("Metric") or a.get("metric") or "")
         a.setdefault("metric_code", a.get("Code") or a.get("code") or a.get("metric_id") or "")
@@ -1521,6 +1603,8 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         a["Type"] = a.get("Type") or a.get("type") or ""
         a["Definition"] = a.get("Definition") or a.get("definition") or ""
         a["Value"] = a.get("Value") if "Value" in a else a.get("value")
+        a["Year Values"] = a.get("year_values") or []
+        a["Selected Year"] = a.get("selected_year")
         a["Page"] = a.get("Page") if "Page" in a else a.get("page")
         a["Context"] = a.get("Context") or a.get("context") or ""
         a["Disclosure Status"] = a.get("Disclosure Status") or a.get("disclosure_status") or a.get("Model Disclosure Status") or ""
@@ -1560,12 +1644,16 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         if status_norm == "not_disclosed":
             a["page"] = None
             a["value"] = COMPLIANCE_VALUE_NA
+            a["year_values"] = []
+            a["selected_year"] = None
         elif status_norm in ("fully_disclosed", "partially_disclosed"):
             if not _payload_value_is_numeric(a.get("value")):
                 a["value"] = COMPLIANCE_VALUE_NA
 
         a["disclosure_status"] = status_norm or a.get("disclosure_status") or a.get("Disclosure Status") or ""
         a["Value"] = a.get("value")
+        a["Year Values"] = a.get("year_values") or []
+        a["Selected Year"] = a.get("selected_year")
         a["Page"] = a.get("page")
         a["Context"] = a.get("context") or ""
         a["Disclosure Status"] = a.get("disclosure_status") or a.get("Disclosure Status") or ""
@@ -1573,6 +1661,70 @@ def _normalize_assessment_payload(payload: dict) -> dict:
         norm.append(a)
 
     payload["metric_analyses"] = norm
+    return payload
+
+
+def _apply_assessment_year_selection(payload: dict, target_year: Optional[int]) -> dict:
+    """Project one requested year into legacy scalar fields without losing year_values."""
+    if target_year is None:
+        return payload
+    try:
+        year = int(target_year)
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=422, detail="year must be an integer between 1900 and 2100")
+    if not 1900 <= year <= 2100:
+        raise HTTPException(status_code=422, detail="year must be between 1900 and 2100")
+
+    rows: List[Dict[str, Any]] = []
+    for key in ("metric_analyses", "sasb_metric_rows"):
+        for row in payload.get(key) or []:
+            if isinstance(row, dict):
+                rows.append(row)
+
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        row["selected_year"] = year
+        row["Selected Year"] = year
+        status = str(row.get("disclosure_status") or "").strip().lower()
+        if status == "not_disclosed":
+            row["year_selection_status"] = "not_disclosed"
+            continue
+
+        matches = [
+            item
+            for item in (row.get("year_values") or [])
+            if isinstance(item, dict) and item.get("year") == year
+        ]
+        distinct = {
+            (
+                float(item["value"]),
+                str(item.get("unit") or item.get("raw_unit") or "").strip().lower(),
+            )
+            for item in matches
+            if isinstance(item.get("value"), (int, float)) and not isinstance(item.get("value"), bool)
+        }
+        if len(distinct) == 1 and matches:
+            selected = matches[0]
+            row["value"] = selected.get("value")
+            row["page"] = selected.get("page")
+            if selected.get("context"):
+                row["context"] = selected.get("context")
+            row["year_selection_status"] = "selected"
+        elif not matches:
+            row["value"] = COMPLIANCE_VALUE_NA
+            row["page"] = None
+            row["year_selection_status"] = "not_available"
+        else:
+            row["value"] = COMPLIANCE_VALUE_NA
+            row["page"] = None
+            row["year_selection_status"] = "ambiguous"
+
+        row["Value"] = row.get("value")
+        row["Page"] = row.get("page")
+        row["Context"] = row.get("context") or ""
+
+    payload["requested_year"] = year
     return payload
 
 

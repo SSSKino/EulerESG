@@ -144,6 +144,8 @@ async def analyze_compliance():
                     "disclosure_status": analysis.disclosure_status.value if hasattr(analysis.disclosure_status, 'value') else analysis.disclosure_status,
                     "reasoning": analysis.reasoning,
                     "value": getattr(analysis, 'value', None),
+                    "year_values": list(getattr(analysis, 'year_values', None) or []),
+                    "selected_year": getattr(analysis, 'selected_year', None),
                     "page": getattr(analysis, 'page', None),
                     "context": getattr(analysis, 'context', None),
                     "category": metric_info.get('category', getattr(analysis, 'category', '')),
@@ -193,7 +195,7 @@ async def analyze_compliance():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def get_assessment(limit: int = 0):
+async def get_assessment(limit: int = 0, year: Optional[int] = None):
     """
     获取当前的合规评估结果（内存态）。
 
@@ -210,6 +212,8 @@ async def get_assessment(limit: int = 0):
         reasoning = analysis.reasoning
         page = getattr(analysis, "page", None)
         value = getattr(analysis, "value", None)
+        year_values = list(getattr(analysis, "year_values", None) or [])
+        selected_year = getattr(analysis, "selected_year", None)
         context = getattr(analysis, "context", None) or ""
         unit = getattr(analysis, "unit", None) or ""
         category = getattr(analysis, "category", "")
@@ -225,6 +229,8 @@ async def get_assessment(limit: int = 0):
             "reasoning": reasoning,
             "page": page,
             "value": value,
+            "year_values": year_values,
+            "selected_year": selected_year,
             "unit": unit,
             "category": category,
             "topic": topic,
@@ -238,6 +244,8 @@ async def get_assessment(limit: int = 0):
             "Type": type_name,
             "Definition": definition,
             "Value": value,
+            "Year Values": year_values,
+            "Selected Year": selected_year,
             "Page": page,
             "Context": context,
             "Disclosure Status": disclosure_status,
@@ -259,10 +267,16 @@ async def get_assessment(limit: int = 0):
         "disclosure_summary": assessment.disclosure_summary,
         "metric_analyses": items,
     }
-    return _normalize_assessment_payload(payload)
+    return _apply_assessment_year_selection(
+        _normalize_assessment_payload(payload),
+        year,
+    )
 
 
-async def get_latest_assessment(user_id: int = Depends(get_current_user)):
+async def get_latest_assessment(
+    year: Optional[int] = None,
+    user_id: int = Depends(get_current_user),
+):
     """
     获取当前用户最新的合规评估结果（从JSON文件）
 
@@ -293,7 +307,10 @@ async def get_latest_assessment(user_id: int = Depends(get_current_user)):
             if json_file and json_file.exists():
                 logger.info(f"Loading latest assessment for user {user_id} from: {json_file}")
                 with open(json_file, "r", encoding="utf-8") as fp:
-                    return _normalize_assessment_payload(json.load(fp))
+                    return _apply_assessment_year_selection(
+                        _normalize_assessment_payload(json.load(fp)),
+                        year,
+                    )
 
         # 若用户有文件但尚未生成合规结果
         return {
@@ -376,6 +393,7 @@ async def get_assessment_by_file(
     file_id: str,
     user_id: int = Depends(get_current_user),
     scope: Optional[str] = None,
+    year: Optional[int] = None,
 ):
     """
     根据文件ID获取合规评估结果（从JSON文件）(只能访问自己的文件)
@@ -463,7 +481,10 @@ async def get_assessment_by_file(
         with open(json_file, 'r', encoding='utf-8') as f:
             assessment_data = json.load(f)
 
-        return _normalize_assessment_payload(assessment_data)
+        return _apply_assessment_year_selection(
+            _normalize_assessment_payload(assessment_data),
+            year,
+        )
 
     except Exception as e:
         logger.error(f"Failed to load assessment for {file_id}: {e}")

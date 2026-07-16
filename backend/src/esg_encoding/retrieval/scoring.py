@@ -23,7 +23,7 @@ from ..models import (
 from ..exceptions import ESGEncodingError, ContentEmbeddingError
 
 _GENERIC_METRIC_TERMS = {
-    "description", "discussion", "approach", "management", "number", "percentage", "amount", "total",
+    "description", "discussion", "approach", "management", "number", "percentage", "percent", "pct", "amount", "total",
     "weight", "list", "countries", "products", "services", "employees", "facilities", "metric",
     "associated", "including", "resulting", "data", "user", "users", "information", "risks", "risk",
     "process", "policies", "practices", "related", "activity", "activities", "topics", "topic",
@@ -159,23 +159,13 @@ def _segment_structure_bonus(segment, expected_unit: Optional[str] = None, prefe
         elif seg_type == "ocr_text":
             bonus -= 0.01
     if re.search(r"-?\d[\d,]*(?:\.\d+)?", content):
-        bonus += 0.02 if expected_unit is not None else 0.04
+        bonus += 0.04
     if getattr(segment, "row_header", None):
         bonus += 0.05
     if getattr(segment, "col_header", None):
         bonus += 0.04
     if getattr(segment, "value_text", None):
         bonus += 0.06
-    normalized_unit = str(expected_unit or "").strip().lower()
-    if normalized_unit:
-        unit_candidates = {normalized_unit}
-        if normalized_unit == "m3":
-            unit_candidates.add("m³")
-        if normalized_unit == "tco2e":
-            unit_candidates.update({"tco₂e", "co2e", "co₂e"})
-        lower_content = content.lower()
-        if any(unit in lower_content for unit in unit_candidates if unit):
-            bonus += 0.06
     return bonus
 
 
@@ -185,7 +175,7 @@ def _normalize_text_for_match(value: str) -> str:
 
 def _extract_metric_anchor_terms(metric: ESGMetric, semantic_expansion: Optional[SemanticExpansion] = None, max_terms: int = 28) -> List[str]:
     raw_terms: List[str] = []
-    for field in [getattr(metric, "metric_name", None), getattr(metric, "metric_code", None), getattr(metric, "sasb_topic", None), getattr(metric, "definition", None), getattr(metric, "description", None)]:
+    for field in [getattr(metric, "metric_name", None), getattr(metric, "metric_code", None), getattr(metric, "definition", None), getattr(metric, "description", None)]:
         if field:
             raw_terms.append(str(field))
     for term in (getattr(metric, "keywords", None) or []):
@@ -242,6 +232,27 @@ def _count_anchor_hits(text: str, anchors: List[str]) -> int:
     return hits
 
 
+def _topic_relevance_adjustment(metric: ESGMetric, content: str) -> float:
+    """Use the industry topic only as a bounded secondary ranking signal."""
+    topic = _normalize_text_for_match(getattr(metric, "sasb_topic", "") or "")
+    if not topic:
+        return 0.0
+    lowered = _normalize_text_for_match(content)
+    if topic in lowered:
+        return 0.08
+    topic_terms = {
+        token
+        for token in re.findall(r"[a-z][a-z0-9-]{2,}", topic)
+        if token not in _GENERIC_METRIC_TERMS
+    }
+    if not topic_terms:
+        return 0.0
+    hits = sum(1 for token in topic_terms if token in lowered)
+    if hits < 2:
+        return 0.0
+    return min(0.06, 0.015 * hits)
+
+
 def _qualitative_relevance_adjustment(metric: ESGMetric, content: str, anchors: List[str], segment_type: str = "") -> float:
     category = str(getattr(metric, "sasb_category", "") or "").strip().lower()
     metric_type = str(getattr(metric, "sasb_type", "") or "").strip().lower()
@@ -294,24 +305,6 @@ def _qualitative_relevance_adjustment(metric: ESGMetric, content: str, anchors: 
     return adjustment
 
 
-def _unit_aliases(unit: str | None) -> List[str]:
-    normalized = str(unit or "").strip().lower()
-    if not normalized:
-        return []
-    aliases = {normalized}
-    compact = normalized.replace(" ", "")
-    aliases.add(compact)
-    if normalized in {"%", "percent", "percentage"}:
-        aliases.update({"%", "percent", "percentage"})
-    if normalized in {"m3", "m³", "cubic meters", "cubic metres"}:
-        aliases.update({"m3", "m³", "cubic meters", "cubic metres"})
-    if normalized in {"tco2e", "mtco2e", "co2e", "co₂e"}:
-        aliases.update({"tco2e", "tco₂e", "mtco2e", "mtco₂e", "co2e", "co₂e", "tonnes co2e", "metric tons co2e"})
-    if normalized in {"mwh", "megawatt hours", "megawatt-hours"}:
-        aliases.update({"mwh", "megawatt hours", "megawatt-hours"})
-    return [a for a in aliases if a]
-
-
 def _metric_evidence_quality_adjustment(metric: ESGMetric, segment, anchors: List[str]) -> float:
     """Small CPU-only evidence-quality signal for final retrieval ranking.
 
@@ -329,9 +322,6 @@ def _metric_evidence_quality_adjustment(metric: ESGMetric, segment, anchors: Lis
             adjustment += 0.06
         else:
             adjustment -= 0.10
-        unit_hits = sum(1 for unit in _unit_aliases(getattr(metric, "unit", None)) if unit in lowered)
-        if unit_hits > 0:
-            adjustment += 0.07
         if anchor_hits >= 2:
             adjustment += 0.04
         elif anchor_hits == 0:

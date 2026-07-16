@@ -133,6 +133,58 @@ class PaddleRuntimeTests(unittest.TestCase):
         for page in range(1, 9):
             self.assertIn(f"<!-- Page {page} |", markdown)
 
+    def test_seven_page_batch_fails_when_pipeline_returns_only_six_pages(self) -> None:
+        fake_pipeline = _FakePipeline(result_count=6)
+        with tempfile.TemporaryDirectory() as tmp, patch.object(
+            parse_core, "get_pipeline", return_value=fake_pipeline
+        ):
+            root = Path(tmp)
+            source = root / "pages_0001_0007.pdf"
+            marker = root / "pages_0001_0007.pdf.ready"
+            source.write_bytes(b"seven-page-pdf")
+            marker.write_text("ready", encoding="utf-8")
+
+            with self.assertRaises(parse_core.PageBatchIncompleteError):
+                parse_core.parse_page_batch(
+                    source,
+                    job_id="job-7",
+                    batch_id="batch-1",
+                    start_page=1,
+                    end_page=7,
+                    total_pages=7,
+                    output_root=root / "output",
+                    ready_path=marker,
+                )
+            self.assertFalse(any(root.glob("output/**/batch.md")))
+
+    def test_page_batch_fails_when_one_result_has_empty_markdown(self) -> None:
+        fake_pipeline = _FakePipeline(result_count=7)
+        with tempfile.TemporaryDirectory() as tmp, patch.object(
+            parse_core, "get_pipeline", return_value=fake_pipeline
+        ), patch.object(
+            parse_core,
+            "_save_result_markdown",
+            side_effect=["parsed"] * 6 + [""],
+        ):
+            root = Path(tmp)
+            source = root / "pages_0001_0007.pdf"
+            marker = root / "pages_0001_0007.pdf.ready"
+            source.write_bytes(b"seven-page-pdf")
+            marker.write_text("ready", encoding="utf-8")
+
+            with self.assertRaises(parse_core.PageBatchIncompleteError):
+                parse_core.parse_page_batch(
+                    source,
+                    job_id="job-empty",
+                    batch_id="batch-1",
+                    start_page=1,
+                    end_page=7,
+                    total_pages=7,
+                    output_root=root / "output",
+                    ready_path=marker,
+                )
+            self.assertFalse(any(root.glob("output/**/batch.md")))
+
     def test_timeout_writes_structured_batch_metadata(self) -> None:
         redis = _FakeRedis()
         payload = {

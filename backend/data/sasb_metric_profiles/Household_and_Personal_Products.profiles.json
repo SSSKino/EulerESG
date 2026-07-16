@@ -26,10 +26,26 @@
         "metres",
         "thousand m3",
         "m3",
-        "meters"
+        "meters",
+        "(1) Total water withdrawn",
+        "Total water withdrawn",
+        "(1) Water withdrawal",
+        "CG-HP-140a.1 (1) Total water withdrawn",
+        "Thousand cubic metres (m³)",
+        "m?",
+        "cubic metres",
+        "cubic meters",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of each in regions with High or"
       ],
-      "dense_query": "Find disclosures for CG-HP-140a.1 (1) Total water withdrawn with unit Thousand cubic metres (m³) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.1 '(1) Total water withdrawn', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.1 '(1) Total water withdrawn', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-140a.1 '(1) Total water withdrawn'; retain every reported year and label.",
+        "When CG-HP-140a.1 '(1) Total water withdrawn' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-140a.1 '(1) Total water withdrawn', including: (1) Total water withdrawn; Total water withdrawn; (1) Water withdrawal; CG-HP-140a.1 (1) Total water withdrawn.",
+        "Disambiguate CG-HP-140a.1 '(1) Total water withdrawn' from sibling metrics sharing CG-HP-140a.1: (2) Total water consumed; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed.",
+        "Find disclosures for CG-HP-140a.1 (1) Total water withdrawn with unit Thousand cubic metres (m³) related to Water Management.",
         "Retrieve exact report evidence for CG-HP-140a.1 (1) Total water withdrawn, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-140a.1 (1) Total water withdrawn with unit Thousand cubic metres (m³).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-140a.1 (1) Total water withdrawn related to Water Management.",
@@ -37,6 +53,7 @@
       ],
       "anchor_terms": [
         "CG-HP-140a.1",
+        "(1) Total water withdrawn",
         "Total water withdrawn",
         "water withdrawn",
         "water",
@@ -45,7 +62,13 @@
         "Thousand cubic metres (m³)",
         "thousand m3",
         "thousand cubic meters",
-        "thousand cubic metres"
+        "thousand cubic metres",
+        "(1) Water withdrawal",
+        "CG-HP-140a.1 (1) Total water withdrawn",
+        "m3",
+        "m?",
+        "cubic metres",
+        "cubic meters"
       ],
       "negative_anchor_terms": [
         "Total water consumed",
@@ -53,7 +76,8 @@
         "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
         "water consumed",
         "water discharged",
-        "water recycled"
+        "water recycled",
+        "(2) Total water consumed"
       ],
       "similar_metric_warnings": [
         {
@@ -78,7 +102,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -86,25 +112,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total water withdrawn', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "volume",
         "expected_units": [
           "Thousand cubic metres (m³)",
-          "thousand m3",
-          "thousand cubic meters",
-          "thousand cubic metres"
+          "m3",
+          "m?",
+          "cubic metres",
+          "cubic meters",
+          "litres",
+          "liters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total water withdrawn' (CG-HP-140a.1, expected unit: Thousand cubic metres (m³)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Total water consumed; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed."
     },
     {
       "metric_id": "CG-HP-140a.1.02",
@@ -132,10 +210,26 @@
         "metres",
         "thousand m3",
         "m3",
-        "meters"
+        "meters",
+        "(2) Total water consumed",
+        "Total water consumed",
+        "(2) Water consumption",
+        "CG-HP-140a.1 (2) Total water consumed",
+        "Thousand cubic metres (m³)",
+        "m?",
+        "cubic metres",
+        "cubic meters",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of each in regions with High or"
       ],
-      "dense_query": "Find disclosures for CG-HP-140a.1 (2) Total water consumed with unit Thousand cubic metres (m³) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.1 '(2) Total water consumed', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.1 '(2) Total water consumed', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-140a.1 '(2) Total water consumed'; retain every reported year and label.",
+        "When CG-HP-140a.1 '(2) Total water consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-140a.1 '(2) Total water consumed', including: (2) Total water consumed; Total water consumed; (2) Water consumption; CG-HP-140a.1 (2) Total water consumed.",
+        "Disambiguate CG-HP-140a.1 '(2) Total water consumed' from sibling metrics sharing CG-HP-140a.1: (1) Total water withdrawn; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed.",
+        "Find disclosures for CG-HP-140a.1 (2) Total water consumed with unit Thousand cubic metres (m³) related to Water Management.",
         "Retrieve exact report evidence for CG-HP-140a.1 (2) Total water consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-140a.1 (2) Total water consumed with unit Thousand cubic metres (m³).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-140a.1 (2) Total water consumed related to Water Management.",
@@ -143,6 +237,7 @@
       ],
       "anchor_terms": [
         "CG-HP-140a.1",
+        "(2) Total water consumed",
         "Total water consumed",
         "water consumed",
         "water",
@@ -151,7 +246,13 @@
         "Thousand cubic metres (m³)",
         "thousand m3",
         "thousand cubic meters",
-        "thousand cubic metres"
+        "thousand cubic metres",
+        "(2) Water consumption",
+        "CG-HP-140a.1 (2) Total water consumed",
+        "m3",
+        "m?",
+        "cubic metres",
+        "cubic meters"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -159,7 +260,8 @@
         "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
         "water withdrawn",
         "water discharged",
-        "water recycled"
+        "water recycled",
+        "(1) Total water withdrawn"
       ],
       "similar_metric_warnings": [
         {
@@ -184,7 +286,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -192,25 +296,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Total water consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "volume",
         "expected_units": [
           "Thousand cubic metres (m³)",
-          "thousand m3",
-          "thousand cubic meters",
-          "thousand cubic metres"
+          "m3",
+          "m?",
+          "cubic metres",
+          "cubic meters",
+          "litres",
+          "liters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Total water consumed' (CG-HP-140a.1, expected unit: Thousand cubic metres (m³)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total water withdrawn; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed."
     },
     {
       "metric_id": "CG-HP-140a.1.03",
@@ -241,10 +397,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percent of the total water withdrawn",
+        "CG-HP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "withdrawn locations",
+        "locations High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "Stress water",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of each in regions with High or"
       ],
-      "dense_query": "Find disclosures for CG-HP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn with unit Percentage (%) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn', under 'Water Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn', under 'Water Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn'; retain every reported year and label.",
+        "When CG-HP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn', including: Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percent of the total water withdrawn; CG-HP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn.",
+        "Disambiguate CG-HP-140a.1 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn' from sibling metrics sharing CG-HP-140a.1: (1) Total water withdrawn; (2) Total water consumed; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed.",
+        "Find disclosures for CG-HP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn with unit Percentage (%) related to Water Management.",
         "Retrieve exact report evidence for CG-HP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn related to Water Management.",
@@ -266,7 +441,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percent of the total water withdrawn",
+        "CG-HP-140a.1 Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
+        "withdrawn locations",
+        "locations High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "Stress water"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -274,7 +459,9 @@
         "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
         "water consumed",
         "water discharged",
-        "water recycled"
+        "water recycled",
+        "(1) Total water withdrawn",
+        "(2) Total water consumed"
       ],
       "similar_metric_warnings": [
         {
@@ -299,7 +486,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -307,11 +496,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -323,9 +538,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn' (CG-HP-140a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total water withdrawn; (2) Total water consumed; Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed."
     },
     {
       "metric_id": "CG-HP-140a.1.04",
@@ -356,10 +594,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percent of the total water consumed",
+        "CG-HP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "consumed locations",
+        "locations High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "Stress water",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of each in regions with High or"
       ],
-      "dense_query": "Find disclosures for CG-HP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed with unit Percentage (%) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed', under 'Water Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed', under 'Water Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed'; retain every reported year and label.",
+        "When CG-HP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed', including: Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed; Water consumed in locations with High or Extremely High Baseline Water Stress as a percent of the total water consumed; CG-HP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed.",
+        "Disambiguate CG-HP-140a.1 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed' from sibling metrics sharing CG-HP-140a.1: (1) Total water withdrawn; (2) Total water consumed; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn.",
+        "Find disclosures for CG-HP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed with unit Percentage (%) related to Water Management.",
         "Retrieve exact report evidence for CG-HP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed related to Water Management.",
@@ -381,7 +638,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Water consumed in locations with High or Extremely High Baseline Water Stress as a percent of the total water consumed",
+        "CG-HP-140a.1 Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed",
+        "consumed locations",
+        "locations High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "Stress water"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -389,7 +656,9 @@
         "Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn",
         "water withdrawn",
         "water discharged",
-        "water recycled"
+        "water recycled",
+        "(1) Total water withdrawn",
+        "(2) Total water consumed"
       ],
       "similar_metric_warnings": [
         {
@@ -414,7 +683,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -422,11 +693,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -438,9 +735,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Water consumed in locations with High or Extremely High Baseline Water Stress as a percentage of the total water consumed' (CG-HP-140a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total water withdrawn; (2) Total water consumed; Water withdrawn in locations with High or Extremely High Baseline Water Stress as a percentage of the total water withdrawn."
     },
     {
       "metric_id": "CG-HP-140a.2",
@@ -453,7 +773,8 @@
       "disclosure_type": "mixed",
       "aliases": [
         "Description of water management risks and discussion of strategies and practices to mitigate those risks",
-        "CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks"
+        "CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management risks and discussion of strategies and practices to mitigate those risks"
       ],
       "bm25_terms": [
         "CG-HP-140a.2",
@@ -465,10 +786,30 @@
         "strategies",
         "practices",
         "mitigate",
-        "those"
+        "those",
+        "Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management",
+        "management risks",
+        "risks strategies",
+        "strategies practices",
+        "practices mitigate",
+        "mitigate those",
+        "those risks",
+        "Description of water management risks",
+        "discussion of strategies",
+        "practices to mitigate those risks",
+        "Description of water management risks and discussion of strategies and practices to mitigate",
+        "The entity shall describe its water management risks associated with water withdrawals, water consumption"
       ],
-      "dense_query": "Find disclosures for CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks', under 'Water Management'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks', under 'Water Management'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-HP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks'.",
+        "When CG-HP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-140a.2 'Description of water management risks and discussion of strategies and practices to mitigate those risks', including: Description of water management risks and discussion of strategies and practices to mitigate those risks; CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks; water management risks and discussion of strategies and practices to mitigate those risks.",
+        "Find disclosures for CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks related to Water Management.",
         "Retrieve exact report evidence for CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks related to Water Management.",
@@ -485,7 +826,19 @@
         "strategies",
         "practices",
         "mitigate",
-        "those"
+        "those",
+        "CG-HP-140a.2 Description of water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management risks and discussion of strategies and practices to mitigate those risks",
+        "water management",
+        "management risks",
+        "risks strategies",
+        "strategies practices",
+        "practices mitigate",
+        "mitigate those",
+        "those risks",
+        "Description of water management risks",
+        "discussion of strategies",
+        "practices to mitigate those risks"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -495,7 +848,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -507,20 +862,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of water management risks and discussion of strategies and practices to mitigate those risks'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of water management risks and discussion of strategies and practices to mitigate those risks' (CG-HP-140a.2, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-HP-250a.1",
@@ -553,10 +956,28 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Revenue from products that contain substances of high concern",
+        "CG-HP-250a.1 Revenue from products that contain substances of high concern",
+        "Revenue products",
+        "products that",
+        "that",
+        "that contain",
+        "contain substances",
+        "substances high",
+        "high concern",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "The entity shall disclose its total revenue from products that contain substances or chemicals of high"
       ],
-      "dense_query": "Find disclosures for CG-HP-250a.1 Revenue from products that contain substances of high concern with unit Presentation currency related to Product Environmental, Health and Safety Performance.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-250a.1 'Revenue from products that contain substances of high concern', under 'Product Environmental, Health and Safety Performance', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-250a.1 'Revenue from products that contain substances of high concern', under 'Product Environmental, Health and Safety Performance', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-250a.1 'Revenue from products that contain substances of high concern'; retain every reported year and label.",
+        "When CG-HP-250a.1 'Revenue from products that contain substances of high concern' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-250a.1 'Revenue from products that contain substances of high concern', including: Revenue from products that contain substances of high concern; CG-HP-250a.1 Revenue from products that contain substances of high concern.",
+        "Find disclosures for CG-HP-250a.1 Revenue from products that contain substances of high concern with unit Presentation currency related to Product Environmental, Health and Safety Performance.",
         "Retrieve exact report evidence for CG-HP-250a.1 Revenue from products that contain substances of high concern, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-250a.1 Revenue from products that contain substances of high concern with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-250a.1 Revenue from products that contain substances of high concern related to Product Environmental, Health and Safety Performance.",
@@ -579,7 +1000,17 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "CG-HP-250a.1 Revenue from products that contain substances of high concern",
+        "Revenue products",
+        "products that",
+        "that",
+        "that contain",
+        "contain substances",
+        "substances high",
+        "high concern",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -588,7 +1019,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -596,25 +1029,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Revenue from products that contain substances of high concern', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Revenue from products that contain substances of high concern' (CG-HP-250a.1, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-HP-250a.3",
@@ -643,10 +1125,27 @@
         "Environmental",
         "Health",
         "Safety",
-        "Performance"
+        "Performance",
+        "Discussion of process to identify and manage emerging materials and chemicals of concern",
+        "CG-HP-250a.3 Discussion of process to identify and manage emerging materials and chemicals of concern",
+        "process identify",
+        "identify manage",
+        "manage emerging",
+        "emerging materials",
+        "materials chemicals",
+        "chemicals concern",
+        "Discussion of process to identify",
+        "manage emerging materials",
+        "chemicals of concern",
+        "The entity shall discuss its strategy for identifying and managing the use of materials, chemicals and"
       ],
-      "dense_query": "Find disclosures for CG-HP-250a.3 Discussion of process to identify and manage emerging materials and chemicals of concern related to Product Environmental, Health and Safety Performance.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-250a.3 'Discussion of process to identify and manage emerging materials and chemicals of concern', under 'Product Environmental, Health and Safety Performance'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-250a.3 'Discussion of process to identify and manage emerging materials and chemicals of concern', under 'Product Environmental, Health and Safety Performance'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-HP-250a.3 'Discussion of process to identify and manage emerging materials and chemicals of concern'.",
+        "When CG-HP-250a.3 'Discussion of process to identify and manage emerging materials and chemicals of concern' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-250a.3 'Discussion of process to identify and manage emerging materials and chemicals of concern', including: Discussion of process to identify and manage emerging materials and chemicals of concern; CG-HP-250a.3 Discussion of process to identify and manage emerging materials and chemicals of concern.",
+        "Find disclosures for CG-HP-250a.3 Discussion of process to identify and manage emerging materials and chemicals of concern related to Product Environmental, Health and Safety Performance.",
         "Retrieve exact report evidence for CG-HP-250a.3 Discussion of process to identify and manage emerging materials and chemicals of concern, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-250a.3 Discussion of process to identify and manage emerging materials and chemicals of concern.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-250a.3 Discussion of process to identify and manage emerging materials and chemicals of concern related to Product Environmental, Health and Safety Performance.",
@@ -666,7 +1165,17 @@
         "Product",
         "Environmental",
         "Health",
-        "Safety"
+        "Safety",
+        "CG-HP-250a.3 Discussion of process to identify and manage emerging materials and chemicals of concern",
+        "process identify",
+        "identify manage",
+        "manage emerging",
+        "emerging materials",
+        "materials chemicals",
+        "chemicals concern",
+        "Discussion of process to identify",
+        "manage emerging materials",
+        "chemicals of concern"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -676,7 +1185,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -688,20 +1199,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of process to identify and manage emerging materials and chemicals of concern'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of process to identify and manage emerging materials and chemicals of concern' (CG-HP-250a.3). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-HP-250a.4",
@@ -734,10 +1293,26 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Revenue from products designed with green chemistry principles",
+        "CG-HP-250a.4 Revenue from products designed with green chemistry principles",
+        "Revenue products",
+        "products designed",
+        "designed green",
+        "green chemistry",
+        "chemistry principles",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "The entity shall disclose its total revenue from products designed with one or more green chemistry"
       ],
-      "dense_query": "Find disclosures for CG-HP-250a.4 Revenue from products designed with green chemistry principles with unit Presentation currency related to Product Environmental, Health and Safety Performance.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-250a.4 'Revenue from products designed with green chemistry principles', under 'Product Environmental, Health and Safety Performance', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-250a.4 'Revenue from products designed with green chemistry principles', under 'Product Environmental, Health and Safety Performance', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-250a.4 'Revenue from products designed with green chemistry principles'; retain every reported year and label.",
+        "When CG-HP-250a.4 'Revenue from products designed with green chemistry principles' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-250a.4 'Revenue from products designed with green chemistry principles', including: Revenue from products designed with green chemistry principles; CG-HP-250a.4 Revenue from products designed with green chemistry principles.",
+        "Find disclosures for CG-HP-250a.4 Revenue from products designed with green chemistry principles with unit Presentation currency related to Product Environmental, Health and Safety Performance.",
         "Retrieve exact report evidence for CG-HP-250a.4 Revenue from products designed with green chemistry principles, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-250a.4 Revenue from products designed with green chemistry principles with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-250a.4 Revenue from products designed with green chemistry principles related to Product Environmental, Health and Safety Performance.",
@@ -760,7 +1335,15 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "CG-HP-250a.4 Revenue from products designed with green chemistry principles",
+        "Revenue products",
+        "products designed",
+        "designed green",
+        "green chemistry",
+        "chemistry principles",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -769,7 +1352,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -777,25 +1362,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Revenue from products designed with green chemistry principles', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Revenue from products designed with green chemistry principles' (CG-HP-250a.4, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-HP-410a.1.01",
@@ -823,10 +1457,26 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "(1) Total weight of packaging",
+        "Total weight of packaging",
+        "CG-HP-410a.1 (1) Total weight of packaging",
+        "weight packaging",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Total weight of packaging, (2) percentage made from recycled or renewable materials, and (3)",
+        "percentage that is recyclable, reusable or compostable"
       ],
-      "dense_query": "Find disclosures for CG-HP-410a.1 (1) Total weight of packaging with unit Metric tonnes (t) related to Packaging Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-410a.1 '(1) Total weight of packaging', under 'Packaging Lifecycle Management', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-410a.1 '(1) Total weight of packaging', under 'Packaging Lifecycle Management', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-410a.1 '(1) Total weight of packaging'; retain every reported year and label.",
+        "When CG-HP-410a.1 '(1) Total weight of packaging' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-410a.1 '(1) Total weight of packaging', including: (1) Total weight of packaging; Total weight of packaging; CG-HP-410a.1 (1) Total weight of packaging.",
+        "Disambiguate CG-HP-410a.1 '(1) Total weight of packaging' from sibling metrics sharing CG-HP-410a.1: (2) Percentage of packaging, by weight, made from recycled or renewable materials; (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable.",
+        "Find disclosures for CG-HP-410a.1 (1) Total weight of packaging with unit Metric tonnes (t) related to Packaging Lifecycle Management.",
         "Retrieve exact report evidence for CG-HP-410a.1 (1) Total weight of packaging, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-410a.1 (1) Total weight of packaging with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-410a.1 (1) Total weight of packaging related to Packaging Lifecycle Management.",
@@ -834,6 +1484,7 @@
       ],
       "anchor_terms": [
         "CG-HP-410a.1",
+        "(1) Total weight of packaging",
         "Total weight of packaging",
         "weight",
         "packaging",
@@ -842,11 +1493,20 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "CG-HP-410a.1 (1) Total weight of packaging",
+        "weight packaging",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Percentage of packaging, by weight, made from recycled or renewable materials",
-        "Percentage of packaging, by weight, that is recyclable, reusable or compostable"
+        "Percentage of packaging, by weight, that is recyclable, reusable or compostable",
+        "(2) Percentage of packaging, by weight, made from recycled or renewable materials",
+        "(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable"
       ],
       "similar_metric_warnings": [
         {
@@ -863,7 +1523,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -871,35 +1533,81 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total weight of packaging', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total weight of packaging' (CG-HP-410a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of packaging, by weight, made from recycled or renewable materials; (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable."
     },
     {
       "metric_id": "CG-HP-410a.1.02",
       "metric_code": "CG-HP-410a.1",
-      "metric": " (2) Percentage of packaging, by weight, made from recycled or renewable materials",
+      "metric": "(2) Percentage of packaging, by weight, made from recycled or renewable materials",
       "topic": "Packaging Lifecycle Management",
       "unit": "Percentage (%)",
       "definition": "CG-HP-410a.1. (1) Total weight of packaging, (2) percentage made from recycled or renewable materials, and (3)\npercentage that is recyclable, reusable or compostable\n\n1 The entity shall disclose (1) the total weight of packaging purchased by the entity in metric tonnes.\n\n    1.1 The scope of the disclosure includes primary packaging and secondary packaging.\n\n        1.1.1 Primary packaging is defined as the packaging designed to come into direct contact with the\n        product.\n\n        1.1.2 Secondary packaging is defined as the packaging designed to contain one or more primary packages\n        together with any protective materials, if required.\n\n        1.1.3 The scope excludes tertiary packaging designed to contain one or more articles or packages, or\n        bulk material, for the purposes of transport, handling or distribution. Tertiary packaging is also\n        known as ‘distribution’ or ‘transport’ packaging.\n\n2 The entity shall disclose (2) the percentage of packaging, by weight, made from recycled or renewable\nmaterials.\n\n    2.1 Recycled content is defined, consistent with definitions in ISO 14021, Environmental labels and\n    declarations—Self-declared environmental claims (Type II environmental labelling), as the proportion, by\n    mass, of recycled or recovered material in a product or packaging, for which only pre-consumer and post-\n    consumer materials shall be considered as recycled content.\n\n        2.1.1 Recycled material is defined as material reprocessed from recovered (or reclaimed) material\n        through a manufacturing process and made into a final product or a component to be integrated into a\n        product.\n\n        2.1.2 Recovered material is defined as material that otherwise would have been discarded as waste or\n        used for energy recovery but which has instead been collected and recovered (or reclaimed) as a\n        material input, in lieu of new primary material, for a recycling or manufacturing process.\n\n        2.1.3 Pre-consumer material is defined as material diverted from the waste stream during a\n        manufacturing process. This definition excludes reuse of materials such as rework, regrind or scrap\n        that are generated in a process and are capable of being reclaimed within the same process in which\n        they were generated.\n\n        2.1.4 Post-consumer material is defined as material generated by households or by commercial,\n        industrial and institutional facilities in their role as end-users of a product that can no longer be\n        used for its intended purpose. This includes returns of material from the distribution chain.\n\n    2.2 Renewable material is defined, consistent with The Consumer Goods Forum’s Global Protocol on Packaging\n    Sustainability 2.0, as those composed of biomass from a living source and replenished at a rate greater\n    than or equal to the rate of depletion, where:\n\n        2.2.1 biomass is defined as a material of biological origin, excluding peat and materials embedded in\n        geological formations or fossilised, but including organic material (both living and dead) from above\n        and below ground, such as trees, crops, grasses, tree litter, algae, animals and waste of biological\n        origin (for example, manure), consistent with the Global Protocol on Packaging Sustainability 2.0.\n\n    2.3 The entity shall calculate the percentage as the weight of packaging made from recycled or renewable\n    materials divided by the total weight of all packaging used by the entity.\n\n        2.3.1 For packaging materials that contain both recycled and virgin parts or are made from both\n        renewable and non-renewable resources, the entity shall classify a portion of the material as recycled\n        or renewable based on an estimate of the weight of each portion.\n\n3 The entity shall disclose the percentage of packaging, by weight, that is recyclable, reusable or\ncompostable.\n\n    3.1 A product or packaging is defined as ‘recyclable’ if it can be diverted from the waste stream through\n    available processes and programmes and can be collected, processed and returned to use in the form of raw\n    materials or products, consistent with definitions in ISO 14021.\n\n    3.2 A product or packaging is defined as ‘reusable’ if it is conceived and designed to accomplish, within\n    its lifecycle, a specific number of trips, rotations or uses for the same purpose for which it was\n    conceived. No product or packaging shall be claimed to be reusable unless the product or packaging can be\n    reused for its original purpose. The claim shall only be made if (a) a programme exists for collecting the\n    used product or packaging and reusing it; or (b) facilities or products exist that allow the purchaser to\n    reuse the product or package. This definition is derived from ISO 14021.\n\n    3.3 A material is defined as ‘compostable’ if it undergoes degradation by biological processes during\n    composting to yield CO2, water, inorganic compounds and biomass at a rate consistent with other known\n    compostable materials and that leaves no visible, distinguishable or toxic residue. Compostable plastics\n    are defined further by ASTM Standard D6400, Standard Specification for Labeling of Plastics Designed to be\n    Aerobically Composted in Municipal or Industrial Facilities.\n\n    3.4 The entity shall calculate the percentage as the weight of recyclable, reusable or compostable\n    packaging divided by the total weight of all packaging used by the entity.\n\n4 The entity may disaggregate the disclosure by major packaging substrate (for example, wood fibre, glass,\nmetal and petroleum-based).",
@@ -908,7 +1616,8 @@
       "aliases": [
         "(2) Percentage of packaging, by weight, made from recycled or renewable materials",
         "Percentage of packaging, by weight, made from recycled or renewable materials",
-        "CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials"
+        "CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials",
+        "(2) Percent of packaging, by weight, made from recycled or renewable materials"
       ],
       "bm25_terms": [
         "CG-HP-410a.1",
@@ -923,17 +1632,38 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of packaging, by weight, made from recycled or renewable materials",
+        "Percentage of packaging, by weight, made from recycled or renewable materials",
+        "CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials",
+        "(2) Percent of packaging, by weight, made from recycled or renewable materials",
+        "packaging weight",
+        "weight made",
+        "made recycled",
+        "recycled renewable",
+        "renewable materials",
+        "Percentage of packaging",
+        "by weight",
+        "made from recycled or renewable materials",
+        "(1) Total weight of packaging, (2) percentage made from recycled or renewable materials, and (3)",
+        "percentage that is recyclable, reusable or compostable"
       ],
-      "dense_query": "Find disclosures for CG-HP-410a.1  (2) Percentage of packaging, by weight, made from recycled or renewable materials with unit Percentage (%) related to Packaging Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-410a.1 '(2) Percentage of packaging, by weight, made from recycled or renewable materials', under 'Packaging Lifecycle Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
-        "Retrieve exact report evidence for CG-HP-410a.1  (2) Percentage of packaging, by weight, made from recycled or renewable materials, including the SASB metric row, table value, or explicit disclosure sentence.",
-        "Find ESG or sustainability report evidence that directly matches CG-HP-410a.1  (2) Percentage of packaging, by weight, made from recycled or renewable materials with unit Percentage (%).",
-        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-410a.1  (2) Percentage of packaging, by weight, made from recycled or renewable materials related to Packaging Lifecycle Management.",
-        "Find numeric table rows or performance metrics reporting CG-HP-410a.1  (2) Percentage of packaging, by weight, made from recycled or renewable materials for the reporting period."
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-410a.1 '(2) Percentage of packaging, by weight, made from recycled or renewable materials', under 'Packaging Lifecycle Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-410a.1 '(2) Percentage of packaging, by weight, made from recycled or renewable materials'; retain every reported year and label.",
+        "When CG-HP-410a.1 '(2) Percentage of packaging, by weight, made from recycled or renewable materials' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-410a.1 '(2) Percentage of packaging, by weight, made from recycled or renewable materials', including: (2) Percentage of packaging, by weight, made from recycled or renewable materials; Percentage of packaging, by weight, made from recycled or renewable materials; CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials; (2) Percent of packaging, by weight, made from recycled or renewable materials.",
+        "Disambiguate CG-HP-410a.1 '(2) Percentage of packaging, by weight, made from recycled or renewable materials' from sibling metrics sharing CG-HP-410a.1: (1) Total weight of packaging; (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable.",
+        "Find disclosures for CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials with unit Percentage (%) related to Packaging Lifecycle Management.",
+        "Retrieve exact report evidence for CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials, including the SASB metric row, table value, or explicit disclosure sentence.",
+        "Find ESG or sustainability report evidence that directly matches CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials with unit Percentage (%).",
+        "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials related to Packaging Lifecycle Management.",
+        "Find numeric table rows or performance metrics reporting CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials for the reporting period."
       ],
       "anchor_terms": [
         "CG-HP-410a.1",
+        "(2) Percentage of packaging, by weight, made from recycled or renewable materials",
         "Percentage of packaging, by weight, made from recycled or renewable materials",
         "packaging",
         "weight",
@@ -946,14 +1676,26 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "CG-HP-410a.1 (2) Percentage of packaging, by weight, made from recycled or renewable materials",
+        "(2) Percent of packaging, by weight, made from recycled or renewable materials",
+        "packaging weight",
+        "weight made",
+        "made recycled",
+        "recycled renewable",
+        "renewable materials",
+        "Percentage of packaging",
+        "by weight",
+        "made from recycled or renewable materials"
       ],
       "negative_anchor_terms": [
         "Total weight of packaging",
         "Percentage of packaging, by weight, that is recyclable, reusable or compostable",
         "grid electricity",
         "total energy consumed",
-        "non-renewable energy"
+        "non-renewable energy",
+        "(1) Total weight of packaging",
+        "(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable"
       ],
       "similar_metric_warnings": [
         {
@@ -970,7 +1712,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -978,11 +1722,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of packaging, by weight, made from recycled or renewable materials', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -994,9 +1764,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of packaging, by weight, made from recycled or renewable materials' (CG-HP-410a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total weight of packaging; (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable."
     },
     {
       "metric_id": "CG-HP-410a.1.03",
@@ -1010,7 +1803,8 @@
       "aliases": [
         "(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable",
         "Percentage of packaging, by weight, that is recyclable, reusable or compostable",
-        "CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable"
+        "CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable",
+        "(3) Percent of packaging, by weight, that is recyclable, reusable or compostable"
       ],
       "bm25_terms": [
         "CG-HP-410a.1",
@@ -1024,10 +1818,32 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable",
+        "Percentage of packaging, by weight, that is recyclable, reusable or compostable",
+        "CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable",
+        "(3) Percent of packaging, by weight, that is recyclable, reusable or compostable",
+        "packaging weight",
+        "weight that",
+        "that",
+        "that recyclable",
+        "recyclable reusable",
+        "reusable compostable",
+        "Percentage of packaging",
+        "by weight",
+        "that is recyclable",
+        "reusable or compostable",
+        "(1) Total weight of packaging, (2) percentage made from recycled or renewable materials, and (3)",
+        "percentage that is recyclable, reusable or compostable"
       ],
-      "dense_query": "Find disclosures for CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable with unit Percentage (%) related to Packaging Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-410a.1 '(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable', under 'Packaging Lifecycle Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-410a.1 '(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable', under 'Packaging Lifecycle Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-410a.1 '(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable'; retain every reported year and label.",
+        "When CG-HP-410a.1 '(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-410a.1 '(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable', including: (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable; Percentage of packaging, by weight, that is recyclable, reusable or compostable; CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable; (3) Percent of packaging, by weight, that is recyclable, reusable or compostable.",
+        "Disambiguate CG-HP-410a.1 '(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable' from sibling metrics sharing CG-HP-410a.1: (1) Total weight of packaging; (2) Percentage of packaging, by weight, made from recycled or renewable materials.",
+        "Find disclosures for CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable with unit Percentage (%) related to Packaging Lifecycle Management.",
         "Retrieve exact report evidence for CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable related to Packaging Lifecycle Management.",
@@ -1035,6 +1851,7 @@
       ],
       "anchor_terms": [
         "CG-HP-410a.1",
+        "(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable",
         "Percentage of packaging, by weight, that is recyclable, reusable or compostable",
         "packaging",
         "weight",
@@ -1046,11 +1863,25 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "CG-HP-410a.1 (3) Percentage of packaging, by weight, that is recyclable, reusable or compostable",
+        "(3) Percent of packaging, by weight, that is recyclable, reusable or compostable",
+        "packaging weight",
+        "weight that",
+        "that",
+        "that recyclable",
+        "recyclable reusable",
+        "reusable compostable",
+        "Percentage of packaging",
+        "by weight",
+        "that is recyclable",
+        "reusable or compostable"
       ],
       "negative_anchor_terms": [
         "Total weight of packaging",
-        "Percentage of packaging, by weight, made from recycled or renewable materials"
+        "Percentage of packaging, by weight, made from recycled or renewable materials",
+        "(1) Total weight of packaging",
+        "(2) Percentage of packaging, by weight, made from recycled or renewable materials"
       ],
       "similar_metric_warnings": [
         {
@@ -1067,7 +1898,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1075,11 +1908,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1091,9 +1950,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage of packaging, by weight, that is recyclable, reusable or compostable' (CG-HP-410a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total weight of packaging; (2) Percentage of packaging, by weight, made from recycled or renewable materials."
     },
     {
       "metric_id": "CG-HP-410a.2",
@@ -1118,10 +2000,27 @@
         "packaging",
         "throughout",
         "lifecycle",
-        "Management"
+        "Management",
+        "Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle",
+        "CG-HP-410a.2 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle",
+        "strategies reduce",
+        "reduce environmental",
+        "environmental impact",
+        "impact packaging",
+        "packaging throughout",
+        "throughout its",
+        "its",
+        "its lifecycle",
+        "Discussion of strategies to reduce the environmental impact of packaging throughout its",
+        "The entity shall discuss its strategies to reduce the environmental impact of the packaging of its products"
       ],
-      "dense_query": "Find disclosures for CG-HP-410a.2 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle related to Packaging Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-410a.2 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle', under 'Packaging Lifecycle Management'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-410a.2 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle', under 'Packaging Lifecycle Management'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-HP-410a.2 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle'.",
+        "When CG-HP-410a.2 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-410a.2 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle', including: Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle; CG-HP-410a.2 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle.",
+        "Find disclosures for CG-HP-410a.2 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle related to Packaging Lifecycle Management.",
         "Retrieve exact report evidence for CG-HP-410a.2 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-410a.2 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-410a.2 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle related to Packaging Lifecycle Management.",
@@ -1138,7 +2037,16 @@
         "packaging",
         "throughout",
         "lifecycle",
-        "Management"
+        "Management",
+        "CG-HP-410a.2 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle",
+        "strategies reduce",
+        "reduce environmental",
+        "environmental impact",
+        "impact packaging",
+        "packaging throughout",
+        "throughout its",
+        "its",
+        "its lifecycle"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1148,7 +2056,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1160,20 +2070,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle' (CG-HP-410a.2, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-HP-430a.1.01",
@@ -1204,10 +2162,26 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Amount of palm oil sourced",
+        "CG-HP-430a.1 Amount of palm oil sourced",
+        "palm oil",
+        "oil sourced",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "Amount of palm oil sourced, percentage certified through the Roundtable on Sustainable Palm Oil",
+        "(RSPO) supply chains as (a) Identity Preserved, (b) Segregated, (c) Mass Balance or (d) Book & Claim"
       ],
-      "dense_query": "Find disclosures for CG-HP-430a.1 Amount of palm oil sourced with unit Metric tonnes (t) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Amount of palm oil sourced', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Amount of palm oil sourced', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-430a.1 'Amount of palm oil sourced'; retain every reported year and label.",
+        "When CG-HP-430a.1 'Amount of palm oil sourced' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-430a.1 'Amount of palm oil sourced', including: Amount of palm oil sourced; CG-HP-430a.1 Amount of palm oil sourced.",
+        "Disambiguate CG-HP-430a.1 'Amount of palm oil sourced' from sibling metrics sharing CG-HP-430a.1: Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim.",
+        "Find disclosures for CG-HP-430a.1 Amount of palm oil sourced with unit Metric tonnes (t) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
         "Retrieve exact report evidence for CG-HP-430a.1 Amount of palm oil sourced, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-430a.1 Amount of palm oil sourced with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-430a.1 Amount of palm oil sourced related to Environmental & Social Impacts of Palm Oil Supply Chain.",
@@ -1227,7 +2201,15 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "CG-HP-430a.1 Amount of palm oil sourced",
+        "palm oil",
+        "oil sourced",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved",
@@ -1258,7 +2240,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1266,30 +2250,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Amount of palm oil sourced', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Amount of palm oil sourced' (CG-HP-430a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim."
     },
     {
       "metric_id": "CG-HP-430a.1.02",
@@ -1302,7 +2332,8 @@
       "disclosure_type": "quantitative",
       "aliases": [
         "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved",
-        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved"
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved"
       ],
       "bm25_terms": [
         "CG-HP-430a.1",
@@ -1324,10 +2355,35 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved",
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved",
+        "weight basis",
+        "basis palm",
+        "palm oil",
+        "oil sourced",
+        "sourced that",
+        "that",
+        "that third-party",
+        "third-party certified",
+        "certified through",
+        "through",
+        "through RSPO",
+        "RSPO supply",
+        "supply chain",
+        "chain Identity",
+        "Amount of palm oil sourced, percentage certified through the Roundtable on Sustainable Palm Oil",
+        "(RSPO) supply chains as (a) Identity Preserved, (b) Segregated, (c) Mass Balance or (d) Book & Claim"
       ],
-      "dense_query": "Find disclosures for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved with unit Percentage (%) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved'; retain every reported year and label.",
+        "When CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved', including: Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved.",
+        "Disambiguate CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved' from sibling metrics sharing CG-HP-430a.1: Amount of palm oil sourced; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim.",
+        "Find disclosures for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved with unit Percentage (%) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
         "Retrieve exact report evidence for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved related to Environmental & Social Impacts of Palm Oil Supply Chain.",
@@ -1351,7 +2407,23 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved",
+        "weight basis",
+        "basis palm",
+        "palm oil",
+        "oil sourced",
+        "sourced that",
+        "that",
+        "that third-party",
+        "third-party certified",
+        "certified through",
+        "through",
+        "through RSPO",
+        "RSPO supply",
+        "supply chain",
+        "chain Identity"
       ],
       "negative_anchor_terms": [
         "Amount of palm oil sourced",
@@ -1382,7 +2454,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1390,11 +2464,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1406,9 +2506,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved' (CG-HP-430a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Amount of palm oil sourced; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim."
     },
     {
       "metric_id": "CG-HP-430a.1.03",
@@ -1421,7 +2544,8 @@
       "disclosure_type": "quantitative",
       "aliases": [
         "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated",
-        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated"
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated"
       ],
       "bm25_terms": [
         "CG-HP-430a.1",
@@ -1442,10 +2566,35 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated",
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated",
+        "weight basis",
+        "basis palm",
+        "palm oil",
+        "oil sourced",
+        "sourced that",
+        "that",
+        "that third-party",
+        "third-party certified",
+        "certified through",
+        "through",
+        "through RSPO",
+        "RSPO supply",
+        "supply chain",
+        "chain Segregated",
+        "Amount of palm oil sourced, percentage certified through the Roundtable on Sustainable Palm Oil",
+        "(RSPO) supply chains as (a) Identity Preserved, (b) Segregated, (c) Mass Balance or (d) Book & Claim"
       ],
-      "dense_query": "Find disclosures for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated with unit Percentage (%) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated'; retain every reported year and label.",
+        "When CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated', including: Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated.",
+        "Disambiguate CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated' from sibling metrics sharing CG-HP-430a.1: Amount of palm oil sourced; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim.",
+        "Find disclosures for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated with unit Percentage (%) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
         "Retrieve exact report evidence for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated related to Environmental & Social Impacts of Palm Oil Supply Chain.",
@@ -1469,7 +2618,23 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated",
+        "weight basis",
+        "basis palm",
+        "palm oil",
+        "oil sourced",
+        "sourced that",
+        "that",
+        "that third-party",
+        "third-party certified",
+        "certified through",
+        "through",
+        "through RSPO",
+        "RSPO supply",
+        "supply chain",
+        "chain Segregated"
       ],
       "negative_anchor_terms": [
         "Amount of palm oil sourced",
@@ -1500,7 +2665,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1508,11 +2675,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1524,9 +2717,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated' (CG-HP-430a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Amount of palm oil sourced; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim."
     },
     {
       "metric_id": "CG-HP-430a.1.04",
@@ -1539,7 +2755,8 @@
       "disclosure_type": "quantitative",
       "aliases": [
         "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance",
-        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance"
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance"
       ],
       "bm25_terms": [
         "CG-HP-430a.1",
@@ -1561,10 +2778,35 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance",
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance",
+        "weight basis",
+        "basis palm",
+        "palm oil",
+        "oil sourced",
+        "sourced that",
+        "that",
+        "that third-party",
+        "third-party certified",
+        "certified through",
+        "through",
+        "through RSPO",
+        "RSPO supply",
+        "supply chain",
+        "chain Mass",
+        "Amount of palm oil sourced, percentage certified through the Roundtable on Sustainable Palm Oil",
+        "(RSPO) supply chains as (a) Identity Preserved, (b) Segregated, (c) Mass Balance or (d) Book & Claim"
       ],
-      "dense_query": "Find disclosures for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance with unit Percentage (%) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance'; retain every reported year and label.",
+        "When CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance', including: Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance; CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance; Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance.",
+        "Disambiguate CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance' from sibling metrics sharing CG-HP-430a.1: Amount of palm oil sourced; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim.",
+        "Find disclosures for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance with unit Percentage (%) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
         "Retrieve exact report evidence for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance related to Environmental & Social Impacts of Palm Oil Supply Chain.",
@@ -1588,7 +2830,23 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance",
+        "weight basis",
+        "basis palm",
+        "palm oil",
+        "oil sourced",
+        "sourced that",
+        "that",
+        "that third-party",
+        "third-party certified",
+        "certified through",
+        "through",
+        "through RSPO",
+        "RSPO supply",
+        "supply chain",
+        "chain Mass"
       ],
       "negative_anchor_terms": [
         "Amount of palm oil sourced",
@@ -1619,7 +2877,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1627,11 +2887,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1643,9 +2929,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance' (CG-HP-430a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Amount of palm oil sourced; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim."
     },
     {
       "metric_id": "CG-HP-430a.1.05",
@@ -1658,7 +2967,8 @@
       "disclosure_type": "quantitative",
       "aliases": [
         "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim",
-        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim"
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim"
       ],
       "bm25_terms": [
         "CG-HP-430a.1",
@@ -1680,10 +2990,35 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim",
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim",
+        "weight basis",
+        "basis palm",
+        "palm oil",
+        "oil sourced",
+        "sourced that",
+        "that",
+        "that third-party",
+        "third-party certified",
+        "certified through",
+        "through",
+        "through RSPO",
+        "RSPO supply",
+        "supply chain",
+        "chain Book",
+        "Amount of palm oil sourced, percentage certified through the Roundtable on Sustainable Palm Oil",
+        "(RSPO) supply chains as (a) Identity Preserved, (b) Segregated, (c) Mass Balance or (d) Book & Claim"
       ],
-      "dense_query": "Find disclosures for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim with unit Percentage (%) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim', under 'Environmental & Social Impacts of Palm Oil Supply Chain', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim'; retain every reported year and label.",
+        "When CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim', including: Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim; CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim; Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim.",
+        "Disambiguate CG-HP-430a.1 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim' from sibling metrics sharing CG-HP-430a.1: Amount of palm oil sourced; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance.",
+        "Find disclosures for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim with unit Percentage (%) related to Environmental & Social Impacts of Palm Oil Supply Chain.",
         "Retrieve exact report evidence for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim related to Environmental & Social Impacts of Palm Oil Supply Chain.",
@@ -1707,7 +3042,23 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "CG-HP-430a.1 Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim",
+        "Percent, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim",
+        "weight basis",
+        "basis palm",
+        "palm oil",
+        "oil sourced",
+        "sourced that",
+        "that",
+        "that third-party",
+        "third-party certified",
+        "certified through",
+        "through",
+        "through RSPO",
+        "RSPO supply",
+        "supply chain",
+        "chain Book"
       ],
       "negative_anchor_terms": [
         "Amount of palm oil sourced",
@@ -1738,7 +3089,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1746,11 +3099,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1762,9 +3141,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (d) Book & Claim' (CG-HP-430a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Amount of palm oil sourced; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (a) Identity Preserved; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (b) Segregated; Percentage, on a weight basis, of palm oil sourced that is third-party certified through the RSPO supply chain as (c) Mass Balance."
     },
     {
       "metric_id": "CG-HP-000.A.01",
@@ -1787,10 +3189,20 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Units of products sold",
+        "CG-HP-000.A Units of products sold",
+        "Units products",
+        "products sold"
       ],
-      "dense_query": "Find disclosures for CG-HP-000.A Units of products sold with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-000.A 'Units of products sold', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-000.A 'Units of products sold', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-000.A 'Units of products sold'; retain every reported year and label.",
+        "When CG-HP-000.A 'Units of products sold' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-000.A 'Units of products sold', including: Units of products sold; CG-HP-000.A Units of products sold.",
+        "Disambiguate CG-HP-000.A 'Units of products sold' from sibling metrics sharing CG-HP-000.A: Total weight of products sold.",
+        "Find disclosures for CG-HP-000.A Units of products sold with unit Number.",
         "Retrieve exact report evidence for CG-HP-000.A Units of products sold, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-000.A Units of products sold with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-000.A Units of products sold.",
@@ -1804,7 +3216,10 @@
         "sold",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "CG-HP-000.A Units of products sold",
+        "Units products",
+        "products sold"
       ],
       "negative_anchor_terms": [
         "Total weight of products sold"
@@ -1820,7 +3235,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1828,24 +3245,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Units of products sold'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Units of products sold' (CG-HP-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Total weight of products sold."
     },
     {
       "metric_id": "CG-HP-000.A.02",
@@ -1871,10 +3336,24 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Total weight of products sold",
+        "CG-HP-000.A Total weight of products sold",
+        "weight products",
+        "products sold",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t"
       ],
-      "dense_query": "Find disclosures for CG-HP-000.A Total weight of products sold with unit Metric tonnes (t).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-000.A 'Total weight of products sold', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-000.A 'Total weight of products sold', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-000.A 'Total weight of products sold'; retain every reported year and label.",
+        "When CG-HP-000.A 'Total weight of products sold' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-000.A 'Total weight of products sold', including: Total weight of products sold; CG-HP-000.A Total weight of products sold.",
+        "Disambiguate CG-HP-000.A 'Total weight of products sold' from sibling metrics sharing CG-HP-000.A: Units of products sold.",
+        "Find disclosures for CG-HP-000.A Total weight of products sold with unit Metric tonnes (t).",
         "Retrieve exact report evidence for CG-HP-000.A Total weight of products sold, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-000.A Total weight of products sold with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-000.A Total weight of products sold.",
@@ -1889,7 +3368,15 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "CG-HP-000.A Total weight of products sold",
+        "weight products",
+        "products sold",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Units of products sold"
@@ -1905,7 +3392,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1913,30 +3402,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total weight of products sold', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total weight of products sold' (CG-HP-000.A, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Units of products sold."
     },
     {
       "metric_id": "CG-HP-000.B",
@@ -1950,7 +3485,8 @@
       "aliases": [
         "Number of manufacturing facilities",
         "Count of manufacturing facilities",
-        "CG-HP-000.B Number of manufacturing facilities"
+        "CG-HP-000.B Number of manufacturing facilities",
+        "Total number of manufacturing facilities"
       ],
       "bm25_terms": [
         "CG-HP-000.B",
@@ -1959,10 +3495,20 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of manufacturing facilities",
+        "Count of manufacturing facilities",
+        "CG-HP-000.B Number of manufacturing facilities",
+        "Total number of manufacturing facilities",
+        "manufacturing facilities"
       ],
-      "dense_query": "Find disclosures for CG-HP-000.B Number of manufacturing facilities with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-HP-000.B 'Number of manufacturing facilities', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-HP-000.B 'Number of manufacturing facilities', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-HP-000.B 'Number of manufacturing facilities'; retain every reported year and label.",
+        "When CG-HP-000.B 'Number of manufacturing facilities' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-HP-000.B 'Number of manufacturing facilities', including: Number of manufacturing facilities; Count of manufacturing facilities; CG-HP-000.B Number of manufacturing facilities; Total number of manufacturing facilities.",
+        "Find disclosures for CG-HP-000.B Number of manufacturing facilities with unit Number.",
         "Retrieve exact report evidence for CG-HP-000.B Number of manufacturing facilities, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-HP-000.B Number of manufacturing facilities with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-HP-000.B Number of manufacturing facilities.",
@@ -1975,7 +3521,11 @@
         "facilities",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of manufacturing facilities",
+        "CG-HP-000.B Number of manufacturing facilities",
+        "Total number of manufacturing facilities",
+        "manufacturing facilities"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1984,7 +3534,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1992,24 +3544,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of manufacturing facilities'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of manufacturing facilities' (CG-HP-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

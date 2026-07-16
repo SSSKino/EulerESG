@@ -24,10 +24,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of recalls",
+        "Number of recalls",
+        "CG-TS-250a.1 (1) Number of recalls",
+        "(1) Number of recalls and (2) total units recalled",
+        "The entity shall disclose (1) the total number of product recalls it issued during the reporting period, including"
       ],
-      "dense_query": "Find disclosures for CG-TS-250a.1 (1) Number of recalls with unit Number related to Chemical & Safety Hazards of Products.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-250a.1 '(1) Number of recalls', under 'Chemical & Safety Hazards of Products', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-250a.1 '(1) Number of recalls', under 'Chemical & Safety Hazards of Products', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-250a.1 '(1) Number of recalls'; retain every reported year and label.",
+        "When CG-TS-250a.1 '(1) Number of recalls' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-250a.1 '(1) Number of recalls', including: (1) Number of recalls; Number of recalls; CG-TS-250a.1 (1) Number of recalls.",
+        "Disambiguate CG-TS-250a.1 '(1) Number of recalls' from sibling metrics sharing CG-TS-250a.1: (2) Total units recalled.",
+        "Find disclosures for CG-TS-250a.1 (1) Number of recalls with unit Number related to Chemical & Safety Hazards of Products.",
         "Retrieve exact report evidence for CG-TS-250a.1 (1) Number of recalls, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-250a.1 (1) Number of recalls with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-250a.1 (1) Number of recalls related to Chemical & Safety Hazards of Products.",
@@ -35,6 +46,7 @@
       ],
       "anchor_terms": [
         "CG-TS-250a.1",
+        "(1) Number of recalls",
         "Number of recalls",
         "recalls",
         "Chemical",
@@ -43,13 +55,15 @@
         "Products",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "CG-TS-250a.1 (1) Number of recalls"
       ],
       "negative_anchor_terms": [
         "Total units recalled",
         "safety complaints",
         "defect complaints",
-        "product returns"
+        "product returns",
+        "(2) Total units recalled"
       ],
       "similar_metric_warnings": [
         {
@@ -62,7 +76,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -70,24 +86,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of recalls'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of recalls' (CG-TS-250a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Total units recalled."
     },
     {
       "metric_id": "CG-TS-250a.1.02",
@@ -115,10 +179,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(2) Total units recalled",
+        "Total units recalled",
+        "CG-TS-250a.1 (2) Total units recalled",
+        "(1) Number of recalls and (2) total units recalled",
+        "The entity shall disclose (1) the total number of product recalls it issued during the reporting period, including"
       ],
-      "dense_query": "Find disclosures for CG-TS-250a.1 (2) Total units recalled with unit Number related to Chemical & Safety Hazards of Products.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-250a.1 '(2) Total units recalled', under 'Chemical & Safety Hazards of Products', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-250a.1 '(2) Total units recalled', under 'Chemical & Safety Hazards of Products', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-250a.1 '(2) Total units recalled'; retain every reported year and label.",
+        "When CG-TS-250a.1 '(2) Total units recalled' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-250a.1 '(2) Total units recalled', including: (2) Total units recalled; Total units recalled; CG-TS-250a.1 (2) Total units recalled.",
+        "Disambiguate CG-TS-250a.1 '(2) Total units recalled' from sibling metrics sharing CG-TS-250a.1: (1) Number of recalls.",
+        "Find disclosures for CG-TS-250a.1 (2) Total units recalled with unit Number related to Chemical & Safety Hazards of Products.",
         "Retrieve exact report evidence for CG-TS-250a.1 (2) Total units recalled, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-250a.1 (2) Total units recalled with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-250a.1 (2) Total units recalled related to Chemical & Safety Hazards of Products.",
@@ -126,6 +201,7 @@
       ],
       "anchor_terms": [
         "CG-TS-250a.1",
+        "(2) Total units recalled",
         "Total units recalled",
         "units recalled",
         "units",
@@ -136,10 +212,12 @@
         "Products",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "CG-TS-250a.1 (2) Total units recalled"
       ],
       "negative_anchor_terms": [
-        "Number of recalls"
+        "Number of recalls",
+        "(1) Number of recalls"
       ],
       "similar_metric_warnings": [
         {
@@ -152,7 +230,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -160,24 +240,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Total units recalled'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Total units recalled' (CG-TS-250a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of recalls."
     },
     {
       "metric_id": "CG-TS-250a.3",
@@ -210,10 +338,30 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "Monetary losses as a result of legal proceedings associated with product safety",
+        "CG-TS-250a.3 Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated product",
+        "product safety",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with product safety"
       ],
-      "dense_query": "Find disclosures for CG-TS-250a.3 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency related to Chemical & Safety Hazards of Products.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-250a.3 'Total amount of monetary losses as a result of legal proceedings associated with product safety', under 'Chemical & Safety Hazards of Products', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-250a.3 'Total amount of monetary losses as a result of legal proceedings associated with product safety', under 'Chemical & Safety Hazards of Products', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-250a.3 'Total amount of monetary losses as a result of legal proceedings associated with product safety'; retain every reported year and label.",
+        "When CG-TS-250a.3 'Total amount of monetary losses as a result of legal proceedings associated with product safety' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-250a.3 'Total amount of monetary losses as a result of legal proceedings associated with product safety', including: Total amount of monetary losses as a result of legal proceedings associated with product safety; Monetary losses as a result of legal proceedings associated with product safety; CG-TS-250a.3 Total amount of monetary losses as a result of legal proceedings associated with product safety.",
+        "Find disclosures for CG-TS-250a.3 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency related to Chemical & Safety Hazards of Products.",
         "Retrieve exact report evidence for CG-TS-250a.3 Total amount of monetary losses as a result of legal proceedings associated with product safety, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-250a.3 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-250a.3 Total amount of monetary losses as a result of legal proceedings associated with product safety related to Chemical & Safety Hazards of Products.",
@@ -236,7 +384,18 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with product safety",
+        "CG-TS-250a.3 Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated product",
+        "product safety",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -250,7 +409,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -258,25 +419,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with product safety', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with product safety' (CG-TS-250a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-TS-250a.4",
@@ -302,10 +512,29 @@
         "chemicals",
         "products",
         "Chemical",
-        "Safety"
+        "Safety",
+        "Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "CG-TS-250a.4 Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "processes assess",
+        "assess manage",
+        "manage risks",
+        "risks hazards",
+        "hazards associated",
+        "associated",
+        "associated chemicals",
+        "chemicals products",
+        "Discussion of processes to assess",
+        "manage risks or hazards associated with chemicals in products",
+        "Discussion of processes to assess and manage risks or hazards",
+        "associated with chemicals in products"
       ],
-      "dense_query": "Find disclosures for CG-TS-250a.4 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Chemical & Safety Hazards of Products.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-250a.4 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', under 'Chemical & Safety Hazards of Products'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-250a.4 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', under 'Chemical & Safety Hazards of Products'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers CG-TS-250a.4 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products'.",
+        "When CG-TS-250a.4 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-250a.4 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products', including: Discussion of processes to assess and manage risks or hazards associated with chemicals in products; CG-TS-250a.4 Discussion of processes to assess and manage risks or hazards associated with chemicals in products.",
+        "Find disclosures for CG-TS-250a.4 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Chemical & Safety Hazards of Products.",
         "Retrieve exact report evidence for CG-TS-250a.4 Discussion of processes to assess and manage risks or hazards associated with chemicals in products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-250a.4 Discussion of processes to assess and manage risks or hazards associated with chemicals in products.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-250a.4 Discussion of processes to assess and manage risks or hazards associated with chemicals in products related to Chemical & Safety Hazards of Products.",
@@ -323,7 +552,18 @@
         "chemicals",
         "products",
         "Chemical",
-        "Safety"
+        "Safety",
+        "CG-TS-250a.4 Discussion of processes to assess and manage risks or hazards associated with chemicals in products",
+        "processes assess",
+        "assess manage",
+        "manage risks",
+        "risks hazards",
+        "hazards associated",
+        "associated",
+        "associated chemicals",
+        "chemicals products",
+        "Discussion of processes to assess",
+        "manage risks or hazards associated with chemicals in products"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -333,7 +573,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -345,20 +587,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of processes to assess and manage risks or hazards associated with chemicals in products' (CG-TS-250a.4). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-TS-430a.1",
@@ -372,7 +662,8 @@
       "aliases": [
         "Number of facilities audited to a social responsibility code of conduct",
         "Count of facilities audited to a social responsibility code of conduct",
-        "CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct"
+        "CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct",
+        "Total number of facilities audited to a social responsibility code of conduct"
       ],
       "bm25_terms": [
         "CG-TS-430a.1",
@@ -389,10 +680,26 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of facilities audited to a social responsibility code of conduct",
+        "Count of facilities audited to a social responsibility code of conduct",
+        "CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct",
+        "Total number of facilities audited to a social responsibility code of conduct",
+        "facilities audited",
+        "audited social",
+        "social responsibility",
+        "responsibility code",
+        "code conduct",
+        "Number of facilities audited to a social responsibility code of",
+        "The entity shall disclose the total number of facilities audited to a social responsibility code of conduct during the"
       ],
-      "dense_query": "Find disclosures for CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct with unit Number related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.1 'Number of facilities audited to a social responsibility code of conduct', under 'Labour Conditions in the Supply Chain', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.1 'Number of facilities audited to a social responsibility code of conduct', under 'Labour Conditions in the Supply Chain', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-430a.1 'Number of facilities audited to a social responsibility code of conduct'; retain every reported year and label.",
+        "When CG-TS-430a.1 'Number of facilities audited to a social responsibility code of conduct' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-430a.1 'Number of facilities audited to a social responsibility code of conduct', including: Number of facilities audited to a social responsibility code of conduct; Count of facilities audited to a social responsibility code of conduct; CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct; Total number of facilities audited to a social responsibility code of conduct.",
+        "Find disclosures for CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct with unit Number related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct related to Labour Conditions in the Supply Chain.",
@@ -413,7 +720,15 @@
         "Chain",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of facilities audited to a social responsibility code of conduct",
+        "CG-TS-430a.1 Number of facilities audited to a social responsibility code of conduct",
+        "Total number of facilities audited to a social responsibility code of conduct",
+        "facilities audited",
+        "audited social",
+        "social responsibility",
+        "responsibility code",
+        "code conduct"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -422,7 +737,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -430,24 +747,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of facilities audited to a social responsibility code of conduct'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of facilities audited to a social responsibility code of conduct' (CG-TS-430a.1, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-TS-430a.2.01",
@@ -478,10 +843,30 @@
         "Conditions",
         "Supply",
         "Chain",
-        "ratio"
+        "ratio",
+        "Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances",
+        "Direct suppliers' social responsibility audit non-conformance rate for (a) priority non-conformances",
+        "CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances",
+        "Direct suppliers'",
+        "suppliers'",
+        "suppliers' social",
+        "social responsibility",
+        "responsibility audit",
+        "audit non-conformance",
+        "non-conformance rate",
+        "rate priority",
+        "priority non-conformances",
+        "Direct suppliers’ social responsibility audit (1) non-conformance",
+        "rate and (2) associated corrective action rate for (a) priority non-conformances"
       ],
-      "dense_query": "Find disclosures for CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances with unit Rate related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances'; retain every reported year and label.",
+        "When CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances', including: Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances; Direct suppliers' social responsibility audit non-conformance rate for (a) priority non-conformances; CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances.",
+        "Disambiguate CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances' from sibling metrics sharing CG-TS-430a.2: Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances.",
+        "Find disclosures for CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances with unit Rate related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances related to Labour Conditions in the Supply Chain.",
@@ -502,7 +887,18 @@
         "Labour",
         "Conditions",
         "Supply",
-        "ratio"
+        "ratio",
+        "Direct suppliers' social responsibility audit non-conformance rate for (a) priority non-conformances",
+        "CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances",
+        "Direct suppliers'",
+        "suppliers'",
+        "suppliers' social",
+        "social responsibility",
+        "responsibility audit",
+        "audit non-conformance",
+        "non-conformance rate",
+        "rate priority",
+        "priority non-conformances"
       ],
       "negative_anchor_terms": [
         "Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances",
@@ -528,7 +924,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -536,23 +934,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances' (CG-TS-430a.2, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances."
     },
     {
       "metric_id": "CG-TS-430a.2.02",
@@ -583,10 +1029,30 @@
         "Conditions",
         "Supply",
         "Chain",
-        "ratio"
+        "ratio",
+        "Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances",
+        "Direct suppliers' social responsibility audit non-conformance rate for (b) other non-conformances",
+        "CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances",
+        "Direct suppliers'",
+        "suppliers'",
+        "suppliers' social",
+        "social responsibility",
+        "responsibility audit",
+        "audit non-conformance",
+        "non-conformance rate",
+        "rate other",
+        "other non-conformances",
+        "Direct suppliers’ social responsibility audit (1) non-conformance",
+        "rate and (2) associated corrective action rate for (a) priority non-conformances"
       ],
-      "dense_query": "Find disclosures for CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances with unit Rate related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances'; retain every reported year and label.",
+        "When CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances', including: Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances; Direct suppliers' social responsibility audit non-conformance rate for (b) other non-conformances; CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances.",
+        "Disambiguate CG-TS-430a.2 'Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances' from sibling metrics sharing CG-TS-430a.2: Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances.",
+        "Find disclosures for CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances with unit Rate related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances related to Labour Conditions in the Supply Chain.",
@@ -607,7 +1073,18 @@
         "Labour",
         "Conditions",
         "Supply",
-        "ratio"
+        "ratio",
+        "Direct suppliers' social responsibility audit non-conformance rate for (b) other non-conformances",
+        "CG-TS-430a.2 Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances",
+        "Direct suppliers'",
+        "suppliers'",
+        "suppliers' social",
+        "social responsibility",
+        "responsibility audit",
+        "audit non-conformance",
+        "non-conformance rate",
+        "rate other",
+        "other non-conformances"
       ],
       "negative_anchor_terms": [
         "Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances",
@@ -633,7 +1110,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -641,23 +1120,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances' (CG-TS-430a.2, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances."
     },
     {
       "metric_id": "CG-TS-430a.2.03",
@@ -689,10 +1216,33 @@
         "Conditions",
         "Supply",
         "Chain",
-        "ratio"
+        "ratio",
+        "Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances",
+        "Direct suppliers' social responsibility audit associated corrective action rate for (a) priority non-conformances",
+        "CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances",
+        "Direct suppliers'",
+        "suppliers'",
+        "suppliers' social",
+        "social responsibility",
+        "responsibility audit",
+        "audit associated",
+        "associated",
+        "associated corrective",
+        "corrective action",
+        "action rate",
+        "rate priority",
+        "priority non-conformances",
+        "Direct suppliers’ social responsibility audit (1) non-conformance",
+        "rate and (2) associated corrective action rate for (a) priority non-conformances"
       ],
-      "dense_query": "Find disclosures for CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances with unit Rate related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances'; retain every reported year and label.",
+        "When CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances', including: Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances; Direct suppliers' social responsibility audit associated corrective action rate for (a) priority non-conformances; CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances.",
+        "Disambiguate CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances' from sibling metrics sharing CG-TS-430a.2: Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances.",
+        "Find disclosures for CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances with unit Rate related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances related to Labour Conditions in the Supply Chain.",
@@ -713,7 +1263,21 @@
         "non-conformances",
         "Labour",
         "Conditions",
-        "ratio"
+        "ratio",
+        "Direct suppliers' social responsibility audit associated corrective action rate for (a) priority non-conformances",
+        "CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances",
+        "Direct suppliers'",
+        "suppliers'",
+        "suppliers' social",
+        "social responsibility",
+        "responsibility audit",
+        "audit associated",
+        "associated",
+        "associated corrective",
+        "corrective action",
+        "action rate",
+        "rate priority",
+        "priority non-conformances"
       ],
       "negative_anchor_terms": [
         "Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances",
@@ -739,7 +1303,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -747,23 +1313,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances' (CG-TS-430a.2, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances."
     },
     {
       "metric_id": "CG-TS-430a.2.04",
@@ -795,10 +1409,33 @@
         "Conditions",
         "Supply",
         "Chain",
-        "ratio"
+        "ratio",
+        "Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances",
+        "Direct suppliers' social responsibility audit associated corrective action rate for (b) other non-conformances",
+        "CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances",
+        "Direct suppliers'",
+        "suppliers'",
+        "suppliers' social",
+        "social responsibility",
+        "responsibility audit",
+        "audit associated",
+        "associated",
+        "associated corrective",
+        "corrective action",
+        "action rate",
+        "rate other",
+        "other non-conformances",
+        "Direct suppliers’ social responsibility audit (1) non-conformance",
+        "rate and (2) associated corrective action rate for (a) priority non-conformances"
       ],
-      "dense_query": "Find disclosures for CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances with unit Rate related to Labour Conditions in the Supply Chain.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances', under 'Labour Conditions in the Supply Chain', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances'; retain every reported year and label.",
+        "When CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances', including: Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances; Direct suppliers' social responsibility audit associated corrective action rate for (b) other non-conformances; CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances.",
+        "Disambiguate CG-TS-430a.2 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances' from sibling metrics sharing CG-TS-430a.2: Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances.",
+        "Find disclosures for CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances with unit Rate related to Labour Conditions in the Supply Chain.",
         "Retrieve exact report evidence for CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances related to Labour Conditions in the Supply Chain.",
@@ -819,7 +1456,21 @@
         "non-conformances",
         "Labour",
         "Conditions",
-        "ratio"
+        "ratio",
+        "Direct suppliers' social responsibility audit associated corrective action rate for (b) other non-conformances",
+        "CG-TS-430a.2 Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances",
+        "Direct suppliers'",
+        "suppliers'",
+        "suppliers' social",
+        "social responsibility",
+        "responsibility audit",
+        "audit associated",
+        "associated",
+        "associated corrective",
+        "corrective action",
+        "action rate",
+        "rate other",
+        "other non-conformances"
       ],
       "negative_anchor_terms": [
         "Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances",
@@ -845,7 +1496,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -853,23 +1506,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Direct suppliers' social responsibility audit (2) associated corrective action rate for (b) other non-conformances' (CG-TS-430a.2, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Direct suppliers' social responsibility audit (1) non-conformance rate for (a) priority non-conformances; Direct suppliers' social responsibility audit (1) non-conformance rate for (b) other non-conformances; Direct suppliers' social responsibility audit (2) associated corrective action rate for (a) priority non-conformances."
     },
     {
       "metric_id": "CG-TS-000.A",
@@ -893,10 +1594,17 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Annual production",
+        "CG-TS-000.A Annual production"
       ],
-      "dense_query": "Find disclosures for CG-TS-000.A Annual production with unit Number of units.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-000.A 'Annual production', with expected unit 'Number of units'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-000.A 'Annual production', with expected unit 'Number of units'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-000.A 'Annual production'; retain every reported year and label.",
+        "When CG-TS-000.A 'Annual production' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-000.A 'Annual production', including: Annual production; CG-TS-000.A Annual production.",
+        "Find disclosures for CG-TS-000.A Annual production with unit Number of units.",
         "Retrieve exact report evidence for CG-TS-000.A Annual production, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-000.A Annual production with unit Number of units.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-000.A Annual production.",
@@ -910,7 +1618,8 @@
         "Number of units",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "CG-TS-000.A Annual production"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -919,7 +1628,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -927,25 +1638,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Annual production', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "number",
         "expected_units": [
-          "Number of units",
-          "Number",
-          "count",
-          "absolute number"
+          "Number of units"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Annual production' (CG-TS-000.A, expected unit: Number of units). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "CG-TS-000.B.01",
@@ -959,7 +1716,8 @@
       "aliases": [
         "Number of manufacturing facilities",
         "Count of manufacturing facilities",
-        "CG-TS-000.B Number of manufacturing facilities"
+        "CG-TS-000.B Number of manufacturing facilities",
+        "Total number of manufacturing facilities"
       ],
       "bm25_terms": [
         "CG-TS-000.B",
@@ -968,10 +1726,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of manufacturing facilities",
+        "Count of manufacturing facilities",
+        "CG-TS-000.B Number of manufacturing facilities",
+        "Total number of manufacturing facilities",
+        "manufacturing facilities",
+        "Number of manufacturing facilities, percentage outsourced",
+        "Note to CG-TS-000.B – The number of manufacturing facilities shall include those owned and operated by the entity as well as those"
       ],
-      "dense_query": "Find disclosures for CG-TS-000.B Number of manufacturing facilities with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-000.B 'Number of manufacturing facilities', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-000.B 'Number of manufacturing facilities', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-000.B 'Number of manufacturing facilities'; retain every reported year and label.",
+        "When CG-TS-000.B 'Number of manufacturing facilities' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-000.B 'Number of manufacturing facilities', including: Number of manufacturing facilities; Count of manufacturing facilities; CG-TS-000.B Number of manufacturing facilities; Total number of manufacturing facilities.",
+        "Disambiguate CG-TS-000.B 'Number of manufacturing facilities' from sibling metrics sharing CG-TS-000.B: Percentage of manufacturing facilities outsourced.",
+        "Find disclosures for CG-TS-000.B Number of manufacturing facilities with unit Number.",
         "Retrieve exact report evidence for CG-TS-000.B Number of manufacturing facilities, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-000.B Number of manufacturing facilities with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-000.B Number of manufacturing facilities.",
@@ -984,7 +1755,11 @@
         "facilities",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of manufacturing facilities",
+        "CG-TS-000.B Number of manufacturing facilities",
+        "Total number of manufacturing facilities",
+        "manufacturing facilities"
       ],
       "negative_anchor_terms": [
         "Percentage of manufacturing facilities outsourced"
@@ -1000,7 +1775,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1008,24 +1785,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of manufacturing facilities'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of manufacturing facilities' (CG-TS-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of manufacturing facilities outsourced."
     },
     {
       "metric_id": "CG-TS-000.B.02",
@@ -1049,10 +1874,23 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of manufacturing facilities outsourced",
+        "Percent of manufacturing facilities outsourced",
+        "CG-TS-000.B Percentage of manufacturing facilities outsourced",
+        "manufacturing facilities",
+        "facilities outsourced",
+        "Number of manufacturing facilities, percentage outsourced",
+        "Note to CG-TS-000.B – The number of manufacturing facilities shall include those owned and operated by the entity as well as those"
       ],
-      "dense_query": "Find disclosures for CG-TS-000.B Percentage of manufacturing facilities outsourced with unit Percentage (%).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric CG-TS-000.B 'Percentage of manufacturing facilities outsourced', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric CG-TS-000.B 'Percentage of manufacturing facilities outsourced', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for CG-TS-000.B 'Percentage of manufacturing facilities outsourced'; retain every reported year and label.",
+        "When CG-TS-000.B 'Percentage of manufacturing facilities outsourced' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for CG-TS-000.B 'Percentage of manufacturing facilities outsourced', including: Percentage of manufacturing facilities outsourced; Percent of manufacturing facilities outsourced; CG-TS-000.B Percentage of manufacturing facilities outsourced.",
+        "Disambiguate CG-TS-000.B 'Percentage of manufacturing facilities outsourced' from sibling metrics sharing CG-TS-000.B: Number of manufacturing facilities.",
+        "Find disclosures for CG-TS-000.B Percentage of manufacturing facilities outsourced with unit Percentage (%).",
         "Retrieve exact report evidence for CG-TS-000.B Percentage of manufacturing facilities outsourced, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches CG-TS-000.B Percentage of manufacturing facilities outsourced with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for CG-TS-000.B Percentage of manufacturing facilities outsourced.",
@@ -1067,7 +1905,11 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of manufacturing facilities outsourced",
+        "CG-TS-000.B Percentage of manufacturing facilities outsourced",
+        "manufacturing facilities",
+        "facilities outsourced"
       ],
       "negative_anchor_terms": [
         "Number of manufacturing facilities"
@@ -1083,7 +1925,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1091,11 +1935,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of manufacturing facilities outsourced', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1107,9 +1977,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of manufacturing facilities outsourced' (CG-TS-000.B, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of manufacturing facilities."
     }
   ]
 }

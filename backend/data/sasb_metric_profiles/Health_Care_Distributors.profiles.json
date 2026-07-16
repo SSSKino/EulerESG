@@ -25,10 +25,22 @@
         "RTK",
         "Litres/RTK",
         "litres per RTK",
-        "L/RTK"
+        "L/RTK",
+        "Payload fuel economy",
+        "HC-DI-110a.1 Payload fuel economy",
+        "Payload fuel",
+        "fuel economy",
+        "liters",
+        "L",
+        "The entity shall disclose its aggregate payload fuel economy for its transportation fleet"
       ],
-      "dense_query": "Find disclosures for HC-DI-110a.1 Payload fuel economy with unit Litres/RTK related to Fleet Fuel Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-110a.1 'Payload fuel economy', under 'Fleet Fuel Management', with expected unit 'Litres/RTK'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-110a.1 'Payload fuel economy', under 'Fleet Fuel Management', with expected unit 'Litres/RTK'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DI-110a.1 'Payload fuel economy'; retain every reported year and label.",
+        "When HC-DI-110a.1 'Payload fuel economy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-110a.1 'Payload fuel economy', including: Payload fuel economy; HC-DI-110a.1 Payload fuel economy.",
+        "Find disclosures for HC-DI-110a.1 Payload fuel economy with unit Litres/RTK related to Fleet Fuel Management.",
         "Retrieve exact report evidence for HC-DI-110a.1 Payload fuel economy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-110a.1 Payload fuel economy with unit Litres/RTK.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-110a.1 Payload fuel economy related to Fleet Fuel Management.",
@@ -45,7 +57,13 @@
         "Management",
         "Litres/RTK",
         "litres per RTK",
-        "L/RTK"
+        "L/RTK",
+        "HC-DI-110a.1 Payload fuel economy",
+        "Payload fuel",
+        "fuel economy",
+        "litres",
+        "liters",
+        "L"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -54,7 +72,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -62,24 +82,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Payload fuel economy', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "volume",
         "expected_units": [
           "Litres/RTK",
-          "litres per RTK",
-          "L/RTK"
+          "m3",
+          "m?",
+          "cubic metres",
+          "cubic meters",
+          "litres",
+          "liters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Payload fuel economy' (HC-DI-110a.1, expected unit: Litres/RTK). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-110a.2",
@@ -92,7 +165,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of efforts to reduce the environmental impact of logistics",
-        "HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics"
+        "HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics",
+        "efforts to reduce the environmental impact of logistics"
       ],
       "bm25_terms": [
         "HC-DI-110a.2",
@@ -105,10 +179,24 @@
         "logistics",
         "Fleet",
         "Fuel",
-        "Management"
+        "Management",
+        "Description of efforts to reduce the environmental impact of logistics",
+        "HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics",
+        "efforts to reduce the environmental impact of logistics",
+        "efforts reduce",
+        "reduce environmental",
+        "environmental impact",
+        "impact logistics",
+        "Description of efforts to reduce the environmental impact of",
+        "The entity shall describe the nature, scope and implementation of its programmes and initiatives to reduce the"
       ],
-      "dense_query": "Find disclosures for HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics related to Fleet Fuel Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-110a.2 'Description of efforts to reduce the environmental impact of logistics', under 'Fleet Fuel Management'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-110a.2 'Description of efforts to reduce the environmental impact of logistics', under 'Fleet Fuel Management'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DI-110a.2 'Description of efforts to reduce the environmental impact of logistics'.",
+        "When HC-DI-110a.2 'Description of efforts to reduce the environmental impact of logistics' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-110a.2 'Description of efforts to reduce the environmental impact of logistics', including: Description of efforts to reduce the environmental impact of logistics; HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics; efforts to reduce the environmental impact of logistics.",
+        "Find disclosures for HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics related to Fleet Fuel Management.",
         "Retrieve exact report evidence for HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics related to Fleet Fuel Management.",
@@ -126,7 +214,13 @@
         "logistics",
         "Fleet",
         "Fuel",
-        "Management"
+        "Management",
+        "HC-DI-110a.2 Description of efforts to reduce the environmental impact of logistics",
+        "efforts to reduce the environmental impact of logistics",
+        "efforts reduce",
+        "reduce environmental",
+        "environmental impact",
+        "impact logistics"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -136,7 +230,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -148,20 +244,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of efforts to reduce the environmental impact of logistics'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of efforts to reduce the environmental impact of logistics' (HC-DI-110a.2). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-250a.1",
@@ -191,10 +335,30 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "Monetary losses as a result of legal proceedings associated with product safety",
+        "HC-DI-250a.1 Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated product",
+        "product safety",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with product safety"
       ],
-      "dense_query": "Find disclosures for HC-DI-250a.1 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency related to Product Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-250a.1 'Total amount of monetary losses as a result of legal proceedings associated with product safety', under 'Product Safety', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-250a.1 'Total amount of monetary losses as a result of legal proceedings associated with product safety', under 'Product Safety', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DI-250a.1 'Total amount of monetary losses as a result of legal proceedings associated with product safety'; retain every reported year and label.",
+        "When HC-DI-250a.1 'Total amount of monetary losses as a result of legal proceedings associated with product safety' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-250a.1 'Total amount of monetary losses as a result of legal proceedings associated with product safety', including: Total amount of monetary losses as a result of legal proceedings associated with product safety; Monetary losses as a result of legal proceedings associated with product safety; HC-DI-250a.1 Total amount of monetary losses as a result of legal proceedings associated with product safety.",
+        "Find disclosures for HC-DI-250a.1 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency related to Product Safety.",
         "Retrieve exact report evidence for HC-DI-250a.1 Total amount of monetary losses as a result of legal proceedings associated with product safety, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-250a.1 Total amount of monetary losses as a result of legal proceedings associated with product safety with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-250a.1 Total amount of monetary losses as a result of legal proceedings associated with product safety related to Product Safety.",
@@ -214,7 +378,18 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with product safety",
+        "HC-DI-250a.1 Total amount of monetary losses as a result of legal proceedings associated with product safety",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated product",
+        "product safety",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -228,7 +403,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -236,25 +413,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with product safety', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with product safety' (HC-DI-250a.1, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-250a.2",
@@ -267,7 +493,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery",
-        "HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery"
+        "HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery",
+        "efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery"
       ],
       "bm25_terms": [
         "HC-DI-250a.2",
@@ -285,10 +512,33 @@
         "abuse",
         "potential",
         "delivery",
-        "Product"
+        "Product",
+        "Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery",
+        "HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery",
+        "efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery",
+        "efforts minimise",
+        "minimise health",
+        "health safety",
+        "safety risks",
+        "risks products",
+        "products sold",
+        "sold associated",
+        "associated",
+        "associated toxicity",
+        "toxicity chemical",
+        "chemical safety",
+        "safety high",
+        "high abuse",
+        "Description of efforts to minimise health and safety risks of",
+        "products sold associated with toxicity/chemical safety, high abuse potential, or"
       ],
-      "dense_query": "Find disclosures for HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery related to Product Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-250a.2 'Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery', under 'Product Safety'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-250a.2 'Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery', under 'Product Safety'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DI-250a.2 'Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery'.",
+        "When HC-DI-250a.2 'Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-250a.2 'Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery', including: Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery; HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery; efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery.",
+        "Find disclosures for HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery related to Product Safety.",
         "Retrieve exact report evidence for HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery related to Product Safety.",
@@ -308,7 +558,22 @@
         "toxicity",
         "chemical",
         "high",
-        "abuse"
+        "abuse",
+        "HC-DI-250a.2 Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery",
+        "efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery",
+        "efforts minimise",
+        "minimise health",
+        "health safety",
+        "safety risks",
+        "risks products",
+        "products sold",
+        "sold associated",
+        "associated",
+        "associated toxicity",
+        "toxicity chemical",
+        "chemical safety",
+        "safety high",
+        "high abuse"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -318,7 +583,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -330,20 +597,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of efforts to minimise health and safety risks of products sold associated with toxicity/chemical safety, high abuse potential, or delivery' (HC-DI-250a.2). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-260a.1",
@@ -356,7 +671,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting",
-        "HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting"
+        "HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting",
+        "methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting"
       ],
       "bm25_terms": [
         "HC-DI-260a.1",
@@ -372,10 +688,33 @@
         "prevent",
         "counterfeiting",
         "Counterfeit",
-        "Drugs"
+        "Drugs",
+        "Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting",
+        "HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting",
+        "methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting",
+        "methods technologies",
+        "technologies used",
+        "used",
+        "used maintain",
+        "maintain traceability",
+        "traceability products",
+        "products throughout",
+        "throughout distribution",
+        "distribution chain",
+        "chain prevent",
+        "prevent counterfeiting",
+        "Description of methods",
+        "technologies used to maintain traceability of products throughout the distribution chain",
+        "Description of methods and technologies used to maintain",
+        "traceability of products throughout the distribution chain and prevent"
       ],
-      "dense_query": "Find disclosures for HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting related to Counterfeit Drugs.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-260a.1 'Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting', under 'Counterfeit Drugs'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-260a.1 'Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting', under 'Counterfeit Drugs'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DI-260a.1 'Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting'.",
+        "When HC-DI-260a.1 'Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-260a.1 'Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting', including: Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting; HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting; methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting.",
+        "Find disclosures for HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting related to Counterfeit Drugs.",
         "Retrieve exact report evidence for HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting related to Counterfeit Drugs.",
@@ -395,7 +734,22 @@
         "chain",
         "prevent",
         "counterfeiting",
-        "Counterfeit"
+        "Counterfeit",
+        "HC-DI-260a.1 Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting",
+        "methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting",
+        "methods technologies",
+        "technologies used",
+        "used",
+        "used maintain",
+        "maintain traceability",
+        "traceability products",
+        "products throughout",
+        "throughout distribution",
+        "distribution chain",
+        "chain prevent",
+        "prevent counterfeiting",
+        "Description of methods",
+        "technologies used to maintain traceability of products throughout the distribution chain"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -405,7 +759,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -417,20 +773,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of methods and technologies used to maintain traceability of products throughout the distribution chain and prevent counterfeiting' (HC-DI-260a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-260a.2",
@@ -459,10 +863,29 @@
         "equipment",
         "devices",
         "Counterfeit",
-        "Drugs"
+        "Drugs",
+        "Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices",
+        "HC-DI-260a.2 Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices",
+        "due diligence",
+        "diligence process",
+        "process qualify",
+        "qualify suppliers",
+        "suppliers drug",
+        "drug products",
+        "products medical",
+        "medical equipment",
+        "equipment devices",
+        "Discussion of due diligence process to qualify suppliers of drug products",
+        "Discussion of due diligence process to qualify suppliers of drug",
+        "products and medical equipment and devices"
       ],
-      "dense_query": "Find disclosures for HC-DI-260a.2 Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices related to Counterfeit Drugs.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-260a.2 'Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices', under 'Counterfeit Drugs'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-260a.2 'Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices', under 'Counterfeit Drugs'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DI-260a.2 'Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices'.",
+        "When HC-DI-260a.2 'Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-260a.2 'Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices', including: Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices; HC-DI-260a.2 Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices.",
+        "Find disclosures for HC-DI-260a.2 Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices related to Counterfeit Drugs.",
         "Retrieve exact report evidence for HC-DI-260a.2 Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-260a.2 Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-260a.2 Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices related to Counterfeit Drugs.",
@@ -482,7 +905,18 @@
         "medical",
         "equipment",
         "devices",
-        "Counterfeit"
+        "Counterfeit",
+        "HC-DI-260a.2 Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices",
+        "due diligence",
+        "diligence process",
+        "process qualify",
+        "qualify suppliers",
+        "suppliers drug",
+        "drug products",
+        "products medical",
+        "medical equipment",
+        "equipment devices",
+        "Discussion of due diligence process to qualify suppliers of drug products"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -492,7 +926,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -504,20 +940,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of due diligence process to qualify suppliers of drug products and medical equipment and devices' (HC-DI-260a.2). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-260a.3",
@@ -545,10 +1029,32 @@
         "risks",
         "counterfeit",
         "products",
-        "Drugs"
+        "Drugs",
+        "Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products",
+        "HC-DI-260a.3 Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products",
+        "process alerting",
+        "alerting customers",
+        "customers business",
+        "business partners",
+        "partners potential",
+        "potential known",
+        "known risks",
+        "risks associated",
+        "associated",
+        "associated counterfeit",
+        "counterfeit products",
+        "Discussion of process for alerting customers",
+        "business partners to potential or known risks associated with counterfeit products",
+        "Discussion of process for alerting customers and business partners",
+        "to potential or known risks associated with counterfeit products"
       ],
-      "dense_query": "Find disclosures for HC-DI-260a.3 Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products related to Counterfeit Drugs.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-260a.3 'Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products', under 'Counterfeit Drugs'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-260a.3 'Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products', under 'Counterfeit Drugs'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DI-260a.3 'Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products'.",
+        "When HC-DI-260a.3 'Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-260a.3 'Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products', including: Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products; HC-DI-260a.3 Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products.",
+        "Find disclosures for HC-DI-260a.3 Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products related to Counterfeit Drugs.",
         "Retrieve exact report evidence for HC-DI-260a.3 Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-260a.3 Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-260a.3 Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products related to Counterfeit Drugs.",
@@ -568,7 +1074,21 @@
         "risks",
         "counterfeit",
         "products",
-        "Drugs"
+        "Drugs",
+        "HC-DI-260a.3 Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products",
+        "process alerting",
+        "alerting customers",
+        "customers business",
+        "business partners",
+        "partners potential",
+        "potential known",
+        "known risks",
+        "risks associated",
+        "associated",
+        "associated counterfeit",
+        "counterfeit products",
+        "Discussion of process for alerting customers",
+        "business partners to potential or known risks associated with counterfeit products"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -578,7 +1098,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -590,20 +1112,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of process for alerting customers and business partners to potential or known risks associated with counterfeit products' (HC-DI-260a.3). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-410a.1",
@@ -629,10 +1199,27 @@
         "throughout",
         "lifecycle",
         "Product",
-        "Management"
+        "Management",
+        "Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle",
+        "HC-DI-410a.1 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle",
+        "strategies reduce",
+        "reduce environmental",
+        "environmental impact",
+        "impact packaging",
+        "packaging throughout",
+        "throughout its",
+        "its",
+        "its lifecycle",
+        "Discussion of strategies to reduce the environmental impact of",
+        "packaging throughout its lifecycle"
       ],
-      "dense_query": "Find disclosures for HC-DI-410a.1 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-410a.1 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle', under 'Product Lifecycle Management'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-410a.1 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle', under 'Product Lifecycle Management'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DI-410a.1 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle'.",
+        "When HC-DI-410a.1 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-410a.1 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle', including: Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle; HC-DI-410a.1 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle.",
+        "Find disclosures for HC-DI-410a.1 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle related to Product Lifecycle Management.",
         "Retrieve exact report evidence for HC-DI-410a.1 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-410a.1 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-410a.1 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle related to Product Lifecycle Management.",
@@ -650,7 +1237,16 @@
         "throughout",
         "lifecycle",
         "Product",
-        "Management"
+        "Management",
+        "HC-DI-410a.1 Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle",
+        "strategies reduce",
+        "reduce environmental",
+        "environmental impact",
+        "impact packaging",
+        "packaging throughout",
+        "throughout its",
+        "its",
+        "its lifecycle"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -660,7 +1256,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -672,20 +1270,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of strategies to reduce the environmental impact of packaging throughout its lifecycle' (HC-DI-410a.1, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-410a.2",
@@ -718,10 +1364,31 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "Amount (by weight) of products accepted for take-back and reused, recycled, or donated",
+        "HC-DI-410a.2 Amount (by weight) of products accepted for take-back and reused, recycled, or donated",
+        "weight products",
+        "products accepted",
+        "accepted take-back",
+        "take-back reused",
+        "reused recycled",
+        "recycled donated",
+        "Amount (by weight) of products accepted for take-back",
+        "or donated",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "Amount (by weight) of products accepted for take-back and reused",
+        "recycled, or donated"
       ],
-      "dense_query": "Find disclosures for HC-DI-410a.2 Amount (by weight) of products accepted for take-back and reused, recycled, or donated with unit Metric tonnes (t) related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-410a.2 'Amount (by weight) of products accepted for take-back and reused, recycled, or donated', under 'Product Lifecycle Management', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-410a.2 'Amount (by weight) of products accepted for take-back and reused, recycled, or donated', under 'Product Lifecycle Management', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DI-410a.2 'Amount (by weight) of products accepted for take-back and reused, recycled, or donated'; retain every reported year and label.",
+        "When HC-DI-410a.2 'Amount (by weight) of products accepted for take-back and reused, recycled, or donated' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-410a.2 'Amount (by weight) of products accepted for take-back and reused, recycled, or donated', including: Amount (by weight) of products accepted for take-back and reused, recycled, or donated; HC-DI-410a.2 Amount (by weight) of products accepted for take-back and reused, recycled, or donated.",
+        "Find disclosures for HC-DI-410a.2 Amount (by weight) of products accepted for take-back and reused, recycled, or donated with unit Metric tonnes (t) related to Product Lifecycle Management.",
         "Retrieve exact report evidence for HC-DI-410a.2 Amount (by weight) of products accepted for take-back and reused, recycled, or donated, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-410a.2 Amount (by weight) of products accepted for take-back and reused, recycled, or donated with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-410a.2 Amount (by weight) of products accepted for take-back and reused, recycled, or donated related to Product Lifecycle Management.",
@@ -743,7 +1410,21 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "HC-DI-410a.2 Amount (by weight) of products accepted for take-back and reused, recycled, or donated",
+        "weight products",
+        "products accepted",
+        "accepted take-back",
+        "take-back reused",
+        "reused recycled",
+        "recycled donated",
+        "Amount (by weight) of products accepted for take-back",
+        "or donated",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -752,7 +1433,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -760,30 +1443,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Amount (by weight) of products accepted for take-back and reused, recycled, or donated', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Amount (by weight) of products accepted for take-back and reused, recycled, or donated' (HC-DI-410a.2, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-510a.1",
@@ -796,7 +1525,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of efforts to minimise conflicts of interest and unethical business practices",
-        "HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices"
+        "HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices",
+        "efforts to minimise conflicts of interest and unethical business practices"
       ],
       "bm25_terms": [
         "HC-DI-510a.1",
@@ -808,10 +1538,27 @@
         "unethical",
         "business",
         "practices",
-        "Ethics"
+        "Ethics",
+        "Description of efforts to minimise conflicts of interest and unethical business practices",
+        "HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices",
+        "efforts to minimise conflicts of interest and unethical business practices",
+        "efforts minimise",
+        "minimise conflicts",
+        "conflicts interest",
+        "interest unethical",
+        "unethical business",
+        "business practices",
+        "Description of efforts to minimise conflicts of interest",
+        "unethical business practices",
+        "Description of efforts to minimise conflicts of interest and unethical"
       ],
-      "dense_query": "Find disclosures for HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices related to Business Ethics.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-510a.1 'Description of efforts to minimise conflicts of interest and unethical business practices', under 'Business Ethics'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-510a.1 'Description of efforts to minimise conflicts of interest and unethical business practices', under 'Business Ethics'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DI-510a.1 'Description of efforts to minimise conflicts of interest and unethical business practices'.",
+        "When HC-DI-510a.1 'Description of efforts to minimise conflicts of interest and unethical business practices' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-510a.1 'Description of efforts to minimise conflicts of interest and unethical business practices', including: Description of efforts to minimise conflicts of interest and unethical business practices; HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices; efforts to minimise conflicts of interest and unethical business practices.",
+        "Find disclosures for HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices related to Business Ethics.",
         "Retrieve exact report evidence for HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices related to Business Ethics.",
@@ -828,7 +1575,17 @@
         "unethical",
         "business",
         "practices",
-        "Ethics"
+        "Ethics",
+        "HC-DI-510a.1 Description of efforts to minimise conflicts of interest and unethical business practices",
+        "efforts to minimise conflicts of interest and unethical business practices",
+        "efforts minimise",
+        "minimise conflicts",
+        "conflicts interest",
+        "interest unethical",
+        "unethical business",
+        "business practices",
+        "Description of efforts to minimise conflicts of interest",
+        "unethical business practices"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -838,7 +1595,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -850,20 +1609,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of efforts to minimise conflicts of interest and unethical business practices'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of efforts to minimise conflicts of interest and unethical business practices' (HC-DI-510a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-510a.2",
@@ -898,10 +1705,35 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices",
+        "Monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices",
+        "HC-DI-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated bribery",
+        "bribery corruption",
+        "corruption other",
+        "other unethical",
+        "unethical business",
+        "business practices",
+        "Total amount of monetary losses as a result of legal proceedings associated with bribery",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with bribery, corruption, or other unethical business practices"
       ],
-      "dense_query": "Find disclosures for HC-DI-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices with unit Presentation currency related to Business Ethics.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices', under 'Business Ethics', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices', under 'Business Ethics', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DI-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices'; retain every reported year and label.",
+        "When HC-DI-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-510a.2 'Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices', including: Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices; Monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices; HC-DI-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices.",
+        "Find disclosures for HC-DI-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices with unit Presentation currency related to Business Ethics.",
         "Retrieve exact report evidence for HC-DI-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices related to Business Ethics.",
@@ -925,7 +1757,23 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices",
+        "HC-DI-510a.2 Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated bribery",
+        "bribery corruption",
+        "corruption other",
+        "other unethical",
+        "unethical business",
+        "business practices",
+        "Total amount of monetary losses as a result of legal proceedings associated with bribery",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -939,7 +1787,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -947,25 +1797,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with bribery, corruption, or other unethical business practices' (HC-DI-510a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DI-000.A",
@@ -979,7 +1878,8 @@
       "aliases": [
         "Number of pharmaceutical units sold by product category",
         "Count of pharmaceutical units sold by product category",
-        "HC-DI-000.A Number of pharmaceutical units sold by product category"
+        "HC-DI-000.A Number of pharmaceutical units sold by product category",
+        "Total number of pharmaceutical units sold by product category"
       ],
       "bm25_terms": [
         "HC-DI-000.A",
@@ -991,14 +1891,27 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of pharmaceutical units sold by product category",
+        "Count of pharmaceutical units sold by product category",
+        "HC-DI-000.A Number of pharmaceutical units sold by product category",
+        "Total number of pharmaceutical units sold by product category",
+        "pharmaceutical units",
+        "units sold",
+        "sold product"
       ],
-      "dense_query": "Find disclosures for HC-DI-000.A Number of pharmaceutical units sold by product category with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-000.A 'Number of pharmaceutical units sold by product category', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-000.A 'Number of pharmaceutical units sold by product category', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DI-000.A 'Number of pharmaceutical units sold by product category'; retain every reported year and label.",
+        "When HC-DI-000.A 'Number of pharmaceutical units sold by product category' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-000.A 'Number of pharmaceutical units sold by product category', including: Number of pharmaceutical units sold by product category; Count of pharmaceutical units sold by product category; HC-DI-000.A Number of pharmaceutical units sold by product category; Total number of pharmaceutical units sold by product category.",
+        "Find disclosures for HC-DI-000.A Number of pharmaceutical units sold by product category with unit Number.",
         "Retrieve exact report evidence for HC-DI-000.A Number of pharmaceutical units sold by product category, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-000.A Number of pharmaceutical units sold by product category with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-000.A Number of pharmaceutical units sold by product category.",
-        "Find numeric table rows or performance metrics reporting HC-DI-000.A Number of pharmaceutical units sold by product category for the reporting period."
+        "Find numeric table rows or performance metrics reporting HC-DI-000.A Number of pharmaceutical units sold by product category for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: product_type."
       ],
       "anchor_terms": [
         "HC-DI-000.A",
@@ -1010,7 +1923,13 @@
         "category",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of pharmaceutical units sold by product category",
+        "HC-DI-000.A Number of pharmaceutical units sold by product category",
+        "Total number of pharmaceutical units sold by product category",
+        "pharmaceutical units",
+        "units sold",
+        "sold product"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1019,7 +1938,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1027,24 +1948,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of pharmaceutical units sold by product category'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "product_type"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of pharmaceutical units sold by product category' (HC-DI-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. Preserve separate reported values and source labels for the variable dimensions: product_type."
     },
     {
       "metric_id": "HC-DI-000.B",
@@ -1058,7 +2029,8 @@
       "aliases": [
         "Number of medical devices sold by product category",
         "Count of medical devices sold by product category",
-        "HC-DI-000.B Number of medical devices sold by product category"
+        "HC-DI-000.B Number of medical devices sold by product category",
+        "Total number of medical devices sold by product category"
       ],
       "bm25_terms": [
         "HC-DI-000.B",
@@ -1070,14 +2042,27 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of medical devices sold by product category",
+        "Count of medical devices sold by product category",
+        "HC-DI-000.B Number of medical devices sold by product category",
+        "Total number of medical devices sold by product category",
+        "medical devices",
+        "devices sold",
+        "sold product"
       ],
-      "dense_query": "Find disclosures for HC-DI-000.B Number of medical devices sold by product category with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DI-000.B 'Number of medical devices sold by product category', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DI-000.B 'Number of medical devices sold by product category', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DI-000.B 'Number of medical devices sold by product category'; retain every reported year and label.",
+        "When HC-DI-000.B 'Number of medical devices sold by product category' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DI-000.B 'Number of medical devices sold by product category', including: Number of medical devices sold by product category; Count of medical devices sold by product category; HC-DI-000.B Number of medical devices sold by product category; Total number of medical devices sold by product category.",
+        "Find disclosures for HC-DI-000.B Number of medical devices sold by product category with unit Number.",
         "Retrieve exact report evidence for HC-DI-000.B Number of medical devices sold by product category, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DI-000.B Number of medical devices sold by product category with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DI-000.B Number of medical devices sold by product category.",
-        "Find numeric table rows or performance metrics reporting HC-DI-000.B Number of medical devices sold by product category for the reporting period."
+        "Find numeric table rows or performance metrics reporting HC-DI-000.B Number of medical devices sold by product category for the reporting period.",
+        "Preserve separate reported values and source labels for the variable dimensions: product_type."
       ],
       "anchor_terms": [
         "HC-DI-000.B",
@@ -1089,7 +2074,13 @@
         "category",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of medical devices sold by product category",
+        "HC-DI-000.B Number of medical devices sold by product category",
+        "Total number of medical devices sold by product category",
+        "medical devices",
+        "devices sold",
+        "sold product"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1098,7 +2089,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1106,24 +2099,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of medical devices sold by product category'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": true
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "breakdown",
+        "variable_dimensions": [
+          "product_type"
+        ],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": true
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of medical devices sold by product category' (HC-DI-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. Preserve separate reported values and source labels for the variable dimensions: product_type."
     }
   ]
 }

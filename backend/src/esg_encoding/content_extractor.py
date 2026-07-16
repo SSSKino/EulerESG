@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+import statistics
 import time
 import uuid
 from datetime import datetime
@@ -74,7 +75,12 @@ def _fsync_parent_dir(path: Path) -> None:
         pass
 
 
-def _write_shared_ready_marker(target: Path, *, payload: Optional[Dict[str, Any]] = None) -> Path:
+def _write_shared_ready_marker(
+    target: Path,
+    *,
+    payload: Optional[Dict[str, Any]] = None,
+    sync_parent: bool = True,
+) -> Path:
     """为 batch PDF 写入 .ready 标记。
 
     backend 先原子写入 batch PDF，再写 ready 标记，worker 只有在 PDF 和
@@ -95,7 +101,8 @@ def _write_shared_ready_marker(target: Path, *, payload: Optional[Dict[str, Any]
             pass
     os.replace(marker_tmp, marker)
     _ensure_shared_file(marker)
-    _fsync_parent_dir(marker)
+    if sync_parent:
+        _fsync_parent_dir(marker)
     return marker
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -103,6 +110,447 @@ def _env_bool(name: str, default: bool = False) -> bool:
     if value is None:
         return default
     return str(value).strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _page_batch_ranges(total_pages: int, batch_size: int) -> list[tuple[int, int]]:
+    """Return one-based inclusive page ranges for Redis OCR tasks."""
+    if total_pages <= 0:
+        return []
+    effective_batch_size = max(1, int(batch_size))
+    return [
+        (start + 1, min(start + effective_batch_size, total_pages))
+        for start in range(0, total_pages, effective_batch_size)
+    ]
+
+
+def _paddle_markdown_page_markers(markdown: object) -> list[int]:
+    """Return one-based page markers emitted by PaddleOCR-VL batch workers."""
+    return [
+        int(match.group(1))
+        for match in re.finditer(
+            r"<!--\s*page\s+(\d+)\s*\|",
+            str(markdown or ""),
+            flags=re.IGNORECASE,
+        )
+    ]
+
+
+def _duration_summary(values: Sequence[object]) -> Dict[str, float | int]:
+    """Build stable internal timing statistics from worker duration values."""
+    durations: list[float] = []
+    for value in values:
+        try:
+            duration = float(value)
+        except (TypeError, ValueError):
+            continue
+        if duration >= 0:
+            durations.append(duration)
+
+    if not durations:
+        return {"count": 0, "avg": 0.0, "p50": 0.0, "p95": 0.0, "max": 0.0}
+
+    ordered = sorted(durations)
+
+    def percentile(fraction: float) -> float:
+        if len(ordered) == 1:
+            return ordered[0]
+        position = (len(ordered) - 1) * fraction
+        lower = int(position)
+        upper = min(lower + 1, len(ordered) - 1)
+        weight = position - lower
+        return ordered[lower] + (ordered[upper] - ordered[lower]) * weight
+
+    return {
+        "count": len(ordered),
+        "avg": round(statistics.fmean(ordered), 3),
+        "p50": round(percentile(0.50), 3),
+        "p95": round(percentile(0.95), 3),
+        "max": round(ordered[-1], 3),
+    }
+
+
+def _batch_timing_summary(batch_states: Sequence[Dict[str, Any]]) -> Dict[str, Dict[str, float | int]]:
+    elapsed_values: list[object] = []
+    predict_values: list[object] = []
+    for state in batch_states:
+        raw_result = state.get("result_json")
+        if isinstance(raw_result, dict):
+            result = raw_result
+        else:
+            try:
+                result = json.loads(str(raw_result or "{}"))
+            except (TypeError, ValueError, json.JSONDecodeError):
+                result = {}
+
+        elapsed = result.get("elapsed_seconds", state.get("elapsed_seconds"))
+        if elapsed is not None and elapsed != "":
+            elapsed_values.append(elapsed)
+        predict = result.get("predict_seconds", state.get("predict_seconds"))
+        if predict is not None and predict != "":
+            predict_values.append(predict)
+
+    return {
+        "elapsed_seconds": _duration_summary(elapsed_values),
+        "predict_seconds": _duration_summary(predict_values),
+    }
+
+
+def _normalise_link_text(value: object) -> str:
+    text = unescape(str(value or "")).lower()
+    text = text.replace("\\n", " ").replace("\\%", "%")
+    text = re.sub(r"\$\s*\^\{.*?\}\s*\$", " ", text)
+    text = re.sub(r"[^a-z0-9%]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+_PDF_LINK_RESOLUTION_VERSION = 2
+
+
+def _link_record_key(record: Dict[str, Any]) -> tuple:
+    return (
+        str(record.get("link_type") or ""),
+        int(record.get("source_page") or 0),
+        int(record.get("target_page") or 0),
+        str(record.get("uri") or ""),
+        str(record.get("anchor_text") or ""),
+    )
+
+
+def _append_pdf_link(segment: TextSegment, record: Dict[str, Any]) -> bool:
+    data = dict(segment.structured_data or {})
+    links = [dict(item) for item in (data.get("pdf_links") or []) if isinstance(item, dict)]
+    key = _link_record_key(record)
+    if any(_link_record_key(item) == key for item in links):
+        return False
+    links.append(dict(record))
+    data["pdf_links"] = links
+    segment.structured_data = data
+    return True
+
+
+def _anchor_match_score(anchor: str, content: str, segment: TextSegment) -> float:
+    if not anchor:
+        return 0.0
+    if not content:
+        return 0.0
+    if anchor in content:
+        score = 1.0 + min(0.2, len(anchor) / max(len(content), 1))
+    else:
+        anchor_tokens = set(anchor.split())
+        content_tokens = set(content.split())
+        if not anchor_tokens:
+            return 0.0
+        score = len(anchor_tokens & content_tokens) / len(anchor_tokens)
+    segment_type = str(segment.segment_type or "").lower()
+    if segment_type == "table_row":
+        score += 0.08
+    elif segment_type == "table_cell":
+        score += 0.05
+    return score
+
+
+def _link_attachment_group(segment: TextSegment) -> tuple:
+    """Group row-derived segments so one annotation is not assigned to every cell."""
+    data = segment.structured_data or {}
+    table_id = segment.source_table_id or data.get("table_id")
+    row_index = data.get("row_index")
+    if table_id and row_index is not None:
+        return ("table_row", str(table_id), str(row_index))
+    return ("segment", str(segment.segment_id))
+
+
+def _duplicate_anchor_candidates(
+    anchor: str,
+    candidates: Sequence[TextSegment],
+    normalised_content: Dict[int, str],
+) -> List[TextSegment]:
+    """Return one ordered candidate per visual occurrence of a repeated anchor."""
+    exact = [
+        segment
+        for segment in candidates
+        if anchor and anchor in normalised_content.get(id(segment), "")
+    ]
+    if not exact:
+        return []
+
+    # Paddle table cells repeat the complete row context. Prefer the row segment
+    # so duplicate PDF annotations map to distinct rows instead of sibling cells.
+    for preferred_type in ("table_row", "text", "heading", "table_cell", "table"):
+        typed = [
+            segment
+            for segment in exact
+            if str(segment.segment_type or "").lower() == preferred_type
+        ]
+        if not typed:
+            continue
+        unique: Dict[tuple, TextSegment] = {}
+        for segment in sorted(
+            typed,
+            key=lambda item: (
+                float(getattr(item, "position_y", 0.0) or 0.0),
+                float(getattr(item, "position_x", 0.0) or 0.0),
+                str(item.segment_id),
+            ),
+        ):
+            unique.setdefault(_link_attachment_group(segment), segment)
+        return list(unique.values())
+    return []
+
+
+def _extract_pdf_link_records(pdf_path: Path) -> List[Dict[str, Any]]:
+    try:
+        import fitz  # type: ignore
+    except Exception as exc:
+        logger.warning(f"PyMuPDF unavailable; PDF links will not be resolved: {exc}")
+        return []
+
+    records: List[Dict[str, Any]] = []
+    try:
+        document = fitz.open(str(pdf_path))
+    except Exception as exc:
+        logger.warning(f"Unable to open PDF for link extraction: {pdf_path} ({exc})")
+        return []
+
+    try:
+        for page_index in range(len(document)):
+            page = document[page_index]
+            try:
+                page_links = page.get_links() or []
+            except Exception:
+                continue
+            try:
+                page_words = page.get_text("words", sort=True) or []
+            except Exception:
+                page_words = []
+            for link in page_links:
+                if not isinstance(link, dict):
+                    continue
+                rect = link.get("from")
+                anchor_text = ""
+                if rect is not None:
+                    try:
+                        rx0, ry0, rx1, ry1 = (float(rect.x0), float(rect.y0), float(rect.x1), float(rect.y1))
+                        anchor_words = [
+                            str(word[4])
+                            for word in page_words
+                            if len(word) >= 5
+                            and float(word[2]) > rx0
+                            and float(word[0]) < rx1
+                            and float(word[3]) > ry0
+                            and float(word[1]) < ry1
+                        ]
+                        anchor_text = re.sub(r"\s+", " ", " ".join(anchor_words)).strip()
+                    except Exception:
+                        anchor_text = ""
+
+                raw_target_page = link.get("page")
+                target_page: Optional[int] = None
+                try:
+                    if raw_target_page is not None and int(raw_target_page) >= 0:
+                        target_page = int(raw_target_page) + 1
+                except Exception:
+                    target_page = None
+
+                uri = str(link.get("uri") or "").strip()
+                remote_file = str(link.get("file") or "").strip()
+                if target_page is not None and not uri and not remote_file:
+                    link_type = "internal"
+                elif uri or remote_file:
+                    link_type = "external_ignored"
+                else:
+                    link_type = "internal_unresolved"
+
+                coords: List[float] = []
+                if rect is not None:
+                    try:
+                        coords = [round(float(value), 3) for value in (rect.x0, rect.y0, rect.x1, rect.y1)]
+                    except Exception:
+                        try:
+                            coords = [round(float(value), 3) for value in list(rect)[:4]]
+                        except Exception:
+                            coords = []
+
+                record: Dict[str, Any] = {
+                    "link_type": link_type,
+                    "anchor_text": anchor_text,
+                    "source_page": page_index + 1,
+                    "resolution_version": _PDF_LINK_RESOLUTION_VERSION,
+                }
+                if target_page is not None:
+                    record["target_page"] = target_page
+                if uri:
+                    record["uri"] = uri
+                elif remote_file:
+                    record["uri"] = remote_file
+                if coords:
+                    record["rect"] = coords
+                records.append(record)
+    finally:
+        document.close()
+    return records
+
+
+def enrich_document_with_pdf_links(
+    document_content: DocumentContent,
+    pdf_path: Optional[str | Path] = None,
+) -> Dict[str, int]:
+    """Attach internal-link topology to Paddle-derived segments without extracting PDF body text."""
+    summary = {"links": 0, "internal": 0, "external_ignored": 0, "anchors_created": 0}
+    if not _env_bool("REPORT_LINK_RESOLUTION_ENABLED", True):
+        return summary
+
+    source_path = Path(pdf_path or document_content.file_path)
+    if not source_path.is_file() or source_path.suffix.lower() != ".pdf":
+        return summary
+
+    existing_records = [
+        link
+        for segment in document_content.segments
+        for link in (
+            (segment.structured_data or {}).get("pdf_links", [])
+            if isinstance(segment.structured_data, dict)
+            else []
+        )
+        if isinstance(link, dict)
+    ]
+    if existing_records and all(
+        int(link.get("resolution_version") or 0) >= _PDF_LINK_RESOLUTION_VERSION
+        for link in existing_records
+    ):
+        unique_existing = {_link_record_key(link): link for link in existing_records}
+        summary["links"] = len(unique_existing)
+        summary["internal"] = sum(1 for link in unique_existing.values() if link.get("link_type") == "internal")
+        summary["external_ignored"] = sum(
+            1 for link in unique_existing.values() if link.get("link_type") == "external_ignored"
+        )
+        return summary
+
+    records = _extract_pdf_link_records(source_path)
+    if not records:
+        if existing_records:
+            unique_existing = {_link_record_key(link): link for link in existing_records}
+            summary["links"] = len(unique_existing)
+            summary["internal"] = sum(
+                1 for link in unique_existing.values() if link.get("link_type") == "internal"
+            )
+            summary["external_ignored"] = sum(
+                1 for link in unique_existing.values() if link.get("link_type") == "external_ignored"
+            )
+        return summary
+
+    if existing_records:
+        repaired_segments: List[TextSegment] = []
+        for segment in document_content.segments:
+            data = dict(segment.structured_data or {})
+            is_generated_anchor = (
+                str(segment.segment_type or "").lower() == "link_anchor"
+                and data.get("source") == "pymupdf_link_annotation"
+            )
+            if is_generated_anchor:
+                continue
+            data.pop("pdf_links", None)
+            segment.structured_data = data
+            repaired_segments.append(segment)
+        document_content.segments = repaired_segments
+
+    anchor_counts: Dict[str, int] = {}
+    page_anchor_counts: Dict[tuple[int, str], int] = {}
+    for item in records:
+        anchor_key = _normalise_link_text(item.get("anchor_text"))
+        if anchor_key:
+            anchor_counts[anchor_key] = anchor_counts.get(anchor_key, 0) + 1
+            page_anchor_key = (int(item.get("source_page") or 1), anchor_key)
+            page_anchor_counts[page_anchor_key] = page_anchor_counts.get(page_anchor_key, 0) + 1
+
+    segments = document_content.segments
+    page_segments: Dict[int, List[TextSegment]] = {}
+    existing_ids = {str(segment.segment_id) for segment in segments}
+    normalised_content = {id(segment): _normalise_link_text(segment.content) for segment in segments}
+    for segment in segments:
+        page_segments.setdefault(int(segment.page_number or 1), []).append(segment)
+
+    anchor_sequence = 0
+    used_duplicate_groups: Dict[tuple[int, str], set[tuple]] = {}
+    for raw_record in records:
+        record = dict(raw_record)
+        anchor_key = _normalise_link_text(record.get("anchor_text"))
+        if anchor_key and anchor_counts.get(anchor_key, 0) >= 5:
+            record["navigation"] = True
+        summary["links"] += 1
+        link_type = str(record.get("link_type") or "")
+        if link_type == "internal":
+            summary["internal"] += 1
+        elif link_type == "external_ignored":
+            summary["external_ignored"] += 1
+
+        source_page = int(record.get("source_page") or 1)
+        candidates = page_segments.get(source_page, [])
+        anchor_text = str(record.get("anchor_text") or "").strip()
+        matched: Optional[TextSegment] = None
+        if anchor_text and candidates:
+            normalised_anchor = _normalise_link_text(anchor_text)
+            page_anchor_key = (source_page, normalised_anchor)
+            if page_anchor_counts.get(page_anchor_key, 0) > 1:
+                used_groups = used_duplicate_groups.setdefault(page_anchor_key, set())
+                for candidate in _duplicate_anchor_candidates(
+                    normalised_anchor,
+                    candidates,
+                    normalised_content,
+                ):
+                    group = _link_attachment_group(candidate)
+                    if group not in used_groups:
+                        matched = candidate
+                        used_groups.add(group)
+                        break
+            if matched is None:
+                scored = [
+                    (_anchor_match_score(normalised_anchor, normalised_content.get(id(segment), ""), segment), segment)
+                    for segment in candidates
+                ]
+                best_score, best_segment = max(scored, key=lambda item: item[0])
+                if best_score >= 0.58:
+                    matched = best_segment
+
+        attached_targets: List[TextSegment] = []
+        if matched is not None:
+            attached_targets.append(matched)
+        elif (link_type == "external_ignored" or record.get("navigation")) and candidates:
+            # Keep ignored URL/navigation metadata without creating retrievable link text.
+            attached_targets.append(candidates[0])
+
+        if attached_targets:
+            for target in attached_targets:
+                _append_pdf_link(target, record)
+            continue
+
+        if link_type != "internal" or record.get("navigation") or not anchor_key:
+            continue
+
+        anchor_sequence += 1
+        base_id = f"{document_content.document_id}_p{source_page}_link_{anchor_sequence:04d}"
+        segment_id = base_id
+        suffix = 1
+        while segment_id in existing_ids:
+            suffix += 1
+            segment_id = f"{base_id}_{suffix}"
+        existing_ids.add(segment_id)
+        page_position = max(
+            [float(getattr(item, "position_y", 0.0) or 0.0) for item in candidates] or [0.0]
+        ) + 0.01
+        anchor_segment = TextSegment(
+            segment_id=segment_id,
+            content=anchor_text or f"Internal PDF link to page {record.get('target_page')}",
+            page_number=source_page,
+            position_y=page_position,
+            segment_type="link_anchor",
+            structured_data={"source": "pymupdf_link_annotation", "pdf_links": [dict(record)]},
+        )
+        segments.append(anchor_segment)
+        normalised_content[id(anchor_segment)] = _normalise_link_text(anchor_segment.content)
+        page_segments.setdefault(source_page, []).append(anchor_segment)
+        summary["anchors_created"] += 1
+
+    return summary
 
 
 def _cleanup_path_tree(path: Path, *, label: str = "") -> None:
@@ -127,9 +575,12 @@ class _SimpleHTMLTableParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.rows: List[List[str]] = []
-        self._row: Optional[List[str]] = None
+        self._row: Optional[List[tuple[str, int, int]]] = None
         self._cell: Optional[List[str]] = None
+        self._cell_rowspan = 1
+        self._cell_colspan = 1
         self._in_cell = False
+        self._active_rowspans: Dict[int, tuple[str, int]] = {}
 
     def handle_starttag(self, tag: str, attrs) -> None:  # type: ignore[override]
         tag = tag.lower()
@@ -137,6 +588,8 @@ class _SimpleHTMLTableParser(HTMLParser):
             self._row = []
         elif tag in {"td", "th"}:
             self._cell = []
+            self._cell_rowspan = self._parse_span(attrs, "rowspan")
+            self._cell_colspan = self._parse_span(attrs, "colspan")
             self._in_cell = True
         elif tag == "br" and self._in_cell and self._cell is not None:
             self._cell.append(" ")
@@ -150,20 +603,64 @@ class _SimpleHTMLTableParser(HTMLParser):
         if tag in {"td", "th"} and self._in_cell:
             text = re.sub(r"\s+", " ", unescape("".join(self._cell or []))).strip()
             if self._row is not None:
-                self._row.append(text)
+                self._row.append((text, self._cell_rowspan, self._cell_colspan))
             self._cell = None
+            self._cell_rowspan = 1
+            self._cell_colspan = 1
             self._in_cell = False
         elif tag == "tr":
-            if self._row is not None and any(str(c).strip() for c in self._row):
-                self.rows.append(self._row)
+            if self._row is not None:
+                expanded_row = self._expand_row(self._row)
+                if any(str(cell).strip() for cell in expanded_row):
+                    self.rows.append(expanded_row)
             self._row = None
+
+    @staticmethod
+    def _parse_span(attrs: Sequence[tuple[str, Optional[str]]], name: str) -> int:
+        for attr_name, raw_value in attrs:
+            if str(attr_name).lower() != name:
+                continue
+            try:
+                value = int(str(raw_value or "1").strip())
+            except (TypeError, ValueError):
+                return 1
+            return min(value, 1000) if value > 0 else 1
+        return 1
+
+    def _expand_row(self, cells: Sequence[tuple[str, int, int]]) -> List[str]:
+        occupied = {
+            column: text
+            for column, (text, _remaining_rows) in self._active_rowspans.items()
+        }
+        next_rowspans = {
+            column: (text, remaining_rows - 1)
+            for column, (text, remaining_rows) in self._active_rowspans.items()
+            if remaining_rows > 1
+        }
+
+        column = 0
+        for text, rowspan, colspan in cells:
+            while any((column + offset) in occupied for offset in range(colspan)):
+                column += 1
+
+            for offset in range(colspan):
+                target_column = column + offset
+                occupied[target_column] = text
+                if rowspan > 1:
+                    next_rowspans[target_column] = (text, rowspan - 1)
+            column += colspan
+
+        self._active_rowspans = next_rowspans
+        if not occupied:
+            return []
+        return [occupied.get(column, "") for column in range(max(occupied) + 1)]
 
 
 class ContentExtractor:
     """通过 PaddleOCR-VL v1.6 Redis 队列提取报告内容。
 
     主要环境变量：
-        PADDLEOCR_PAGE_BATCH_SIZE: backend 拆分 PDF 的每批页数，默认 2。
+        PADDLEOCR_PAGE_BATCH_SIZE: backend 拆分 PDF 的每批页数，默认 7。
         PADDLEOCR_VL_TIMEOUT: 解析等待超时时间，单位秒。
     """
 
@@ -188,7 +685,7 @@ class ContentExtractor:
         if not source_path.exists():
             raise ContentExtractionError(f"文件不存在: {source_path}", file_path=str(source_path))
 
-        start = time.time()
+        start = time.perf_counter()
         try:
             self.logger.info(f"开始使用 PaddleOCR-VL v1.6 提取报告内容: {source_path}")
             self._emit_progress("ocr_start", "PaddleOCR-VL extraction started.", 10)
@@ -200,6 +697,7 @@ class ContentExtractor:
                     file_path=str(source_path),
                 )
 
+            segment_started = time.perf_counter()
             document_id = self._document_id(source_path)
             segments = self._segments_from_markdown(markdown, document_id)
             if not segments:
@@ -226,10 +724,50 @@ class ContentExtractor:
                 markdown_content=markdown,
                 created_at=datetime.now(),
             )
-            elapsed = time.time() - start
+            segment_seconds = time.perf_counter() - segment_started
+            link_started = time.perf_counter()
+            link_summary = enrich_document_with_pdf_links(document, source_path)
+            link_seconds = time.perf_counter() - link_started
+            elapsed = time.perf_counter() - start
+            stage_timings = dict(result.get("stage_timings") or {})
+            stage_timings.update(
+                {
+                    "segment_build_seconds": round(segment_seconds, 3),
+                    "link_seconds": round(link_seconds, 3),
+                    "extract_total_seconds": round(elapsed, 3),
+                }
+            )
+            result["stage_timings"] = stage_timings
+
+            task_key = str(result.get("_task_key") or "")
+            if task_key:
+                try:
+                    client = self._redis_client()
+                    redis_result = {
+                        key: value
+                        for key, value in result.items()
+                        if key != "markdown" and not str(key).startswith("_")
+                    }
+                    self._redis_hash_set(
+                        client,
+                        task_key,
+                        {
+                            "segment_build_seconds": stage_timings["segment_build_seconds"],
+                            "link_seconds": stage_timings["link_seconds"],
+                            "extract_total_seconds": stage_timings["extract_total_seconds"],
+                            "stage_timings": stage_timings,
+                            "result_json": redis_result,
+                        },
+                    )
+                except Exception as exc:
+                    self.logger.warning(f"写入 PaddleOCR 提取耗时 metadata 失败: task={task_key}, error={exc}")
+
+            batch_elapsed = (result.get("batch_timing") or {}).get("elapsed_seconds") or {}
             self.logger.info(
                 f"PaddleOCR-VL 内容提取完成: file={source_path.name}, segments={len(segments)}, "
-                f"elapsed={elapsed:.2f}s, parser_output={result.get('output_dir', '')}"
+                f"elapsed={elapsed:.2f}s, parser_output={result.get('output_dir', '')}, "
+                f"pdf_links={link_summary.get('internal', 0)}/{link_summary.get('links', 0)}, "
+                f"timings={stage_timings}, batch_elapsed={batch_elapsed}"
             )
             self._emit_progress("ocr_done", f"OCR extraction completed with {len(segments)} segments.", 45, segments=len(segments))
             return document
@@ -360,16 +898,16 @@ class ContentExtractor:
 
         注意：PDF 是在 backend 中拆分的，不是在 PaddleOCR worker 中拆分。
         因此 PADDLEOCR_PAGE_BATCH_SIZE 必须出现在 backend.environment 中。
-        默认值为 2，配置只在 backend.environment 中设置。
+        默认值为 7，配置只在 backend.environment 中设置。
         """
-        raw = os.getenv("PADDLEOCR_PAGE_BATCH_SIZE", "2")
+        raw = os.getenv("PADDLEOCR_PAGE_BATCH_SIZE", "7")
         try:
             value = int(str(raw).strip())
         except Exception:
             self.logger.warning(
-                f"PADDLEOCR_PAGE_BATCH_SIZE={raw!r} 无法解析为整数，使用默认值 2"
+                f"PADDLEOCR_PAGE_BATCH_SIZE={raw!r} 无法解析为整数，使用默认值 7"
             )
-            value = 2
+            value = 7
         if value < 1:
             self.logger.warning(
                 f"PADDLEOCR_PAGE_BATCH_SIZE={raw!r} 小于 1，使用 1"
@@ -387,10 +925,10 @@ class ContentExtractor:
         batch_size: int,
     ) -> tuple[list[dict], int, Path]:
         try:
-            from pypdf import PdfReader, PdfWriter  # type: ignore
+            import fitz  # type: ignore
         except Exception as exc:
             raise ContentExtractionError(
-                "页级 batch 队列需要 backend 安装 pypdf",
+                "页级 batch 队列需要 backend 安装 PyMuPDF",
                 file_path=str(source_path),
             ) from exc
 
@@ -402,57 +940,78 @@ class ContentExtractor:
             shutil.rmtree(batch_dir, ignore_errors=True)
         _ensure_shared_writable_dir(batch_dir)
 
-        reader = PdfReader(str(source_path))
-        total_pages = len(reader.pages)
-        if total_pages <= 0:
-            raise ContentExtractionError("PDF 没有可解析页", file_path=str(source_path))
+        document = fitz.open(str(source_path))
+        try:
+            total_pages = len(document)
+            if total_pages <= 0:
+                raise ContentExtractionError("PDF 没有可解析页", file_path=str(source_path))
 
-        units: list[dict] = []
-        for start in range(0, total_pages, max(1, batch_size)):
-            end = min(start + max(1, batch_size), total_pages)
-            writer = PdfWriter()
-            for page_index in range(start, end):
-                writer.add_page(reader.pages[page_index])
-            unit_index = len(units) + 1
-            batch_path = batch_dir / f"pages_{start + 1:04d}_{end:04d}.pdf"
-            tmp_path = batch_path.with_name(batch_path.name + ".tmp")
-            if tmp_path.exists():
+            units: list[dict] = []
+            for unit_index, (start_page, end_page) in enumerate(
+                _page_batch_ranges(total_pages, batch_size),
+                1,
+            ):
+                batch_path = batch_dir / f"pages_{start_page:04d}_{end_page:04d}.pdf"
+                # Keep the .pdf suffix so PyMuPDF can infer the output format.
+                tmp_path = batch_path.with_name(f"{batch_path.stem}.tmp.pdf")
+                if tmp_path.exists():
+                    try:
+                        tmp_path.unlink()
+                    except Exception:
+                        pass
+
+                batch_document = fitz.open()
                 try:
-                    tmp_path.unlink()
-                except Exception:
-                    pass
-            # 先写临时文件，flush/fsync 后再原子 rename 成最终文件名。
-            # 这样 worker 不会读到半写入的 PDF。
-            with tmp_path.open("wb") as f:
-                writer.write(f)
-                f.flush()
-                try:
-                    os.fsync(f.fileno())
-                except Exception:
-                    pass
-            os.replace(tmp_path, batch_path)
-            _ensure_shared_file(batch_path)
-            _fsync_parent_dir(batch_path)
-            ready_path = _write_shared_ready_marker(
-                batch_path,
-                payload={
-                    "job_id": job_id,
-                    "unit_index": unit_index,
-                    "start_page": start + 1,
-                    "end_page": end,
-                    "total_pages": total_pages,
-                },
-            )
-            units.append(
-                {
-                    "unit_index": unit_index,
-                    "batch_id": f"batch_{unit_index:04d}",
-                    "start_page": start + 1,
-                    "end_page": end,
-                    "input_path": str(batch_path),
-                    "ready_path": str(ready_path),
-                }
-            )
+                    batch_document.insert_pdf(
+                        document,
+                        from_page=start_page - 1,
+                        to_page=end_page - 1,
+                        # Link topology is read from the original PDF after OCR.
+                        # Skipping link-object copying keeps temporary batch creation fast.
+                        links=False,
+                        annots=True,
+                    )
+                    batch_document.save(str(tmp_path), garbage=0, deflate=False, clean=False)
+                finally:
+                    batch_document.close()
+
+                # PyMuPDF closes the file after save; fsync before the atomic rename.
+                with tmp_path.open("r+b") as f:
+                    f.flush()
+                    try:
+                        os.fsync(f.fileno())
+                    except Exception:
+                        pass
+                os.replace(tmp_path, batch_path)
+                _ensure_shared_file(batch_path)
+                ready_path = _write_shared_ready_marker(
+                    batch_path,
+                    payload={
+                        "job_id": job_id,
+                        "unit_index": unit_index,
+                        "start_page": start_page,
+                        "end_page": end_page,
+                        "total_pages": total_pages,
+                    },
+                    sync_parent=False,
+                )
+                units.append(
+                    {
+                        "unit_index": unit_index,
+                        "batch_id": f"batch_{unit_index:04d}",
+                        "start_page": start_page,
+                        "end_page": end_page,
+                        "input_path": str(batch_path),
+                        "ready_path": str(ready_path),
+                    }
+                )
+
+            # No Redis task is submitted until every batch is ready, so one final
+            # directory fsync durably records all PDF and marker renames.
+            if units:
+                _fsync_parent_dir(Path(units[-1]["ready_path"]))
+        finally:
+            document.close()
 
         # 这里先在 backend 容器内做一次可见性校验，再入 Redis 队列。
         # 这不能替代 worker 侧等待，但能提前发现目录/权限/挂载异常。
@@ -480,6 +1039,7 @@ class ContentExtractor:
         return units, total_pages, batch_dir
 
     def _run_paddleocr_vl_page_batch_queue(self, source_path: Path) -> Dict[str, Any]:
+        queue_run_started = time.perf_counter()
         client = self._redis_client()
 
         queue_name = os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse").strip()
@@ -496,12 +1056,15 @@ class ContentExtractor:
         _ensure_shared_writable_dir(output_dir)
         _ensure_shared_writable_dir(output_dir / "batches")
 
+        split_started = time.perf_counter()
         units, total_pages, batch_dir = self._split_pdf_for_page_batch_queue(source_path, job_id, batch_size)
+        split_seconds = time.perf_counter() - split_started
         total_units = len(units)
 
         self.logger.info(
             f"提交 PaddleOCR-VL 页级 batch 队列任务: job_id={job_id}, file={source_path.name}, "
-            f"pages={total_pages}, units={total_units}, batch_size={batch_size}, queue={queue_name}"
+            f"pages={total_pages}, units={total_units}, batch_size={batch_size}, queue={queue_name}, "
+            f"split_seconds={split_seconds:.3f}"
         )
         self._emit_progress(
             "ocr_queued",
@@ -544,9 +1107,12 @@ class ContentExtractor:
                 "total_units": total_units,
                 "units_done": 0,
                 "page_batch_size": batch_size,
+                "split_seconds": round(split_seconds, 3),
             },
         )
 
+        queue_submit_started = time.perf_counter()
+        ocr_queue_started = queue_submit_started
         for unit in units:
             unit_index = int(unit["unit_index"])
             batch_key = f"{task_key}:batch:{unit_index:04d}"
@@ -583,12 +1149,26 @@ class ContentExtractor:
             )
             client.rpush(queue_name, json.dumps(payload, ensure_ascii=False))
 
+        queue_submit_seconds = time.perf_counter() - queue_submit_started
+        self._redis_hash_set(
+            client,
+            task_key,
+            {
+                "queue_submit_seconds": round(queue_submit_seconds, 3),
+                "stage_timings": {
+                    "split_seconds": round(split_seconds, 3),
+                    "queue_submit_seconds": round(queue_submit_seconds, 3),
+                },
+            },
+        )
+
         deadline = time.time() + timeout
         last_progress_signature = None
         # 即使 batch 状态没有变化，也要定时推送“仍在处理”的进度。
         # 否则单个 PaddleOCR batch 处理较久时，前端会看起来像卡住。
         progress_emit_interval = float(os.getenv("PADDLEOCR_PROGRESS_EMIT_INTERVAL", "5.0") or "5.0")
         last_progress_emit_ts = 0.0
+        batch_states: list[dict] = []
         while time.time() < deadline:
             batch_states = [client.hgetall(f"{task_key}:batch:{i:04d}") for i in range(1, total_units + 1)]
             statuses = [str(s.get("status", "queued")).lower() for s in batch_states]
@@ -712,6 +1292,8 @@ class ContentExtractor:
             if failed_count:
                 errors = [s.get("error", "unknown worker error") for s in batch_states if str(s.get("status", "")).lower() == "failed"]
                 error_text = errors[0] if errors else "unknown worker error"
+                ocr_queue_seconds = time.perf_counter() - ocr_queue_started
+                batch_timing = _batch_timing_summary(batch_states)
                 self._redis_hash_set(
                     client,
                     task_key,
@@ -721,6 +1303,8 @@ class ContentExtractor:
                         "cancel_requested": "1",
                         "failed_at": datetime.now().isoformat(),
                         "error": error_text,
+                        "ocr_queue_seconds": round(ocr_queue_seconds, 3),
+                        "batch_timing": batch_timing,
                     },
                 )
                 self._remove_queued_batches_for_job(client, queue_name, job_id)
@@ -737,20 +1321,91 @@ class ContentExtractor:
 
             if done_count + failed_count >= total_units:
                 self._emit_progress("ocr_merging", "Merging OCR batch results.", 45, paddle_job_id=job_id, total_units=total_units)
-                return self._merge_paddleocr_page_batch_results(
-                    client=client,
-                    task_key=task_key,
-                    job_id=job_id,
-                    source_path=source_path,
-                    batch_states=batch_states,
-                    output_dir=output_dir,
-                    total_pages=total_pages,
-                    total_units=total_units,
-                    batch_size=batch_size,
+                ocr_queue_seconds = time.perf_counter() - ocr_queue_started
+                batch_timing = _batch_timing_summary(batch_states)
+                merge_started = time.perf_counter()
+                try:
+                    result = self._merge_paddleocr_page_batch_results(
+                        client=client,
+                        task_key=task_key,
+                        job_id=job_id,
+                        source_path=source_path,
+                        batch_states=batch_states,
+                        output_dir=output_dir,
+                        total_pages=total_pages,
+                        total_units=total_units,
+                        batch_size=batch_size,
+                    )
+                except ContentExtractionError as exc:
+                    self._redis_hash_set(
+                        client,
+                        task_key,
+                        {
+                            "status": "failed",
+                            "stage": "merge_validation_failed",
+                            "failed_at": datetime.now().isoformat(),
+                            "error": str(exc),
+                        },
+                    )
+                    if not _env_bool("PADDLEOCR_KEEP_PROCESS_OUTPUT", False):
+                        _cleanup_path_tree(output_dir, label="incomplete worker batch output")
+                        _cleanup_path_tree(
+                            Path(
+                                os.getenv(
+                                    "PADDLEOCR_JOB_WORK_DIR",
+                                    "/workspace/uploads/paddleocr_vl_jobs",
+                                )
+                            )
+                            / job_id,
+                            label="incomplete batch PDFs",
+                        )
+                    raise
+                merge_seconds = time.perf_counter() - merge_started
+                queue_total_seconds = time.perf_counter() - queue_run_started
+                stage_timings = {
+                    "split_seconds": round(split_seconds, 3),
+                    "queue_submit_seconds": round(queue_submit_seconds, 3),
+                    "ocr_queue_seconds": round(ocr_queue_seconds, 3),
+                    "merge_seconds": round(merge_seconds, 3),
+                    "queue_total_seconds": round(queue_total_seconds, 3),
+                }
+                result["stage_timings"] = stage_timings
+                result["batch_timing"] = batch_timing
+                result["_task_key"] = task_key
+                elapsed_stats = batch_timing["elapsed_seconds"]
+                redis_result = {
+                    key: value
+                    for key, value in result.items()
+                    if key != "markdown" and not str(key).startswith("_")
+                }
+                self._redis_hash_set(
+                    client,
+                    task_key,
+                    {
+                        "split_seconds": stage_timings["split_seconds"],
+                        "queue_submit_seconds": stage_timings["queue_submit_seconds"],
+                        "ocr_queue_seconds": stage_timings["ocr_queue_seconds"],
+                        "merge_seconds": stage_timings["merge_seconds"],
+                        "queue_total_seconds": stage_timings["queue_total_seconds"],
+                        "batch_elapsed_avg_seconds": elapsed_stats["avg"],
+                        "batch_elapsed_p50_seconds": elapsed_stats["p50"],
+                        "batch_elapsed_p95_seconds": elapsed_stats["p95"],
+                        "batch_elapsed_max_seconds": elapsed_stats["max"],
+                        "stage_timings": stage_timings,
+                        "batch_timing": batch_timing,
+                        "result_json": redis_result,
+                    },
                 )
+                self.logger.info(
+                    f"PaddleOCR-VL internal timings: job_id={job_id}, stages={stage_timings}, "
+                    f"batch_elapsed={elapsed_stats}"
+                )
+                return result
 
             time.sleep(max(0.25, poll_interval))
 
+        ocr_queue_seconds = time.perf_counter() - ocr_queue_started
+        batch_timing = _batch_timing_summary(batch_states)
         self._redis_hash_set(
             client,
             task_key,
@@ -760,6 +1415,8 @@ class ContentExtractor:
                 "cancel_requested": "1",
                 "failed_at": datetime.now().isoformat(),
                 "error": f"timeout={timeout}s",
+                "ocr_queue_seconds": round(ocr_queue_seconds, 3),
+                "batch_timing": batch_timing,
             },
         )
         self._remove_queued_batches_for_job(client, queue_name, job_id)
@@ -785,15 +1442,60 @@ class ContentExtractor:
         batch_size: int,
     ) -> Dict[str, Any]:
         combined_parts: list[str] = []
+        combined_page_markers: list[int] = []
         elapsed_total = 0.0
+        expected_ranges = _page_batch_ranges(total_pages, batch_size)
+        if len(expected_ranges) != total_units:
+            raise ContentExtractionError(
+                f"PaddleOCR-VL batch plan mismatch: job_id={job_id}, "
+                f"expected_units={len(expected_ranges)}, reported_units={total_units}",
+                file_path=str(source_path),
+            )
 
         for idx, state in enumerate(batch_states, 1):
             status = str(state.get("status", "")).lower()
             if status in {"success", "completed"}:
-                try:
-                    result = json.loads(state.get("result_json") or "{}")
-                except Exception:
-                    result = dict(state)
+                raw_result = state.get("result_json")
+                if isinstance(raw_result, dict):
+                    result = dict(raw_result)
+                else:
+                    try:
+                        result = json.loads(raw_result or "{}")
+                    except Exception:
+                        result = dict(state)
+                expected_start, expected_end = expected_ranges[idx - 1]
+                expected_count = expected_end - expected_start + 1
+
+                def _required_result_int(name: str) -> int:
+                    raw_value = result.get(name)
+                    if raw_value is None or raw_value == "":
+                        raw_value = state.get(name)
+                    try:
+                        return int(raw_value)
+                    except (TypeError, ValueError):
+                        raise ContentExtractionError(
+                            f"PaddleOCR-VL batch result missing {name}: "
+                            f"job_id={job_id}, unit={idx}",
+                            file_path=str(source_path),
+                        )
+
+                actual_start = _required_result_int("start_page")
+                actual_end = _required_result_int("end_page")
+                result_count = _required_result_int("result_count")
+                if (actual_start, actual_end) != (expected_start, expected_end):
+                    raise ContentExtractionError(
+                        f"PaddleOCR-VL batch page range mismatch: job_id={job_id}, "
+                        f"unit={idx}, expected={expected_start}-{expected_end}, "
+                        f"returned={actual_start}-{actual_end}",
+                        file_path=str(source_path),
+                    )
+                if result_count != expected_count:
+                    raise ContentExtractionError(
+                        f"PaddleOCR-VL batch page count mismatch: job_id={job_id}, "
+                        f"unit={idx}, expected={expected_count}, returned={result_count}",
+                        file_path=str(source_path),
+                    )
+
                 md_path = Path(result.get("batch_markdown_path") or state.get("batch_markdown_path") or "")
                 if not md_path.exists():
                     raise ContentExtractionError(
@@ -801,8 +1503,17 @@ class ContentExtractor:
                         file_path=str(source_path),
                     )
                 md = md_path.read_text(encoding="utf-8", errors="ignore").strip()
-                if md:
-                    combined_parts.append(md)
+                expected_markers = list(range(expected_start, expected_end + 1))
+                page_markers = _paddle_markdown_page_markers(md)
+                if page_markers != expected_markers:
+                    raise ContentExtractionError(
+                        f"PaddleOCR-VL batch Markdown pages are incomplete or out of order: "
+                        f"job_id={job_id}, unit={idx}, expected={expected_markers}, "
+                        f"returned={page_markers}",
+                        file_path=str(source_path),
+                    )
+                combined_parts.append(md)
+                combined_page_markers.extend(page_markers)
                 try:
                     elapsed_total += float(result.get("elapsed_seconds") or 0.0)
                 except Exception:
@@ -818,6 +1529,15 @@ class ContentExtractor:
                     f"PaddleOCR-VL batch 状态异常: job_id={job_id}, unit={idx}, status={status}",
                     file_path=str(source_path),
                 )
+
+        expected_document_markers = list(range(1, total_pages + 1))
+        if combined_page_markers != expected_document_markers:
+            raise ContentExtractionError(
+                f"PaddleOCR-VL merged document pages are incomplete or out of order: "
+                f"job_id={job_id}, expected=1-{total_pages}, "
+                f"returned={combined_page_markers}",
+                file_path=str(source_path),
+            )
 
         markdown = "\n".join(part for part in combined_parts if str(part).strip()).strip()
         if not markdown:

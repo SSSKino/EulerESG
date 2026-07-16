@@ -1,4 +1,15 @@
+x-paddleocr-shared-env: &paddleocr-shared-env
+  # Backend and workers must use the same Redis keys and shared paths.
+  PADDLEOCR_TASK_QUEUE_URL: redis://redis:6379/0
+  PADDLEOCR_TASK_QUEUE_NAME: paddleocr:parse
+  PADDLEOCR_TASK_KEY_PREFIX: paddleocr:task
+  PADDLEOCR_TASK_RESULT_TTL: '86400'
+  PADDLEOCR_OUTPUT_DIR: /workspace/uploads/paddleocr_vl_output
+  PADDLEOCR_SHARED_DIR_MODE: '0777'
+  PADDLEOCR_SHARED_FILE_MODE: '0666'
+
 x-paddleocr-worker-env: &paddleocr-worker-env
+  <<: *paddleocr-shared-env
   # 完整 PaddleOCR-VL v1.6 模型配置。worker 只负责解析已经拆好的 batch。
   PADDLEOCR_PIPELINE_VERSION: v1.6
   PADDLEOCR_DEVICE: gpu:0
@@ -19,7 +30,6 @@ x-paddleocr-worker-env: &paddleocr-worker-env
   PADDLEOCR_VLM_MIN_PIXELS: '112896'
   PADDLEOCR_VLM_MAX_PIXELS: '1003520'
   PADDLEOCR_VLM_MAX_NEW_TOKENS: '2048'
-  PADDLEOCR_OUTPUT_DIR: /workspace/uploads/paddleocr_vl_output
   PADDLEOCR_LOCK_DIR: /workspace/uploads/paddleocr_vl_locks
   PADDLEOCR_SERIALIZE_MODEL_LOAD: 'true'
   PADDLEOCR_BATCH_TIMEOUT_SECONDS: '1200'
@@ -38,25 +48,12 @@ x-paddleocr-worker-env: &paddleocr-worker-env
   PADDLEOCR_REQUIRE_PREFLIGHT_MARKER: 'true'
   PADDLEOCR_PREFLIGHT_ON_START: 'false'
 
-  # 共享目录权限。
-  PADDLEOCR_SHARED_DIR_MODE: '0777'
-  PADDLEOCR_SHARED_FILE_MODE: '0666'
-
   # 模型生命周期。
-  PADDLEOCR_LAZY_LOAD: 'true'
   PADDLEOCR_UNLOAD_AFTER_TASK: 'false'
   PADDLEOCR_UNLOAD_WHEN_IDLE: 'true'
   PADDLEOCR_IDLE_UNLOAD_SECONDS: '1800'
   PADDLEOCR_RESTART_AFTER_TASKS: '500'
   PADDLEOCR_EXIT_ON_TASK_FAILURE: 'true'
-
-  # Redis 队列。注意：PADDLEOCR_PAGE_BATCH_SIZE 不放在 worker 里。
-  # 拆分 PDF 的是 backend，所以 batch size 只在 backend.environment 中设置一次。
-  PADDLEOCR_TASK_QUEUE_URL: redis://redis:6379/0
-  PADDLEOCR_TASK_QUEUE_NAME: paddleocr:parse
-  PADDLEOCR_TASK_KEY_PREFIX: paddleocr:task
-  PADDLEOCR_TASK_RESULT_TTL: '86400'
-
 
 x-paddleocr-worker-base: &paddleocr-worker-base
   build:
@@ -120,7 +117,7 @@ services:
     volumes:
       - ./backend/paddleocr_vl/vllm_config.yaml:/home/paddleocr/vllm_config.yaml:ro
       - paddleocr_vlm_cache:/home/paddleocr/.cache
-      # Reuse the model cache already validated by paddleocr-model-init.
+      # Share the PaddleX model cache with preflight and workers.
       - paddleocr_paddlex:/home/paddleocr/.paddlex
     expose:
       - '8118'
@@ -150,7 +147,7 @@ services:
       PADDLEOCR_ALLOW_MODEL_DOWNLOAD: 'true'
       PADDLEOCR_REQUIRE_PREFLIGHT_MARKER: 'false'
 
-  # 默认只保留一个 PaddleOCR worker。
+  # 两个 worker 并行处理页批次，并共享独立的 vLLM 服务。
   paddleocr-worker-1:
     <<: *paddleocr-worker-base
     depends_on:
@@ -164,8 +161,7 @@ services:
       <<: *paddleocr-worker-env
       PADDLEOCR_WORKER_ID: paddleocr-worker-1
 
-  # Two workers process two 2-page tasks concurrently. Each worker can submit
-  # up to 16 VLM requests, matching the vLLM max-num-seqs limit of 32.
+  # 每个 worker 最多提交 16 个 VLM 请求，与 vLLM max-num-seqs=32 对齐。
   paddleocr-worker-2:
     <<: *paddleocr-worker-base
     depends_on:
@@ -215,29 +211,28 @@ services:
     env_file:
       - ./backend/config/.env
     environment:
-      PARSER_BACKEND: paddleocr
-      PADDLEOCR_TASK_QUEUE_URL: redis://redis:6379/0
-      PADDLEOCR_TASK_QUEUE_NAME: paddleocr:parse
-      PADDLEOCR_TASK_KEY_PREFIX: paddleocr:task
-      PADDLEOCR_TASK_RESULT_TTL: '86400'
+      <<: *paddleocr-shared-env
       PADDLEOCR_TASK_POLL_INTERVAL: '2.0'
       PADDLEOCR_VL_TIMEOUT: '28800'
       REPORT_JOB_EXPOSE_INTERNAL_DETAILS: 'false'
+      REPORT_LINK_RESOLUTION_ENABLED: 'true'
+      REPORT_LINK_MAX_DEPTH: '2'
+      REPORT_LINK_MAX_TARGET_PAGES_PER_METRIC: '8'
+      # Second-pass retrieval reads the target page and its next 7 pages only.
+      REPORT_LINK_FORWARD_PAGE_COUNT: '7'
+      REPORT_SKIP_PROFILED_METRIC_EXPANSION: 'true'
+      REPORT_DISCLOSURE_LLM_CONCURRENCY: '8'
+      # Match disclosure_inference.py hard limits; larger values are ignored.
+      REPORT_ANALYSIS_MAX_EVIDENCE_SEGMENTS: '46'
+      REPORT_ANALYSIS_MAX_CHARS_PER_EVIDENCE: '8192'
 
       # Backend is the only service that splits PDF pages.
-      # One Redis task processes up to 2 PDF pages; a 116-page report creates 58 tasks.
-      PADDLEOCR_PAGE_BATCH_SIZE: '2'
+      # One Redis task processes up to 7 PDF pages; a 116-page report creates 17 tasks.
+      PADDLEOCR_PAGE_BATCH_SIZE: '7'
       PADDLEOCR_KEEP_PROCESS_OUTPUT: 'false'
-      PADDLEOCR_OUTPUT_DIR: /workspace/uploads/paddleocr_vl_output
       PADDLEOCR_JOB_WORK_DIR: /workspace/uploads/paddleocr_vl_jobs
-      PADDLEOCR_SHARED_DIR_MODE: '0777'
-      PADDLEOCR_SHARED_FILE_MODE: '0666'
       PADDLEOCR_SPLIT_VISIBILITY_WAIT_SECONDS: '60'
 
-      EXCEL_METRICS_REPORT_WORKERS: '3'
-      EXCEL_METRICS_LLM_CONCURRENCY: '8'
-      EXCEL_METRICS_LLM_RETRY: '4'
-      EXCEL_METRICS_LLM_RETRY_SLEEP: '0.8'
       PYTHONPATH: /workspace/backend/src
       PYTHONUNBUFFERED: '1'
 
@@ -246,17 +241,18 @@ services:
       HF_ALLOW_ONLINE: '0'
       EMBEDDING_MODEL: microsoft/harrier-oss-v1-0.6b
       EMBEDDING_MODEL_DTYPE: float16
-      LOCAL_EMBEDDINGS_MODEL_PATH: microsoft/harrier-oss-v1-0.6b
       LOCAL_EMBEDDINGS_DEVICE: cuda
-      LOCAL_EMBEDDINGS_MODEL_DTYPE: float16
       RERANK_MODEL: Qwen/Qwen3-Reranker-4B
       RERANK_MODEL_DTYPE: float16
-      LOCAL_RERANKER_MODEL_PATH: Qwen/Qwen3-Reranker-4B
       LOCAL_RERANKER_DEVICE: cuda
-      LOCAL_RERANKER_MODEL_DTYPE: float16
-      LOCAL_RERANKER_TOP_K: '24'
-      LOCAL_RERANKER_BATCH_SIZE: '4'
-      LOCAL_RERANKER_MAX_CHARS_PER_PASSAGE: '1200'
+      LOCAL_RERANKER_TOP_K: '46'
+      LOCAL_RERANKER_BATCH_SIZE: '8'
+      LOCAL_RERANKER_MAX_CHARS_PER_PASSAGE: 'model'
+      LOCAL_RERANKER_MAX_PADDED_CHARS_PER_BATCH: 'model'
+      LOCAL_RERANKER_MAX_QUERY_CHARS: '1600'
+      LOCAL_RERANKER_MAX_INSTRUCTION_CHARS: '1200'
+      # "model" resolves to Qwen3-Reranker-4B max_position_embeddings (40960).
+      LOCAL_RERANKER_MAX_LENGTH: 'model'
 
       WATCHFILES_FORCE_POLLING: 'true'
       WATCHFILES_POLL_INTERVAL: '8.0'

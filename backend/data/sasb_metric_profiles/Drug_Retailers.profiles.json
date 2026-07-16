@@ -24,10 +24,23 @@
         "Retail",
         "Gigajoules",
         "GJ",
-        "Gigajoules (GJ)"
+        "Gigajoules (GJ)",
+        "(1) Total energy consumed",
+        "Total energy consumed",
+        "(1) Energy consumption",
+        "HC-DR-130a.1 (1) Total energy consumed",
+        "gigajoule",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for HC-DR-130a.1 (1) Total energy consumed with unit Gigajoules (GJ) related to Energy Management in Retail.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-130a.1 '(1) Total energy consumed', under 'Energy Management in Retail', with expected unit 'Gigajoules (GJ)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-130a.1 '(1) Total energy consumed', under 'Energy Management in Retail', with expected unit 'Gigajoules (GJ)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-130a.1 '(1) Total energy consumed'; retain every reported year and label.",
+        "When HC-DR-130a.1 '(1) Total energy consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-130a.1 '(1) Total energy consumed', including: (1) Total energy consumed; Total energy consumed; (1) Energy consumption; HC-DR-130a.1 (1) Total energy consumed.",
+        "Disambiguate HC-DR-130a.1 '(1) Total energy consumed' from sibling metrics sharing HC-DR-130a.1: (2) Percentage grid electricity; (3) Percentage renewable.",
+        "Find disclosures for HC-DR-130a.1 (1) Total energy consumed with unit Gigajoules (GJ) related to Energy Management in Retail.",
         "Retrieve exact report evidence for HC-DR-130a.1 (1) Total energy consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-130a.1 (1) Total energy consumed with unit Gigajoules (GJ).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-130a.1 (1) Total energy consumed related to Energy Management in Retail.",
@@ -35,6 +48,7 @@
       ],
       "anchor_terms": [
         "HC-DR-130a.1",
+        "(1) Total energy consumed",
         "Total energy consumed",
         "energy consumed",
         "energy",
@@ -43,11 +57,16 @@
         "Retail",
         "Gigajoules (GJ)",
         "GJ",
-        "gigajoules"
+        "gigajoules",
+        "(1) Energy consumption",
+        "HC-DR-130a.1 (1) Total energy consumed",
+        "gigajoule"
       ],
       "negative_anchor_terms": [
         "Percentage grid electricity",
-        "Percentage renewable"
+        "Percentage renewable",
+        "(2) Percentage grid electricity",
+        "(3) Percentage renewable"
       ],
       "similar_metric_warnings": [
         {
@@ -64,7 +83,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -72,24 +93,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total energy consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "energy",
         "expected_units": [
           "Gigajoules (GJ)",
           "GJ",
-          "gigajoules"
+          "MWh",
+          "kWh",
+          "MJ",
+          "kJ"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total energy consumed' (HC-DR-130a.1, expected unit: Gigajoules (GJ)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage grid electricity; (3) Percentage renewable."
     },
     {
       "metric_id": "HC-DR-130a.1.02",
@@ -103,7 +176,8 @@
       "aliases": [
         "(2) Percentage grid electricity",
         "Percentage grid electricity",
-        "HC-DR-130a.1 (2) Percentage grid electricity"
+        "HC-DR-130a.1 (2) Percentage grid electricity",
+        "(2) Percent grid electricity"
       ],
       "bm25_terms": [
         "HC-DR-130a.1",
@@ -116,10 +190,22 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage grid electricity",
+        "Percentage grid electricity",
+        "HC-DR-130a.1 (2) Percentage grid electricity",
+        "(2) Percent grid electricity",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for HC-DR-130a.1 (2) Percentage grid electricity with unit Percentage (%) related to Energy Management in Retail.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-130a.1 '(2) Percentage grid electricity', under 'Energy Management in Retail', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-130a.1 '(2) Percentage grid electricity', under 'Energy Management in Retail', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-130a.1 '(2) Percentage grid electricity'; retain every reported year and label.",
+        "When HC-DR-130a.1 '(2) Percentage grid electricity' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-130a.1 '(2) Percentage grid electricity', including: (2) Percentage grid electricity; Percentage grid electricity; HC-DR-130a.1 (2) Percentage grid electricity; (2) Percent grid electricity.",
+        "Disambiguate HC-DR-130a.1 '(2) Percentage grid electricity' from sibling metrics sharing HC-DR-130a.1: (1) Total energy consumed; (3) Percentage renewable.",
+        "Find disclosures for HC-DR-130a.1 (2) Percentage grid electricity with unit Percentage (%) related to Energy Management in Retail.",
         "Retrieve exact report evidence for HC-DR-130a.1 (2) Percentage grid electricity, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-130a.1 (2) Percentage grid electricity with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-130a.1 (2) Percentage grid electricity related to Energy Management in Retail.",
@@ -127,6 +213,7 @@
       ],
       "anchor_terms": [
         "HC-DR-130a.1",
+        "(2) Percentage grid electricity",
         "Percentage grid electricity",
         "grid electricity",
         "grid",
@@ -137,13 +224,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "HC-DR-130a.1 (2) Percentage grid electricity",
+        "(2) Percent grid electricity"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
         "Percentage renewable",
         "renewable energy",
-        "fuel consumed"
+        "fuel consumed",
+        "(1) Total energy consumed",
+        "(3) Percentage renewable"
       ],
       "similar_metric_warnings": [
         {
@@ -164,7 +255,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -172,11 +265,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage grid electricity', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -188,9 +307,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage grid electricity' (HC-DR-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (3) Percentage renewable."
     },
     {
       "metric_id": "HC-DR-130a.1.03",
@@ -204,7 +346,8 @@
       "aliases": [
         "(3) Percentage renewable",
         "Percentage renewable",
-        "HC-DR-130a.1 (3) Percentage renewable"
+        "HC-DR-130a.1 (3) Percentage renewable",
+        "(3) Percent renewable"
       ],
       "bm25_terms": [
         "HC-DR-130a.1",
@@ -216,10 +359,21 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(3) Percentage renewable",
+        "Percentage renewable",
+        "HC-DR-130a.1 (3) Percentage renewable",
+        "(3) Percent renewable",
+        "(1) Total energy consumed, (2) percentage grid electricity and"
       ],
-      "dense_query": "Find disclosures for HC-DR-130a.1 (3) Percentage renewable with unit Percentage (%) related to Energy Management in Retail.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-130a.1 '(3) Percentage renewable', under 'Energy Management in Retail', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-130a.1 '(3) Percentage renewable', under 'Energy Management in Retail', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-130a.1 '(3) Percentage renewable'; retain every reported year and label.",
+        "When HC-DR-130a.1 '(3) Percentage renewable' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-130a.1 '(3) Percentage renewable', including: (3) Percentage renewable; Percentage renewable; HC-DR-130a.1 (3) Percentage renewable; (3) Percent renewable.",
+        "Disambiguate HC-DR-130a.1 '(3) Percentage renewable' from sibling metrics sharing HC-DR-130a.1: (1) Total energy consumed; (2) Percentage grid electricity.",
+        "Find disclosures for HC-DR-130a.1 (3) Percentage renewable with unit Percentage (%) related to Energy Management in Retail.",
         "Retrieve exact report evidence for HC-DR-130a.1 (3) Percentage renewable, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-130a.1 (3) Percentage renewable with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-130a.1 (3) Percentage renewable related to Energy Management in Retail.",
@@ -227,6 +381,7 @@
       ],
       "anchor_terms": [
         "HC-DR-130a.1",
+        "(3) Percentage renewable",
         "Percentage renewable",
         "renewable Energy",
         "renewable",
@@ -236,13 +391,17 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "HC-DR-130a.1 (3) Percentage renewable",
+        "(3) Percent renewable"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
         "Percentage grid electricity",
         "grid electricity",
-        "non-renewable energy"
+        "non-renewable energy",
+        "(1) Total energy consumed",
+        "(2) Percentage grid electricity"
       ],
       "similar_metric_warnings": [
         {
@@ -259,7 +418,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -267,11 +428,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage renewable', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -283,9 +470,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage renewable' (HC-DR-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (2) Percentage grid electricity."
     },
     {
       "metric_id": "HC-DR-230a.1",
@@ -298,7 +508,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of policies and practices to secure customers' personal health data records and other personal data",
-        "HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data"
+        "HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data",
+        "policies and practices to secure customers' personal health data records and other personal data"
       ],
       "bm25_terms": [
         "HC-DR-230a.1",
@@ -313,10 +524,32 @@
         "records",
         "other",
         "Security",
-        "Privacy"
+        "Privacy",
+        "Description of policies and practices to secure customers' personal health data records and other personal data",
+        "HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data",
+        "policies and practices to secure customers' personal health data records and other personal data",
+        "policies practices",
+        "practices secure",
+        "secure customers'",
+        "customers'",
+        "customers' personal",
+        "personal health",
+        "health records",
+        "records other",
+        "other personal",
+        "Description of policies",
+        "practices to secure customers' personal health data records",
+        "other personal data",
+        "Description of policies and practices to secure customers’",
+        "personal health data records and other personal data"
       ],
-      "dense_query": "Find disclosures for HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data related to Data Security & Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data', under 'Data Security & Privacy'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data', under 'Data Security & Privacy'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DR-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data'.",
+        "When HC-DR-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-230a.1 'Description of policies and practices to secure customers' personal health data records and other personal data', including: Description of policies and practices to secure customers' personal health data records and other personal data; HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data; policies and practices to secure customers' personal health data records and other personal data.",
+        "Find disclosures for HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data related to Data Security & Privacy.",
         "Retrieve exact report evidence for HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data related to Data Security & Privacy.",
@@ -336,7 +569,21 @@
         "records",
         "other",
         "Security",
-        "Privacy"
+        "Privacy",
+        "HC-DR-230a.1 Description of policies and practices to secure customers' personal health data records and other personal data",
+        "policies and practices to secure customers' personal health data records and other personal data",
+        "policies practices",
+        "practices secure",
+        "secure customers'",
+        "customers'",
+        "customers' personal",
+        "personal health",
+        "health records",
+        "records other",
+        "other personal",
+        "Description of policies",
+        "practices to secure customers' personal health data records",
+        "other personal data"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -346,7 +593,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -358,20 +607,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies and practices to secure customers' personal health data records and other personal data'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies and practices to secure customers' personal health data records and other personal data' (HC-DR-230a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-230a.2.01",
@@ -396,10 +693,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of data breaches",
+        "Number of data breaches",
+        "HC-DR-230a.2 (1) Number of data breaches",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-DR-230a.2 (1) Number of data breaches with unit Number related to Data Security & Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(1) Number of data breaches', under 'Data Security & Privacy', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(1) Number of data breaches', under 'Data Security & Privacy', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-230a.2 '(1) Number of data breaches'; retain every reported year and label.",
+        "When HC-DR-230a.2 '(1) Number of data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-230a.2 '(1) Number of data breaches', including: (1) Number of data breaches; Number of data breaches; HC-DR-230a.2 (1) Number of data breaches.",
+        "Disambiguate HC-DR-230a.2 '(1) Number of data breaches' from sibling metrics sharing HC-DR-230a.2: (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach.",
+        "Find disclosures for HC-DR-230a.2 (1) Number of data breaches with unit Number related to Data Security & Privacy.",
         "Retrieve exact report evidence for HC-DR-230a.2 (1) Number of data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-230a.2 (1) Number of data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-230a.2 (1) Number of data breaches related to Data Security & Privacy.",
@@ -407,6 +715,7 @@
       ],
       "anchor_terms": [
         "HC-DR-230a.2",
+        "(1) Number of data breaches",
         "Number of data breaches",
         "data breach",
         "breaches",
@@ -414,7 +723,8 @@
         "Privacy",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "HC-DR-230a.2 (1) Number of data breaches"
       ],
       "negative_anchor_terms": [
         "Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
@@ -423,7 +733,11 @@
         "Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach"
       ],
       "similar_metric_warnings": [
         {
@@ -448,7 +762,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -456,24 +772,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of data breaches' (HC-DR-230a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach."
     },
     {
       "metric_id": "HC-DR-230a.2.02",
@@ -487,7 +851,8 @@
       "aliases": [
         "(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
         "Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
-        "HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach"
+        "HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(2) Percent of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach"
       ],
       "bm25_terms": [
         "HC-DR-230a.2",
@@ -506,10 +871,37 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(2) Percent of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "breaches which",
+        "which",
+        "which customers'",
+        "customers'",
+        "customers' personal",
+        "personal but",
+        "not personal",
+        "personal health",
+        "health was",
+        "was",
+        "was subject",
+        "subject breach",
+        "Percentage of data breaches in which customers' (a) personal data",
+        "but not personal health data",
+        "was subject to the data breach",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach with unit Percentage (%) related to Data Security & Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach', under 'Data Security & Privacy', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach', under 'Data Security & Privacy', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach'; retain every reported year and label.",
+        "When HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach', including: (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (2) Percent of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach.",
+        "Disambiguate HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach' from sibling metrics sharing HC-DR-230a.2: (1) Number of data breaches; (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach.",
+        "Find disclosures for HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach with unit Percentage (%) related to Data Security & Privacy.",
         "Retrieve exact report evidence for HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach related to Data Security & Privacy.",
@@ -517,6 +909,7 @@
       ],
       "anchor_terms": [
         "HC-DR-230a.2",
+        "(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
         "Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
         "data breach",
         "personal data",
@@ -533,7 +926,24 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "HC-DR-230a.2 (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(2) Percent of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "breaches which",
+        "which",
+        "which customers'",
+        "customers'",
+        "customers' personal",
+        "personal but",
+        "not personal",
+        "personal health",
+        "health was",
+        "was",
+        "was subject",
+        "subject breach",
+        "Percentage of data breaches in which customers' (a) personal data",
+        "but not personal health data",
+        "was subject to the data breach"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
@@ -542,7 +952,11 @@
         "Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach"
       ],
       "similar_metric_warnings": [
         {
@@ -567,7 +981,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -575,11 +991,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -591,9 +1033,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach' (HC-DR-230a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach."
     },
     {
       "metric_id": "HC-DR-230a.2.03",
@@ -607,7 +1072,8 @@
       "aliases": [
         "(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
         "Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
-        "HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach"
+        "HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "(2) Percent of data breaches in which customers' (b) personal health data was subject to the data breach"
       ],
       "bm25_terms": [
         "HC-DR-230a.2",
@@ -623,10 +1089,32 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "(2) Percent of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "breaches which",
+        "which",
+        "which customers'",
+        "customers'",
+        "customers' personal",
+        "personal health",
+        "health was",
+        "was",
+        "was subject",
+        "subject breach",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach with unit Percentage (%) related to Data Security & Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach', under 'Data Security & Privacy', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach', under 'Data Security & Privacy', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach'; retain every reported year and label.",
+        "When HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach', including: (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (2) Percent of data breaches in which customers' (b) personal health data was subject to the data breach.",
+        "Disambiguate HC-DR-230a.2 '(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach' from sibling metrics sharing HC-DR-230a.2: (1) Number of data breaches; (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach.",
+        "Find disclosures for HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach with unit Percentage (%) related to Data Security & Privacy.",
         "Retrieve exact report evidence for HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach related to Data Security & Privacy.",
@@ -634,6 +1122,7 @@
       ],
       "anchor_terms": [
         "HC-DR-230a.2",
+        "(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
         "Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
         "data breach",
         "breaches",
@@ -647,7 +1136,19 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "HC-DR-230a.2 (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "(2) Percent of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "breaches which",
+        "which",
+        "which customers'",
+        "customers'",
+        "customers' personal",
+        "personal health",
+        "health was",
+        "was",
+        "was subject",
+        "subject breach"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
@@ -656,7 +1157,11 @@
         "Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach"
       ],
       "similar_metric_warnings": [
         {
@@ -681,7 +1186,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -689,11 +1196,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -705,9 +1238,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach' (HC-DR-230a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach."
     },
     {
       "metric_id": "HC-DR-230a.2.04",
@@ -742,10 +1298,36 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "unique customers",
+        "customers affected",
+        "affected breaches",
+        "breaches which",
+        "which",
+        "which customers'",
+        "customers'",
+        "customers' personal",
+        "personal but",
+        "not personal",
+        "personal health",
+        "health was",
+        "was",
+        "was subject",
+        "subject breach",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach with unit Number related to Data Security & Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach', under 'Data Security & Privacy', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach', under 'Data Security & Privacy', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach'; retain every reported year and label.",
+        "When HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach', including: (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach; Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach; HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach.",
+        "Disambiguate HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach' from sibling metrics sharing HC-DR-230a.2: (1) Number of data breaches; (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach.",
+        "Find disclosures for HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach with unit Number related to Data Security & Privacy.",
         "Retrieve exact report evidence for HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach related to Data Security & Privacy.",
@@ -753,6 +1335,7 @@
       ],
       "anchor_terms": [
         "HC-DR-230a.2",
+        "(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
         "Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
         "data breach",
         "personal data",
@@ -768,7 +1351,23 @@
         "breach",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "unique customers",
+        "customers affected",
+        "affected breaches",
+        "breaches which",
+        "which",
+        "which customers'",
+        "customers'",
+        "customers' personal",
+        "personal but",
+        "not personal",
+        "personal health",
+        "health was",
+        "was",
+        "was subject",
+        "subject breach"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
@@ -777,7 +1376,11 @@
         "Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach"
       ],
       "similar_metric_warnings": [
         {
@@ -802,7 +1405,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -810,24 +1415,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach' (HC-DR-230a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach."
     },
     {
       "metric_id": "HC-DR-230a.2.05",
@@ -859,10 +1512,34 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
+        "Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
+        "HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
+        "unique customers",
+        "customers affected",
+        "affected breaches",
+        "breaches which",
+        "which",
+        "which customers'",
+        "customers'",
+        "customers' personal",
+        "personal health",
+        "health was",
+        "was",
+        "was subject",
+        "subject breach",
+        "(1) Number of data breaches, (2) percentage involving (a) personal",
+        "data only and (b) personal health data, (3) number of customers affected in each"
       ],
-      "dense_query": "Find disclosures for HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach with unit Number related to Data Security & Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach', under 'Data Security & Privacy', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach', under 'Data Security & Privacy', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach'; retain every reported year and label.",
+        "When HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach', including: (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach; Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach; HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach.",
+        "Disambiguate HC-DR-230a.2 '(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach' from sibling metrics sharing HC-DR-230a.2: (1) Number of data breaches; (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach.",
+        "Find disclosures for HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach with unit Number related to Data Security & Privacy.",
         "Retrieve exact report evidence for HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach related to Data Security & Privacy.",
@@ -870,6 +1547,7 @@
       ],
       "anchor_terms": [
         "HC-DR-230a.2",
+        "(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
         "Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
         "data breach",
         "unique",
@@ -884,7 +1562,21 @@
         "Privacy",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "HC-DR-230a.2 (3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach",
+        "unique customers",
+        "customers affected",
+        "affected breaches",
+        "breaches which",
+        "which",
+        "which customers'",
+        "customers'",
+        "customers' personal",
+        "personal health",
+        "health was",
+        "was",
+        "was subject",
+        "subject breach"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
@@ -893,7 +1585,11 @@
         "Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach",
+        "(2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach",
+        "(3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach"
       ],
       "similar_metric_warnings": [
         {
@@ -918,7 +1614,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -926,24 +1624,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of unique customers affected by data breaches in which the customers' (b) personal health data was subject to the data breach' (HC-DR-230a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage of data breaches in which customers' (a) personal data, but not personal health data, was subject to the data breach; (2) Percentage of data breaches in which customers' (b) personal health data was subject to the data breach; (3) Number of unique customers affected by data breaches in which the customers' (a) personal data, but not personal health data, was subject to the data breach."
     },
     {
       "metric_id": "HC-DR-230a.3",
@@ -973,10 +1719,31 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with data security and privacy",
+        "Monetary losses as a result of legal proceedings associated with data security and privacy",
+        "HC-DR-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated security",
+        "security privacy",
+        "Total amount of monetary losses as a result of legal proceedings associated with data security",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with data security and privacy"
       ],
-      "dense_query": "Find disclosures for HC-DR-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy with unit Presentation currency related to Data Security & Privacy.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy', under 'Data Security & Privacy', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy', under 'Data Security & Privacy', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy'; retain every reported year and label.",
+        "When HC-DR-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-230a.3 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy', including: Total amount of monetary losses as a result of legal proceedings associated with data security and privacy; Monetary losses as a result of legal proceedings associated with data security and privacy; HC-DR-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy.",
+        "Find disclosures for HC-DR-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy with unit Presentation currency related to Data Security & Privacy.",
         "Retrieve exact report evidence for HC-DR-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy related to Data Security & Privacy.",
@@ -996,7 +1763,19 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with data security and privacy",
+        "HC-DR-230a.3 Total amount of monetary losses as a result of legal proceedings associated with data security and privacy",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated security",
+        "security privacy",
+        "Total amount of monetary losses as a result of legal proceedings associated with data security",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1010,7 +1789,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1018,25 +1799,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with data security and privacy' (HC-DR-230a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-250a.1",
@@ -1049,7 +1879,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of efforts to reduce the occurrence of compromised drugs within the supply chain",
-        "HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain"
+        "HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain",
+        "efforts to reduce the occurrence of compromised drugs within the supply chain"
       ],
       "bm25_terms": [
         "HC-DR-250a.1",
@@ -1062,10 +1893,26 @@
         "supply",
         "chain",
         "Drug",
-        "Integrity"
+        "Integrity",
+        "Description of efforts to reduce the occurrence of compromised drugs within the supply chain",
+        "HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain",
+        "efforts to reduce the occurrence of compromised drugs within the supply chain",
+        "efforts reduce",
+        "reduce occurrence",
+        "occurrence compromised",
+        "compromised drugs",
+        "drugs supply",
+        "supply chain",
+        "Description of efforts to reduce the occurrence of compromised",
+        "drugs within the supply chain"
       ],
-      "dense_query": "Find disclosures for HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain related to Drug Supply Chain Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-250a.1 'Description of efforts to reduce the occurrence of compromised drugs within the supply chain', under 'Drug Supply Chain Integrity'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-250a.1 'Description of efforts to reduce the occurrence of compromised drugs within the supply chain', under 'Drug Supply Chain Integrity'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DR-250a.1 'Description of efforts to reduce the occurrence of compromised drugs within the supply chain'.",
+        "When HC-DR-250a.1 'Description of efforts to reduce the occurrence of compromised drugs within the supply chain' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-250a.1 'Description of efforts to reduce the occurrence of compromised drugs within the supply chain', including: Description of efforts to reduce the occurrence of compromised drugs within the supply chain; HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain; efforts to reduce the occurrence of compromised drugs within the supply chain.",
+        "Find disclosures for HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain related to Drug Supply Chain Integrity.",
         "Retrieve exact report evidence for HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain related to Drug Supply Chain Integrity.",
@@ -1083,7 +1930,15 @@
         "supply",
         "chain",
         "Drug",
-        "Integrity"
+        "Integrity",
+        "HC-DR-250a.1 Description of efforts to reduce the occurrence of compromised drugs within the supply chain",
+        "efforts to reduce the occurrence of compromised drugs within the supply chain",
+        "efforts reduce",
+        "reduce occurrence",
+        "occurrence compromised",
+        "compromised drugs",
+        "drugs supply",
+        "supply chain"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1093,7 +1948,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1105,20 +1962,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of efforts to reduce the occurrence of compromised drugs within the supply chain'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of efforts to reduce the occurrence of compromised drugs within the supply chain' (HC-DR-250a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-250a.2.01",
@@ -1145,10 +2050,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of drug recalls issued",
+        "Number of drug recalls issued",
+        "HC-DR-250a.2 (1) Number of drug recalls issued",
+        "drug recalls",
+        "recalls issued",
+        "(1) Number of drug recalls issued, (2) total units recalled and",
+        "(3) percentage for private-label products"
       ],
-      "dense_query": "Find disclosures for HC-DR-250a.2 (1) Number of drug recalls issued with unit Number related to Drug Supply Chain Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-250a.2 '(1) Number of drug recalls issued', under 'Drug Supply Chain Integrity', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-250a.2 '(1) Number of drug recalls issued', under 'Drug Supply Chain Integrity', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-250a.2 '(1) Number of drug recalls issued'; retain every reported year and label.",
+        "When HC-DR-250a.2 '(1) Number of drug recalls issued' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-250a.2 '(1) Number of drug recalls issued', including: (1) Number of drug recalls issued; Number of drug recalls issued; HC-DR-250a.2 (1) Number of drug recalls issued.",
+        "Disambiguate HC-DR-250a.2 '(1) Number of drug recalls issued' from sibling metrics sharing HC-DR-250a.2: (2) Total units recalled; (3) Percentage of total units recalled that were for private-label products.",
+        "Find disclosures for HC-DR-250a.2 (1) Number of drug recalls issued with unit Number related to Drug Supply Chain Integrity.",
         "Retrieve exact report evidence for HC-DR-250a.2 (1) Number of drug recalls issued, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-250a.2 (1) Number of drug recalls issued with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-250a.2 (1) Number of drug recalls issued related to Drug Supply Chain Integrity.",
@@ -1156,6 +2074,7 @@
       ],
       "anchor_terms": [
         "HC-DR-250a.2",
+        "(1) Number of drug recalls issued",
         "Number of drug recalls issued",
         "drug",
         "recalls",
@@ -1165,14 +2084,19 @@
         "Integrity",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "HC-DR-250a.2 (1) Number of drug recalls issued",
+        "drug recalls",
+        "recalls issued"
       ],
       "negative_anchor_terms": [
         "Total units recalled",
         "Percentage of total units recalled that were for private-label products",
         "safety complaints",
         "defect complaints",
-        "product returns"
+        "product returns",
+        "(2) Total units recalled",
+        "(3) Percentage of total units recalled that were for private-label products"
       ],
       "similar_metric_warnings": [
         {
@@ -1189,7 +2113,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1197,24 +2123,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of drug recalls issued'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of drug recalls issued' (HC-DR-250a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Total units recalled; (3) Percentage of total units recalled that were for private-label products."
     },
     {
       "metric_id": "HC-DR-250a.2.02",
@@ -1242,10 +2216,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(2) Total units recalled",
+        "Total units recalled",
+        "HC-DR-250a.2 (2) Total units recalled",
+        "(1) Number of drug recalls issued, (2) total units recalled and",
+        "(3) percentage for private-label products"
       ],
-      "dense_query": "Find disclosures for HC-DR-250a.2 (2) Total units recalled with unit Number related to Drug Supply Chain Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-250a.2 '(2) Total units recalled', under 'Drug Supply Chain Integrity', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-250a.2 '(2) Total units recalled', under 'Drug Supply Chain Integrity', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-250a.2 '(2) Total units recalled'; retain every reported year and label.",
+        "When HC-DR-250a.2 '(2) Total units recalled' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-250a.2 '(2) Total units recalled', including: (2) Total units recalled; Total units recalled; HC-DR-250a.2 (2) Total units recalled.",
+        "Disambiguate HC-DR-250a.2 '(2) Total units recalled' from sibling metrics sharing HC-DR-250a.2: (1) Number of drug recalls issued; (3) Percentage of total units recalled that were for private-label products.",
+        "Find disclosures for HC-DR-250a.2 (2) Total units recalled with unit Number related to Drug Supply Chain Integrity.",
         "Retrieve exact report evidence for HC-DR-250a.2 (2) Total units recalled, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-250a.2 (2) Total units recalled with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-250a.2 (2) Total units recalled related to Drug Supply Chain Integrity.",
@@ -1253,6 +2238,7 @@
       ],
       "anchor_terms": [
         "HC-DR-250a.2",
+        "(2) Total units recalled",
         "Total units recalled",
         "units recalled",
         "units",
@@ -1263,11 +2249,14 @@
         "Integrity",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "HC-DR-250a.2 (2) Total units recalled"
       ],
       "negative_anchor_terms": [
         "Number of drug recalls issued",
-        "Percentage of total units recalled that were for private-label products"
+        "Percentage of total units recalled that were for private-label products",
+        "(1) Number of drug recalls issued",
+        "(3) Percentage of total units recalled that were for private-label products"
       ],
       "similar_metric_warnings": [
         {
@@ -1284,7 +2273,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1292,24 +2283,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Total units recalled'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Total units recalled' (HC-DR-250a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of drug recalls issued; (3) Percentage of total units recalled that were for private-label products."
     },
     {
       "metric_id": "HC-DR-250a.2.03",
@@ -1323,7 +2362,8 @@
       "aliases": [
         "(3) Percentage of total units recalled that were for private-label products",
         "Percentage of total units recalled that were for private-label products",
-        "HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products"
+        "HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products",
+        "(3) Percent of total units recalled that were for private-label products"
       ],
       "bm25_terms": [
         "HC-DR-250a.2",
@@ -1339,10 +2379,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(3) Percentage of total units recalled that were for private-label products",
+        "Percentage of total units recalled that were for private-label products",
+        "HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products",
+        "(3) Percent of total units recalled that were for private-label products",
+        "recalled that",
+        "that",
+        "that were",
+        "were",
+        "were private-label",
+        "private-label products",
+        "(1) Number of drug recalls issued, (2) total units recalled and",
+        "(3) percentage for private-label products"
       ],
-      "dense_query": "Find disclosures for HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products with unit Percentage (%) related to Drug Supply Chain Integrity.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-250a.2 '(3) Percentage of total units recalled that were for private-label products', under 'Drug Supply Chain Integrity', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-250a.2 '(3) Percentage of total units recalled that were for private-label products', under 'Drug Supply Chain Integrity', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-250a.2 '(3) Percentage of total units recalled that were for private-label products'; retain every reported year and label.",
+        "When HC-DR-250a.2 '(3) Percentage of total units recalled that were for private-label products' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-250a.2 '(3) Percentage of total units recalled that were for private-label products', including: (3) Percentage of total units recalled that were for private-label products; Percentage of total units recalled that were for private-label products; HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products; (3) Percent of total units recalled that were for private-label products.",
+        "Disambiguate HC-DR-250a.2 '(3) Percentage of total units recalled that were for private-label products' from sibling metrics sharing HC-DR-250a.2: (1) Number of drug recalls issued; (2) Total units recalled.",
+        "Find disclosures for HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products with unit Percentage (%) related to Drug Supply Chain Integrity.",
         "Retrieve exact report evidence for HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products related to Drug Supply Chain Integrity.",
@@ -1350,6 +2408,7 @@
       ],
       "anchor_terms": [
         "HC-DR-250a.2",
+        "(3) Percentage of total units recalled that were for private-label products",
         "Percentage of total units recalled that were for private-label products",
         "units recalled",
         "units",
@@ -1363,11 +2422,21 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "HC-DR-250a.2 (3) Percentage of total units recalled that were for private-label products",
+        "(3) Percent of total units recalled that were for private-label products",
+        "recalled that",
+        "that",
+        "that were",
+        "were",
+        "were private-label",
+        "private-label products"
       ],
       "negative_anchor_terms": [
         "Number of drug recalls issued",
-        "Total units recalled"
+        "Total units recalled",
+        "(1) Number of drug recalls issued",
+        "(2) Total units recalled"
       ],
       "similar_metric_warnings": [
         {
@@ -1384,7 +2453,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1392,11 +2463,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage of total units recalled that were for private-label products', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1408,9 +2505,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage of total units recalled that were for private-label products' (HC-DR-250a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of drug recalls issued; (2) Total units recalled."
     },
     {
       "metric_id": "HC-DR-260a.2",
@@ -1441,10 +2561,30 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with controlled substances",
+        "Monetary losses as a result of legal proceedings associated with controlled substances",
+        "HC-DR-260a.2 Total amount of monetary losses as a result of legal proceedings associated with controlled substances",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated controlled",
+        "controlled substances",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with controlled substances"
       ],
-      "dense_query": "Find disclosures for HC-DR-260a.2 Total amount of monetary losses as a result of legal proceedings associated with controlled substances with unit Presentation currency related to Management of Controlled Substances.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-260a.2 'Total amount of monetary losses as a result of legal proceedings associated with controlled substances', under 'Management of Controlled Substances', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-260a.2 'Total amount of monetary losses as a result of legal proceedings associated with controlled substances', under 'Management of Controlled Substances', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-260a.2 'Total amount of monetary losses as a result of legal proceedings associated with controlled substances'; retain every reported year and label.",
+        "When HC-DR-260a.2 'Total amount of monetary losses as a result of legal proceedings associated with controlled substances' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-260a.2 'Total amount of monetary losses as a result of legal proceedings associated with controlled substances', including: Total amount of monetary losses as a result of legal proceedings associated with controlled substances; Monetary losses as a result of legal proceedings associated with controlled substances; HC-DR-260a.2 Total amount of monetary losses as a result of legal proceedings associated with controlled substances.",
+        "Find disclosures for HC-DR-260a.2 Total amount of monetary losses as a result of legal proceedings associated with controlled substances with unit Presentation currency related to Management of Controlled Substances.",
         "Retrieve exact report evidence for HC-DR-260a.2 Total amount of monetary losses as a result of legal proceedings associated with controlled substances, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-260a.2 Total amount of monetary losses as a result of legal proceedings associated with controlled substances with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-260a.2 Total amount of monetary losses as a result of legal proceedings associated with controlled substances related to Management of Controlled Substances.",
@@ -1465,7 +2605,18 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with controlled substances",
+        "HC-DR-260a.2 Total amount of monetary losses as a result of legal proceedings associated with controlled substances",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated controlled",
+        "controlled substances",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1479,7 +2630,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1487,25 +2640,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with controlled substances', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with controlled substances' (HC-DR-260a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-260b.1",
@@ -1532,10 +2734,21 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "First fill adherence rate",
+        "HC-DR-260b.1 First fill adherence rate",
+        "First fill",
+        "fill adherence",
+        "adherence rate",
+        "The entity shall disclose its customer first fill adherence rate, expressed as a percentage, which is calculated as"
       ],
-      "dense_query": "Find disclosures for HC-DR-260b.1 First fill adherence rate with unit Percentage (%) related to Patient Health Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-260b.1 'First fill adherence rate', under 'Patient Health Outcomes', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-260b.1 'First fill adherence rate', under 'Patient Health Outcomes', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-260b.1 'First fill adherence rate'; retain every reported year and label.",
+        "When HC-DR-260b.1 'First fill adherence rate' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-260b.1 'First fill adherence rate', including: First fill adherence rate; HC-DR-260b.1 First fill adherence rate.",
+        "Find disclosures for HC-DR-260b.1 First fill adherence rate with unit Percentage (%) related to Patient Health Outcomes.",
         "Retrieve exact report evidence for HC-DR-260b.1 First fill adherence rate, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-260b.1 First fill adherence rate with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-260b.1 First fill adherence rate related to Patient Health Outcomes.",
@@ -1554,7 +2767,11 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "HC-DR-260b.1 First fill adherence rate",
+        "First fill",
+        "fill adherence",
+        "adherence rate"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1563,7 +2780,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1571,11 +2790,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'First fill adherence rate', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1587,9 +2832,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'First fill adherence rate' (HC-DR-260b.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-260b.2",
@@ -1602,7 +2870,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of policies and practices to prevent prescription dispensing errors",
-        "HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors"
+        "HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors",
+        "policies and practices to prevent prescription dispensing errors"
       ],
       "bm25_terms": [
         "HC-DR-260b.2",
@@ -1615,10 +2884,26 @@
         "errors",
         "Patient",
         "Health",
-        "Outcomes"
+        "Outcomes",
+        "Description of policies and practices to prevent prescription dispensing errors",
+        "HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors",
+        "policies and practices to prevent prescription dispensing errors",
+        "policies practices",
+        "practices prevent",
+        "prevent prescription",
+        "prescription dispensing",
+        "dispensing errors",
+        "Description of policies",
+        "practices to prevent prescription dispensing errors",
+        "Description of policies and practices to prevent prescription"
       ],
-      "dense_query": "Find disclosures for HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors related to Patient Health Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-260b.2 'Description of policies and practices to prevent prescription dispensing errors', under 'Patient Health Outcomes'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-260b.2 'Description of policies and practices to prevent prescription dispensing errors', under 'Patient Health Outcomes'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers HC-DR-260b.2 'Description of policies and practices to prevent prescription dispensing errors'.",
+        "When HC-DR-260b.2 'Description of policies and practices to prevent prescription dispensing errors' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-260b.2 'Description of policies and practices to prevent prescription dispensing errors', including: Description of policies and practices to prevent prescription dispensing errors; HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors; policies and practices to prevent prescription dispensing errors.",
+        "Find disclosures for HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors related to Patient Health Outcomes.",
         "Retrieve exact report evidence for HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors related to Patient Health Outcomes.",
@@ -1636,7 +2921,16 @@
         "errors",
         "Patient",
         "Health",
-        "Outcomes"
+        "Outcomes",
+        "HC-DR-260b.2 Description of policies and practices to prevent prescription dispensing errors",
+        "policies and practices to prevent prescription dispensing errors",
+        "policies practices",
+        "practices prevent",
+        "prevent prescription",
+        "prescription dispensing",
+        "dispensing errors",
+        "Description of policies",
+        "practices to prevent prescription dispensing errors"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1646,7 +2940,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1658,20 +2954,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies and practices to prevent prescription dispensing errors'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies and practices to prevent prescription dispensing errors' (HC-DR-260b.2). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-260b.3",
@@ -1705,10 +3049,31 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors",
+        "Monetary losses as a result of legal proceedings associated with prescription dispensing errors",
+        "HC-DR-260b.3 Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated prescription",
+        "prescription dispensing",
+        "dispensing errors",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with prescription dispensing errors"
       ],
-      "dense_query": "Find disclosures for HC-DR-260b.3 Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors with unit Presentation currency related to Patient Health Outcomes.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-260b.3 'Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors', under 'Patient Health Outcomes', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-260b.3 'Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors', under 'Patient Health Outcomes', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-260b.3 'Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors'; retain every reported year and label.",
+        "When HC-DR-260b.3 'Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-260b.3 'Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors', including: Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors; Monetary losses as a result of legal proceedings associated with prescription dispensing errors; HC-DR-260b.3 Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors.",
+        "Find disclosures for HC-DR-260b.3 Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors with unit Presentation currency related to Patient Health Outcomes.",
         "Retrieve exact report evidence for HC-DR-260b.3 Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-260b.3 Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-260b.3 Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors related to Patient Health Outcomes.",
@@ -1732,7 +3097,19 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with prescription dispensing errors",
+        "HC-DR-260b.3 Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated prescription",
+        "prescription dispensing",
+        "dispensing errors",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1746,7 +3123,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1754,25 +3133,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with prescription dispensing errors' (HC-DR-260b.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-000.A",
@@ -1786,7 +3214,8 @@
       "aliases": [
         "Number of pharmacy locations",
         "Count of pharmacy locations",
-        "HC-DR-000.A Number of pharmacy locations"
+        "HC-DR-000.A Number of pharmacy locations",
+        "Total number of pharmacy locations"
       ],
       "bm25_terms": [
         "HC-DR-000.A",
@@ -1795,10 +3224,20 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of pharmacy locations",
+        "Count of pharmacy locations",
+        "HC-DR-000.A Number of pharmacy locations",
+        "Total number of pharmacy locations",
+        "pharmacy locations"
       ],
-      "dense_query": "Find disclosures for HC-DR-000.A Number of pharmacy locations with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-000.A 'Number of pharmacy locations', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-000.A 'Number of pharmacy locations', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-000.A 'Number of pharmacy locations'; retain every reported year and label.",
+        "When HC-DR-000.A 'Number of pharmacy locations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-000.A 'Number of pharmacy locations', including: Number of pharmacy locations; Count of pharmacy locations; HC-DR-000.A Number of pharmacy locations; Total number of pharmacy locations.",
+        "Find disclosures for HC-DR-000.A Number of pharmacy locations with unit Number.",
         "Retrieve exact report evidence for HC-DR-000.A Number of pharmacy locations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-000.A Number of pharmacy locations with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-000.A Number of pharmacy locations.",
@@ -1811,7 +3250,11 @@
         "locations",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of pharmacy locations",
+        "HC-DR-000.A Number of pharmacy locations",
+        "Total number of pharmacy locations",
+        "pharmacy locations"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1820,7 +3263,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1828,24 +3273,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of pharmacy locations'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of pharmacy locations' (HC-DR-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-000.B",
@@ -1867,10 +3360,23 @@
         "space",
         "Square",
         "metres",
-        "Square metres (m²)"
+        "Square metres (m²)",
+        "Total area of retail space",
+        "HC-DR-000.B Total area of retail space",
+        "area retail",
+        "retail space",
+        "m2",
+        "m?",
+        "square metres",
+        "square meters"
       ],
-      "dense_query": "Find disclosures for HC-DR-000.B Total area of retail space with unit Square metres (m²).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-000.B 'Total area of retail space', with expected unit 'Square metres (m²)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-000.B 'Total area of retail space', with expected unit 'Square metres (m²)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-000.B 'Total area of retail space'; retain every reported year and label.",
+        "When HC-DR-000.B 'Total area of retail space' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-000.B 'Total area of retail space', including: Total area of retail space; HC-DR-000.B Total area of retail space.",
+        "Find disclosures for HC-DR-000.B Total area of retail space with unit Square metres (m²).",
         "Retrieve exact report evidence for HC-DR-000.B Total area of retail space, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-000.B Total area of retail space with unit Square metres (m²).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-000.B Total area of retail space.",
@@ -1882,7 +3388,14 @@
         "area",
         "retail",
         "space",
-        "Square metres (m²)"
+        "Square metres (m²)",
+        "HC-DR-000.B Total area of retail space",
+        "area retail",
+        "retail space",
+        "m2",
+        "m?",
+        "square metres",
+        "square meters"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1891,7 +3404,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1899,22 +3414,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total area of retail space', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "area",
         "expected_units": [
-          "Square metres (m²)"
+          "Square metres (m²)",
+          "hectares",
+          "ha",
+          "m2",
+          "m?",
+          "square metres",
+          "square meters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total area of retail space' (HC-DR-000.B, expected unit: Square metres (m²)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "HC-DR-000.C.01",
@@ -1928,7 +3498,8 @@
       "aliases": [
         "Number of prescriptions filled",
         "Count of prescriptions filled",
-        "HC-DR-000.C Number of prescriptions filled"
+        "HC-DR-000.C Number of prescriptions filled",
+        "Total number of prescriptions filled"
       ],
       "bm25_terms": [
         "HC-DR-000.C",
@@ -1937,10 +3508,22 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of prescriptions filled",
+        "Count of prescriptions filled",
+        "HC-DR-000.C Number of prescriptions filled",
+        "Total number of prescriptions filled",
+        "prescriptions filled",
+        "Number of prescriptions filled, percentage for controlled"
       ],
-      "dense_query": "Find disclosures for HC-DR-000.C Number of prescriptions filled with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-000.C 'Number of prescriptions filled', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-000.C 'Number of prescriptions filled', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-000.C 'Number of prescriptions filled'; retain every reported year and label.",
+        "When HC-DR-000.C 'Number of prescriptions filled' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-000.C 'Number of prescriptions filled', including: Number of prescriptions filled; Count of prescriptions filled; HC-DR-000.C Number of prescriptions filled; Total number of prescriptions filled.",
+        "Disambiguate HC-DR-000.C 'Number of prescriptions filled' from sibling metrics sharing HC-DR-000.C: Percentage of prescriptions filled for controlled substances.",
+        "Find disclosures for HC-DR-000.C Number of prescriptions filled with unit Number.",
         "Retrieve exact report evidence for HC-DR-000.C Number of prescriptions filled, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-000.C Number of prescriptions filled with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-000.C Number of prescriptions filled.",
@@ -1953,7 +3536,11 @@
         "filled",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of prescriptions filled",
+        "HC-DR-000.C Number of prescriptions filled",
+        "Total number of prescriptions filled",
+        "prescriptions filled"
       ],
       "negative_anchor_terms": [
         "Percentage of prescriptions filled for controlled substances"
@@ -1969,7 +3556,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1977,24 +3566,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of prescriptions filled'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of prescriptions filled' (HC-DR-000.C, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of prescriptions filled for controlled substances."
     },
     {
       "metric_id": "HC-DR-000.C.02",
@@ -2019,10 +3656,23 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of prescriptions filled for controlled substances",
+        "Percent of prescriptions filled for controlled substances",
+        "HC-DR-000.C Percentage of prescriptions filled for controlled substances",
+        "prescriptions filled",
+        "filled controlled",
+        "controlled substances",
+        "Number of prescriptions filled, percentage for controlled"
       ],
-      "dense_query": "Find disclosures for HC-DR-000.C Percentage of prescriptions filled for controlled substances with unit Percentage (%).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-000.C 'Percentage of prescriptions filled for controlled substances', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-000.C 'Percentage of prescriptions filled for controlled substances', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-000.C 'Percentage of prescriptions filled for controlled substances'; retain every reported year and label.",
+        "When HC-DR-000.C 'Percentage of prescriptions filled for controlled substances' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-000.C 'Percentage of prescriptions filled for controlled substances', including: Percentage of prescriptions filled for controlled substances; Percent of prescriptions filled for controlled substances; HC-DR-000.C Percentage of prescriptions filled for controlled substances.",
+        "Disambiguate HC-DR-000.C 'Percentage of prescriptions filled for controlled substances' from sibling metrics sharing HC-DR-000.C: Number of prescriptions filled.",
+        "Find disclosures for HC-DR-000.C Percentage of prescriptions filled for controlled substances with unit Percentage (%).",
         "Retrieve exact report evidence for HC-DR-000.C Percentage of prescriptions filled for controlled substances, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-000.C Percentage of prescriptions filled for controlled substances with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-000.C Percentage of prescriptions filled for controlled substances.",
@@ -2038,7 +3688,12 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of prescriptions filled for controlled substances",
+        "HC-DR-000.C Percentage of prescriptions filled for controlled substances",
+        "prescriptions filled",
+        "filled controlled",
+        "controlled substances"
       ],
       "negative_anchor_terms": [
         "Number of prescriptions filled"
@@ -2054,7 +3709,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2062,11 +3719,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of prescriptions filled for controlled substances', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -2078,9 +3761,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of prescriptions filled for controlled substances' (HC-DR-000.C, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of prescriptions filled."
     },
     {
       "metric_id": "HC-DR-000.D",
@@ -2094,7 +3800,8 @@
       "aliases": [
         "Number of pharmacists",
         "Count of pharmacists",
-        "HC-DR-000.D Number of pharmacists"
+        "HC-DR-000.D Number of pharmacists",
+        "Total number of pharmacists"
       ],
       "bm25_terms": [
         "HC-DR-000.D",
@@ -2102,10 +3809,20 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of pharmacists",
+        "Count of pharmacists",
+        "HC-DR-000.D Number of pharmacists",
+        "Total number of pharmacists",
+        "Pharmacists are employees who dispense drugs prescribed by physicians and other health practitioners and provide information to"
       ],
-      "dense_query": "Find disclosures for HC-DR-000.D Number of pharmacists with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric HC-DR-000.D 'Number of pharmacists', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric HC-DR-000.D 'Number of pharmacists', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for HC-DR-000.D 'Number of pharmacists'; retain every reported year and label.",
+        "When HC-DR-000.D 'Number of pharmacists' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for HC-DR-000.D 'Number of pharmacists', including: Number of pharmacists; Count of pharmacists; HC-DR-000.D Number of pharmacists; Total number of pharmacists.",
+        "Find disclosures for HC-DR-000.D Number of pharmacists with unit Number.",
         "Retrieve exact report evidence for HC-DR-000.D Number of pharmacists, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches HC-DR-000.D Number of pharmacists with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for HC-DR-000.D Number of pharmacists.",
@@ -2117,7 +3834,10 @@
         "pharmacists",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of pharmacists",
+        "HC-DR-000.D Number of pharmacists",
+        "Total number of pharmacists"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2126,7 +3846,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2134,24 +3856,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of pharmacists'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of pharmacists' (HC-DR-000.D, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

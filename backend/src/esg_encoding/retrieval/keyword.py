@@ -64,7 +64,7 @@ class KeywordRetriever:
             return []
         results: List[RetrievalResult] = []
         segments = list(report_content.document_content.segments)
-        row_lookup = self._build_table_row_lookup(segments)
+        row_lookup = self._get_table_row_lookup(report_content, segments)
         for segment in segments:
             content = getattr(segment, "content", "") or ""
             if not any(pattern.search(content) for pattern in profile.exact_code_patterns):
@@ -139,17 +139,13 @@ class KeywordRetriever:
         query_tokens = self._query_tokens(profile)
         if not query_tokens:
             return []
+        identity_tokens = self._identity_query_tokens(profile)
 
-        segments = list(report_content.document_content.segments)
-        doc_tokens = [self._segment_tokens(segment) for segment in segments]
+        segments, doc_tokens, doc_freq, avg_len = self._get_bm25_corpus(report_content)
         if not doc_tokens:
             return []
 
         n_docs = len(doc_tokens)
-        avg_len = sum(len(tokens) for tokens in doc_tokens) / max(n_docs, 1)
-        doc_freq: Counter[str] = Counter()
-        for tokens in doc_tokens:
-            doc_freq.update(set(tokens))
 
         raw_scores: List[Tuple[object, float, List[str]]] = []
         for segment, tokens in zip(segments, doc_tokens):
@@ -158,6 +154,8 @@ class KeywordRetriever:
             counts = Counter(tokens)
             matched = [token for token in query_tokens if counts.get(token, 0) > 0]
             if not matched:
+                continue
+            if identity_tokens and not any(token in identity_tokens for token in matched):
                 continue
             score = self._bm25_score(counts, len(tokens), query_tokens, doc_freq, n_docs, avg_len)
             if score <= 0:
@@ -180,6 +178,7 @@ class KeywordRetriever:
                 )
                 + _qualitative_relevance_adjustment(metric, getattr(segment, "content", "") or "", anchor_terms, getattr(segment, "segment_type", ""))
                 + _metric_evidence_quality_adjustment(metric, segment, anchor_terms)
+                + _topic_relevance_adjustment(metric, getattr(segment, "content", "") or "")
             )
             if adjusted < 0.08:
                 continue
@@ -230,6 +229,7 @@ class KeywordRetriever:
             prefer_narrative=not _is_quantitative_metric(metric),
         )
         score += _metric_evidence_quality_adjustment(metric, segment, profile.anchor_terms)
+        score += _topic_relevance_adjustment(metric, getattr(segment, "content", "") or "")
         return _clamp_score(score)
 
     def _build_table_row_lookup(self, segments: Sequence[Any]) -> Dict[Tuple[str, int], Any]:
@@ -241,6 +241,50 @@ class KeywordRetriever:
             if key is not None:
                 lookup[key] = segment
         return lookup
+
+    @staticmethod
+    def _cache_signature(segments: Sequence[Any]) -> Tuple[int, int]:
+        return id(segments), len(segments)
+
+    def _get_table_row_lookup(
+        self,
+        report_content: ReportContent,
+        segments: Sequence[Any],
+    ) -> Dict[Tuple[str, int], Any]:
+        source_segments = report_content.document_content.segments
+        signature = self._cache_signature(source_segments)
+        cached = getattr(report_content, "_keyword_table_row_cache", None)
+        if isinstance(cached, tuple) and len(cached) == 2 and cached[0] == signature:
+            return cached[1]
+        lookup = self._build_table_row_lookup(segments)
+        try:
+            object.__setattr__(report_content, "_keyword_table_row_cache", (signature, lookup))
+        except Exception:
+            pass
+        return lookup
+
+    def _get_bm25_corpus(
+        self,
+        report_content: ReportContent,
+    ) -> Tuple[List[Any], List[List[str]], Counter[str], float]:
+        source_segments = report_content.document_content.segments
+        signature = self._cache_signature(source_segments)
+        cached = getattr(report_content, "_keyword_bm25_cache", None)
+        if isinstance(cached, tuple) and len(cached) == 5 and cached[0] == signature:
+            return cached[1], cached[2], cached[3], cached[4]
+
+        segments = list(source_segments)
+        doc_tokens = [self._segment_tokens(segment) for segment in segments]
+        avg_len = sum(len(tokens) for tokens in doc_tokens) / max(len(doc_tokens), 1)
+        doc_freq: Counter[str] = Counter()
+        for tokens in doc_tokens:
+            doc_freq.update(set(tokens))
+        cache_value = (signature, segments, doc_tokens, doc_freq, avg_len)
+        try:
+            object.__setattr__(report_content, "_keyword_bm25_cache", cache_value)
+        except Exception:
+            pass
+        return segments, doc_tokens, doc_freq, avg_len
 
     def _table_row_key(self, segment: Any) -> Optional[Tuple[str, int]]:
         table_id = getattr(segment, "source_table_id", None)
@@ -293,6 +337,22 @@ class KeywordRetriever:
             if len(out) >= 48:
                 break
         return out
+
+    def _identity_query_tokens(self, profile: MetricRetrievalProfile) -> set[str]:
+        """Tokens that can qualify BM25 evidence before topic-only bonuses."""
+        values = [
+            profile.metric_name,
+            profile.metric_code,
+            profile.definition,
+            *profile.aliases,
+        ]
+        identity_tokens = {
+            token
+            for value in values
+            for token in tokenize_metric_text(value)
+        }
+        identity_tokens.difference_update(tokenize_metric_text(profile.topic))
+        return identity_tokens
 
     def _segment_tokens(self, segment) -> List[str]:
         structured_parts = [

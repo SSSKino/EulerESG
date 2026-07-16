@@ -70,6 +70,11 @@ class ExcelExporter:
                     "Type": metric.get("Type", metric.get("type", "")),
                     "Definition": metric.get("Definition", metric.get("definition", "")),
                     "Value": self._format_value(metric.get("Value", metric.get("value"))),
+                    "Selected Year": metric.get("Selected Year", metric.get("selected_year")),
+                    "Annual Values": json.dumps(
+                        metric.get("Year Values", metric.get("year_values", [])) or [],
+                        ensure_ascii=False,
+                    ),
                     "Page": self._format_page(metric.get("Page", metric.get("page"))),
                     "Context": metric.get("Context", metric.get("context", "")),
                     "Disclosure Status": metric.get("Disclosure Status", metric.get("disclosure_status", "")),

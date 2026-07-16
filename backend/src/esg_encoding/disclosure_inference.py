@@ -3,8 +3,11 @@ Disclosure Inference Engine - Use LLM to analyze ESG metric disclosure status
 """
 
 import json
-from typing import Any, List, Dict, Optional, Tuple, Union
+from typing import Any, List, Dict, Optional, Sequence, Tuple, Union
 import re
+import os
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 import openai
 from loguru import logger
@@ -16,7 +19,18 @@ from .models import (
     DisclosureAnalysis,
     ComplianceAssessment,
     ReportContent,
-    MetricCollection
+    MetricCollection,
+    RetrievalResult,
+)
+from .exceptions import DisclosureAnalysisError
+from .retrieval.metric_profile import (
+    MetricRetrievalProfile,
+    build_profile_index,
+    compact_metric_text,
+    compile_metric_code_patterns,
+    content_contains_alias,
+    find_metric_profile,
+    normalize_metric_text,
 )
 
 def _is_claude_model(model_name: str) -> bool:
@@ -46,6 +60,60 @@ DISCLOSURE_JSON_SCHEMA = {
         "evidence_segment_id": {"type": ["string", "null"]},
         "evidence_quote": {"type": ["string", "null"]},
         "specific_data_found": {"type": ["string", "null"]},
+        "year_values": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "year": {"type": "integer"},
+                    "value": {"type": "number"},
+                    "raw_value": {"type": ["number", "null"]},
+                    "unit": {"type": ["string", "null"]},
+                    "page": {"type": ["integer", "null"]},
+                    "evidence_segment_id": {"type": ["string", "null"]},
+                    "evidence_quote": {"type": ["string", "null"]},
+                },
+                "required": [
+                    "year",
+                    "value",
+                    "raw_value",
+                    "unit",
+                    "page",
+                    "evidence_segment_id",
+                    "evidence_quote",
+                ],
+                "additionalProperties": False,
+            },
+        },
+        "derived_calculation": {
+            "type": ["object", "null"],
+            "properties": {
+                "operation": {
+                    "type": "string",
+                    "enum": ["ratio_percent", "ratio", "sum", "difference"],
+                },
+                "formula": {"type": "string"},
+                "operands": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "value": {"type": "number"},
+                            "unit": {"type": "string"},
+                            "year": {"type": "integer"},
+                            "boundary": {"type": "string"},
+                            "segment_id": {"type": "string"},
+                        },
+                        "required": ["name", "value", "unit", "year", "boundary", "segment_id"],
+                        "additionalProperties": False,
+                    },
+                    "minItems": 2,
+                },
+            },
+            "required": ["operation", "formula", "operands"],
+            "additionalProperties": False,
+        },
         "improvement_suggestions": {
             "type": "array",
             "items": {"type": "string"},
@@ -57,6 +125,22 @@ DISCLOSURE_JSON_SCHEMA = {
 
 # Stored in assessment JSON when no metric-specific number is disclosed / extractable.
 COMPLIANCE_VALUE_NA = "n/a"
+
+_DEFAULT_REJECT_VALUE_SOURCES = {
+    "metric_code",
+    "reference_index",
+    "page_number",
+    "row_or_column_number",
+    "standalone_year",
+}
+
+
+def _positive_env_int(name: str, default: int, *, minimum: int = 1, maximum: Optional[int] = None) -> int:
+    try:
+        value = max(minimum, int(os.getenv(name, str(default)) or str(default)))
+    except (TypeError, ValueError):
+        value = max(minimum, default)
+    return min(value, maximum) if maximum is not None else value
 
 def _parse_llm_numeric_value_only(raw: object) -> Optional[Union[int, float]]:
     """
@@ -144,6 +228,7 @@ def _normalize_unit_text(unit: Optional[str]) -> str:
         (r"(?i)\blit(?:er|re)s?\b", "L"),
         (r"(?i)\bmillilit(?:er|re)s?\b", "mL"),
         (r"(?i)\bmetric\s+tons?\b", "t"),
+        (r"(?i)\btons?\b", "t"),
         (r"(?i)\btonnes?\b", "t"),
         (r"(?i)\bkilograms?\b", "kg"),
         (r"(?i)\bgrams?\b", "g"),
@@ -195,6 +280,7 @@ def _normalize_value_status(raw: object) -> str:
         "raw_unit_only": "raw_unit_only",
         "unit_mismatch": "unit_mismatch",
         "ambiguous": "ambiguous",
+        "derived": "derived",
         "none": "none",
         "null": "none",
     }
@@ -268,7 +354,7 @@ def _split_unit_expression(unit: Optional[str]) -> Tuple[str, str, float]:
     return _normalize_unit_atom(raw), "", multiplier
 
 def _unit_profile(unit: Optional[str]) -> Optional[Tuple[str, float]]:
-    token = _normalize_unit_atom(unit)
+    token = _normalize_unit_atom(_extract_unit_hint(unit) or unit)
     if not token:
         return None
     maps = {
@@ -323,6 +409,37 @@ class DisclosureInferenceEngine:
         )
         logger.info("LLM client initialized successfully for disclosure inference")
         return client
+
+    def _not_disclosed_analysis_for_metric(self, metric, reasoning: str) -> DisclosureAnalysis:
+        return DisclosureAnalysis(
+            metric_id=metric.metric_id,
+            metric_name=metric.metric_name,
+            metric_code=metric.metric_code,
+            disclosure_status=DisclosureStatus.NOT_DISCLOSED,
+            reasoning=reasoning,
+            evidence_segments=[],
+            improvement_suggestions=[],
+            category=getattr(metric, "sasb_category", ""),
+            topic=(getattr(metric, "sasb_topic", None) or ""),
+            unit=getattr(metric, "unit", ""),
+            type=getattr(metric, "sasb_type", ""),
+            definition=(getattr(metric, "definition", None) or ""),
+            value=COMPLIANCE_VALUE_NA,
+            page=None,
+        )
+
+    def _analyze_collection_metric(
+        self,
+        metric,
+        retrieval_result: Optional[MetricRetrievalResult],
+        report_content: ReportContent,
+    ) -> DisclosureAnalysis:
+        if retrieval_result is None or retrieval_result.total_matches <= 0:
+            return self._not_disclosed_analysis_for_metric(
+                metric,
+                "No relevant metric content found",
+            )
+        return self._analyze_single_metric(retrieval_result, report_content, metric)
     
     def analyze_compliance(
         self,
@@ -357,73 +474,55 @@ class DisclosureInferenceEngine:
             # Create retrieval results mapping
             retrieval_map = {result.metric_id: result for result in retrieval_results}
             
-            metric_analyses = []
-            for i, metric in enumerate(all_metrics.metrics):
-                logger.info(f"Analyzing metric {i+1}/{len(all_metrics.metrics)}: {metric.metric_name}")
-                
-                # If retrieval results exist and matching content found, use retrieval analysis; otherwise mark as not disclosed
-                #print("======== DEBUG METRIC STRUCTURE ========")
-                #print(metric)
-                if metric.metric_id in retrieval_map:
-                    retrieval_result = retrieval_map[metric.metric_id]
-                    # Only perform LLM analysis when matching content is actually found
-                    if retrieval_result.total_matches > 0:
-                        try:
-                            analysis = self._analyze_single_metric(retrieval_result, report_content, metric)
-                        except Exception as e:
-                            logger.warning(f"Metric analysis failed for {metric.metric_name}, using fallback: {e}")
-                            analysis = DisclosureAnalysis(
-                                metric_id=metric.metric_id,
-                                metric_name=metric.metric_name,
-                                metric_code=metric.metric_code,
-                                disclosure_status=DisclosureStatus.NOT_DISCLOSED,
-                                reasoning=f"Analysis failed: {e}",
-                                evidence_segments=[],
-                                improvement_suggestions=[],
-                                category=getattr(metric, 'sasb_category', ''),
-                                topic=(getattr(metric, 'sasb_topic', None) or ''),
-                                unit=getattr(metric, 'unit', ''),
-                                type=getattr(metric, 'sasb_type', ''),
-                                value=COMPLIANCE_VALUE_NA,
-                                page=None
-                            )
-                    else:
-                        # Retrieval result exists but no matching content, directly mark as not disclosed
-                        analysis = DisclosureAnalysis(
-                            metric_id=metric.metric_id,
-                            metric_name=metric.metric_name,
-                            metric_code=metric.metric_code,
-                            disclosure_status=DisclosureStatus.NOT_DISCLOSED,
-                            reasoning="No relevant metric content found",
-                            evidence_segments=[],
-                            improvement_suggestions=[],
-                            # SASB display fields
-                            category=getattr(metric, 'sasb_category', ''),
-                            topic=(getattr(metric, 'sasb_topic', None) or ''),
-                            unit=getattr(metric, 'unit', ''),
-                            type=getattr(metric, 'sasb_type', ''),
-                            value=COMPLIANCE_VALUE_NA,
-                            page=None
-                        )
-                else:
-                    # No relevant content retrieved, directly mark as not disclosed
-                    analysis = DisclosureAnalysis(
-                        metric_id=metric.metric_id,
-                        metric_name=metric.metric_name,
-                        metric_code=metric.metric_code,
-                        disclosure_status=DisclosureStatus.NOT_DISCLOSED,
-                        reasoning="No relevant metric content found",
-                        evidence_segments=[],
-                        improvement_suggestions=[],
-                        # SASB display fields
-                        category=getattr(metric, 'sasb_category', ''),
-                        topic=(getattr(metric, 'sasb_topic', None) or ''),
-                        unit=getattr(metric, 'unit', ''),
-                        type=getattr(metric, 'sasb_type', ''),
-                        value=COMPLIANCE_VALUE_NA,
-                        page=None
-                    )
-                metric_analyses.append(analysis)
+            metrics = list(all_metrics.metrics)
+            concurrency = _positive_env_int(
+                "REPORT_DISCLOSURE_LLM_CONCURRENCY",
+                4,
+                maximum=8,
+            )
+            concurrency = min(concurrency, max(1, len(metrics)))
+            logger.info(
+                f"Compliance metric analysis concurrency={concurrency}, metrics={len(metrics)}"
+            )
+
+            # Build immutable report lookup caches before worker threads begin.
+            self._get_report_segment_cache(report_content)
+            ordered_analyses: List[Optional[DisclosureAnalysis]] = [None] * len(metrics)
+
+            def analyze_indexed(index: int, metric):
+                started = time.perf_counter()
+                logger.info(f"Analyzing metric {index + 1}/{len(metrics)}: {metric.metric_name}")
+                analysis = self._analyze_collection_metric(
+                    metric,
+                    retrieval_map.get(metric.metric_id),
+                    report_content,
+                )
+                logger.info(
+                    f"Metric analysis completed {index + 1}/{len(metrics)}: "
+                    f"{metric.metric_name}, elapsed={time.perf_counter() - started:.2f}s"
+                )
+                return index, analysis
+
+            if concurrency == 1:
+                for index, metric in enumerate(metrics):
+                    result_index, analysis = analyze_indexed(index, metric)
+                    ordered_analyses[result_index] = analysis
+            else:
+                with ThreadPoolExecutor(
+                    max_workers=concurrency,
+                    thread_name_prefix="disclosure-llm",
+                ) as executor:
+                    futures = [
+                        executor.submit(analyze_indexed, index, metric)
+                        for index, metric in enumerate(metrics)
+                    ]
+                    for future in as_completed(futures):
+                        result_index, analysis = future.result()
+                        ordered_analyses[result_index] = analysis
+
+            metric_analyses = [
+                analysis for analysis in ordered_analyses if analysis is not None
+            ]
                 
         else:
             logger.info(f"Starting compliance analysis for {len(retrieval_results)} retrieved metrics")
@@ -531,131 +630,287 @@ class DisclosureInferenceEngine:
                 pass
         return None
     
-    def _fallback_disclosure_analysis(
-        self,
-        retrieval_result: MetricRetrievalResult,
-        metric: Optional['ESGMetric'],
-        evidence_segment_ids: List[str],
-        reasoning: str,
-    ) -> DisclosureAnalysis:
-        """Return a NOT_DISCLOSED analysis when LLM fails or returns invalid output."""
-        return DisclosureAnalysis(
-            metric_id=retrieval_result.metric_id,
-            metric_name=retrieval_result.metric_name,
-            metric_code=retrieval_result.metric_code,
-            disclosure_status=DisclosureStatus.NOT_DISCLOSED,
-            reasoning=reasoning,
-            evidence_segments=evidence_segment_ids or [],
-            improvement_suggestions=[],
-            category=getattr(metric, "sasb_category", "") if metric else "",
-            topic=(getattr(metric, "sasb_topic", None) or "") if metric else "",
-            unit=(getattr(metric, "unit", None) or "") if metric else "",
-            type=getattr(metric, "sasb_type", "") if metric else "",
-            definition=(getattr(metric, "definition", None) or "") if metric else "",
-            value=COMPLIANCE_VALUE_NA,
-            page=None,
-            context=None,
-        )
-    
-
     def _metric_code_candidates(
         self,
         retrieval_result: MetricRetrievalResult,
         metric: Optional['ESGMetric'] = None,
     ) -> List[str]:
         """Return robust current-metric code candidates for deterministic evidence checks."""
-        raw_candidates: List[object] = [
+        primary_candidates: List[object] = [
             getattr(metric, "metric_code", None) if metric is not None else None,
-            getattr(metric, "metric_id", None) if metric is not None else None,
             getattr(retrieval_result, "metric_code", None),
-            getattr(retrieval_result, "metric_id", None),
         ]
         candidates: List[str] = []
         seen = set()
-        for raw in raw_candidates:
-            if raw is None:
-                continue
-            for part in re.split(r"[,;\n|]+", str(raw)):
-                code = part.strip().strip("()[]{}")
-                if not code:
+
+        def append_candidates(raw_values: List[object], *, strict_shape: bool = False) -> None:
+            for raw in raw_values:
+                if raw is None:
                     continue
-                # Metric codes should normally contain both letters and digits.
-                # This avoids accidental matches on broad words or short ids.
-                if len(code) < 3 or not re.search(r"[A-Za-z]", code) or not re.search(r"\d", code):
-                    continue
-                key = code.upper()
-                if key in seen:
-                    continue
-                seen.add(key)
-                candidates.append(code)
+                for part in re.split(r"[,;\n|]+", str(raw)):
+                    code = part.replace("\u00a0", " ").strip().strip("()[]{}")
+                    if not code:
+                        continue
+                    if len(code) < 3 or not re.search(r"[A-Za-z]", code) or not re.search(r"\d", code):
+                        continue
+                    if strict_shape and (
+                        len(code) > 40
+                        or not re.search(r"[-./]", code)
+                        or re.search(r"\s{2,}|_", code)
+                    ):
+                        continue
+                    key = re.sub(r"[^A-Za-z0-9]", "", code).upper()
+                    if not key or key in seen:
+                        continue
+                    seen.add(key)
+                    candidates.append(code)
+
+        append_candidates(primary_candidates)
+        if not candidates:
+            append_candidates(
+                [
+                    getattr(metric, "metric_id", None) if metric is not None else None,
+                    getattr(retrieval_result, "metric_id", None),
+                ],
+                strict_shape=True,
+            )
         return candidates
 
+    def _resolve_metric_profile(
+        self,
+        metric: Optional['ESGMetric'],
+        retrieval_result: Optional[MetricRetrievalResult] = None,
+    ) -> Optional[MetricRetrievalProfile]:
+        """Resolve the exact generated profile for runtime extraction rules."""
+        try:
+            if metric is not None:
+                profile = find_metric_profile(metric)
+                if profile is not None:
+                    return profile
+            if retrieval_result is not None:
+                return find_metric_profile(retrieval_result.metric_code or retrieval_result.metric_id)
+        except Exception as exc:
+            logger.debug(f"Metric profile lookup failed; using base extraction rules: {exc}")
+        return None
+
+    def _profile_identity_aliases(
+        self,
+        profile: MetricRetrievalProfile,
+        *,
+        unique_for_shared_code: bool = True,
+    ) -> List[str]:
+        aliases = [profile.metric_name, profile.canonical_label, *profile.aliases]
+        blocked = {
+            normalize_metric_text(profile.metric_code),
+            normalize_metric_text(profile.topic),
+            normalize_metric_text(profile.unit),
+        }
+        cleaned: List[str] = []
+        seen = set()
+        for alias in aliases:
+            value = re.sub(r"\s+", " ", str(alias or "")).strip()
+            normalized = normalize_metric_text(value)
+            if not normalized or normalized in blocked or normalized in seen:
+                continue
+            seen.add(normalized)
+            cleaned.append(value)
+
+        if not unique_for_shared_code or not profile.metric_code:
+            return cleaned
+
+        siblings = [
+            item
+            for item in self._profiles_for_metric_codes(profile=profile)
+            if item.metric_id != profile.metric_id
+        ]
+        if not siblings:
+            return cleaned
+
+        sibling_aliases = {
+            normalize_metric_text(alias)
+            for sibling in siblings
+            for alias in [sibling.metric_name, sibling.canonical_label, *sibling.aliases]
+            if str(alias or "").strip()
+        }
+        unique_aliases = [
+            alias for alias in cleaned
+            if normalize_metric_text(alias) not in sibling_aliases
+        ]
+        return unique_aliases or [profile.metric_name]
+
+    def _profiles_for_metric_codes(
+        self,
+        *,
+        profile: Optional[MetricRetrievalProfile] = None,
+        code_candidates: Optional[Sequence[str]] = None,
+    ) -> List[MetricRetrievalProfile]:
+        """Return de-duplicated profiles belonging to the current SASB code."""
+        raw_codes: List[object] = list(code_candidates or [])
+        if profile is not None:
+            raw_codes.insert(0, profile.metric_code)
+        try:
+            index = build_profile_index()
+        except Exception:
+            return []
+
+        matches: List[MetricRetrievalProfile] = []
+        seen = set()
+        for raw_code in raw_codes:
+            for key in (str(raw_code or "").strip().lower(), compact_metric_text(raw_code)):
+                if not key:
+                    continue
+                for candidate in index["by_code"].get(key.lower(), []):
+                    identity = (
+                        candidate.industry,
+                        candidate.metric_id,
+                        candidate.metric_code,
+                        candidate.metric_name,
+                        candidate.unit,
+                    )
+                    if identity in seen:
+                        continue
+                    seen.add(identity)
+                    matches.append(candidate)
+        return matches
+
+    def _metric_code_is_shared(
+        self,
+        profile: Optional[MetricRetrievalProfile],
+        code_candidates: Optional[Sequence[str]] = None,
+    ) -> bool:
+        return len(
+            self._profiles_for_metric_codes(
+                profile=profile,
+                code_candidates=code_candidates,
+            )
+        ) > 1
+
+    def _profile_component_matches(
+        self,
+        text: object,
+        profile: Optional[MetricRetrievalProfile],
+    ) -> bool:
+        if profile is None:
+            return False
+        evidence = str(text or "")
+        return any(
+            content_contains_alias(evidence, alias)
+            for alias in self._profile_identity_aliases(profile)
+        )
+
+    def _profile_reject_value_sources(
+        self,
+        profile: Optional[MetricRetrievalProfile],
+    ) -> set[str]:
+        if profile is not None and profile.reject_values_from:
+            return {str(value).strip().lower() for value in profile.reject_values_from}
+        return set(_DEFAULT_REJECT_VALUE_SOURCES)
+
+    def _candidate_profile_text(self, candidate: Dict[str, Any]) -> str:
+        segment = candidate.get("segment")
+        return "\n".join(
+            str(value or "")
+            for value in [
+                candidate.get("description"),
+                candidate.get("row_label"),
+                candidate.get("column_label"),
+                candidate.get("label"),
+                getattr(segment, "content", "") if segment is not None else "",
+            ]
+            if str(value or "").strip()
+        )
+
+    def _candidate_has_meaningful_label(self, candidate: Dict[str, Any]) -> bool:
+        label_text = " ".join(
+            str(value or "")
+            for value in [
+                candidate.get("row_label"),
+                candidate.get("label"),
+                candidate.get("column_label"),
+                candidate.get("description"),
+            ]
+            if str(value or "").strip()
+        )
+        label_text = re.sub(r"(?i)\b(?:FY|CY)?\s*['\u2019]?\d{2,4}\b", " ", label_text)
+        label_text = re.sub(r"[-+]?\d[\d,.]*\s*%?", " ", label_text)
+        label_text = re.sub(r"[^A-Za-z]+", " ", label_text).strip().lower()
+        label_text = re.sub(
+            r"\b(?:reported|result|value|unit|measure|fy|cy)\b",
+            " ",
+            label_text,
+        )
+        label_text = re.sub(r"\s+", " ", label_text).strip()
+        return bool(
+            label_text
+            and label_text not in {"value", "unit", "unit of measure", "percentage", "percent"}
+        )
+
+    def _candidate_satisfies_profile(
+        self,
+        candidate: Dict[str, Any],
+        profile: Optional[MetricRetrievalProfile],
+    ) -> bool:
+        if profile is None:
+            return True
+        if (
+            profile.requires_value_label or profile.requires_dimension_labels
+        ) and not self._candidate_has_meaningful_label(candidate):
+            return False
+        requires_component_match = self._metric_code_is_shared(profile) or bool(
+            profile.value_selection_rules.get(
+                "match_current_component_before_sibling_values", False
+            )
+        )
+        if requires_component_match and not self._profile_component_matches(
+            self._candidate_profile_text(candidate), profile
+        ):
+            return False
+        return True
+
+    def _profile_prompt_rules(
+        self,
+        profile: Optional[MetricRetrievalProfile],
+    ) -> Dict[str, Any]:
+        if profile is None:
+            return {}
+        return {
+            "profile_metric_id": profile.metric_id,
+            "target_identity_aliases": self._profile_identity_aliases(profile)[:16],
+            "direct_disclosure_rules": profile.direct_disclosure_rules,
+            "value_type": profile.value_type,
+            "expected_units": profile.expected_units,
+            "output_shape": profile.output_shape,
+            "variable_dimensions": profile.variable_dimensions,
+            "requires_dimension_labels": profile.requires_dimension_labels,
+            "requires_value_label": profile.requires_value_label,
+            "reject_values_from": profile.reject_values_from,
+            "year_rules": profile.year_rules,
+            "value_selection_rules": profile.value_selection_rules,
+            "similar_metric_warnings": profile.similar_metric_warnings[:12],
+        }
+
     def _contains_metric_code(self, text: object, code_candidates: List[str]) -> bool:
-        """True when evidence text explicitly contains one of the current metric codes."""
+        """True when evidence contains the current code with OCR-tolerant separators."""
         evidence = str(text or "")
         if not evidence or not code_candidates:
             return False
         for code in code_candidates:
-            pattern = r"(?<![A-Za-z0-9])" + re.escape(code) + r"(?![A-Za-z0-9])"
-            if re.search(pattern, evidence, flags=re.IGNORECASE):
+            if any(pattern.search(evidence) for pattern in compile_metric_code_patterns(code)):
                 return True
         return False
-
-    def _direct_numeric_from_segment_fields(self, segment) -> Tuple[Optional[Union[int, float]], Optional[str], str]:
-        """Extract a compact numeric value from structured/cell fields before prose fallback."""
-        if segment is None:
-            return None, None, ""
-
-        unit = self._format_short_metadata_value(
-            self._get_segment_field(segment, "unit", "cell_unit", "raw_unit"),
-            120,
-        ) or None
-
-        field_names = (
-            "value", "value_text", "cell_value", "raw_value", "numeric_value",
-            "amount", "figure", "data", "extracted_value",
-        )
-        for field in field_names:
-            raw_value = self._get_segment_field(segment, field)
-            parsed = _parse_llm_numeric_value_only(raw_value)
-            if parsed is not None:
-                return parsed, unit, f"{field}={raw_value}"
-
-        data = self._segment_structured_data_dict(segment)
-        for key, raw_value in data.items():
-            if str(key).lower() in {"page", "page_number", "row_index", "column_index", "year"}:
-                continue
-            parsed = _parse_llm_numeric_value_only(raw_value)
-            if parsed is not None:
-                unit = unit or self._format_short_metadata_value(
-                    data.get("unit") or data.get("cell_unit") or data.get("raw_unit"),
-                    120,
-                ) or None
-                return parsed, unit, f"structured_data.{key}={raw_value}"
-
-        compact_sources = [
-            self._get_segment_field(segment, "value_text", "cell_value", "value"),
-            getattr(segment, "content", ""),
-        ]
-        for source in compact_sources:
-            parsed = self._extract_numeric_from_cell_text(source)
-            if parsed is not None:
-                return parsed, unit, self._format_short_metadata_value(source, 220)
-
-        return None, unit, ""
 
     def _direct_evidence_bundle_for_segment(
         self,
         report_content: ReportContent,
         segment,
         code_candidates: List[str],
-        expected_unit: str = "",
-    ) -> Tuple[str, Optional[Union[int, float]], Optional[str], str]:
-        """Build same-row/same-segment evidence and extract a deterministic numeric value."""
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> Tuple[str, List[Dict[str, Any]]]:
+        """Build same-row/same-segment evidence and return its real data cells."""
         if segment is None:
-            return "", None, None, ""
+            return "", []
 
-        row_context, row_numeric, row_unit, row_desc = self._build_table_row_aggregation_context(
+        row_context, _, _, _ = self._build_table_row_aggregation_context(
             report_content,
             segment,
             max_chars=1800,
@@ -664,23 +919,16 @@ class DisclosureInferenceEngine:
         hit_text = self._truncate_segment_text(getattr(segment, "content", "") or "", 1000)
         evidence_text = "\n\n".join(x for x in [row_context, structured_hint, hit_text] if x)
 
-        numeric_value = row_numeric
-        raw_unit = row_unit
-        data_desc = row_desc or ""
-
-        # If the row-level latest-year value is not available, use the current cell/segment.
-        if numeric_value is None:
-            numeric_value, raw_unit, data_desc = self._direct_numeric_from_segment_fields(segment)
-
-        # If the code is present only in the row context and the current cell has the value,
-        # this still counts as code + data in the same table row.
         if not self._contains_metric_code(evidence_text, code_candidates):
-            return evidence_text, None, raw_unit, data_desc
+            return evidence_text, []
 
-        if numeric_value is None:
-            return evidence_text, None, raw_unit, data_desc
-
-        return evidence_text, numeric_value, raw_unit, data_desc
+        numeric_candidates = self._real_data_candidates_for_row(
+            report_content,
+            segment,
+            code_candidates,
+            metric_profile,
+        )
+        return evidence_text, numeric_candidates
 
     def _direct_code_data_disclosure_analysis(
         self,
@@ -689,6 +937,7 @@ class DisclosureInferenceEngine:
         metric: Optional['ESGMetric'],
         segment_metadata: List[Dict],
         evidence_segment_ids: List[str],
+        metric_profile: Optional[MetricRetrievalProfile] = None,
     ) -> Optional[DisclosureAnalysis]:
         """Classify as fully_disclosed when current metric code and direct data are found together.
 
@@ -699,6 +948,24 @@ class DisclosureInferenceEngine:
         """
         code_candidates = self._metric_code_candidates(retrieval_result, metric)
         if not code_candidates or not segment_metadata:
+            return None
+
+        metric_profile = metric_profile or self._resolve_metric_profile(
+            metric, retrieval_result
+        )
+        direct_rules = (
+            metric_profile.direct_disclosure_rules if metric_profile is not None else {}
+        )
+        shared_code = self._metric_code_is_shared(metric_profile, code_candidates)
+        # A shared code without an exactly resolved sub-metric profile is
+        # intrinsically ambiguous and must continue through normal analysis.
+        if shared_code and metric_profile is None:
+            return None
+        if (
+            metric_profile is not None
+            and metric_profile.output_shape in {"breakdown", "table"}
+            and metric_profile.variable_dimensions
+        ):
             return None
 
         expected_unit = getattr(metric, "unit", "") if metric else ""
@@ -715,32 +982,111 @@ class DisclosureInferenceEngine:
             if segment is None:
                 continue
 
-            evidence_text, numeric_value, raw_unit, data_desc = self._direct_evidence_bundle_for_segment(
+            evidence_text, numeric_candidates = self._direct_evidence_bundle_for_segment(
                 report_content=report_content,
                 segment=segment,
                 code_candidates=code_candidates,
-                expected_unit=expected_unit,
+                metric_profile=metric_profile,
             )
             if not evidence_text or not self._contains_metric_code(evidence_text, code_candidates):
                 continue
-            if numeric_value is None:
+            requires_component_match = shared_code or bool(
+                direct_rules.get("requires_component_label_when_code_shared", False)
+            )
+            if requires_component_match and not self._profile_component_matches(
+                evidence_text, metric_profile
+            ):
+                continue
+            numeric_candidates = [
+                candidate
+                for candidate in numeric_candidates
+                if self._candidate_satisfies_profile(candidate, metric_profile)
+            ]
+            if not numeric_candidates:
                 continue
 
-            converted_value = _convert_numeric_value_between_units(numeric_value, raw_unit, expected_unit)
-            stored_numeric = converted_value if converted_value is not None else numeric_value
-            value_status = "converted" if converted_value is not None and raw_unit and expected_unit else "exact"
-            page_number = getattr(segment, "page_number", None) or meta.get("page_number")
+            # A direct row may contain one value or one unambiguous value per
+            # reporting year. Multiple values within the same year still go
+            # through normal sub-metric analysis.
+            if len(numeric_candidates) > 1:
+                candidate_years = [candidate.get("year") for candidate in numeric_candidates]
+                if any(year is None for year in candidate_years):
+                    continue
+                if len(set(int(year) for year in candidate_years)) != len(candidate_years):
+                    continue
+
+            year_values = self._metric_year_values_from_candidates(
+                numeric_candidates,
+                metric,
+                metric_profile,
+            )
+            target_year = self._target_year_for_metric(metric)
+            selected_year, selected_year_value = self._select_metric_year_value(
+                year_values,
+                target_year,
+                metric_profile,
+            )
+            selected_candidate: Optional[Dict[str, Any]] = None
+            if selected_year_value is not None:
+                for candidate in numeric_candidates:
+                    if (
+                        candidate.get("year") == selected_year_value.get("year")
+                        and _parse_llm_numeric_value_only(candidate.get("value"))
+                        == _parse_llm_numeric_value_only(selected_year_value.get("raw_value"))
+                    ):
+                        selected_candidate = candidate
+                        break
+            elif len(numeric_candidates) == 1 and not year_values:
+                selected_candidate = numeric_candidates[0]
+
+            if selected_year_value is not None:
+                stored_numeric = selected_year_value.get("value")
+                numeric_value = selected_year_value.get("raw_value")
+                raw_unit = selected_year_value.get("raw_unit")
+                data_desc = selected_year_value.get("context") or ""
+                data_segment = selected_candidate.get("segment") if selected_candidate else None
+            elif selected_candidate is not None:
+                numeric_value = selected_candidate.get("value")
+                raw_unit = selected_candidate.get("unit")
+                converted_value = _convert_numeric_value_between_units(numeric_value, raw_unit, expected_unit)
+                stored_numeric = converted_value if converted_value is not None else numeric_value
+                data_desc = str(selected_candidate.get("description") or "")
+                data_segment = selected_candidate.get("segment")
+            else:
+                numeric_value = None
+                raw_unit = None
+                stored_numeric = None
+                data_desc = ""
+                data_segment = None
+
+            page_number = (
+                (selected_year_value or {}).get("page")
+                or getattr(data_segment, "page_number", None)
+                or getattr(segment, "page_number", None)
+                or meta.get("page_number")
+            )
             score = float(meta.get("score", 0) or 0)
+            data_segment_id = (
+                (selected_year_value or {}).get("evidence_segment_id")
+                or getattr(data_segment, "segment_id", None)
+                or segment_id
+            )
 
             hit = {
-                "segment_id": segment_id,
+                "segment_id": data_segment_id,
                 "page": page_number,
                 "value": stored_numeric,
                 "raw_value": numeric_value,
                 "raw_unit": raw_unit,
-                "value_status": value_status,
                 "context": self._format_short_metadata_value(evidence_text, 1400),
-                "data_desc": data_desc or f"{numeric_value} {raw_unit or ''}".strip(),
+                "data_desc": data_desc or f"{numeric_value or ''} {raw_unit or ''}".strip(),
+                "year_values": year_values,
+                "selected_year": selected_year,
+                "data_segment_ids": [
+                    candidate.get("segment_id")
+                    for candidate in numeric_candidates
+                    if candidate.get("segment_id")
+                ],
                 "score": score,
             }
             if best_hit is None or hit["score"] > best_hit.get("score", 0):
@@ -751,10 +1097,15 @@ class DisclosureInferenceEngine:
 
         code_text = "/".join(code_candidates[:2])
         raw_unit_text = f" {best_hit['raw_unit']}" if best_hit.get("raw_unit") else ""
+        years_text = ", ".join(
+            str(item.get("year")) for item in best_hit.get("year_values", [])
+        )
         reasoning = (
             f"Direct code-data extraction found the current metric code ({code_text}) "
-            f"and a directly extractable metric data value ({best_hit['raw_value']}{raw_unit_text}) "
-            "in the same evidence row/segment, so this metric is classified as fully_disclosed before LLM assessment."
+            f"and directly extractable metric data in the same evidence row/segment"
+            f"{f' for reporting years {years_text}' if years_text else ''}. "
+            f"The currently projected value is {best_hit['raw_value']}{raw_unit_text}; "
+            "all annual values are retained for later year selection."
         )
 
         return DisclosureAnalysis(
@@ -763,7 +1114,11 @@ class DisclosureInferenceEngine:
             metric_code=retrieval_result.metric_code,
             disclosure_status=DisclosureStatus.FULLY_DISCLOSED,
             reasoning=reasoning,
-            evidence_segments=evidence_segment_ids or [best_hit["segment_id"]],
+            evidence_segments=list(dict.fromkeys([
+                best_hit["segment_id"],
+                *(best_hit.get("data_segment_ids") or []),
+                *(evidence_segment_ids or []),
+            ])),
             improvement_suggestions=[],
             category=getattr(metric, 'sasb_category', '') if metric else '',
             topic=(getattr(metric, 'sasb_topic', None) or '') if metric else '',
@@ -771,8 +1126,15 @@ class DisclosureInferenceEngine:
             type=getattr(metric, 'sasb_type', '') if metric else '',
             definition=(getattr(metric, 'definition', None) or '') if metric else '',
             value=_finalize_compliance_value_field(best_hit.get("value")),
+            year_values=best_hit.get("year_values") or [],
+            selected_year=best_hit.get("selected_year"),
             context=best_hit.get("context"),
             page=best_hit.get("page"),
+            evidence_sources=self._build_evidence_sources(
+                segment_metadata,
+                preferred_segment_id=best_hit.get("segment_id"),
+                preferred_page=best_hit.get("page"),
+            ),
         )
 
     def _analyze_single_metric(
@@ -795,9 +1157,20 @@ class DisclosureInferenceEngine:
         relevant_segments = []
         evidence_segment_ids = []
         segment_metadata = []
+        metric_profile = self._resolve_metric_profile(metric, retrieval_result)
 
-        # Keep the 0327 direct-LLM style as the primary analysis path, but use a dynamic evidence window in the 11-40 range.
-        final_window = self._get_final_window_size(metric, observed_matches=int(getattr(retrieval_result, "total_matches", 0) or 0))
+        # Analyze up to the configured number of best fused evidence segments.
+        final_window = _positive_env_int(
+            "REPORT_ANALYSIS_MAX_EVIDENCE_SEGMENTS",
+            46,
+            maximum=46,
+        )
+        max_evidence_chars = _positive_env_int(
+            "REPORT_ANALYSIS_MAX_CHARS_PER_EVIDENCE",
+            8192,
+            minimum=600,
+            maximum=8192,
+        )
         for result in retrieval_result.combined_results[:final_window]:
             # Prefer segment from report_content; fallback to retrieval payload (more robust across caches)
             segment = None
@@ -813,7 +1186,19 @@ class DisclosureInferenceEngine:
                 fallback_content=getattr(result, "content", None),
             )
 
+            link_source_context = None
+            link_source_segment_id = getattr(result, "link_source_segment_id", None)
+            if getattr(result, "link_target_page", None) is not None:
+                content, link_source_context, link_source_segment_id = self._build_linked_evidence_context(
+                    report_content=report_content,
+                    result=result,
+                    target_context=content,
+                    max_chars=max_evidence_chars,
+                )
+
             if content:
+                if getattr(result, "link_target_page", None) is None:
+                    content = self._truncate_segment_text(content, max_evidence_chars)
                 relevant_segments.append(content)
                 evidence_segment_ids.append(result.segment_id)
 
@@ -828,6 +1213,11 @@ class DisclosureInferenceEngine:
                     "source_table_id": table_id,
                     "row_index": row_index,
                     "column_index": col_index,
+                    "link_source_page": getattr(result, "link_source_page", None),
+                    "link_target_page": getattr(result, "link_target_page", None),
+                    "link_anchor_text": getattr(result, "link_anchor_text", None),
+                    "link_source_segment_id": link_source_segment_id,
+                    "link_source_context": link_source_context,
                 }
                 segment_metadata.append(metadata)
 
@@ -842,6 +1232,7 @@ class DisclosureInferenceEngine:
             metric=metric,
             segment_metadata=segment_metadata,
             evidence_segment_ids=evidence_segment_ids,
+            metric_profile=metric_profile,
         )
         if direct_analysis is not None:
             return direct_analysis
@@ -861,6 +1252,7 @@ class DisclosureInferenceEngine:
             metric_category=(getattr(metric, "sasb_category", None) or "") if metric else "",
             metric_type=(getattr(metric, "sasb_type", None) or "") if metric else "",
             metric_keywords=(getattr(metric, "keywords", None) or []) if metric else [],
+            metric_profile=metric_profile,
         )
         
         try:
@@ -879,6 +1271,27 @@ class DisclosureInferenceEngine:
               "evidence_segment_id": "SEG_000123",
               "evidence_quote": "Total energy use was 511 MWh in FY2024...",
               "specific_data_found": "511 MWh (FY2024), normalized to 1839.6 GJ",
+              "year_values": [
+                {
+                  "year": 2023,
+                  "value": 478,
+                  "raw_value": 478,
+                  "unit": "MWh",
+                  "page": 23,
+                  "evidence_segment_id": "SEG_000123",
+                  "evidence_quote": "FY2023 total energy use: 478 MWh"
+                },
+                {
+                  "year": 2024,
+                  "value": 511,
+                  "raw_value": 511,
+                  "unit": "MWh",
+                  "page": 23,
+                  "evidence_segment_id": "SEG_000123",
+                  "evidence_quote": "FY2024 total energy use: 511 MWh"
+                }
+              ],
+              "derived_calculation": null,
               "improvement_suggestions": []
             }
             """
@@ -906,10 +1319,16 @@ Assessment principles:
 - A retrieved report segment that explicitly contains the current SASB metric code and a metric-specific value or narrative is the strongest evidence of disclosure. When the row/section label semantically belongs to the current metric or current code-level metric family, treat it as a direct metric hit.
 - If a same-code report row/table or same-metric-label row/table provides a numeric value or narrative for the current metric, classify it as fully_disclosed. Do not downgrade because sibling sub-items under the same code are missing, because the unit is different but convertible, because the report does not restate the conversion formula, or because the framework definition contains additional guidance.
 - For split metrics under one SASB code, assess the current sub-item only. Missing sibling sub-items must not reduce the status for the current sub-item. A value for a clearly different sub-item should not be used as this sub-item's value.
+- For internal PDF links, assess the link-source row and its surrounding context together with the linked target-page evidence. The source row can itself contain a valid disclosure value; do not discard it merely because it also contains a link or appears in a reporting-framework index.
+- For representation/distribution metrics, a table can legitimately contain several group percentages rather than one scalar. If the requested employee category and reporting period are present, treat the distribution as disclosed evidence; set value to null/ambiguous when no single scalar represents the metric and preserve the reported percentages in specific_data_found/evidence_quote. Do not classify it as not_disclosed merely because the evidence has multiple values.
+- When report categories are broader proxies rather than exact framework categories (for example, "people leader roles" versus executive/non-executive management, or "non-technical roles" versus all other employees), use partially_disclosed and state the category mismatch. An exact category such as "Technical" is stronger evidence.
 - If the report label is semantically aligned with the current metric, do not require verbatim wording from the framework. Category labels, employee groups, product labels, operational labels, and line items may be equivalent even when phrased differently.
 - Unit differences must be handled by judgment. If the reported value can be safely converted, normalized, or interpreted as an equivalent unit for the current metric, keep the disclosure as fully_disclosed when the metric itself is directly disclosed. Provide raw_value/raw_unit and converted value when possible.
 - Do not downgrade from fully_disclosed solely because of source unit wording, reporting-unit wording, missing conversion narrative, non-core scope uncertainty, or definition/guidance text when the reported value is directly usable for the current metric.
 - Never put narrative text in value. Do not choose a number from a clearly different line item or clearly different sub-item.
+- Extract every explicitly disclosed annual value for the current metric into year_values. Keep one metric assessment with multiple year entries; do not discard older years merely because value contains the latest year.
+- Each year_values item must bind one year to its own metric-specific value and evidence. Do not infer missing years and do not copy one year's value into another year.
+- Derive a value only when the metric definition explicitly states the formula and every operand is present in the evidence with the same year, reporting boundary and compatible units. Otherwise derived_calculation must be null.
 """
 
             FORCE_JSON = True # If model outputs thought train in response
@@ -945,9 +1364,18 @@ Assessment principles:
             api_kwargs["messages"] = queries
 
             # Call LLM for analysis
-            response = self.llm_client.chat.completions.create(
-                **api_kwargs
-            )
+            try:
+                response = self.llm_client.chat.completions.create(**api_kwargs)
+            except Exception as exc:
+                logger.exception(
+                    f"LLM request failed for metric {retrieval_result.metric_name}"
+                )
+                raise DisclosureAnalysisError(
+                    f"LLM request failed for metric '{retrieval_result.metric_name}'.",
+                    metric_id=retrieval_result.metric_id,
+                    metric_name=retrieval_result.metric_name,
+                    error_type="llm_request_failed",
+                ) from exc
             
             #print("======== DEBUG LLM RESPONSE ========")
             #print(response.choices[0].message.content)
@@ -956,24 +1384,29 @@ Assessment principles:
             content = (response.choices[0].message.content or "").strip()
             llm_result = self._extract_json_from_llm_response(content)
             if llm_result is None:
-                logger.warning(
-                    f"LLM did not return valid JSON for metric {retrieval_result.metric_name}; "
-                    "returning fallback NOT_DISCLOSED analysis."
+                logger.error(
+                    f"LLM did not return valid JSON for metric "
+                    f"{retrieval_result.metric_name}"
                 )
-                return self._fallback_disclosure_analysis(
-                    retrieval_result, metric, evidence_segment_ids,
-                    reasoning="LLM did not return valid JSON; analysis skipped."
+                raise DisclosureAnalysisError(
+                    f"LLM returned invalid JSON for metric '{retrieval_result.metric_name}'.",
+                    metric_id=retrieval_result.metric_id,
+                    metric_name=retrieval_result.metric_name,
+                    error_type="invalid_llm_json",
                 )
 
             # Validate required fields from LLM
             if "reasoning" not in llm_result or not llm_result["reasoning"]:
-                logger.warning(
-                    f"LLM response missing required 'reasoning' for metric {retrieval_result.metric_name}; "
-                    "returning fallback analysis."
+                logger.error(
+                    f"LLM response missing required 'reasoning' for metric "
+                    f"{retrieval_result.metric_name}"
                 )
-                return self._fallback_disclosure_analysis(
-                    retrieval_result, metric, evidence_segment_ids,
-                    reasoning="LLM response missing required reasoning field."
+                raise DisclosureAnalysisError(
+                    f"LLM response validation failed for metric "
+                    f"'{retrieval_result.metric_name}'.",
+                    metric_id=retrieval_result.metric_id,
+                    metric_name=retrieval_result.metric_name,
+                    error_type="invalid_llm_response",
                 )
 
             # -----------------------------
@@ -983,11 +1416,43 @@ Assessment principles:
             # disclosure_status is decided by the prompt/LLM directly. Python only maps
             # that field to the internal enum and does not reclassify from
             # metric_hit/has_disclosure/disclosure_quality/value_status/units/numbers.
-            disclosure_status = self._map_llm_disclosure_status(llm_result)
+            try:
+                disclosure_status = self._map_llm_disclosure_status(llm_result)
+            except ValueError as exc:
+                raise DisclosureAnalysisError(
+                    f"LLM response validation failed for metric "
+                    f"'{retrieval_result.metric_name}'.",
+                    metric_id=retrieval_result.metric_id,
+                    metric_name=retrieval_result.metric_name,
+                    error_type="invalid_llm_response",
+                ) from exc
+
+            llm_value_status = _normalize_value_status(llm_result.get("value_status"))
+            preserve_ambiguous_value = llm_value_status == "ambiguous"
 
             found_numeric = _parse_llm_numeric_value_only(llm_result.get("value", None))
             if found_numeric is None:
                 found_numeric = _parse_llm_numeric_value_only(llm_result.get("raw_value", None))
+            validated_derived_calculation = self._validated_derived_calculation(
+                llm_result,
+                metric,
+                segment_metadata,
+            )
+            if validated_derived_calculation is not None:
+                found_numeric = validated_derived_calculation["result"]
+            elif llm_value_status == "derived":
+                found_numeric = None
+            elif preserve_ambiguous_value:
+                # A distribution is valid evidence but may not have one canonical
+                # scalar. Do not replace that explicit decision with an arbitrary
+                # table-cell value during deterministic fallback processing.
+                found_numeric = None
+
+            # A scalar explicitly selected by the LLM, or produced by a
+            # validated calculation, has precedence over deterministic table
+            # candidates. Those candidates remain available as evidence and as
+            # a fallback only when no authoritative scalar was selected.
+            authoritative_scalar_selected = found_numeric is not None
 
             found_page = None
             found_context = None
@@ -1039,6 +1504,13 @@ Assessment principles:
             selected_row_context = None
             selected_latest_numeric = None
             selected_latest_unit = None
+            selected_metric_candidate = self._select_metric_candidate_from_exact_code_evidence(
+                report_content,
+                segment_metadata,
+                metric,
+                self._metric_code_candidates(retrieval_result, metric),
+                metric_profile,
+            )
             if selected_segment_id:
                 try:
                     selected_segment = self._get_segment_by_id(report_content, selected_segment_id)
@@ -1050,6 +1522,15 @@ Assessment principles:
                             selected_row_context = row_ctx
                             selected_latest_numeric = latest_num
                             selected_latest_unit = latest_unit
+                        selected_segment_candidate = self._select_metric_numeric_candidate(
+                            report_content,
+                            selected_segment,
+                            metric,
+                            self._metric_code_candidates(retrieval_result, metric),
+                            metric_profile,
+                        )
+                        if selected_metric_candidate is None:
+                            selected_metric_candidate = selected_segment_candidate
                 except Exception:
                     pass
 
@@ -1058,12 +1539,127 @@ Assessment principles:
             # from the same table row (for example an absolute value plus a percentage).
             if (
                 disclosure_status != DisclosureStatus.NOT_DISCLOSED
+                and not preserve_ambiguous_value
                 and found_numeric is None
                 and selected_latest_numeric is not None
+                and not (
+                    metric_profile is not None
+                    and metric_profile.value_selection_rules.get(
+                        "do_not_select_first_of_multiple_unlabeled_values", False
+                    )
+                )
             ):
                 expected_unit = getattr(metric, "unit", "") if metric else ""
                 converted_latest = _convert_numeric_value_between_units(selected_latest_numeric, selected_latest_unit, expected_unit)
                 found_numeric = converted_latest if converted_latest is not None else selected_latest_numeric
+
+            # For multi-value rows, use the candidate selected by the current
+            # sub-metric name/unit. This is part of normal analysis, not the
+            # same-code deterministic shortcut.
+            if (
+                disclosure_status != DisclosureStatus.NOT_DISCLOSED
+                and not preserve_ambiguous_value
+                and found_numeric is None
+                and selected_metric_candidate is not None
+                and validated_derived_calculation is None
+            ):
+                candidate_value = selected_metric_candidate.get("value")
+                candidate_unit = selected_metric_candidate.get("unit")
+                expected_unit = getattr(metric, "unit", "") if metric else ""
+                converted_candidate = _convert_numeric_value_between_units(candidate_value, candidate_unit, expected_unit)
+                found_numeric = converted_candidate if converted_candidate is not None else candidate_value
+                candidate_segment = selected_metric_candidate.get("segment")
+                candidate_segment_id = getattr(candidate_segment, "segment_id", None)
+                if candidate_segment_id and candidate_segment_id not in evidence_segment_ids:
+                    evidence_segment_ids.insert(0, candidate_segment_id)
+                candidate_page = getattr(candidate_segment, "page_number", None)
+                if candidate_page is not None:
+                    found_page = candidate_page
+
+            year_values: List[Dict[str, Any]] = []
+            selected_year: Optional[int] = None
+            selected_year_context: Optional[str] = None
+            target_year = self._target_year_for_metric(metric)
+            if disclosure_status != DisclosureStatus.NOT_DISCLOSED:
+                code_candidates = self._metric_code_candidates(retrieval_result, metric)
+                deterministic_year_values = self._collect_metric_year_values_from_exact_code_evidence(
+                    report_content,
+                    segment_metadata,
+                    metric,
+                    code_candidates,
+                    metric_profile,
+                )
+                selected_candidate_year_values = (
+                    self._metric_year_values_from_candidates(
+                        [selected_metric_candidate], metric, metric_profile
+                    )
+                    if selected_metric_candidate is not None
+                    else []
+                )
+                llm_year_values = self._normalise_llm_year_values(
+                    llm_result,
+                    metric,
+                    segment_metadata,
+                    metric_profile,
+                )
+                derived_year_values: List[Dict[str, Any]] = []
+                if validated_derived_calculation is not None:
+                    derived_year = validated_derived_calculation.get("year")
+                    derived_result = validated_derived_calculation.get("result")
+                    if derived_year is not None and derived_result is not None:
+                        derived_year_values.append(
+                            {
+                                "year": derived_year,
+                                "value": derived_result,
+                                "raw_value": derived_result,
+                                "raw_unit": getattr(metric, "unit", "") if metric else "",
+                                "unit": getattr(metric, "unit", "") if metric else "",
+                                "page": found_page,
+                                "context": validated_derived_calculation.get("formula"),
+                                "evidence_segment_id": evidence_seg_id,
+                                "source": "derived_calculation",
+                            }
+                        )
+                year_values = self._merge_metric_year_values(
+                    derived_year_values,
+                    llm_year_values,
+                    deterministic_year_values,
+                    selected_candidate_year_values,
+                )
+                candidate_selected_year, selected_year_value = self._select_metric_year_value(
+                    year_values,
+                    target_year,
+                    metric_profile,
+                )
+                if selected_year_value is not None and not preserve_ambiguous_value:
+                    selected_source = str(selected_year_value.get("source") or "")
+                    authoritative_year_value = selected_source in {
+                        "llm_evidence",
+                        "derived_calculation",
+                    }
+                    if not authoritative_scalar_selected or authoritative_year_value:
+                        selected_year = candidate_selected_year
+                        found_numeric = selected_year_value.get("value")
+                        if selected_year_value.get("page") is not None:
+                            found_page = selected_year_value.get("page")
+                        selected_year_context = str(
+                            selected_year_value.get("context") or ""
+                        ).strip() or None
+                        selected_year_segment = selected_year_value.get("evidence_segment_id")
+                        if selected_year_segment and selected_year_segment not in evidence_segment_ids:
+                            evidence_segment_ids.insert(0, selected_year_segment)
+                elif target_year is not None:
+                    # Never silently substitute the latest value when the caller
+                    # explicitly requested a year that is absent or ambiguous.
+                    found_numeric = None
+                    found_page = None
+
+                if (
+                    metric_profile is not None
+                    and metric_profile.output_shape in {"breakdown", "table"}
+                    and metric_profile.variable_dimensions
+                ):
+                    found_numeric = None
 
             # Prefer the LLM-selected quote/context. Use full-row context only when
             # the LLM did not return metric-specific context.
@@ -1077,6 +1673,13 @@ Assessment principles:
                         found_context = "; ".join(str(x) for x in specific_data if x is not None).strip() or None
                     else:
                         found_context = str(specific_data).strip() or None
+
+            if (
+                not found_context
+                and not preserve_ambiguous_value
+                and selected_metric_candidate is not None
+            ):
+                found_context = str(selected_metric_candidate.get("description") or "").strip() or None
 
             if (
                 disclosure_status != DisclosureStatus.NOT_DISCLOSED
@@ -1097,6 +1700,9 @@ Assessment principles:
                     excerpt = str(relevant_segments[idx]).strip()
                     if excerpt:
                         found_context = excerpt[:900]
+
+            if selected_year_context:
+                found_context = selected_year_context
 
             if disclosure_status == DisclosureStatus.NOT_DISCLOSED:
                 stored_value: Union[int, float, str] = COMPLIANCE_VALUE_NA
@@ -1119,53 +1725,212 @@ Assessment principles:
                 type=getattr(metric, 'sasb_type', '') if metric else '',
                 definition=(getattr(metric, 'definition', None) or '') if metric else '',
                 value=stored_value,
+                year_values=year_values,
+                selected_year=selected_year,
                 context=found_context,
-                page=found_page
+                page=found_page,
+                evidence_sources=self._build_evidence_sources(
+                    segment_metadata,
+                    preferred_segment_id=evidence_seg_id or selected_segment_id,
+                    preferred_page=found_page,
+                ),
+                derived_calculation=validated_derived_calculation,
             )
             
-        except json.JSONDecodeError as e:
-            logger.warning(f"Failed to parse LLM JSON for metric {retrieval_result.metric_name}: {e}")
-            return self._fallback_disclosure_analysis(
-                retrieval_result, metric, evidence_segment_ids,
-                reasoning=f"LLM returned invalid JSON: {e}",
+        except DisclosureAnalysisError:
+            raise
+        except json.JSONDecodeError as exc:
+            logger.exception(
+                f"Failed to parse LLM JSON for metric {retrieval_result.metric_name}"
             )
-        except Exception as e:
-            logger.warning(f"LLM analysis failed for metric {retrieval_result.metric_name}: {e}")
-            return self._fallback_disclosure_analysis(
-                retrieval_result, metric, evidence_segment_ids,
-                reasoning=f"Analysis error: {e}",
+            raise DisclosureAnalysisError(
+                f"LLM returned invalid JSON for metric '{retrieval_result.metric_name}'.",
+                metric_id=retrieval_result.metric_id,
+                metric_name=retrieval_result.metric_name,
+                error_type="invalid_llm_json",
+            ) from exc
+        except Exception as exc:
+            logger.exception(
+                f"Disclosure analysis failed for metric {retrieval_result.metric_name}"
             )
+            raise DisclosureAnalysisError(
+                f"Disclosure analysis failed for metric "
+                f"'{retrieval_result.metric_name}'.",
+                metric_id=retrieval_result.metric_id,
+                metric_name=retrieval_result.metric_name,
+                error_type="analysis_execution_failed",
+            ) from exc
 
         return analysis
-    
-    def _is_quantitative_metric(self, metric: Optional['ESGMetric']) -> bool:
-        if metric is None:
-            return False
-        category = str(getattr(metric, "sasb_category", "") or "").strip().lower()
-        metric_type = str(getattr(metric, "sasb_type", "") or "").strip().lower()
-        unit = str(getattr(metric, "unit", "") or "").strip()
-        return bool(unit) or category == "quantitative" or "quantitative" in metric_type
 
-    def _is_qualitative_metric(self, metric: Optional['ESGMetric']) -> bool:
-        return not self._is_quantitative_metric(metric)
+    def _validated_derived_calculation(
+        self,
+        llm_result: Dict[str, Any],
+        metric: Optional['ESGMetric'],
+        segment_metadata: List[Dict[str, Any]],
+    ) -> Optional[Dict[str, Any]]:
+        raw = llm_result.get("derived_calculation")
+        if not isinstance(raw, dict):
+            return None
+        operation = str(raw.get("operation") or "").strip().lower()
+        if operation not in {"ratio_percent", "ratio", "sum", "difference"}:
+            return None
+        formula = str(raw.get("formula") or "").strip()
+        if not formula:
+            return None
 
-    def _get_final_window_size(self, metric: Optional['ESGMetric'], observed_matches: int = 0) -> int:
-        base = 18 if self._is_quantitative_metric(metric) else 11
-        metric_name = str(getattr(metric, "metric_name", "") or "") if metric is not None else ""
-        definition = str(getattr(metric, "definition", "") or getattr(metric, "description", "") or "") if metric is not None else ""
-        token_count = len(re.findall(r"[A-Za-z0-9]{3,}", f"{metric_name} {definition}"))
-        complexity_bonus = min(7, token_count // 16)
-        if observed_matches >= 1000:
-            richness_bonus = 10
-        elif observed_matches >= 400:
-            richness_bonus = 7
-        elif observed_matches >= 150:
-            richness_bonus = 4
-        elif observed_matches >= 50:
-            richness_bonus = 2
+        definition = str(
+            getattr(metric, "definition", "") or getattr(metric, "description", "") or ""
+        ).lower() if metric is not None else ""
+        formula_cues = {
+            "ratio_percent": ("divided by", "percentage", "rate as", "ratio"),
+            "ratio": ("divided by", "ratio"),
+            "sum": ("sum of", "calculated as the sum", "total of"),
+            "difference": ("difference between", "subtract"),
+        }
+        if not definition or not any(cue in definition for cue in formula_cues[operation]):
+            return None
+
+        operands = raw.get("operands")
+        if not isinstance(operands, list) or len(operands) < 2:
+            return None
+        if operation == "difference" and len(operands) != 2:
+            return None
+        valid_segment_ids = {
+            str(item.get("segment_id")) for item in segment_metadata if item.get("segment_id")
+        }
+        parsed: List[Dict[str, Any]] = []
+        for operand in operands:
+            if not isinstance(operand, dict):
+                return None
+            value = _parse_llm_numeric_value_only(operand.get("value"))
+            unit = str(operand.get("unit") or "").strip()
+            boundary = re.sub(r"\s+", " ", str(operand.get("boundary") or "").strip().lower())
+            segment_id = str(operand.get("segment_id") or "").strip()
+            try:
+                year = int(operand.get("year"))
+            except Exception:
+                return None
+            if value is None or not unit or not boundary or segment_id not in valid_segment_ids:
+                return None
+            parsed.append(
+                {
+                    "name": str(operand.get("name") or "").strip(),
+                    "value": value,
+                    "unit": unit,
+                    "year": year,
+                    "boundary": str(operand.get("boundary") or "").strip(),
+                    "segment_id": segment_id,
+                }
+            )
+
+        years = {item["year"] for item in parsed}
+        boundaries = {re.sub(r"\s+", " ", item["boundary"].strip().lower()) for item in parsed}
+        if len(years) != 1 or len(boundaries) != 1:
+            return None
+
+        values = [float(item["value"]) for item in parsed]
+        if operation in {"ratio", "ratio_percent"}:
+            left_profile = _unit_profile(parsed[0]["unit"])
+            right_profile = _unit_profile(parsed[1]["unit"])
+            if left_profile is None or right_profile is None or left_profile[0] != right_profile[0]:
+                return None
+            denominator = values[1] * _extract_unit_multiplier(parsed[1]["unit"]) * right_profile[1]
+            if denominator == 0:
+                return None
+            numerator = values[0] * _extract_unit_multiplier(parsed[0]["unit"]) * left_profile[1]
+            result = numerator / denominator
+            if operation == "ratio_percent":
+                result *= 100.0
         else:
-            richness_bonus = 0
-        return max(11, min(40, base + complexity_bonus + richness_bonus))
+            result_unit = parsed[0]["unit"]
+            compatible_values = [values[0]]
+            for item, value in zip(parsed[1:], values[1:]):
+                if _normalize_unit_text(item["unit"]).lower() == _normalize_unit_text(result_unit).lower():
+                    compatible_values.append(value)
+                    continue
+                converted = _convert_numeric_value_between_units(value, item["unit"], result_unit)
+                if converted is None:
+                    return None
+                compatible_values.append(float(converted))
+            result = (
+                sum(compatible_values)
+                if operation == "sum"
+                else compatible_values[0] - compatible_values[1]
+            )
+
+        if operation == "ratio_percent":
+            result_unit = "%"
+        elif operation == "ratio":
+            result_unit = "ratio"
+        else:
+            result_unit = parsed[0]["unit"]
+
+        return {
+            "operation": operation,
+            "formula": formula,
+            "operands": parsed,
+            "result": _clean_converted_number(result),
+            "result_unit": result_unit,
+            "year": next(iter(years)),
+            "boundary": parsed[0]["boundary"],
+        }
+
+    def _build_evidence_sources(
+        self,
+        segment_metadata: List[Dict[str, Any]],
+        preferred_segment_id: Optional[str] = None,
+        preferred_page: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        ordered = sorted(
+            list(segment_metadata or []),
+            key=lambda item: (
+                1 if preferred_segment_id and item.get("segment_id") == preferred_segment_id else 0,
+                1 if item.get("link_target_page") else 0,
+                float(item.get("score", 0) or 0),
+            ),
+            reverse=True,
+        )
+        sources: List[Dict[str, Any]] = []
+        seen = set()
+        for item in ordered:
+            data_page = item.get("page_number")
+            link_source_page = item.get("link_source_page")
+            link_target_page = item.get("link_target_page")
+            source_type = "linked_page" if link_target_page else "report_page"
+            key = (source_type, data_page, link_source_page, link_target_page)
+            if key in seen:
+                continue
+            seen.add(key)
+            source: Dict[str, Any] = {
+                "source_type": source_type,
+                "data_page": data_page,
+                "segment_id": item.get("segment_id"),
+            }
+            if link_target_page:
+                source["link_source_page"] = link_source_page
+                source["target_page"] = link_target_page
+                anchor_text = self._format_short_metadata_value(
+                    item.get("link_anchor_text"),
+                    320,
+                )
+                source_segment_id = str(item.get("link_source_segment_id") or "").strip()
+                source_context = self._format_short_metadata_value(
+                    item.get("link_source_context"),
+                    1200,
+                )
+                if anchor_text:
+                    source["anchor_text"] = anchor_text
+                if source_segment_id:
+                    source["link_source_segment_id"] = source_segment_id
+                if source_context:
+                    source["source_context"] = source_context
+            sources.append(source)
+            if len(sources) >= 8:
+                break
+        if not sources and preferred_page is not None:
+            sources.append({"source_type": "report_page", "data_page": preferred_page})
+        return sources
 
     def _truncate_segment_text(self, text: str, max_chars: int = 1200) -> str:
         value = str(text or "").strip()
@@ -1173,15 +1938,52 @@ Assessment principles:
             return value
         return value[: max_chars - 3].rstrip() + "..."
 
-    def _get_ordered_segments(self, report_content: ReportContent):
-        return sorted(
-            report_content.document_content.segments,
+    def _get_report_segment_cache(self, report_content: ReportContent) -> Dict[str, Any]:
+        segments = report_content.document_content.segments
+        signature = (id(segments), len(segments))
+        cached = getattr(report_content, "_disclosure_segment_cache", None)
+        if isinstance(cached, dict) and cached.get("signature") == signature:
+            return cached
+
+        ordered = sorted(
+            segments,
             key=lambda seg: (
                 getattr(seg, "page_number", 0) or 0,
                 getattr(seg, "position_y", 0.0) or 0.0,
                 getattr(seg, "segment_id", ""),
             ),
         )
+        by_id = {
+            str(getattr(segment, "segment_id", "")): segment
+            for segment in segments
+            if getattr(segment, "segment_id", None)
+        }
+        ordered_index = {
+            str(getattr(segment, "segment_id", "")): index
+            for index, segment in enumerate(ordered)
+            if getattr(segment, "segment_id", None)
+        }
+        table_rows: Dict[Tuple[str, int], List[Any]] = {}
+        for segment in segments:
+            row_key = self._get_table_row_key(segment)
+            if row_key != (None, None):
+                table_rows.setdefault(row_key, []).append(segment)
+
+        cached = {
+            "signature": signature,
+            "ordered": ordered,
+            "ordered_index": ordered_index,
+            "by_id": by_id,
+            "table_rows": table_rows,
+        }
+        try:
+            object.__setattr__(report_content, "_disclosure_segment_cache", cached)
+        except Exception:
+            pass
+        return cached
+
+    def _get_ordered_segments(self, report_content: ReportContent):
+        return self._get_report_segment_cache(report_content)["ordered"]
 
     def _is_adjacent_context_segment(self, target_segment, candidate_segment) -> bool:
         if candidate_segment is None or target_segment is None:
@@ -1272,47 +2074,651 @@ Assessment principles:
     def _extract_years_from_text(self, text: object) -> List[int]:
         raw = str(text or "")
         years: List[int] = []
-        for m in re.finditer(r"(?i)\b(?:FY|CY|FISCAL\s+YEAR\s*)?(20\d{2}|19\d{2})\b", raw):
+
+        def append_year(raw_year: object) -> None:
             try:
-                y = int(m.group(1))
-                if 1990 <= y <= 2100:
+                y = int(raw_year)
+                if 1990 <= y <= 2100 and y not in years:
                     years.append(y)
             except Exception:
                 pass
-        return years
+
+        for m in re.finditer(r"(?i)\b(?:(?:FY|CY)\s*|FISCAL\s+YEAR\s*)?(20\d{2}|19\d{2})\b", raw):
+            append_year(m.group(1))
+        for m in re.finditer(r"(?i)\b(?:FY|CY)\s*['\u2019]?(\d{2})\b", raw):
+            append_year(2000 + int(m.group(1)))
+        return sorted(years)
+
+    def _strip_metric_codes(self, text: object, code_candidates: Optional[List[str]] = None) -> str:
+        cleaned = str(text or "")
+        for code in code_candidates or []:
+            for pattern in compile_metric_code_patterns(code):
+                cleaned = pattern.sub(" ", cleaned)
+        return cleaned
+
+    def _numeric_mentions_from_cell_text(
+        self,
+        text: object,
+        code_candidates: Optional[List[str]] = None,
+        reject_values_from: Optional[Sequence[str]] = None,
+    ) -> List[Dict[str, Any]]:
+        rejected_sources = {
+            str(value).strip().lower()
+            for value in (reject_values_from or _DEFAULT_REJECT_VALUE_SOURCES)
+        }
+        raw = str(text or "")
+        if "metric_code" in rejected_sources:
+            raw = self._strip_metric_codes(raw, code_candidates)
+        raw = raw.strip()
+        if not raw:
+            return []
+        raw = raw.replace("\\n", "\n").replace("\\%", "%")
+        raw = re.sub(r"\$\s*\^\{.*?\}\s*\$", " ", raw)
+        mentions: List[Dict[str, Any]] = []
+        seen = set()
+        for line in re.split(r"[\n|]+", raw):
+            line = re.sub(r"\s+", " ", line).strip()
+            if not line:
+                continue
+            for match in re.finditer(r"-?\d[\d,]*(?:\.\d+)?\s*%?", line):
+                token = match.group(0).strip()
+                cleaned = token.replace(",", "").rstrip("%").strip()
+                try:
+                    numeric = float(cleaned)
+                except Exception:
+                    continue
+                before = line[max(0, match.start() - 24):match.start()].lower()
+                if (
+                    "page_number" in rejected_sources
+                    and re.search(r"(?:page|p\.)\s*[:#-]?\s*$", before)
+                ):
+                    continue
+                if (
+                    "row_or_column_number" in rejected_sources
+                    and re.search(r"(?:row|column|col)\s*[:#-]?\s*$", before)
+                ):
+                    continue
+                if (
+                    "reference_index" in rejected_sources
+                    and re.search(r"(?:index|indices|reference)\s*[:#-]?\s*$", before)
+                ):
+                    continue
+                if (
+                    "standalone_year" in rejected_sources
+                    and re.search(r"(?:fy|cy|fiscal\s+year)\s*$", before)
+                    and 0 <= numeric <= 2100
+                ):
+                    continue
+                if (
+                    "standalone_year" in rejected_sources
+                    and re.fullmatch(r"\d{4}", cleaned)
+                    and 1900 <= numeric <= 2100
+                ):
+                    continue
+                value: Union[int, float] = int(numeric) if numeric == int(numeric) and abs(numeric) < 1e15 else numeric
+                unit = "%" if token.endswith("%") else _extract_unit_hint(line)
+                key = (value, _normalize_unit_text(unit).lower(), line.lower())
+                if key in seen:
+                    continue
+                seen.add(key)
+                mentions.append({"value": value, "unit": unit or None, "description": line})
+        return mentions
+
+    def _is_navigation_or_code_cell(
+        self,
+        segment,
+        code_candidates: Optional[List[str]] = None,
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> bool:
+        if str(getattr(segment, "segment_type", "") or "").lower() != "table_cell":
+            return True
+        rejected_sources = self._profile_reject_value_sources(metric_profile)
+        header = str(self._get_segment_field(segment, "col_header", "column_header") or "").strip().lower()
+        if "reference_index" in rejected_sources and re.search(r"\b(reference|indices?)\b", header):
+            return True
+        if "metric_code" in rejected_sources and re.search(r"\b(code|sasb|gri)\b", header):
+            return True
+        if "page_number" in rejected_sources and re.search(r"\b(page|location|link)\b", header):
+            return True
+        value_text = str(self._get_segment_field(segment, "value_text", "cell_value", "value") or "").strip()
+        if (
+            "metric_code" in rejected_sources
+            and value_text
+            and self._contains_metric_code(value_text, code_candidates or [])
+        ):
+            without_codes = self._strip_metric_codes(value_text, code_candidates)
+            if not re.search(r"-?\d[\d,]*(?:\.\d+)?\s*%?", without_codes):
+                return True
+        return False
+
+    def _real_data_candidates_for_row(
+        self,
+        report_content: ReportContent,
+        target_segment,
+        code_candidates: Optional[List[str]] = None,
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> List[Dict[str, Any]]:
+        row_key = self._get_table_row_key(target_segment)
+        if row_key == (None, None):
+            return []
+        candidates: List[Dict[str, Any]] = []
+        row_segments = self._get_report_segment_cache(report_content)["table_rows"].get(
+            row_key,
+            [],
+        )
+        for segment in row_segments:
+            if self._is_navigation_or_code_cell(
+                segment, code_candidates, metric_profile
+            ):
+                continue
+
+            preferred_value = self._get_segment_field(
+                segment,
+                "value_text", "cell_value", "raw_value", "numeric_value",
+                "amount", "figure", "data", "extracted_value",
+            )
+            source_text = preferred_value if preferred_value is not None else getattr(segment, "content", "")
+            mentions = self._numeric_mentions_from_cell_text(
+                source_text,
+                code_candidates,
+                self._profile_reject_value_sources(metric_profile),
+            )
+            col_header = self._format_short_metadata_value(
+                self._get_segment_field(segment, "col_header", "column_header"),
+                120,
+            )
+            row_header = self._format_short_metadata_value(
+                self._get_segment_field(segment, "row_header"),
+                220,
+            )
+            local_years = self._extract_years_from_text(
+                " ".join(part for part in [col_header, str(preferred_value or "")] if part)
+            )
+            if not local_years:
+                content_years = self._extract_years_from_text(getattr(segment, "content", ""))
+                if len(content_years) == 1:
+                    local_years = content_years
+            candidate_year = local_years[0] if len(local_years) == 1 else None
+            explicit_unit = self._format_short_metadata_value(
+                self._get_segment_field(segment, "unit", "cell_unit", "raw_unit"),
+                80,
+            ) or None
+            dimension_labels: Dict[str, str] = {}
+            if metric_profile is not None and metric_profile.variable_dimensions and row_header:
+                dimension_labels[metric_profile.variable_dimensions[0]] = row_header
+            for mention in mentions:
+                candidates.append(
+                    {
+                        "segment": segment,
+                        "value": mention["value"],
+                        "unit": mention.get("unit") or explicit_unit,
+                        "description": mention.get("description") or str(source_text),
+                        "year": candidate_year,
+                        "page": getattr(segment, "page_number", None),
+                        "segment_id": getattr(segment, "segment_id", None),
+                        "label": row_header or col_header or None,
+                        "row_label": row_header or None,
+                        "column_label": col_header or None,
+                        "source_year_label": col_header if candidate_year is not None else None,
+                        "dimensions": dimension_labels,
+                    }
+                )
+        return candidates
+
+    def _metric_candidate_rank(
+        self,
+        candidate: Dict[str, Any],
+        metric: Optional['ESGMetric'],
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> Tuple[float, int, bool, bool]:
+        metric_name = str(getattr(metric, "metric_name", "") or "") if metric is not None else ""
+        metric_tokens = {
+            token for token in re.findall(r"[a-z][a-z0-9-]{2,}", metric_name.lower())
+            if token not in {"the", "and", "for", "with", "from", "number", "total", "percentage"}
+        }
+        segment = candidate.get("segment")
+        description = " ".join(
+            str(part or "")
+            for part in [
+                candidate.get("description"),
+                candidate.get("label"),
+                self._get_segment_field(segment, "row_header") if segment is not None else None,
+            ]
+        ).lower()
+        description_tokens = set(re.findall(r"[a-z][a-z0-9-]{2,}", description))
+        overlap = len(metric_tokens & description_tokens)
+        score = float(overlap)
+        expected_units = [
+            str(getattr(metric, "unit", "") or "") if metric is not None else "",
+            *(metric_profile.expected_units if metric_profile is not None else []),
+        ]
+        expected_profiles = [
+            unit_profile
+            for unit_profile in (_unit_profile(unit) for unit in expected_units)
+            if unit_profile is not None
+        ]
+        candidate_profile = _unit_profile(candidate.get("unit"))
+        unit_match = False
+        if expected_profiles and candidate_profile:
+            unit_match = any(
+                expected_profile[0] == candidate_profile[0]
+                for expected_profile in expected_profiles
+            )
+            score += 8.0 if unit_match else -8.0
+        elif (
+            any(profile[0] == "ratio_percent" for profile in expected_profiles)
+            and "%" in description
+        ):
+            unit_match = True
+            score += 8.0
+        component_match = self._profile_component_matches(description, metric_profile)
+        if metric_profile is not None and metric_profile.value_selection_rules.get(
+            "match_current_component_before_sibling_values", False
+        ):
+            score += 24.0 if component_match else -24.0
+        return score, overlap, unit_match, component_match
+
+    def _select_metric_candidate_from_candidates(
+        self,
+        candidates: List[Dict[str, Any]],
+        metric: Optional['ESGMetric'],
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> Optional[Dict[str, Any]]:
+        if not candidates:
+            return None
+        metric_profile = metric_profile or self._resolve_metric_profile(metric)
+        candidates = [
+            candidate
+            for candidate in candidates
+            if self._candidate_satisfies_profile(candidate, metric_profile)
+        ]
+        if not candidates:
+            return None
+        if len(candidates) == 1:
+            return candidates[0]
+
+        ranked: List[Tuple[float, int, bool, bool, Dict[str, Any]]] = []
+        for candidate in candidates:
+            score, overlap, unit_match, component_match = self._metric_candidate_rank(
+                candidate, metric, metric_profile
+            )
+            ranked.append((score, overlap, unit_match, component_match, candidate))
+        ranked.sort(key=lambda item: item[0], reverse=True)
+        if ranked[0][0] <= 0:
+            return None
+        if len(ranked) > 1 and abs(ranked[0][0] - ranked[1][0]) < 1e-9:
+            return None
+        selected = dict(ranked[0][4])
+        selected["selection_score"] = ranked[0][0]
+        selected["selection_margin"] = ranked[0][0] - ranked[1][0] if len(ranked) > 1 else ranked[0][0]
+        selected["name_overlap"] = ranked[0][1]
+        selected["unit_match"] = ranked[0][2]
+        selected["component_match"] = ranked[0][3]
+        return selected
+
+    def _select_metric_numeric_candidate(
+        self,
+        report_content: ReportContent,
+        target_segment,
+        metric: Optional['ESGMetric'],
+        code_candidates: Optional[List[str]] = None,
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> Optional[Dict[str, Any]]:
+        metric_profile = metric_profile or self._resolve_metric_profile(metric)
+        candidates = self._real_data_candidates_for_row(
+            report_content,
+            target_segment,
+            code_candidates,
+            metric_profile,
+        )
+        if not candidates:
+            return None
+        dated = [candidate for candidate in candidates if candidate.get("year") is not None]
+        if dated:
+            latest_year = max(int(candidate["year"]) for candidate in dated)
+            candidates = [candidate for candidate in dated if int(candidate["year"]) == latest_year]
+        return self._select_metric_candidate_from_candidates(
+            candidates, metric, metric_profile
+        )
+
+    def _metric_year_values_from_candidates(
+        self,
+        candidates: List[Dict[str, Any]],
+        metric: Optional['ESGMetric'],
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> List[Dict[str, Any]]:
+        metric_profile = metric_profile or self._resolve_metric_profile(metric)
+        expected_unit = str(getattr(metric, "unit", "") or "") if metric is not None else ""
+        by_year: Dict[int, List[Dict[str, Any]]] = {}
+        for candidate in candidates:
+            try:
+                year = int(candidate.get("year"))
+            except (TypeError, ValueError):
+                continue
+            if 1900 <= year <= 2100:
+                by_year.setdefault(year, []).append(candidate)
+
+        year_values: List[Dict[str, Any]] = []
+        for year in sorted(by_year):
+            preserve_dimensions = bool(
+                metric_profile is not None
+                and metric_profile.variable_dimensions
+                and metric_profile.value_selection_rules.get(
+                    "preserve_variable_dimension_labels", False
+                )
+            )
+            if preserve_dimensions:
+                selected_candidates = [
+                    candidate
+                    for candidate in by_year[year]
+                    if self._candidate_satisfies_profile(candidate, metric_profile)
+                ]
+            else:
+                selected = self._select_metric_candidate_from_candidates(
+                    by_year[year], metric, metric_profile
+                )
+                selected_candidates = [selected] if selected is not None else []
+
+            for selected in selected_candidates:
+                raw_value = selected.get("value")
+                raw_unit = selected.get("unit")
+                converted = _convert_numeric_value_between_units(
+                    raw_value, raw_unit, expected_unit
+                )
+                value = converted if converted is not None else raw_value
+                unit = (
+                    expected_unit
+                    if converted is not None and expected_unit
+                    else (raw_unit or expected_unit or "")
+                )
+                year_values.append(
+                    {
+                        "year": year,
+                        "source_year_label": selected.get("source_year_label"),
+                        "value": _finalize_compliance_value_field(value),
+                        "raw_value": raw_value,
+                        "raw_unit": raw_unit,
+                        "unit": unit,
+                        "page": selected.get("page"),
+                        "context": str(selected.get("description") or "").strip() or None,
+                        "evidence_segment_id": selected.get("segment_id"),
+                        "label": selected.get("label"),
+                        "dimensions": dict(selected.get("dimensions") or {}),
+                        "source": "structured_table",
+                    }
+                )
+        return year_values
+
+    def _merge_metric_year_values(self, *collections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        merged: List[Dict[str, Any]] = []
+        seen = set()
+        for collection in collections:
+            for raw in collection or []:
+                if not isinstance(raw, dict):
+                    continue
+                try:
+                    year = int(raw.get("year"))
+                except (TypeError, ValueError):
+                    continue
+                value = _parse_llm_numeric_value_only(raw.get("value"))
+                if not 1900 <= year <= 2100 or value is None:
+                    continue
+                item = dict(raw)
+                item["year"] = year
+                item["value"] = value
+                unit_key = _normalize_unit_text(item.get("unit") or item.get("raw_unit")).lower()
+                value_key = float(value)
+                dimensions_key = json.dumps(
+                    item.get("dimensions") or {},
+                    ensure_ascii=False,
+                    sort_keys=True,
+                )
+                key = (year, value_key, unit_key, dimensions_key)
+                if key in seen:
+                    continue
+                seen.add(key)
+                merged.append(item)
+        return sorted(merged, key=lambda item: (int(item["year"]), str(item.get("label") or "")))
+
+    def _target_year_for_metric(self, metric: Optional['ESGMetric']) -> Optional[int]:
+        candidates = []
+        if metric is not None:
+            candidates.extend(
+                getattr(metric, name, None)
+                for name in ("target_year", "reporting_year", "year")
+            )
+        candidates.append(getattr(getattr(self, "config", None), "target_year", None))
+        candidates.append(os.getenv("REPORT_TARGET_YEAR"))
+        for raw in candidates:
+            try:
+                year = int(raw)
+            except (TypeError, ValueError):
+                continue
+            if 1900 <= year <= 2100:
+                return year
+        return None
+
+    def _select_metric_year_value(
+        self,
+        year_values: List[Dict[str, Any]],
+        target_year: Optional[int] = None,
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> Tuple[Optional[int], Optional[Dict[str, Any]]]:
+        if not year_values:
+            return target_year, None
+        selected_year = target_year or max(int(item["year"]) for item in year_values)
+        matches = [item for item in year_values if int(item["year"]) == selected_year]
+        if (
+            metric_profile is not None
+            and metric_profile.variable_dimensions
+            and metric_profile.output_shape in {"breakdown", "table"}
+        ):
+            return selected_year, None
+        distinct = {
+            (
+                float(item["value"]),
+                _normalize_unit_text(item.get("unit") or item.get("raw_unit")).lower(),
+            )
+            for item in matches
+            if _parse_llm_numeric_value_only(item.get("value")) is not None
+        }
+        if len(distinct) != 1 or not matches:
+            return selected_year, None
+        return selected_year, matches[0]
+
+    def _select_metric_candidate_from_exact_code_evidence(
+        self,
+        report_content: ReportContent,
+        segment_metadata: List[Dict[str, Any]],
+        metric: Optional['ESGMetric'],
+        code_candidates: List[str],
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Select an unambiguous submetric value across all exact-code table rows."""
+        metric_profile = metric_profile or self._resolve_metric_profile(metric)
+        best: Optional[Dict[str, Any]] = None
+        seen_rows = set()
+        for meta in segment_metadata:
+            segment_id = meta.get("segment_id")
+            if not segment_id:
+                continue
+            try:
+                segment = self._get_segment_by_id(report_content, segment_id)
+            except Exception:
+                segment = None
+            if segment is None:
+                continue
+
+            row_key = self._get_table_row_key(segment)
+            if row_key == (None, None) or row_key in seen_rows:
+                continue
+            seen_rows.add(row_key)
+            row_context, _, _, _ = self._build_table_row_aggregation_context(
+                report_content,
+                segment,
+                max_chars=1800,
+            )
+            evidence_text = "\n".join(
+                part
+                for part in [
+                    row_context,
+                    str(getattr(segment, "content", "") or ""),
+                    str(meta.get("link_source_context") or ""),
+                ]
+                if part
+            )
+            if not self._contains_metric_code(evidence_text, code_candidates):
+                continue
+
+            candidate = self._select_metric_numeric_candidate(
+                report_content,
+                segment,
+                metric,
+                code_candidates,
+                metric_profile,
+            )
+            if candidate is None:
+                continue
+            candidate["retrieval_score"] = float(meta.get("score", 0) or 0)
+            rank = (
+                float(candidate.get("selection_score", 0) or 0),
+                float(candidate.get("selection_margin", 0) or 0),
+                candidate["retrieval_score"],
+            )
+            if best is None or rank > best["_rank"]:
+                candidate["_rank"] = rank
+                best = candidate
+        if best is not None:
+            best.pop("_rank", None)
+        return best
+
+    def _collect_metric_year_values_from_exact_code_evidence(
+        self,
+        report_content: ReportContent,
+        segment_metadata: List[Dict[str, Any]],
+        metric: Optional['ESGMetric'],
+        code_candidates: List[str],
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> List[Dict[str, Any]]:
+        """Collect all unambiguous annual values from exact-code table rows."""
+        metric_profile = metric_profile or self._resolve_metric_profile(metric)
+        year_values: List[Dict[str, Any]] = []
+        seen_rows = set()
+        for meta in segment_metadata:
+            segment_id = meta.get("segment_id")
+            if not segment_id:
+                continue
+            segment = self._get_segment_by_id(report_content, segment_id)
+            if segment is None:
+                continue
+            row_key = self._get_table_row_key(segment)
+            if row_key == (None, None) or row_key in seen_rows:
+                continue
+            seen_rows.add(row_key)
+            row_context, _, _, _ = self._build_table_row_aggregation_context(
+                report_content,
+                segment,
+                max_chars=2200,
+            )
+            evidence_text = "\n".join(
+                part for part in [row_context, str(getattr(segment, "content", "") or "")] if part
+            )
+            if not self._contains_metric_code(evidence_text, code_candidates):
+                continue
+            candidates = self._real_data_candidates_for_row(
+                report_content,
+                segment,
+                code_candidates,
+                metric_profile,
+            )
+            year_values.extend(
+                self._metric_year_values_from_candidates(
+                    candidates, metric, metric_profile
+                )
+            )
+        return self._merge_metric_year_values(year_values)
+
+    def _normalise_llm_year_values(
+        self,
+        llm_result: Dict[str, Any],
+        metric: Optional['ESGMetric'],
+        segment_metadata: List[Dict[str, Any]],
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> List[Dict[str, Any]]:
+        metric_profile = metric_profile or self._resolve_metric_profile(metric)
+        if (
+            metric_profile is not None
+            and not metric_profile.year_rules.get("extract_all_reported_years", True)
+        ):
+            return []
+        raw_values = llm_result.get("year_values")
+        if not isinstance(raw_values, list):
+            return []
+        expected_unit = str(getattr(metric, "unit", "") or "") if metric is not None else ""
+        valid_pages = {
+            int(meta["page_number"])
+            for meta in segment_metadata
+            if meta.get("page_number") is not None
+        }
+        valid_segment_ids = {
+            str(meta["segment_id"])
+            for meta in segment_metadata
+            if meta.get("segment_id")
+        }
+        year_values: List[Dict[str, Any]] = []
+        for raw in raw_values:
+            if not isinstance(raw, dict):
+                continue
+            try:
+                year = int(raw.get("year"))
+            except (TypeError, ValueError):
+                continue
+            if not 1900 <= year <= 2100:
+                continue
+            raw_value = _parse_llm_numeric_value_only(raw.get("raw_value"))
+            value = _parse_llm_numeric_value_only(raw.get("value"))
+            if raw_value is None:
+                raw_value = value
+            if raw_value is None:
+                continue
+            raw_unit = str(raw.get("unit") or raw.get("raw_unit") or "").strip() or None
+            converted = _convert_numeric_value_between_units(raw_value, raw_unit, expected_unit)
+            normalized_value = converted if converted is not None else (value if value is not None else raw_value)
+            normalized_unit = expected_unit if converted is not None and expected_unit else (raw_unit or expected_unit or "")
+
+            page = None
+            try:
+                candidate_page = int(raw.get("page")) if raw.get("page") is not None else None
+                if candidate_page is not None and (not valid_pages or candidate_page in valid_pages):
+                    page = candidate_page
+            except (TypeError, ValueError):
+                page = None
+            segment_id = str(raw.get("evidence_segment_id") or "").strip() or None
+            if segment_id is not None and valid_segment_ids and segment_id not in valid_segment_ids:
+                segment_id = None
+            year_values.append(
+                {
+                    "year": year,
+                    "value": normalized_value,
+                    "raw_value": raw_value,
+                    "raw_unit": raw_unit,
+                    "unit": normalized_unit,
+                    "page": page,
+                    "context": str(raw.get("evidence_quote") or "").strip() or None,
+                    "evidence_segment_id": segment_id,
+                    "source_year_label": str(raw.get("source_year_label") or "").strip() or None,
+                    "label": str(raw.get("label") or "").strip() or None,
+                    "dimensions": dict(raw.get("dimensions") or {})
+                    if isinstance(raw.get("dimensions"), dict)
+                    else {},
+                    "source": "llm_evidence",
+                }
+            )
+        return self._merge_metric_year_values(year_values)
 
     def _extract_numeric_from_cell_text(self, text: object) -> Optional[Union[int, float]]:
-        raw = str(text or "").strip()
-        if not raw:
-            return None
-        direct = _parse_llm_numeric_value_only(raw)
-        if direct is not None:
-            return direct
-        # Avoid long prose. For table cells, pick the last non-year numeric token.
-        if len(raw) > 160:
-            return None
-        candidates = re.findall(r"-?\d[\d,]*(?:\.\d+)?%?", raw)
-        usable: List[str] = []
-        for token in candidates:
-            cleaned = token.replace(",", "").rstrip("%")
-            try:
-                val = float(cleaned)
-            except Exception:
-                continue
-            if 1900 <= val <= 2100 and re.fullmatch(r"\d{4}", cleaned):
-                continue
-            usable.append(token)
-        if not usable:
-            return None
-        # A compact table cell can contain multiple paired values, such as
-        # "5,155,385: 85% MWh". In that case, picking the last number would
-        # incorrectly select a sibling percentage instead of the absolute value.
-        # Return None and let the LLM/context choose the metric-specific value.
-        has_percent = any(str(tok).strip().endswith("%") for tok in usable)
-        has_non_percent = any(not str(tok).strip().endswith("%") for tok in usable)
-        if len(usable) > 1 and has_percent and has_non_percent:
-            return None
-        return _parse_llm_numeric_value_only(usable[-1])
+        mentions = self._numeric_mentions_from_cell_text(text)
+        return mentions[0]["value"] if len(mentions) == 1 else None
 
     def _build_table_row_aggregation_context(
         self,
@@ -1330,16 +2736,12 @@ Assessment principles:
         if table_id is None or row_index is None:
             return "", None, None, None
 
-        try:
-            all_segments = list(getattr(report_content.document_content, "segments", []) or [])
-        except Exception:
-            all_segments = []
-
-        row_segments = []
-        for seg in all_segments:
-            key = self._get_table_row_key(seg)
-            if key == (table_id, row_index):
-                row_segments.append(seg)
+        row_segments = list(
+            self._get_report_segment_cache(report_content)["table_rows"].get(
+                (table_id, row_index),
+                [],
+            )
+        )
 
         if len(row_segments) <= 1:
             return "", None, None, None
@@ -1366,6 +2768,7 @@ Assessment principles:
         latest_numeric: Optional[Union[int, float]] = None
         latest_unit: Optional[str] = None
         latest_desc: Optional[str] = None
+        annual_descriptions: Dict[int, str] = {}
 
         for seg in row_segments:
             col_index = self._get_table_column_index(seg)
@@ -1382,10 +2785,15 @@ Assessment principles:
             if cell_line and cell_line not in cells:
                 cells.append(cell_line)
 
-            year_candidates = self._extract_years_from_text(" ".join([col_header, content, value_text]))
+            year_candidates = self._extract_years_from_text(" ".join([col_header, value_text]))
+            if not year_candidates:
+                content_years = self._extract_years_from_text(content)
+                if len(content_years) == 1:
+                    year_candidates = content_years
             cell_year = max(year_candidates) if year_candidates else None
             numeric_candidate = self._extract_numeric_from_cell_text(value_text or content)
             if cell_year is not None and numeric_candidate is not None:
+                annual_descriptions.setdefault(cell_year, cell_line)
                 if latest_year is None or cell_year > latest_year:
                     latest_year = cell_year
                     latest_numeric = numeric_candidate
@@ -1400,6 +2808,14 @@ Assessment principles:
         if row_header:
             parts.append(f"- Row Header: {row_header}")
         parts.append("- Row Cells: " + " | ".join(cells))
+        if annual_descriptions:
+            parts.append(
+                "- Annual Value Candidates: "
+                + " | ".join(
+                    f"FY{year}: {annual_descriptions[year]}"
+                    for year in sorted(annual_descriptions)
+                )
+            )
         if latest_year is not None and latest_desc:
             parts.append(f"- Latest Year Candidate: FY{latest_year}: {latest_desc}")
         row_context = "\n".join(parts)
@@ -1470,15 +2886,12 @@ Assessment principles:
         return "[Structured Evidence Metadata]\n" + "\n".join(hint_lines)
 
     def _build_augmented_segment_context(self, report_content: ReportContent, segment_id: str, fallback_content: Optional[str] = None) -> Optional[str]:
-        target_segment = self._get_segment_by_id(report_content, segment_id)
+        cache = self._get_report_segment_cache(report_content)
+        target_segment = cache["by_id"].get(segment_id)
         if target_segment is None:
             return fallback_content
-        ordered_segments = self._get_ordered_segments(report_content)
-        target_index = None
-        for idx, seg in enumerate(ordered_segments):
-            if seg.segment_id == segment_id:
-                target_index = idx
-                break
+        ordered_segments = cache["ordered"]
+        target_index = cache["ordered_index"].get(segment_id)
         if target_index is None:
             return getattr(target_segment, "content", None) or fallback_content
         parts: List[str] = []
@@ -1507,6 +2920,147 @@ Assessment principles:
                     parts.append(f"[Next Context]\n{next_text}")
         return "\n\n".join(parts) if parts else hit_text or fallback_content
 
+    def _resolve_link_source_segment_id(
+        self,
+        report_content: ReportContent,
+        result: RetrievalResult,
+    ) -> Optional[str]:
+        explicit = str(getattr(result, "link_source_segment_id", "") or "").strip()
+        if explicit and self._get_segment_by_id(report_content, explicit) is not None:
+            return explicit
+
+        source_page = getattr(result, "link_source_page", None)
+        if source_page is None:
+            return None
+        anchor = re.sub(
+            r"\s+",
+            " ",
+            re.sub(r"[^a-z0-9]+", " ", str(getattr(result, "link_anchor_text", "") or "").lower()),
+        ).strip()
+        target_page = getattr(result, "link_target_page", None)
+        type_rank = {
+            "table_cell": 6,
+            "table_row": 5,
+            "link_anchor": 4,
+            "text": 3,
+            "heading": 3,
+            "table": 1,
+        }
+        candidates: List[Tuple[int, str]] = []
+        for segment in report_content.document_content.segments or []:
+            if getattr(segment, "page_number", None) != source_page:
+                continue
+            segment_id = str(getattr(segment, "segment_id", "") or "")
+            if not segment_id:
+                continue
+            segment_type = str(getattr(segment, "segment_type", "") or "").lower()
+            score = type_rank.get(segment_type, 2)
+            value_text = re.sub(
+                r"\s+",
+                " ",
+                re.sub(r"[^a-z0-9]+", " ", str(getattr(segment, "value_text", "") or "").lower()),
+            ).strip()
+            content = re.sub(
+                r"\s+",
+                " ",
+                re.sub(r"[^a-z0-9]+", " ", str(getattr(segment, "content", "") or "").lower()),
+            ).strip()
+            if anchor and anchor in value_text:
+                score += 5
+            elif anchor and anchor in content:
+                score += 3
+            data = getattr(segment, "structured_data", None)
+            if isinstance(data, dict):
+                for link in data.get("pdf_links") or []:
+                    if not isinstance(link, dict) or link.get("link_type") != "internal":
+                        continue
+                    try:
+                        link_target = int(link.get("target_page"))
+                    except Exception:
+                        continue
+                    if target_page is not None and link_target == int(target_page):
+                        score += 6
+                        break
+            if score > type_rank.get(segment_type, 2) or not anchor:
+                candidates.append((score, segment_id))
+        if not candidates:
+            return None
+        candidates.sort(reverse=True)
+        return candidates[0][1]
+
+    def _build_linked_evidence_context(
+        self,
+        report_content: ReportContent,
+        result: RetrievalResult,
+        target_context: Optional[str],
+        max_chars: int,
+    ) -> Tuple[str, Optional[str], Optional[str]]:
+        """Pair the link's source-row context with the resolved target evidence."""
+        source_segment_id = self._resolve_link_source_segment_id(report_content, result)
+        source_context = None
+        if source_segment_id and source_segment_id != getattr(result, "segment_id", None):
+            source_segment = self._get_segment_by_id(report_content, source_segment_id)
+            if source_segment is not None:
+                source_parts: List[str] = []
+                source_hit = self._truncate_segment_text(
+                    getattr(source_segment, "content", "") or "",
+                    1000,
+                )
+                if source_hit:
+                    source_parts.append(f"[Link Source Hit]\n{source_hit}")
+                row_context, _, _, _ = self._build_table_row_aggregation_context(
+                    report_content,
+                    source_segment,
+                    max_chars=1800,
+                )
+                if row_context:
+                    source_parts.append(row_context)
+                augmented_source = self._build_augmented_segment_context(
+                    report_content=report_content,
+                    segment_id=source_segment_id,
+                )
+                if augmented_source:
+                    source_parts.append(f"[Link Source Surrounding Context]\n{augmented_source}")
+                source_context = "\n\n".join(source_parts)
+
+        max_chars = max(600, int(max_chars or 2400))
+        source_budget = min(1200, max(300, max_chars // 2))
+        source_excerpt = (
+            self._truncate_segment_text(source_context, source_budget)
+            if source_context
+            else None
+        )
+        target_budget = max(300, max_chars - (len(source_excerpt) if source_excerpt else 0) - 260)
+        target_parts: List[str] = []
+        target_hit = str(getattr(result, "content", "") or "").strip()
+        if target_hit:
+            target_parts.append(f"[Link Target Hit]\n{target_hit}")
+        if target_context:
+            target_parts.append(f"[Link Target Surrounding Context]\n{target_context}")
+        target_excerpt = self._truncate_segment_text("\n\n".join(target_parts), target_budget)
+        anchor_text = str(getattr(result, "link_anchor_text", "") or "").strip()
+        source_page = getattr(result, "link_source_page", None)
+        root_target_page = getattr(result, "link_target_page", None)
+
+        parts = [
+            "[Internal PDF Link Source Context]",
+            f"- Source Page: {source_page}",
+        ]
+        if anchor_text:
+            parts.append(f"- Anchor Text: {anchor_text}")
+        if source_excerpt:
+            parts.append(source_excerpt)
+        parts.extend(
+            [
+                "[Internal PDF Link Target Context]",
+                f"- Root Target Page: {root_target_page}",
+                f"- Data Page: {getattr(result, 'page_number', None)}",
+            ]
+        )
+        if target_excerpt:
+            parts.append(target_excerpt)
+        return "\n".join(parts), source_excerpt, source_segment_id
+
     def _build_analysis_prompt(
         self,
         metric_name: str,
@@ -1520,6 +3074,7 @@ Assessment principles:
         metric_category: str = "",
         metric_type: str = "",
         metric_keywords: Optional[List[str]] = None,
+        metric_profile: Optional[MetricRetrievalProfile] = None,
     ) -> str:
         """
         Build LLM analysis prompt containing segment tag information
@@ -1560,6 +3115,13 @@ Assessment principles:
                             segment_info += f", Matched Keywords: {kws}"
                     except Exception:
                         pass
+                if meta.get("link_target_page") is not None:
+                    segment_info += (
+                        f", Internal Link: Page {meta.get('link_source_page')} -> "
+                        f"Page {meta.get('link_target_page')}"
+                    )
+                    if meta.get("link_anchor_text"):
+                        segment_info += f", Anchor: {meta.get('link_anchor_text')}"
                 segment_info += "]"
 
             segments_text_parts.append(segment_info)
@@ -1600,6 +3162,12 @@ Assessment principles:
             if desc_text
             else ""
         )
+        profile_rules = self._profile_prompt_rules(metric_profile)
+        profile_rules_text = (
+            json.dumps(profile_rules, ensure_ascii=False, sort_keys=True)
+            if profile_rules
+            else "No generated metric-specific extraction rules are available."
+        )
 
         prompt = f"""As a professional ESG/SASB compliance analyst, conduct one unified disclosure assessment for the current metric.
 
@@ -1607,6 +3175,9 @@ Metric Information:
 - Metric Name: {metric_name}
 - Metric Code: {metric_code or metric_id}
 {topic_line}{category_line}{type_line}{unit_line}{keywords_line}{desc_line}
+Mandatory Metric Profile Extraction Rules:
+{profile_rules_text}
+
 All Related Retrieved Segments (with segment_id + tag info):
 {segments_text if segments_text else "No related segments found"}
 
@@ -1614,6 +3185,7 @@ Analyze all retrieved segments together. Do not score segments independently. Th
 
 Core assessment principles:
 1) Respond ONLY with a JSON object. No markdown and no backticks.
+1a) The Mandatory Metric Profile Extraction Rules above are executable constraints. Apply the shared-Code component rule, rejected value sources, year rules, variable dimensions, required labels, and sibling warnings before selecting a value or status. They override generic same-Code shortcuts below when stricter.
 2) The final "disclosure_status" must be exactly one of: "fully_disclosed", "partially_disclosed", "not_disclosed".
 3) Python will not derive or correct the status later. Your "disclosure_status" is the final classification.
 4) The current Metric Name is the metric being assessed. If the framework definition contains multiple components under the same SASB code, do not require components that are not part of the current Metric Name.
@@ -1624,14 +3196,18 @@ Core assessment principles:
 9) For split metrics under one SASB code, assess only the current Metric Name. A direct value for the current sub-item is fully_disclosed even if sibling sub-items under the same code are absent. A value for a clearly different sub-item should not be used as the value for this sub-item.
 10) Unit differences must be handled by judgment, not treated as automatic gaps. If the reported unit is equivalent, safely convertible, or standardly normalizable to the expected unit, use the raw value/raw unit and provide the converted value when possible. Do not downgrade from fully_disclosed when unit conversion, unit wording, or missing conversion narrative is the only remaining issue.
 11) Do not require the report to state a conversion factor if the conversion is standard and safe. Use ordinary conversions such as MWh to GJ, kWh to GJ, liters to cubic meters, kilograms to metric tons, and percentage fractions when appropriate.
-12) Use "value_status" as one of: exact, converted, approximate, raw_unit_only, unit_mismatch, ambiguous, none.
+12) Use "value_status" as one of: exact, converted, derived, approximate, raw_unit_only, unit_mismatch, ambiguous, none.
 13) For qualitative/narrative metrics, a direct description of the requested approach, policy, process, practice, governance mechanism, or management system can be fully_disclosed without a numeric value. Set "value" to null in that case.
 14) Distinguish imperfect disclosure from no disclosure. If the current metric itself is disclosed but has non-core ambiguity, use partially_disclosed rather than not_disclosed. If the current metric is directly and sufficiently disclosed, use fully_disclosed.
 15) evidence_quote must be a short excerpt (<= 180 chars) that supports your conclusion; when using table evidence, quote from the full row context rather than an isolated cell.
 16) If a segment includes [Full Table Row Context], treat that row as one evidence unit. Use the row header, all row cells, column headers, values, and units together; do not judge a table cell in isolation.
-17) For table rows with multiple years, use the latest reporting year as the preferred extracted value unless the current metric explicitly requires another period.
+17) For table rows or narrative evidence with multiple years, extract every explicitly reported metric-specific annual value into year_values. Keep all years in this one metric result. The scalar value may represent the latest year for compatibility unless the current metric explicitly requests another period.
 18) If a segment includes [Structured Evidence Metadata], use row headers, column headers, cell values, and units as table context.
 19) If multiple candidate segments conflict, choose the segment that most directly matches the current metric name, current metric code, expected unit, category/split, and framework context.
+20) Derive a value only when the framework definition explicitly gives the formula and all operands are disclosed for the same year, same reporting boundary and compatible units. Include operation, formula and fully sourced operands; otherwise set derived_calculation to null.
+21) For evidence reached through an internal PDF link, evaluate [Internal PDF Link Source Context] and [Internal PDF Link Target Context] together. The source row, anchor text and surrounding cells establish what the target means. If the source row itself contains a real metric value, such as "Employee engagement as a percentage: 87%", extract that value even when the same row also contains a link or is in a reporting-framework index.
+22) Representation/distribution metrics may be answered by multiple percentages in one category table. When the requested category and latest year are present, treat the complete distribution as metric evidence, set value to null with value_status "ambiguous" if there is no single canonical scalar, and preserve the values in specific_data_found/evidence_quote. Multiple legitimate values are not a reason for not_disclosed.
+23) A broader report category may be a partial proxy: "people leader roles" does not uniquely separate executive from non-executive management, and "non-technical roles" is not necessarily identical to all other employees. Use partially_disclosed for those mappings and explain the boundary; do not discard the table. "Technical" directly supports technical employees, subject to any geographic or scope limitation.
 
 Disclosure status definitions:
 
@@ -1659,6 +3235,24 @@ Return JSON format:
   "evidence_segment_id": "<segment_id|null>",
   "evidence_quote": "<short quote|null>",
   "specific_data_found": "<detailed context, may include unit/year if present>",
+  "year_values": [
+    {{
+      "year": <int>,
+      "value": <number>,
+      "raw_value": <number|null>,
+      "unit": "<reported unit|null>",
+      "page": <int|null>,
+      "evidence_segment_id": "<segment_id|null>",
+      "evidence_quote": "<year-specific short quote|null>"
+    }}
+  ],
+  "derived_calculation": null OR {{
+    "operation": "ratio_percent|ratio|sum|difference",
+    "formula": "<formula stated by the framework>",
+    "operands": [
+      {{"name": "<name>", "value": <number>, "unit": "<unit>", "year": <int>, "boundary": "<reporting boundary>", "segment_id": "<segment_id>"}}
+    ]
+  }},
   "improvement_suggestions": ["Suggestion 1", "Suggestion 2", ...]
 }}
 """
@@ -1709,10 +3303,7 @@ Return JSON format:
         Returns:
             TextSegment or None
         """
-        for segment in report_content.document_content.segments:
-            if segment.segment_id == segment_id:
-                return segment
-        return None
+        return self._get_report_segment_cache(report_content)["by_id"].get(segment_id)
     
     def generate_compliance_report(self, assessment: ComplianceAssessment) -> str:
         """
@@ -1770,6 +3361,21 @@ Return JSON format:
             unit = _clean_text(getattr(analysis, "unit", ""))
             return f"{value} {unit}".strip()
 
+        def _year_values_text(analysis: DisclosureAnalysis) -> str:
+            rendered: List[str] = []
+            for item in getattr(analysis, "year_values", None) or []:
+                if not isinstance(item, dict):
+                    continue
+                year = item.get("year")
+                value = item.get("value")
+                if year is None or value is None:
+                    continue
+                unit = _clean_text(item.get("unit") or getattr(analysis, "unit", ""))
+                text = f"FY{year}: {value} {unit}".strip()
+                if text not in rendered:
+                    rendered.append(text)
+            return "; ".join(rendered) or "-"
+
         def _page_text(analysis: DisclosureAnalysis) -> str:
             page = getattr(analysis, "page", None)
             return str(page) if page not in (None, "") else "-"
@@ -1785,6 +3391,19 @@ Return JSON format:
             shown = segments[:limit]
             suffix = f" (+{len(segments) - limit} more)" if len(segments) > limit else ""
             return ", ".join(shown) + suffix
+
+        def _evidence_source_text(analysis: DisclosureAnalysis) -> str:
+            rendered: List[str] = []
+            for source in getattr(analysis, "evidence_sources", None) or []:
+                if not isinstance(source, dict):
+                    continue
+                if source.get("source_type") == "linked_page":
+                    text = f"internal link page {source.get('link_source_page')} -> page {source.get('target_page')}"
+                else:
+                    text = f"report page {source.get('data_page')}"
+                if text not in rendered:
+                    rendered.append(text)
+            return "; ".join(rendered)
 
         def _first_suggestion(analysis: DisclosureAnalysis) -> str:
             suggestions = [
@@ -1968,8 +3587,8 @@ Return JSON format:
             [
                 "## Disclosure Matrix",
                 "",
-                "| Status | Code | Metric | Value | Page | Evidence Segments |",
-                "|---|---|---|---|---:|---|",
+                "| Status | Code | Metric | Selected Value | Annual Values | Page | Evidence Segments |",
+                "|---|---|---|---|---|---:|---|",
             ]
         )
         for analysis in unique_metric_analyses:
@@ -1981,6 +3600,7 @@ Return JSON format:
                         _table_cell(_metric_code(analysis), 80),
                         _table_cell(_metric_name(analysis), 240),
                         _table_cell(_value_text(analysis), 120),
+                        _table_cell(_year_values_text(analysis), 320),
                         _table_cell(_page_text(analysis), 40),
                         _table_cell(_evidence_text(analysis), 160),
                     ]
@@ -2005,9 +3625,16 @@ Return JSON format:
                 _append_field(lines, "Topic/Type", _topic_key(analysis))
                 _append_field(lines, "Expected unit", getattr(analysis, "unit", ""))
                 lines.append(f"- **Reported value**: {_value_text(analysis)}")
+                if _year_values_text(analysis) != "-":
+                    lines.append(f"- **All annual values**: {_year_values_text(analysis)}")
+                    _append_field(lines, "Selected year", getattr(analysis, "selected_year", None))
                 lines.append(f"- **Page**: {_page_text(analysis)}")
                 if _evidence_text(analysis) != "-":
                     lines.append(f"- **Evidence segments**: {_evidence_text(analysis)}")
+                _append_field(lines, "Evidence sources", _evidence_source_text(analysis), limit=500)
+                derived = getattr(analysis, "derived_calculation", None)
+                if isinstance(derived, dict):
+                    _append_field(lines, "Derived formula", derived.get("formula"), limit=500)
                 _append_field(lines, "Evidence context", getattr(analysis, "context", ""), limit=700)
                 _append_field(lines, "Analysis reasoning", getattr(analysis, "reasoning", ""), limit=1200)
                 _append_suggestions(lines, analysis)

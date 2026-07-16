@@ -32,10 +32,33 @@
         "CO2-e",
         "metric tonnes CO2-e",
         "CO2",
-        "equivalent"
+        "equivalent",
+        "(1) Gross global Scope 1 emissions",
+        "Gross global Scope 1 emissions",
+        "(1) Scope 1 GHG emissions",
+        "(1) Gross Scope 1 greenhouse gas emissions",
+        "TC-SC-110a.1 (1) Gross global Scope 1 emissions",
+        "Gross",
+        "Gross global",
+        "global",
+        "global Scope",
+        "Scope emissions",
+        "Metric tonnes (t) CO₂-e",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Gross global Scope 1 emissions and (2) amount of total",
+        "emissions from perfluorinated compounds"
       ],
-      "dense_query": "Find disclosures for TC-SC-110a.1 (1) Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-110a.1 '(1) Gross global Scope 1 emissions', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-110a.1 '(1) Gross global Scope 1 emissions', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-110a.1 '(1) Gross global Scope 1 emissions'; retain every reported year and label.",
+        "When TC-SC-110a.1 '(1) Gross global Scope 1 emissions' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-110a.1 '(1) Gross global Scope 1 emissions', including: (1) Gross global Scope 1 emissions; Gross global Scope 1 emissions; (1) Scope 1 GHG emissions; (1) Gross Scope 1 greenhouse gas emissions; TC-SC-110a.1 (1) Gross global Scope 1 emissions.",
+        "Disambiguate TC-SC-110a.1 '(1) Gross global Scope 1 emissions' from sibling metrics sharing TC-SC-110a.1: (2) amount of total emissions from perfluorinated compounds.",
+        "Find disclosures for TC-SC-110a.1 (1) Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TC-SC-110a.1 (1) Gross global Scope 1 emissions, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-110a.1 (1) Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-110a.1 (1) Gross global Scope 1 emissions related to Greenhouse Gas Emissions.",
@@ -43,6 +66,7 @@
       ],
       "anchor_terms": [
         "TC-SC-110a.1",
+        "(1) Gross global Scope 1 emissions",
         "Gross global Scope 1 emissions",
         "Scope 1",
         "Greenhouse Gas",
@@ -54,7 +78,20 @@
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
         "metric tonnes CO2-e",
-        "tonnes CO2 equivalent"
+        "tonnes CO2 equivalent",
+        "(1) Scope 1 GHG emissions",
+        "(1) Gross Scope 1 greenhouse gas emissions",
+        "TC-SC-110a.1 (1) Gross global Scope 1 emissions",
+        "Gross",
+        "Gross global",
+        "global",
+        "global Scope",
+        "Scope emissions",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "amount of total emissions from perfluorinated compounds",
@@ -62,7 +99,8 @@
         "Scope 3",
         "emissions intensity",
         "market-based emissions",
-        "location-based emissions"
+        "location-based emissions",
+        "(2) amount of total emissions from perfluorinated compounds"
       ],
       "similar_metric_warnings": [
         {
@@ -79,7 +117,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -87,30 +127,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Gross global Scope 1 emissions', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
-          "Metric tonnes (t)",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Gross global Scope 1 emissions' (TC-SC-110a.1, expected unit: Metric tonnes (t) CO₂-e). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) amount of total emissions from perfluorinated compounds."
     },
     {
       "metric_id": "TC-SC-110a.1.02",
@@ -141,10 +227,28 @@
         "CO2-e",
         "metric tonnes CO2-e",
         "CO2",
-        "equivalent"
+        "equivalent",
+        "(2) amount of total emissions from perfluorinated compounds",
+        "amount of total emissions from perfluorinated compounds",
+        "TC-SC-110a.1 (2) amount of total emissions from perfluorinated compounds",
+        "emissions perfluorinated",
+        "perfluorinated compounds",
+        "Metric tonnes (t) CO₂-e",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Gross global Scope 1 emissions and (2) amount of total",
+        "emissions from perfluorinated compounds"
       ],
-      "dense_query": "Find disclosures for TC-SC-110a.1 (2) amount of total emissions from perfluorinated compounds with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-110a.1 '(2) amount of total emissions from perfluorinated compounds', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-110a.1 '(2) amount of total emissions from perfluorinated compounds', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-110a.1 '(2) amount of total emissions from perfluorinated compounds'; retain every reported year and label.",
+        "When TC-SC-110a.1 '(2) amount of total emissions from perfluorinated compounds' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-110a.1 '(2) amount of total emissions from perfluorinated compounds', including: (2) amount of total emissions from perfluorinated compounds; amount of total emissions from perfluorinated compounds; TC-SC-110a.1 (2) amount of total emissions from perfluorinated compounds.",
+        "Disambiguate TC-SC-110a.1 '(2) amount of total emissions from perfluorinated compounds' from sibling metrics sharing TC-SC-110a.1: (1) Gross global Scope 1 emissions.",
+        "Find disclosures for TC-SC-110a.1 (2) amount of total emissions from perfluorinated compounds with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TC-SC-110a.1 (2) amount of total emissions from perfluorinated compounds, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-110a.1 (2) amount of total emissions from perfluorinated compounds with unit Metric tonnes (t) CO₂-e.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-110a.1 (2) amount of total emissions from perfluorinated compounds related to Greenhouse Gas Emissions.",
@@ -152,6 +256,7 @@
       ],
       "anchor_terms": [
         "TC-SC-110a.1",
+        "(2) amount of total emissions from perfluorinated compounds",
         "amount of total emissions from perfluorinated compounds",
         "Greenhouse Gas",
         "emissions",
@@ -162,10 +267,19 @@
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
         "metric tonnes CO2-e",
-        "tonnes CO2 equivalent"
+        "tonnes CO2 equivalent",
+        "TC-SC-110a.1 (2) amount of total emissions from perfluorinated compounds",
+        "emissions perfluorinated",
+        "perfluorinated compounds",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
-        "Gross global Scope 1 emissions"
+        "Gross global Scope 1 emissions",
+        "(1) Gross global Scope 1 emissions"
       ],
       "similar_metric_warnings": [
         {
@@ -178,7 +292,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -186,30 +302,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) amount of total emissions from perfluorinated compounds', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
-          "Metric tonnes (t)",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) amount of total emissions from perfluorinated compounds' (TC-SC-110a.1, expected unit: Metric tonnes (t) CO₂-e). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Gross global Scope 1 emissions."
     },
     {
       "metric_id": "TC-SC-110a.2",
@@ -244,10 +406,31 @@
         "against",
         "those",
         "Greenhouse",
-        "Gas"
+        "Gas",
+        "Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "TC-SC-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "long- short-term",
+        "short-term strategy",
+        "strategy plan",
+        "plan manage",
+        "manage Scope",
+        "Scope emissions",
+        "emissions emissions",
+        "emissions reduction",
+        "reduction targets",
+        "targets analysis",
+        "analysis performance",
+        "performance against",
+        "Discussion of long- and short-term strategy or plan to manage",
+        "Scope 1 emissions, emissions reduction targets, and an analysis of performance"
       ],
-      "dense_query": "Find disclosures for TC-SC-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', under 'Greenhouse Gas Emissions'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', under 'Greenhouse Gas Emissions'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers TC-SC-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets'.",
+        "When TC-SC-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', including: Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets; TC-SC-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets.",
+        "Find disclosures for TC-SC-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TC-SC-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
@@ -267,7 +450,24 @@
         "manage",
         "Scope",
         "emissions",
-        "reduction"
+        "reduction",
+        "TC-SC-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "long- short-term",
+        "short-term strategy",
+        "strategy plan",
+        "plan manage",
+        "manage Scope",
+        "Scope emissions",
+        "emissions emissions",
+        "emissions reduction",
+        "reduction targets",
+        "targets",
+        "targets analysis",
+        "analysis",
+        "analysis performance",
+        "performance",
+        "performance against",
+        "against"
       ],
       "negative_anchor_terms": [
         "Scope 2",
@@ -288,7 +488,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -300,20 +502,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets' (TC-SC-110a.2, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TC-SC-130a.1.01",
@@ -339,10 +589,23 @@
         "Manufacturing",
         "Gigajoules",
         "GJ",
-        "Gigajoules (GJ)"
+        "Gigajoules (GJ)",
+        "(1) Total energy consumed",
+        "Total energy consumed",
+        "(1) Energy consumption",
+        "TC-SC-130a.1 (1) Total energy consumed",
+        "gigajoule",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for TC-SC-130a.1 (1) Total energy consumed with unit Gigajoules (GJ) related to Energy Management in Manufacturing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-130a.1 '(1) Total energy consumed', under 'Energy Management in Manufacturing', with expected unit 'Gigajoules (GJ)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-130a.1 '(1) Total energy consumed', under 'Energy Management in Manufacturing', with expected unit 'Gigajoules (GJ)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-130a.1 '(1) Total energy consumed'; retain every reported year and label.",
+        "When TC-SC-130a.1 '(1) Total energy consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-130a.1 '(1) Total energy consumed', including: (1) Total energy consumed; Total energy consumed; (1) Energy consumption; TC-SC-130a.1 (1) Total energy consumed.",
+        "Disambiguate TC-SC-130a.1 '(1) Total energy consumed' from sibling metrics sharing TC-SC-130a.1: (2) Percentage of total energy consumed supplied from grid electricity; (3) Percentage of total energy consumed that was renewable energy.",
+        "Find disclosures for TC-SC-130a.1 (1) Total energy consumed with unit Gigajoules (GJ) related to Energy Management in Manufacturing.",
         "Retrieve exact report evidence for TC-SC-130a.1 (1) Total energy consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-130a.1 (1) Total energy consumed with unit Gigajoules (GJ).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-130a.1 (1) Total energy consumed related to Energy Management in Manufacturing.",
@@ -350,6 +613,7 @@
       ],
       "anchor_terms": [
         "TC-SC-130a.1",
+        "(1) Total energy consumed",
         "Total energy consumed",
         "energy consumed",
         "energy",
@@ -358,11 +622,16 @@
         "Manufacturing",
         "Gigajoules (GJ)",
         "GJ",
-        "gigajoules"
+        "gigajoules",
+        "(1) Energy consumption",
+        "TC-SC-130a.1 (1) Total energy consumed",
+        "gigajoule"
       ],
       "negative_anchor_terms": [
         "Percentage of total energy consumed supplied from grid electricity",
-        "Percentage of total energy consumed that was renewable energy"
+        "Percentage of total energy consumed that was renewable energy",
+        "(2) Percentage of total energy consumed supplied from grid electricity",
+        "(3) Percentage of total energy consumed that was renewable energy"
       ],
       "similar_metric_warnings": [
         {
@@ -379,7 +648,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -387,24 +658,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total energy consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "energy",
         "expected_units": [
           "Gigajoules (GJ)",
           "GJ",
-          "gigajoules"
+          "MWh",
+          "kWh",
+          "MJ",
+          "kJ"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total energy consumed' (TC-SC-130a.1, expected unit: Gigajoules (GJ)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of total energy consumed supplied from grid electricity; (3) Percentage of total energy consumed that was renewable energy."
     },
     {
       "metric_id": "TC-SC-130a.1.02",
@@ -418,7 +741,8 @@
       "aliases": [
         "(2) Percentage of total energy consumed supplied from grid electricity",
         "Percentage of total energy consumed supplied from grid electricity",
-        "TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity"
+        "TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity",
+        "(2) Percent of total energy consumed supplied from grid electricity"
       ],
       "bm25_terms": [
         "TC-SC-130a.1",
@@ -434,10 +758,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of total energy consumed supplied from grid electricity",
+        "Percentage of total energy consumed supplied from grid electricity",
+        "TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity",
+        "(2) Percent of total energy consumed supplied from grid electricity",
+        "consumed supplied",
+        "supplied grid",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity with unit Percentage (%) related to Energy Management in Manufacturing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-130a.1 '(2) Percentage of total energy consumed supplied from grid electricity', under 'Energy Management in Manufacturing', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-130a.1 '(2) Percentage of total energy consumed supplied from grid electricity', under 'Energy Management in Manufacturing', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-130a.1 '(2) Percentage of total energy consumed supplied from grid electricity'; retain every reported year and label.",
+        "When TC-SC-130a.1 '(2) Percentage of total energy consumed supplied from grid electricity' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-130a.1 '(2) Percentage of total energy consumed supplied from grid electricity', including: (2) Percentage of total energy consumed supplied from grid electricity; Percentage of total energy consumed supplied from grid electricity; TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity; (2) Percent of total energy consumed supplied from grid electricity.",
+        "Disambiguate TC-SC-130a.1 '(2) Percentage of total energy consumed supplied from grid electricity' from sibling metrics sharing TC-SC-130a.1: (1) Total energy consumed; (3) Percentage of total energy consumed that was renewable energy.",
+        "Find disclosures for TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity with unit Percentage (%) related to Energy Management in Manufacturing.",
         "Retrieve exact report evidence for TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity related to Energy Management in Manufacturing.",
@@ -445,6 +783,7 @@
       ],
       "anchor_terms": [
         "TC-SC-130a.1",
+        "(2) Percentage of total energy consumed supplied from grid electricity",
         "Percentage of total energy consumed supplied from grid electricity",
         "grid electricity",
         "energy consumed",
@@ -458,13 +797,19 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "TC-SC-130a.1 (2) Percentage of total energy consumed supplied from grid electricity",
+        "(2) Percent of total energy consumed supplied from grid electricity",
+        "consumed supplied",
+        "supplied grid"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
         "Percentage of total energy consumed that was renewable energy",
         "renewable energy",
-        "fuel consumed"
+        "fuel consumed",
+        "(1) Total energy consumed",
+        "(3) Percentage of total energy consumed that was renewable energy"
       ],
       "similar_metric_warnings": [
         {
@@ -485,7 +830,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -493,11 +840,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of total energy consumed supplied from grid electricity', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -509,9 +882,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of total energy consumed supplied from grid electricity' (TC-SC-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (3) Percentage of total energy consumed that was renewable energy."
     },
     {
       "metric_id": "TC-SC-130a.1.03",
@@ -525,7 +921,8 @@
       "aliases": [
         "(3) Percentage of total energy consumed that was renewable energy",
         "Percentage of total energy consumed that was renewable energy",
-        "TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy"
+        "TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy",
+        "(3) Percent of total energy consumed that was renewable energy"
       ],
       "bm25_terms": [
         "TC-SC-130a.1",
@@ -539,10 +936,27 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(3) Percentage of total energy consumed that was renewable energy",
+        "Percentage of total energy consumed that was renewable energy",
+        "TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy",
+        "(3) Percent of total energy consumed that was renewable energy",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was renewable",
+        "(1) Total energy consumed, (2) percentage grid electricity and",
+        "(3) percentage renewable"
       ],
-      "dense_query": "Find disclosures for TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy with unit Percentage (%) related to Energy Management in Manufacturing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-130a.1 '(3) Percentage of total energy consumed that was renewable energy', under 'Energy Management in Manufacturing', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-130a.1 '(3) Percentage of total energy consumed that was renewable energy', under 'Energy Management in Manufacturing', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-130a.1 '(3) Percentage of total energy consumed that was renewable energy'; retain every reported year and label.",
+        "When TC-SC-130a.1 '(3) Percentage of total energy consumed that was renewable energy' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-130a.1 '(3) Percentage of total energy consumed that was renewable energy', including: (3) Percentage of total energy consumed that was renewable energy; Percentage of total energy consumed that was renewable energy; TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy; (3) Percent of total energy consumed that was renewable energy.",
+        "Disambiguate TC-SC-130a.1 '(3) Percentage of total energy consumed that was renewable energy' from sibling metrics sharing TC-SC-130a.1: (1) Total energy consumed; (2) Percentage of total energy consumed supplied from grid electricity.",
+        "Find disclosures for TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy with unit Percentage (%) related to Energy Management in Manufacturing.",
         "Retrieve exact report evidence for TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy related to Energy Management in Manufacturing.",
@@ -550,6 +964,7 @@
       ],
       "anchor_terms": [
         "TC-SC-130a.1",
+        "(3) Percentage of total energy consumed that was renewable energy",
         "Percentage of total energy consumed that was renewable energy",
         "renewable energy",
         "energy consumed",
@@ -561,13 +976,22 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "TC-SC-130a.1 (3) Percentage of total energy consumed that was renewable energy",
+        "(3) Percent of total energy consumed that was renewable energy",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was renewable"
       ],
       "negative_anchor_terms": [
         "Total energy consumed",
         "Percentage of total energy consumed supplied from grid electricity",
         "grid electricity",
-        "non-renewable energy"
+        "non-renewable energy",
+        "(1) Total energy consumed",
+        "(2) Percentage of total energy consumed supplied from grid electricity"
       ],
       "similar_metric_warnings": [
         {
@@ -588,7 +1012,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -596,11 +1022,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage of total energy consumed that was renewable energy', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -612,9 +1064,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage of total energy consumed that was renewable energy' (TC-SC-130a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total energy consumed; (2) Percentage of total energy consumed supplied from grid electricity."
     },
     {
       "metric_id": "TC-SC-140a.1.01",
@@ -642,10 +1117,26 @@
         "metres",
         "thousand m3",
         "m3",
-        "meters"
+        "meters",
+        "(1) Total water withdrawn",
+        "Total water withdrawn",
+        "(1) Water withdrawal",
+        "TC-SC-140a.1 (1) Total water withdrawn",
+        "Thousand cubic metres (m³)",
+        "m?",
+        "cubic metres",
+        "cubic meters",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of"
       ],
-      "dense_query": "Find disclosures for TC-SC-140a.1 (1) Total water withdrawn with unit Thousand cubic metres (m³) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-140a.1 '(1) Total water withdrawn', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-140a.1 '(1) Total water withdrawn', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-140a.1 '(1) Total water withdrawn'; retain every reported year and label.",
+        "When TC-SC-140a.1 '(1) Total water withdrawn' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-140a.1 '(1) Total water withdrawn', including: (1) Total water withdrawn; Total water withdrawn; (1) Water withdrawal; TC-SC-140a.1 (1) Total water withdrawn.",
+        "Disambiguate TC-SC-140a.1 '(1) Total water withdrawn' from sibling metrics sharing TC-SC-140a.1: (2) total water consumed; (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress; (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress.",
+        "Find disclosures for TC-SC-140a.1 (1) Total water withdrawn with unit Thousand cubic metres (m³) related to Water Management.",
         "Retrieve exact report evidence for TC-SC-140a.1 (1) Total water withdrawn, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-140a.1 (1) Total water withdrawn with unit Thousand cubic metres (m³).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-140a.1 (1) Total water withdrawn related to Water Management.",
@@ -653,6 +1144,7 @@
       ],
       "anchor_terms": [
         "TC-SC-140a.1",
+        "(1) Total water withdrawn",
         "Total water withdrawn",
         "water withdrawn",
         "water",
@@ -661,7 +1153,13 @@
         "Thousand cubic metres (m³)",
         "thousand m3",
         "thousand cubic meters",
-        "thousand cubic metres"
+        "thousand cubic metres",
+        "(1) Water withdrawal",
+        "TC-SC-140a.1 (1) Total water withdrawn",
+        "m3",
+        "m?",
+        "cubic metres",
+        "cubic meters"
       ],
       "negative_anchor_terms": [
         "total water consumed",
@@ -669,7 +1167,10 @@
         "Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
         "water consumed",
         "water discharged",
-        "water recycled"
+        "water recycled",
+        "(2) total water consumed",
+        "(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress"
       ],
       "similar_metric_warnings": [
         {
@@ -694,7 +1195,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -702,25 +1205,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total water withdrawn', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "volume",
         "expected_units": [
           "Thousand cubic metres (m³)",
-          "thousand m3",
-          "thousand cubic meters",
-          "thousand cubic metres"
+          "m3",
+          "m?",
+          "cubic metres",
+          "cubic meters",
+          "litres",
+          "liters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total water withdrawn' (TC-SC-140a.1, expected unit: Thousand cubic metres (m³)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) total water consumed; (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress; (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress."
     },
     {
       "metric_id": "TC-SC-140a.1.02",
@@ -747,10 +1302,25 @@
         "metres",
         "thousand m3",
         "m3",
-        "meters"
+        "meters",
+        "(2) total water consumed",
+        "total water consumed",
+        "TC-SC-140a.1 (2) total water consumed",
+        "Thousand cubic metres (m³)",
+        "m?",
+        "cubic metres",
+        "cubic meters",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of"
       ],
-      "dense_query": "Find disclosures for TC-SC-140a.1 (2) total water consumed with unit Thousand cubic metres (m³) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-140a.1 '(2) total water consumed', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-140a.1 '(2) total water consumed', under 'Water Management', with expected unit 'Thousand cubic metres (m³)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-140a.1 '(2) total water consumed'; retain every reported year and label.",
+        "When TC-SC-140a.1 '(2) total water consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-140a.1 '(2) total water consumed', including: (2) total water consumed; total water consumed; TC-SC-140a.1 (2) total water consumed.",
+        "Disambiguate TC-SC-140a.1 '(2) total water consumed' from sibling metrics sharing TC-SC-140a.1: (1) Total water withdrawn; (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress; (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress.",
+        "Find disclosures for TC-SC-140a.1 (2) total water consumed with unit Thousand cubic metres (m³) related to Water Management.",
         "Retrieve exact report evidence for TC-SC-140a.1 (2) total water consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-140a.1 (2) total water consumed with unit Thousand cubic metres (m³).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-140a.1 (2) total water consumed related to Water Management.",
@@ -758,6 +1328,7 @@
       ],
       "anchor_terms": [
         "TC-SC-140a.1",
+        "(2) total water consumed",
         "total water consumed",
         "water consumed",
         "water",
@@ -766,7 +1337,12 @@
         "Thousand cubic metres (m³)",
         "thousand m3",
         "thousand cubic meters",
-        "thousand cubic metres"
+        "thousand cubic metres",
+        "TC-SC-140a.1 (2) total water consumed",
+        "m3",
+        "m?",
+        "cubic metres",
+        "cubic meters"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -774,7 +1350,10 @@
         "Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
         "water withdrawn",
         "water discharged",
-        "water recycled"
+        "water recycled",
+        "(1) Total water withdrawn",
+        "(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress"
       ],
       "similar_metric_warnings": [
         {
@@ -799,7 +1378,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -807,25 +1388,77 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) total water consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "volume",
         "expected_units": [
           "Thousand cubic metres (m³)",
-          "thousand m3",
-          "thousand cubic meters",
-          "thousand cubic metres"
+          "m3",
+          "m?",
+          "cubic metres",
+          "cubic meters",
+          "litres",
+          "liters"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) total water consumed' (TC-SC-140a.1, expected unit: Thousand cubic metres (m³)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total water withdrawn; (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress; (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress."
     },
     {
       "metric_id": "TC-SC-140a.1.03",
@@ -839,7 +1472,8 @@
       "aliases": [
         "(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
         "Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
-        "TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress"
+        "TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "(3) Percent of total water withdrawn in regions with High or Extremely High Baseline Water Stress"
       ],
       "bm25_terms": [
         "TC-SC-140a.1",
@@ -856,10 +1490,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "(3) Percent of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "withdrawn regions",
+        "regions High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of"
       ],
-      "dense_query": "Find disclosures for TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress with unit Percentage (%) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-140a.1 '(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress', under 'Water Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-140a.1 '(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress', under 'Water Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-140a.1 '(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress'; retain every reported year and label.",
+        "When TC-SC-140a.1 '(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-140a.1 '(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress', including: (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress; Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress; TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress; (3) Percent of total water withdrawn in regions with High or Extremely High Baseline Water Stress.",
+        "Disambiguate TC-SC-140a.1 '(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress' from sibling metrics sharing TC-SC-140a.1: (1) Total water withdrawn; (2) total water consumed; (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress.",
+        "Find disclosures for TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress with unit Percentage (%) related to Water Management.",
         "Retrieve exact report evidence for TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress related to Water Management.",
@@ -867,6 +1520,7 @@
       ],
       "anchor_terms": [
         "TC-SC-140a.1",
+        "(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
         "Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
         "water withdrawn",
         "Baseline Water Stress",
@@ -881,7 +1535,16 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "TC-SC-140a.1 (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "(3) Percent of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
+        "withdrawn regions",
+        "regions High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -889,7 +1552,10 @@
         "Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
         "water consumed",
         "water discharged",
-        "water recycled"
+        "water recycled",
+        "(1) Total water withdrawn",
+        "(2) total water consumed",
+        "(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress"
       ],
       "similar_metric_warnings": [
         {
@@ -914,7 +1580,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -922,11 +1590,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -938,9 +1632,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress' (TC-SC-140a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total water withdrawn; (2) total water consumed; (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress."
     },
     {
       "metric_id": "TC-SC-140a.1.04",
@@ -954,7 +1671,8 @@
       "aliases": [
         "(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
         "Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
-        "TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress"
+        "TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
+        "(4) Percent of total water consumed in regions with High or Extremely High Baseline Water Stress"
       ],
       "bm25_terms": [
         "TC-SC-140a.1",
@@ -971,10 +1689,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
+        "Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
+        "TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
+        "(4) Percent of total water consumed in regions with High or Extremely High Baseline Water Stress",
+        "consumed regions",
+        "regions High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress",
+        "(1) Total water withdrawn, (2) total water consumed",
+        "percentage of"
       ],
-      "dense_query": "Find disclosures for TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress with unit Percentage (%) related to Water Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-140a.1 '(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress', under 'Water Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-140a.1 '(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress', under 'Water Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-140a.1 '(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress'; retain every reported year and label.",
+        "When TC-SC-140a.1 '(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-140a.1 '(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress', including: (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress; Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress; TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress; (4) Percent of total water consumed in regions with High or Extremely High Baseline Water Stress.",
+        "Disambiguate TC-SC-140a.1 '(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress' from sibling metrics sharing TC-SC-140a.1: (1) Total water withdrawn; (2) total water consumed; (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress.",
+        "Find disclosures for TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress with unit Percentage (%) related to Water Management.",
         "Retrieve exact report evidence for TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress related to Water Management.",
@@ -982,6 +1719,7 @@
       ],
       "anchor_terms": [
         "TC-SC-140a.1",
+        "(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
         "Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
         "water consumed",
         "Baseline Water Stress",
@@ -996,7 +1734,16 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "TC-SC-140a.1 (4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress",
+        "(4) Percent of total water consumed in regions with High or Extremely High Baseline Water Stress",
+        "consumed regions",
+        "regions High",
+        "High Extremely",
+        "Extremely High",
+        "High Baseline",
+        "Baseline Water",
+        "Water Stress"
       ],
       "negative_anchor_terms": [
         "Total water withdrawn",
@@ -1004,7 +1751,10 @@
         "Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress",
         "water withdrawn",
         "water discharged",
-        "water recycled"
+        "water recycled",
+        "(1) Total water withdrawn",
+        "(2) total water consumed",
+        "(3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress"
       ],
       "similar_metric_warnings": [
         {
@@ -1029,7 +1779,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1037,11 +1789,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1053,9 +1831,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(4) Percentage of total water consumed in regions with High or Extremely High Baseline Water Stress' (TC-SC-140a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total water withdrawn; (2) total water consumed; (3) Percentage of total water withdrawn in regions with High or Extremely High Baseline Water Stress."
     },
     {
       "metric_id": "TC-SC-150a.1.01",
@@ -1083,10 +1884,27 @@
         "CO",
         "t CO2-e",
         "CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "(1) Amount of hazardous waste from manufacturing",
+        "Amount of hazardous waste from manufacturing",
+        "TC-SC-150a.1 (1) Amount of hazardous waste from manufacturing",
+        "hazardous waste",
+        "waste manufacturing",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "(1) Amount of hazardous waste from manufacturing, (2) percentage",
+        "The entity shall disclose (1) the total weight of hazardous waste generated, in metric tonnes, from manufacturing"
       ],
-      "dense_query": "Find disclosures for TC-SC-150a.1 (1) Amount of hazardous waste from manufacturing with unit Metric tonnes (t) related to Waste Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-150a.1 '(1) Amount of hazardous waste from manufacturing', under 'Waste Management', with expected unit 'Metric tonnes (t)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-150a.1 '(1) Amount of hazardous waste from manufacturing', under 'Waste Management', with expected unit 'Metric tonnes (t)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-150a.1 '(1) Amount of hazardous waste from manufacturing'; retain every reported year and label.",
+        "When TC-SC-150a.1 '(1) Amount of hazardous waste from manufacturing' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-150a.1 '(1) Amount of hazardous waste from manufacturing', including: (1) Amount of hazardous waste from manufacturing; Amount of hazardous waste from manufacturing; TC-SC-150a.1 (1) Amount of hazardous waste from manufacturing.",
+        "Disambiguate TC-SC-150a.1 '(1) Amount of hazardous waste from manufacturing' from sibling metrics sharing TC-SC-150a.1: (2) Percentage of hazardous waste recycled.",
+        "Find disclosures for TC-SC-150a.1 (1) Amount of hazardous waste from manufacturing with unit Metric tonnes (t) related to Waste Management.",
         "Retrieve exact report evidence for TC-SC-150a.1 (1) Amount of hazardous waste from manufacturing, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-150a.1 (1) Amount of hazardous waste from manufacturing with unit Metric tonnes (t).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-150a.1 (1) Amount of hazardous waste from manufacturing related to Waste Management.",
@@ -1094,6 +1912,7 @@
       ],
       "anchor_terms": [
         "TC-SC-150a.1",
+        "(1) Amount of hazardous waste from manufacturing",
         "Amount of hazardous waste from manufacturing",
         "hazardous",
         "waste",
@@ -1102,10 +1921,19 @@
         "Metric tonnes (t)",
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
-        "metric tonnes CO2-e"
+        "metric tonnes CO2-e",
+        "TC-SC-150a.1 (1) Amount of hazardous waste from manufacturing",
+        "hazardous waste",
+        "waste manufacturing",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
-        "Percentage of hazardous waste recycled"
+        "Percentage of hazardous waste recycled",
+        "(2) Percentage of hazardous waste recycled"
       ],
       "similar_metric_warnings": [
         {
@@ -1118,7 +1946,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1126,30 +1956,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Amount of hazardous waste from manufacturing', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t)",
-          "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Amount of hazardous waste from manufacturing' (TC-SC-150a.1, expected unit: Metric tonnes (t)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of hazardous waste recycled."
     },
     {
       "metric_id": "TC-SC-150a.1.02",
@@ -1163,7 +2039,8 @@
       "aliases": [
         "(2) Percentage of hazardous waste recycled",
         "Percentage of hazardous waste recycled",
-        "TC-SC-150a.1 (2) Percentage of hazardous waste recycled"
+        "TC-SC-150a.1 (2) Percentage of hazardous waste recycled",
+        "(2) Percent of hazardous waste recycled"
       ],
       "bm25_terms": [
         "TC-SC-150a.1",
@@ -1174,10 +2051,24 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of hazardous waste recycled",
+        "Percentage of hazardous waste recycled",
+        "TC-SC-150a.1 (2) Percentage of hazardous waste recycled",
+        "(2) Percent of hazardous waste recycled",
+        "hazardous waste",
+        "waste recycled",
+        "(1) Amount of hazardous waste from manufacturing, (2) percentage",
+        "The entity shall disclose (1) the total weight of hazardous waste generated, in metric tonnes, from manufacturing"
       ],
-      "dense_query": "Find disclosures for TC-SC-150a.1 (2) Percentage of hazardous waste recycled with unit Percentage (%) related to Waste Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-150a.1 '(2) Percentage of hazardous waste recycled', under 'Waste Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-150a.1 '(2) Percentage of hazardous waste recycled', under 'Waste Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-150a.1 '(2) Percentage of hazardous waste recycled'; retain every reported year and label.",
+        "When TC-SC-150a.1 '(2) Percentage of hazardous waste recycled' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-150a.1 '(2) Percentage of hazardous waste recycled', including: (2) Percentage of hazardous waste recycled; Percentage of hazardous waste recycled; TC-SC-150a.1 (2) Percentage of hazardous waste recycled; (2) Percent of hazardous waste recycled.",
+        "Disambiguate TC-SC-150a.1 '(2) Percentage of hazardous waste recycled' from sibling metrics sharing TC-SC-150a.1: (1) Amount of hazardous waste from manufacturing.",
+        "Find disclosures for TC-SC-150a.1 (2) Percentage of hazardous waste recycled with unit Percentage (%) related to Waste Management.",
         "Retrieve exact report evidence for TC-SC-150a.1 (2) Percentage of hazardous waste recycled, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-150a.1 (2) Percentage of hazardous waste recycled with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-150a.1 (2) Percentage of hazardous waste recycled related to Waste Management.",
@@ -1185,6 +2076,7 @@
       ],
       "anchor_terms": [
         "TC-SC-150a.1",
+        "(2) Percentage of hazardous waste recycled",
         "Percentage of hazardous waste recycled",
         "hazardous",
         "waste",
@@ -1193,10 +2085,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "TC-SC-150a.1 (2) Percentage of hazardous waste recycled",
+        "(2) Percent of hazardous waste recycled",
+        "hazardous waste",
+        "waste recycled"
       ],
       "negative_anchor_terms": [
-        "Amount of hazardous waste from manufacturing"
+        "Amount of hazardous waste from manufacturing",
+        "(1) Amount of hazardous waste from manufacturing"
       ],
       "similar_metric_warnings": [
         {
@@ -1209,7 +2106,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1217,11 +2116,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of hazardous waste recycled', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1233,9 +2158,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of hazardous waste recycled' (TC-SC-150a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Amount of hazardous waste from manufacturing."
     },
     {
       "metric_id": "TC-SC-320a.1",
@@ -1248,7 +2196,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards",
-        "TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards"
+        "TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards",
+        "efforts to assess, monitor, and reduce exposure of workforce to human health hazards"
       ],
       "bm25_terms": [
         "TC-SC-320a.1",
@@ -1262,10 +2211,30 @@
         "human",
         "health",
         "hazards",
-        "Safety"
+        "Safety",
+        "Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards",
+        "TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards",
+        "efforts to assess, monitor, and reduce exposure of workforce to human health hazards",
+        "efforts assess",
+        "assess monitor",
+        "monitor reduce",
+        "reduce exposure",
+        "exposure workforce",
+        "workforce human",
+        "human health",
+        "health hazards",
+        "Description of efforts to assess",
+        "reduce exposure of workforce to human health hazards",
+        "Description of efforts to assess, monitor, and reduce exposure of",
+        "workforce to human health hazards"
       ],
-      "dense_query": "Find disclosures for TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-320a.1 'Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards', under 'Workforce Health & Safety'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-320a.1 'Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards', under 'Workforce Health & Safety'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers TC-SC-320a.1 'Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards'.",
+        "When TC-SC-320a.1 'Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-320a.1 'Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards', including: Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards; TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards; efforts to assess, monitor, and reduce exposure of workforce to human health hazards.",
+        "Find disclosures for TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards related to Workforce Health & Safety.",
         "Retrieve exact report evidence for TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards related to Workforce Health & Safety.",
@@ -1284,7 +2253,19 @@
         "human",
         "health",
         "hazards",
-        "Safety"
+        "Safety",
+        "TC-SC-320a.1 Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards",
+        "efforts to assess, monitor, and reduce exposure of workforce to human health hazards",
+        "efforts assess",
+        "assess monitor",
+        "monitor reduce",
+        "reduce exposure",
+        "exposure workforce",
+        "workforce human",
+        "human health",
+        "health hazards",
+        "Description of efforts to assess",
+        "reduce exposure of workforce to human health hazards"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1294,7 +2275,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1306,20 +2289,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of efforts to assess, monitor, and reduce exposure of workforce to human health hazards' (TC-SC-320a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TC-SC-320a.2",
@@ -1352,10 +2383,33 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations",
+        "Monetary losses as a result of legal proceedings associated with employee health and safety violations",
+        "TC-SC-320a.2 Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated employee",
+        "employee health",
+        "health safety",
+        "safety violations",
+        "Total amount of monetary losses as a result of legal proceedings associated with employee health",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with employee health and safety violations"
       ],
-      "dense_query": "Find disclosures for TC-SC-320a.2 Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations with unit Presentation currency related to Workforce Health & Safety.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-320a.2 'Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations', under 'Workforce Health & Safety', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-320a.2 'Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations', under 'Workforce Health & Safety', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-320a.2 'Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations'; retain every reported year and label.",
+        "When TC-SC-320a.2 'Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-320a.2 'Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations', including: Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations; Monetary losses as a result of legal proceedings associated with employee health and safety violations; TC-SC-320a.2 Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations.",
+        "Find disclosures for TC-SC-320a.2 Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations with unit Presentation currency related to Workforce Health & Safety.",
         "Retrieve exact report evidence for TC-SC-320a.2 Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-320a.2 Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-320a.2 Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations related to Workforce Health & Safety.",
@@ -1378,7 +2432,21 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with employee health and safety violations",
+        "TC-SC-320a.2 Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated employee",
+        "employee health",
+        "health safety",
+        "safety violations",
+        "Total amount of monetary losses as a result of legal proceedings associated with employee health",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -1392,7 +2460,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1400,25 +2470,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with employee health and safety violations' (TC-SC-320a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TC-SC-330a.1",
@@ -1447,10 +2566,25 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of employees that require a work visa",
+        "Percent of employees that require a work visa",
+        "TC-SC-330a.1 Percentage of employees that require a work visa",
+        "employees that",
+        "that",
+        "that require",
+        "require work",
+        "work visa",
+        "Global",
+        "The entity shall disclose the percentage of employees that require a work visa in the country in which they are"
       ],
-      "dense_query": "Find disclosures for TC-SC-330a.1 Percentage of employees that require a work visa with unit Percentage (%) related to Recruiting & Managing a Global & Skilled Workforce.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-330a.1 'Percentage of employees that require a work visa', under 'Recruiting & Managing a Global & Skilled Workforce', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-330a.1 'Percentage of employees that require a work visa', under 'Recruiting & Managing a Global & Skilled Workforce', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-330a.1 'Percentage of employees that require a work visa'; retain every reported year and label.",
+        "When TC-SC-330a.1 'Percentage of employees that require a work visa' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-330a.1 'Percentage of employees that require a work visa', including: Percentage of employees that require a work visa; Percent of employees that require a work visa; TC-SC-330a.1 Percentage of employees that require a work visa.",
+        "Find disclosures for TC-SC-330a.1 Percentage of employees that require a work visa with unit Percentage (%) related to Recruiting & Managing a Global & Skilled Workforce.",
         "Retrieve exact report evidence for TC-SC-330a.1 Percentage of employees that require a work visa, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-330a.1 Percentage of employees that require a work visa with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-330a.1 Percentage of employees that require a work visa related to Recruiting & Managing a Global & Skilled Workforce.",
@@ -1470,7 +2604,14 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of employees that require a work visa",
+        "TC-SC-330a.1 Percentage of employees that require a work visa",
+        "employees that",
+        "that",
+        "that require",
+        "require work",
+        "work visa"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1479,7 +2620,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1487,11 +2630,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of employees that require a work visa', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1503,9 +2672,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of employees that require a work visa' (TC-SC-330a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TC-SC-410a.1",
@@ -1535,10 +2727,26 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of products by revenue that contain IEC 62474 declarable substances",
+        "Percent of products by revenue that contain IEC 62474 declarable substances",
+        "TC-SC-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances",
+        "products revenue",
+        "revenue that",
+        "that",
+        "that contain",
+        "contain IEC",
+        "IEC declarable",
+        "declarable substances",
+        "Percentage of products by revenue that contain IEC 62474"
       ],
-      "dense_query": "Find disclosures for TC-SC-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances with unit Percentage (%) related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances', under 'Product Lifecycle Management', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances', under 'Product Lifecycle Management', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances'; retain every reported year and label.",
+        "When TC-SC-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-410a.1 'Percentage of products by revenue that contain IEC 62474 declarable substances', including: Percentage of products by revenue that contain IEC 62474 declarable substances; Percent of products by revenue that contain IEC 62474 declarable substances; TC-SC-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances.",
+        "Find disclosures for TC-SC-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances with unit Percentage (%) related to Product Lifecycle Management.",
         "Retrieve exact report evidence for TC-SC-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances related to Product Lifecycle Management.",
@@ -1559,7 +2767,16 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of products by revenue that contain IEC 62474 declarable substances",
+        "TC-SC-410a.1 Percentage of products by revenue that contain IEC 62474 declarable substances",
+        "products revenue",
+        "revenue that",
+        "that",
+        "that contain",
+        "contain IEC",
+        "IEC declarable",
+        "declarable substances"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1568,7 +2785,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1576,14 +2795,40 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of products by revenue that contain IEC 62474 declarable substances', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "mixed",
+        "value_type": "percentage",
         "expected_units": [
           "Percentage (%)",
           "%",
@@ -1592,9 +2837,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Extract each required component separately and preserve its original unit, denominator, category, and reporting-period context."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of products by revenue that contain IEC 62474 declarable substances' (TC-SC-410a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TC-SC-410a.2.01",
@@ -1621,10 +2889,26 @@
         "Lifecycle",
         "Management",
         "Various",
-        "category"
+        "category",
+        "Processor energy efficiency at a system-level for (1) servers",
+        "Processor energy efficiency at a system-level for servers",
+        "TC-SC-410a.2 Processor energy efficiency at a system-level for (1) servers",
+        "Processor energy",
+        "energy efficiency",
+        "efficiency system-level",
+        "system-level servers",
+        "Various, by product category",
+        "Processor energy efficiency at a system-level for: (1) servers",
+        "(2) desktops and (3) laptops"
       ],
-      "dense_query": "Find disclosures for TC-SC-410a.2 Processor energy efficiency at a system-level for (1) servers with unit Various, by product category related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-410a.2 'Processor energy efficiency at a system-level for (1) servers', under 'Product Lifecycle Management', with expected unit 'Various, by product category'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-410a.2 'Processor energy efficiency at a system-level for (1) servers', under 'Product Lifecycle Management', with expected unit 'Various, by product category'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-410a.2 'Processor energy efficiency at a system-level for (1) servers'; retain every reported year and label.",
+        "When TC-SC-410a.2 'Processor energy efficiency at a system-level for (1) servers' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-410a.2 'Processor energy efficiency at a system-level for (1) servers', including: Processor energy efficiency at a system-level for (1) servers; Processor energy efficiency at a system-level for servers; TC-SC-410a.2 Processor energy efficiency at a system-level for (1) servers.",
+        "Disambiguate TC-SC-410a.2 'Processor energy efficiency at a system-level for (1) servers' from sibling metrics sharing TC-SC-410a.2: Processor energy efficiency at a system-level for (2) desktops; Processor energy efficiency at a system-level for (3) laptops.",
+        "Find disclosures for TC-SC-410a.2 Processor energy efficiency at a system-level for (1) servers with unit Various, by product category related to Product Lifecycle Management.",
         "Retrieve exact report evidence for TC-SC-410a.2 Processor energy efficiency at a system-level for (1) servers, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-410a.2 Processor energy efficiency at a system-level for (1) servers with unit Various, by product category.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-410a.2 Processor energy efficiency at a system-level for (1) servers related to Product Lifecycle Management.",
@@ -1641,7 +2925,13 @@
         "Product",
         "Lifecycle",
         "Management",
-        "Various, by product category"
+        "Various, by product category",
+        "Processor energy efficiency at a system-level for servers",
+        "TC-SC-410a.2 Processor energy efficiency at a system-level for (1) servers",
+        "Processor energy",
+        "energy efficiency",
+        "efficiency system-level",
+        "system-level servers"
       ],
       "negative_anchor_terms": [
         "Processor energy efficiency at a system-level for (2) desktops",
@@ -1663,7 +2953,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1675,22 +2967,70 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
-        "requires_numeric_value": false,
-        "requires_unit": true
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Processor energy efficiency at a system-level for (1) servers', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
+        "requires_numeric_value": true,
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "efficiency",
         "expected_units": [
           "Various, by product category"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve the efficiency basis, numerator, denominator, reporting year, and complete unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Processor energy efficiency at a system-level for (1) servers' (TC-SC-410a.2, expected unit: Various, by product category). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Processor energy efficiency at a system-level for (2) desktops; Processor energy efficiency at a system-level for (3) laptops."
     },
     {
       "metric_id": "TC-SC-410a.2.02",
@@ -1717,10 +3057,26 @@
         "Lifecycle",
         "Management",
         "Various",
-        "category"
+        "category",
+        "Processor energy efficiency at a system-level for (2) desktops",
+        "Processor energy efficiency at a system-level for desktops",
+        "TC-SC-410a.2 Processor energy efficiency at a system-level for (2) desktops",
+        "Processor energy",
+        "energy efficiency",
+        "efficiency system-level",
+        "system-level desktops",
+        "Various, by product category",
+        "Processor energy efficiency at a system-level for: (1) servers",
+        "(2) desktops and (3) laptops"
       ],
-      "dense_query": "Find disclosures for TC-SC-410a.2 Processor energy efficiency at a system-level for (2) desktops with unit Various, by product category related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-410a.2 'Processor energy efficiency at a system-level for (2) desktops', under 'Product Lifecycle Management', with expected unit 'Various, by product category'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-410a.2 'Processor energy efficiency at a system-level for (2) desktops', under 'Product Lifecycle Management', with expected unit 'Various, by product category'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-410a.2 'Processor energy efficiency at a system-level for (2) desktops'; retain every reported year and label.",
+        "When TC-SC-410a.2 'Processor energy efficiency at a system-level for (2) desktops' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-410a.2 'Processor energy efficiency at a system-level for (2) desktops', including: Processor energy efficiency at a system-level for (2) desktops; Processor energy efficiency at a system-level for desktops; TC-SC-410a.2 Processor energy efficiency at a system-level for (2) desktops.",
+        "Disambiguate TC-SC-410a.2 'Processor energy efficiency at a system-level for (2) desktops' from sibling metrics sharing TC-SC-410a.2: Processor energy efficiency at a system-level for (1) servers; Processor energy efficiency at a system-level for (3) laptops.",
+        "Find disclosures for TC-SC-410a.2 Processor energy efficiency at a system-level for (2) desktops with unit Various, by product category related to Product Lifecycle Management.",
         "Retrieve exact report evidence for TC-SC-410a.2 Processor energy efficiency at a system-level for (2) desktops, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-410a.2 Processor energy efficiency at a system-level for (2) desktops with unit Various, by product category.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-410a.2 Processor energy efficiency at a system-level for (2) desktops related to Product Lifecycle Management.",
@@ -1737,7 +3093,13 @@
         "Product",
         "Lifecycle",
         "Management",
-        "Various, by product category"
+        "Various, by product category",
+        "Processor energy efficiency at a system-level for desktops",
+        "TC-SC-410a.2 Processor energy efficiency at a system-level for (2) desktops",
+        "Processor energy",
+        "energy efficiency",
+        "efficiency system-level",
+        "system-level desktops"
       ],
       "negative_anchor_terms": [
         "Processor energy efficiency at a system-level for (1) servers",
@@ -1759,7 +3121,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1771,22 +3135,70 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
-        "requires_numeric_value": false,
-        "requires_unit": true
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Processor energy efficiency at a system-level for (2) desktops', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
+        "requires_numeric_value": true,
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "efficiency",
         "expected_units": [
           "Various, by product category"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve the efficiency basis, numerator, denominator, reporting year, and complete unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Processor energy efficiency at a system-level for (2) desktops' (TC-SC-410a.2, expected unit: Various, by product category). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Processor energy efficiency at a system-level for (1) servers; Processor energy efficiency at a system-level for (3) laptops."
     },
     {
       "metric_id": "TC-SC-410a.2.03",
@@ -1813,10 +3225,26 @@
         "Lifecycle",
         "Management",
         "Various",
-        "category"
+        "category",
+        "Processor energy efficiency at a system-level for (3) laptops",
+        "Processor energy efficiency at a system-level for laptops",
+        "TC-SC-410a.2 Processor energy efficiency at a system-level for (3) laptops",
+        "Processor energy",
+        "energy efficiency",
+        "efficiency system-level",
+        "system-level laptops",
+        "Various, by product category",
+        "Processor energy efficiency at a system-level for: (1) servers",
+        "(2) desktops and (3) laptops"
       ],
-      "dense_query": "Find disclosures for TC-SC-410a.2 Processor energy efficiency at a system-level for (3) laptops with unit Various, by product category related to Product Lifecycle Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-410a.2 'Processor energy efficiency at a system-level for (3) laptops', under 'Product Lifecycle Management', with expected unit 'Various, by product category'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-410a.2 'Processor energy efficiency at a system-level for (3) laptops', under 'Product Lifecycle Management', with expected unit 'Various, by product category'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-410a.2 'Processor energy efficiency at a system-level for (3) laptops'; retain every reported year and label.",
+        "When TC-SC-410a.2 'Processor energy efficiency at a system-level for (3) laptops' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-410a.2 'Processor energy efficiency at a system-level for (3) laptops', including: Processor energy efficiency at a system-level for (3) laptops; Processor energy efficiency at a system-level for laptops; TC-SC-410a.2 Processor energy efficiency at a system-level for (3) laptops.",
+        "Disambiguate TC-SC-410a.2 'Processor energy efficiency at a system-level for (3) laptops' from sibling metrics sharing TC-SC-410a.2: Processor energy efficiency at a system-level for (1) servers; Processor energy efficiency at a system-level for (2) desktops.",
+        "Find disclosures for TC-SC-410a.2 Processor energy efficiency at a system-level for (3) laptops with unit Various, by product category related to Product Lifecycle Management.",
         "Retrieve exact report evidence for TC-SC-410a.2 Processor energy efficiency at a system-level for (3) laptops, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-410a.2 Processor energy efficiency at a system-level for (3) laptops with unit Various, by product category.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-410a.2 Processor energy efficiency at a system-level for (3) laptops related to Product Lifecycle Management.",
@@ -1833,7 +3261,13 @@
         "Product",
         "Lifecycle",
         "Management",
-        "Various, by product category"
+        "Various, by product category",
+        "Processor energy efficiency at a system-level for laptops",
+        "TC-SC-410a.2 Processor energy efficiency at a system-level for (3) laptops",
+        "Processor energy",
+        "energy efficiency",
+        "efficiency system-level",
+        "system-level laptops"
       ],
       "negative_anchor_terms": [
         "Processor energy efficiency at a system-level for (1) servers",
@@ -1855,7 +3289,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1867,22 +3303,70 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
-        "requires_numeric_value": false,
-        "requires_unit": true
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Processor energy efficiency at a system-level for (3) laptops', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
+        "requires_numeric_value": true,
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "efficiency",
         "expected_units": [
           "Various, by product category"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve the efficiency basis, numerator, denominator, reporting year, and complete unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Processor energy efficiency at a system-level for (3) laptops' (TC-SC-410a.2, expected unit: Various, by product category). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Processor energy efficiency at a system-level for (1) servers; Processor energy efficiency at a system-level for (2) desktops."
     },
     {
       "metric_id": "TC-SC-440a.1",
@@ -1895,7 +3379,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of the management of risks associated with the use of critical materials",
-        "TC-SC-440a.1 Description of the management of risks associated with the use of critical materials"
+        "TC-SC-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials"
       ],
       "bm25_terms": [
         "TC-SC-440a.1",
@@ -1904,10 +3389,26 @@
         "risks",
         "critical",
         "materials",
-        "Sourcing"
+        "Sourcing",
+        "Description of the management of risks associated with the use of critical materials",
+        "TC-SC-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials",
+        "management risks",
+        "risks associated",
+        "associated",
+        "associated use",
+        "use",
+        "use critical",
+        "critical materials",
+        "Description of the management of risks associated with the use of"
       ],
-      "dense_query": "Find disclosures for TC-SC-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-440a.1 'Description of the management of risks associated with the use of critical materials', under 'Materials Sourcing'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-440a.1 'Description of the management of risks associated with the use of critical materials', under 'Materials Sourcing'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers TC-SC-440a.1 'Description of the management of risks associated with the use of critical materials'.",
+        "When TC-SC-440a.1 'Description of the management of risks associated with the use of critical materials' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-440a.1 'Description of the management of risks associated with the use of critical materials', including: Description of the management of risks associated with the use of critical materials; TC-SC-440a.1 Description of the management of risks associated with the use of critical materials; the management of risks associated with the use of critical materials.",
+        "Find disclosures for TC-SC-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
         "Retrieve exact report evidence for TC-SC-440a.1 Description of the management of risks associated with the use of critical materials, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-440a.1 Description of the management of risks associated with the use of critical materials.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-440a.1 Description of the management of risks associated with the use of critical materials related to Materials Sourcing.",
@@ -1921,7 +3422,16 @@
         "risks",
         "critical",
         "materials",
-        "Sourcing"
+        "Sourcing",
+        "TC-SC-440a.1 Description of the management of risks associated with the use of critical materials",
+        "the management of risks associated with the use of critical materials",
+        "management risks",
+        "risks associated",
+        "associated",
+        "associated use",
+        "use",
+        "use critical",
+        "critical materials"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1931,7 +3441,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1943,20 +3455,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of the management of risks associated with the use of critical materials'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of the management of risks associated with the use of critical materials' (TC-SC-440a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TC-SC-520a.1",
@@ -1991,10 +3551,31 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "TC-SC-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour regulations",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with anti-competitive behaviour regulations"
       ],
-      "dense_query": "Find disclosures for TC-SC-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency related to Intellectual Property Protection & Competitive Behaviour.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', under 'Intellectual Property Protection & Competitive Behaviour', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', under 'Intellectual Property Protection & Competitive Behaviour', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations'; retain every reported year and label.",
+        "When TC-SC-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', including: Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations; Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations; TC-SC-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations.",
+        "Find disclosures for TC-SC-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency related to Intellectual Property Protection & Competitive Behaviour.",
         "Retrieve exact report evidence for TC-SC-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations related to Intellectual Property Protection & Competitive Behaviour.",
@@ -2018,7 +3599,19 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "TC-SC-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour regulations",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -2032,7 +3625,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2040,25 +3635,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations' (TC-SC-520a.1, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TC-SC-000.A",
@@ -2078,10 +3722,18 @@
         "production",
         "See",
         "note",
-        "See note"
+        "See note",
+        "Total production",
+        "TC-SC-000.A Total production",
+        "Note to TC-SC-000.A – The entity shall disclose total production from its own manufacturing facilities and those with which it contracts for"
       ],
-      "dense_query": "Find disclosures for TC-SC-000.A Total production with unit See note.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-000.A 'Total production'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-000.A 'Total production'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-000.A 'Total production'; retain every reported year and label.",
+        "When TC-SC-000.A 'Total production' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-000.A 'Total production', including: Total production; TC-SC-000.A Total production.",
+        "Find disclosures for TC-SC-000.A Total production with unit See note.",
         "Retrieve exact report evidence for TC-SC-000.A Total production, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-000.A Total production with unit See note.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-000.A Total production.",
@@ -2091,7 +3743,8 @@
         "TC-SC-000.A",
         "Total production",
         "production",
-        "See note"
+        "See note",
+        "TC-SC-000.A Total production"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2100,7 +3753,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2108,22 +3763,69 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total production'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
-        "expected_units": [
-          "See note"
-        ],
+        "value_type": "number",
+        "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total production' (TC-SC-000.A, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TC-SC-000.B",
@@ -2147,10 +3849,20 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of production from owned facilities",
+        "Percent of production from owned facilities",
+        "TC-SC-000.B Percentage of production from owned facilities",
+        "production owned",
+        "owned facilities"
       ],
-      "dense_query": "Find disclosures for TC-SC-000.B Percentage of production from owned facilities with unit Percentage (%).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TC-SC-000.B 'Percentage of production from owned facilities', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TC-SC-000.B 'Percentage of production from owned facilities', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TC-SC-000.B 'Percentage of production from owned facilities'; retain every reported year and label.",
+        "When TC-SC-000.B 'Percentage of production from owned facilities' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TC-SC-000.B 'Percentage of production from owned facilities', including: Percentage of production from owned facilities; Percent of production from owned facilities; TC-SC-000.B Percentage of production from owned facilities.",
+        "Find disclosures for TC-SC-000.B Percentage of production from owned facilities with unit Percentage (%).",
         "Retrieve exact report evidence for TC-SC-000.B Percentage of production from owned facilities, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TC-SC-000.B Percentage of production from owned facilities with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TC-SC-000.B Percentage of production from owned facilities.",
@@ -2165,7 +3877,11 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of production from owned facilities",
+        "TC-SC-000.B Percentage of production from owned facilities",
+        "production owned",
+        "owned facilities"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -2174,7 +3890,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -2182,11 +3900,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of production from owned facilities', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -2198,9 +3942,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of production from owned facilities' (TC-SC-000.B, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

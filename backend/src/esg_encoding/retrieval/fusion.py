@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 
 from .metric_profile import MetricRetrievalProfile, best_alias_matches, content_contains_alias
 from .scoring import (
@@ -17,6 +17,7 @@ from .scoring import (
     _normalize_text_for_match,
     _segment_structure_bonus,
     _target_window_size,
+    _topic_relevance_adjustment,
 )
 
 _CHANNEL_WEIGHTS = {
@@ -30,6 +31,7 @@ _CHANNEL_WEIGHTS = {
     "dense": 1.00,
     "semantic": 1.00,
     "semantic+rerank": 1.45,
+    "linked_page": 9.00,
 }
 _CHANNEL_PRIORITY = {
     "exact_code": 2.00,
@@ -39,25 +41,20 @@ _CHANNEL_PRIORITY = {
     "semantic+rerank": 0.52,
     "dense": 0.42,
     "semantic": 0.42,
+    "linked_page": 2.20,
 }
 
 
 def _channel_weight(channel: str) -> float:
+    if "linked_page" in channel:
+        return float(_CHANNEL_WEIGHTS["linked_page"])
     return float(_CHANNEL_WEIGHTS.get(channel, _CHANNEL_WEIGHTS.get(channel.split("+")[-1], 1.0)))
 
 
 def _channel_priority(channel: str) -> float:
+    if "linked_page" in channel:
+        return float(_CHANNEL_PRIORITY["linked_page"])
     return float(_CHANNEL_PRIORITY.get(channel, _CHANNEL_PRIORITY.get(channel.split("+")[-1], 0.35)))
-
-
-def _is_exact_code_result(result: RetrievalResult) -> bool:
-    """Return True when a result came from, or still contains, exact-code retrieval."""
-    return "exact_code" in str(getattr(result, "retrieval_type", "") or "")
-
-
-def _code_first_sort_key(result: RetrievalResult) -> Tuple[int, float]:
-    """Sort exact-code hits before all other retrieval channels, then by score."""
-    return (1 if _is_exact_code_result(result) else 0, float(getattr(result, "score", 0.0) or 0.0))
 
 
 def _merge_keywords(values: Iterable[Sequence[str]]) -> List[str]:
@@ -101,6 +98,10 @@ def rrf_fuse(
                     "keywords": [],
                     "priority": 0.0,
                     "best_source_score": 0.0,
+                    "link_source_page": None,
+                    "link_target_page": None,
+                    "link_anchor_text": None,
+                    "link_source_segment_id": None,
                 },
             )
             bucket["score"] = float(bucket["score"]) + weight / float(k + rank)
@@ -108,6 +109,11 @@ def rrf_fuse(
             bucket["best_source_score"] = max(float(bucket["best_source_score"]), float(result.score or 0.0))
             bucket["channels"].append(channel)
             bucket["keywords"].append(list(result.matched_keywords or []))
+            if getattr(result, "link_target_page", None) is not None:
+                bucket["link_source_page"] = getattr(result, "link_source_page", None)
+                bucket["link_target_page"] = getattr(result, "link_target_page", None)
+                bucket["link_anchor_text"] = getattr(result, "link_anchor_text", None)
+                bucket["link_source_segment_id"] = getattr(result, "link_source_segment_id", None)
             existing = bucket["result"]
             if priority > _channel_priority(getattr(existing, "retrieval_type", "")) or float(result.score or 0.0) > float(getattr(existing, "score", 0.0) or 0.0):
                 bucket["result"] = result
@@ -123,10 +129,7 @@ def rrf_fuse(
         normalized_rrf = float(bucket["score"]) / max_raw
         priority = float(bucket["priority"])
         source_score = float(bucket["best_source_score"])
-        has_exact_code = "exact_code" in channels
         fused_score = _clamp_score(0.50 * normalized_rrf + 0.35 * priority + 0.15 * source_score)
-        if has_exact_code:
-            fused_score = max(0.96, fused_score)
         fused.append(
             RetrievalResult(
                 segment_id=segment_id,
@@ -136,32 +139,18 @@ def rrf_fuse(
                 retrieval_type="rrf:" + "+".join(channels),
                 matched_keywords=_merge_keywords(bucket["keywords"]),  # type: ignore[arg-type]
                 metric_id=base.metric_id,
+                link_source_page=bucket["link_source_page"],
+                link_target_page=bucket["link_target_page"],
+                link_anchor_text=bucket["link_anchor_text"],
+                link_source_segment_id=bucket["link_source_segment_id"],
             )
         )
-    fused.sort(key=_code_first_sort_key, reverse=True)
+    fused.sort(key=lambda item: item.score, reverse=True)
     return fused
 
 
 def _has_number(text: str) -> bool:
     return bool(re.search(r"-?\d[\d,]*(?:\.\d+)?\s*(?:%|percent|percentage|[A-Za-zµμ³₂/.-]+)?", text or ""))
-
-
-def _unit_hits(content: str, unit: str) -> int:
-    unit = str(unit or "").strip().lower()
-    if not unit or unit in {"n/a", "na", "none"}:
-        return 0
-    aliases = {unit, unit.replace(" ", "")}
-    if "%" in unit or "percent" in unit:
-        aliases.update({"%", "percent", "percentage"})
-    if "co2" in unit or "co₂" in unit:
-        aliases.update({"co2e", "co₂e", "tco2e", "mtco2e", "metric tons co2e"})
-    if "mwh" in unit or "megawatt" in unit:
-        aliases.update({"mwh", "megawatt hours", "megawatt-hours"})
-    if "gj" in unit or "gigajoule" in unit:
-        aliases.update({"gj", "gigajoules"})
-    lowered = _normalize_text_for_match(content)
-    compact = re.sub(r"\s+", "", lowered)
-    return sum(1 for alias in aliases if alias and (alias in lowered or alias.replace(" ", "") in compact))
 
 
 def exact_metric_rerank(
@@ -219,14 +208,13 @@ def exact_metric_rerank(
             if seg_type in preferred:
                 direct += 0.06
             direct += _metric_evidence_quality_adjustment(metric, segment, profile.anchor_terms)
+            direct += _topic_relevance_adjustment(metric, content)
 
         if _is_quantitative_metric(metric):
             if _has_number(content):
                 direct += 0.08
             else:
                 direct -= 0.10
-            if _unit_hits(content, profile.unit):
-                direct += 0.08
         else:
             process_terms = ("policy", "process", "procedure", "governance", "oversight", "risk management", "approach", "program", "programme")
             if any(term in lowered for term in process_terms):
@@ -235,14 +223,14 @@ def exact_metric_rerank(
         if "exact_code" in result.retrieval_type:
             direct += 0.22
             code_match = True
+        elif "linked_page" in result.retrieval_type:
+            direct += 0.24
         elif "exact_alias" in result.retrieval_type:
             direct += 0.07
         elif "semantic" in result.retrieval_type and not alias_matches and anchor_hits == 0:
             direct -= 0.08
 
         final_score = _clamp_score(0.50 * float(result.score or 0.0) + 0.50 * _clamp_score(direct))
-        if code_match:
-            final_score = max(0.97, final_score)
         reranked.append(
             RetrievalResult(
                 segment_id=result.segment_id,
@@ -252,10 +240,14 @@ def exact_metric_rerank(
                 retrieval_type=(result.retrieval_type + "+exact_metric_rerank") if "exact_metric_rerank" not in result.retrieval_type else result.retrieval_type,
                 matched_keywords=_merge_keywords([matched]),
                 metric_id=result.metric_id,
+                link_source_page=getattr(result, "link_source_page", None),
+                link_target_page=getattr(result, "link_target_page", None),
+                link_anchor_text=getattr(result, "link_anchor_text", None),
+                link_source_segment_id=getattr(result, "link_source_segment_id", None),
             )
         )
 
-    reranked.sort(key=_code_first_sort_key, reverse=True)
+    reranked.sort(key=lambda item: item.score, reverse=True)
     if top_k is None:
         top_k = _target_window_size(getattr(metric, "config", None) or object(), metric, observed_matches=len(reranked)) if False else len(reranked)
     return reranked[: max(1, int(top_k or len(reranked)))]

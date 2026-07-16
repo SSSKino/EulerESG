@@ -24,7 +24,7 @@ from ..models import ESGMetric, SemanticExpansion
 
 _GENERIC_TERMS = {
     "the", "and", "or", "of", "to", "in", "for", "with", "by", "from", "as", "on", "at",
-    "metric", "metrics", "number", "amount", "total", "percentage", "description", "discussion",
+    "metric", "metrics", "number", "amount", "total", "percentage", "percent", "pct", "description", "discussion",
     "approach", "including", "related", "associated", "data", "information", "report", "reported",
     "sustainability", "disclosure", "topic", "topics", "type", "category", "unit", "value",
 }
@@ -54,6 +54,17 @@ class MetricRetrievalProfile:
     preferred_chunk_types: List[str] = field(default_factory=list)
     evidence_hints: Dict[str, Any] = field(default_factory=dict)
     extraction_hints: Dict[str, Any] = field(default_factory=dict)
+    direct_disclosure_rules: Dict[str, Any] = field(default_factory=dict)
+    requires_dimension_labels: bool = False
+    value_type: str = ""
+    expected_units: List[str] = field(default_factory=list)
+    year_sensitive: bool = False
+    output_shape: str = ""
+    variable_dimensions: List[str] = field(default_factory=list)
+    reject_values_from: List[str] = field(default_factory=list)
+    requires_value_label: bool = False
+    year_rules: Dict[str, Any] = field(default_factory=dict)
+    value_selection_rules: Dict[str, Any] = field(default_factory=dict)
     similar_metric_warnings: List[Dict[str, Any]] = field(default_factory=list)
     rerank_instruction: str = ""
     raw: Dict[str, Any] = field(default_factory=dict)
@@ -103,8 +114,12 @@ def _as_list(value: Any) -> List[str]:
     return [text] if text else []
 
 
-def _code_regex(metric_code: str, extra_patterns: Optional[Sequence[str]] = None) -> List[re.Pattern]:
-    code = str(metric_code or "").strip()
+def compile_metric_code_patterns(
+    metric_code: str,
+    extra_patterns: Optional[Sequence[str]] = None,
+) -> List[re.Pattern]:
+    """Compile exact-boundary patterns tolerant of OCR separator variation."""
+    code = str(metric_code or "").replace("\u00a0", " ").strip()
     patterns: List[str] = []
     if code:
         escaped = re.escape(code)
@@ -112,9 +127,10 @@ def _code_regex(metric_code: str, extra_patterns: Optional[Sequence[str]] = None
         patterns.append(escaped)
         if flexible != escaped:
             patterns.append(flexible)
-        compact = re.sub(r"[^A-Za-z0-9]", "", code)
-        if compact and compact.lower() != code.lower():
-            patterns.append(re.escape(compact))
+        tokens = re.findall(r"[A-Za-z0-9]+", code)
+        if len(tokens) >= 2:
+            separator = r"[\s\u00a0\-\u2010\u2011\u2012\u2013\u2014\u2212._:/]*"
+            patterns.append(separator.join(re.escape(token) for token in tokens))
     for pattern in extra_patterns or []:
         pattern = str(pattern or "").strip()
         if pattern:
@@ -136,6 +152,10 @@ def _code_regex(metric_code: str, extra_patterns: Optional[Sequence[str]] = None
     return compiled
 
 
+def _code_regex(metric_code: str, extra_patterns: Optional[Sequence[str]] = None) -> List[re.Pattern]:
+    return compile_metric_code_patterns(metric_code, extra_patterns)
+
+
 def _metric_name_variants(metric_name: str) -> List[str]:
     name = re.sub(r"\s+", " ", str(metric_name or "").strip())
     if not name:
@@ -155,6 +175,16 @@ def _metric_name_variants(metric_name: str) -> List[str]:
     no_parens = re.sub(r"\s+", " ", no_parens).strip(" ,;:")
     if no_parens and len(no_parens) >= 5:
         variants.append(no_parens)
+    if "(" not in name and ")" not in name:
+        compact_label = re.match(
+            r"^(percentage|percent|weight|number|amount)\s+of\b.*\b([A-Za-z][A-Za-z-]{3,})$",
+            name,
+            flags=re.IGNORECASE,
+        )
+        if compact_label:
+            tail = compact_label.group(2)
+            if normalize_metric_text(tail) not in _GENERIC_TERMS:
+                variants.append(f"{compact_label.group(1)} {tail}")
     return _dedupe_keep_order(variants)
 
 
@@ -197,6 +227,56 @@ def _unit_aliases(unit: str) -> List[str]:
     return _dedupe_keep_order(aliases)
 
 
+_GENERIC_UNIT_SIGNALS = {"%", "percent", "percentage", "pct"}
+
+
+def _normalized_signal_set(values: Iterable[str]) -> set[str]:
+    return {
+        normalize_metric_text(value)
+        for value in values
+        if normalize_metric_text(value)
+    }
+
+
+def _unit_signal_set(unit: str) -> set[str]:
+    return _normalized_signal_set([unit, *_unit_aliases(unit), *_GENERIC_UNIT_SIGNALS])
+
+
+def _topic_signal_set(topic: str) -> set[str]:
+    return _normalized_signal_set([topic, *tokenize_metric_text(topic)])
+
+
+def _without_standalone_signals(values: Iterable[str], blocked: set[str]) -> List[str]:
+    """Drop standalone generic signals while preserving meaningful phrases."""
+    return _dedupe_keep_order(
+        value
+        for value in values
+        if normalize_metric_text(value) not in blocked
+    )
+
+
+def _strip_explicit_unit_context(query: str, unit: str) -> str:
+    """Remove an expected-unit clause without changing canonical metric names."""
+    text = str(query or "").strip()
+    if not text:
+        return ""
+    text = re.sub(
+        r",?\s*with\s+expected\s+unit\s+(['\"]).*?\1",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if unit:
+        text = re.sub(
+            rf"\bexpected\s+unit\s*:\s*{re.escape(str(unit).strip())}",
+            "",
+            text,
+            flags=re.IGNORECASE,
+        )
+    text = re.sub(r"\s+", " ", text)
+    return re.sub(r"\s+([,.;:])", r"\1", text).strip()
+
+
 def _package_backend_root() -> Path:
     # .../backend/src/esg_encoding/retrieval/metric_profile.py -> backend
     return Path(__file__).resolve().parents[3]
@@ -217,18 +297,40 @@ def _profile_from_dict(data: Mapping[str, Any]) -> MetricRetrievalProfile:
     unit = str(data.get("unit") or "").strip()
     topic = str(data.get("topic") or data.get("sasb_topic") or "").strip()
     definition = str(data.get("definition") or data.get("description") or "").strip()
-    aliases = _dedupe_keep_order(
+    unit_signals = _unit_signal_set(unit)
+    topic_signals = _topic_signal_set(topic)
+    aliases = _without_standalone_signals(
         _as_list(data.get("aliases"))
         + _metric_name_variants(metric_name)
-        + _as_list(data.get("metric"))
-        + ([metric_code] if metric_code else [])
-        + ([topic] if topic else [])
-        + _unit_aliases(unit)
+        + _as_list(data.get("metric")),
+        unit_signals | _normalized_signal_set([metric_code, topic]),
     )
-    bm25_terms = _dedupe_keep_order(_as_list(data.get("bm25_terms")) + aliases + _as_list(data.get("anchor_terms")))
-    anchor_terms = _dedupe_keep_order(_as_list(data.get("anchor_terms")) + tokenize_metric_text(" ".join([metric_name, metric_code, topic])))[:48]
-    dense_query = str(data.get("dense_query") or "").strip()
+    raw_anchor_terms = (
+        _as_list(data.get("anchor_terms"))
+        + tokenize_metric_text(" ".join([metric_name, metric_code]))
+    )
+    anchor_terms = _without_standalone_signals(
+        raw_anchor_terms,
+        unit_signals | topic_signals,
+    )[:48]
+    bm25_terms = _without_standalone_signals(
+        _as_list(data.get("bm25_terms")) + aliases + anchor_terms,
+        unit_signals,
+    )
+    dense_query = _strip_explicit_unit_context(
+        str(data.get("dense_query") or "").strip(),
+        unit,
+    )
     dense_queries = _dedupe_keep_order(_as_list(data.get("dense_queries")))
+    evidence_hints = dict(data.get("evidence_hints") or {})
+    extraction_hints = dict(data.get("extraction_hints") or {})
+    direct_disclosure_rules = dict(
+        evidence_hints.get("direct_disclosure_rules") or {}
+    )
+    year_rules = dict(extraction_hints.get("year_rules") or {})
+    value_selection_rules = dict(
+        extraction_hints.get("value_selection_rules") or {}
+    )
     if not dense_query:
         dense_query = "\n".join(
             part
@@ -236,7 +338,6 @@ def _profile_from_dict(data: Mapping[str, Any]) -> MetricRetrievalProfile:
                 f"Canonical metric code: {metric_code}" if metric_code else "",
                 f"Canonical metric name: {metric_name}" if metric_name else "",
                 f"Disclosure topic: {topic}" if topic else "",
-                f"Expected unit: {unit}" if unit else "",
                 f"Metric definition: {definition}" if definition else "",
                 "Aliases and report expressions: " + "; ".join(aliases[:24]) if aliases else "",
             ]
@@ -261,8 +362,28 @@ def _profile_from_dict(data: Mapping[str, Any]) -> MetricRetrievalProfile:
         anchor_terms=anchor_terms,
         negative_anchor_terms=_dedupe_keep_order(_as_list(data.get("negative_anchor_terms"))),
         preferred_chunk_types=[x.lower() for x in _dedupe_keep_order(_as_list(data.get("preferred_chunk_types")))],
-        evidence_hints=dict(data.get("evidence_hints") or {}),
-        extraction_hints=dict(data.get("extraction_hints") or {}),
+        evidence_hints=evidence_hints,
+        extraction_hints=extraction_hints,
+        direct_disclosure_rules=direct_disclosure_rules,
+        requires_dimension_labels=bool(
+            evidence_hints.get("requires_dimension_labels", False)
+        ),
+        value_type=str(extraction_hints.get("value_type") or "").strip().lower(),
+        expected_units=_dedupe_keep_order(_as_list(extraction_hints.get("expected_units"))),
+        year_sensitive=bool(extraction_hints.get("year_sensitive", False)),
+        output_shape=str(extraction_hints.get("output_shape") or "").strip().lower(),
+        variable_dimensions=_dedupe_keep_order(
+            _as_list(extraction_hints.get("variable_dimensions"))
+        ),
+        reject_values_from=[
+            value.lower()
+            for value in _dedupe_keep_order(
+                _as_list(extraction_hints.get("reject_values_from"))
+            )
+        ],
+        requires_value_label=bool(extraction_hints.get("requires_value_label", False)),
+        year_rules=year_rules,
+        value_selection_rules=value_selection_rules,
         similar_metric_warnings=list(data.get("similar_metric_warnings") or []),
         rerank_instruction=str(data.get("rerank_instruction") or "").strip(),
         raw=dict(data),
@@ -293,16 +414,20 @@ def load_all_metric_profiles(profile_dir: Optional[str] = None) -> List[MetricRe
 @lru_cache(maxsize=4)
 def build_profile_index(profile_dir: Optional[str] = None) -> Dict[str, Any]:
     profiles = load_all_metric_profiles(profile_dir)
-    by_code: Dict[str, MetricRetrievalProfile] = {}
-    by_id: Dict[str, MetricRetrievalProfile] = {}
+    by_code: Dict[str, List[MetricRetrievalProfile]] = {}
+    by_id: Dict[str, List[MetricRetrievalProfile]] = {}
     by_alias: Dict[str, List[MetricRetrievalProfile]] = {}
     for profile in profiles:
         for key in [profile.metric_code, compact_metric_text(profile.metric_code)]:
             if key:
-                by_code[key.lower()] = profile
+                bucket = by_code.setdefault(key.lower(), [])
+                if profile not in bucket:
+                    bucket.append(profile)
         for key in [profile.metric_id, compact_metric_text(profile.metric_id)]:
             if key:
-                by_id[key.lower()] = profile
+                bucket = by_id.setdefault(key.lower(), [])
+                if profile not in bucket:
+                    bucket.append(profile)
         for alias in profile.aliases:
             norm = normalize_metric_text(alias)
             if norm:
@@ -310,31 +435,116 @@ def build_profile_index(profile_dir: Optional[str] = None) -> Dict[str, Any]:
     return {"profiles": profiles, "by_code": by_code, "by_id": by_id, "by_alias": by_alias}
 
 
+def _profile_unit_family(value: object) -> str:
+    unit = normalize_metric_text(value)
+    if not unit:
+        return ""
+    if "%" in unit or "percent" in unit:
+        return "percent"
+    if any(token in unit for token in ("ton", "tonne", "kilogram", " kg", "mass", " t)")):
+        return "mass"
+    if any(token in unit for token in ("mwh", "kwh", "gwh", "gigajoule", " gj", "energy")):
+        return "energy"
+    if any(token in unit for token in ("litre", "liter", "cubic", "m3", "volume")):
+        return "volume"
+    return compact_metric_text(unit)
+
+
+def _profile_candidate_score(metric: Any, profile: MetricRetrievalProfile) -> float:
+    metric_name = normalize_metric_text(getattr(metric, "metric_name", ""))
+    profile_names = [profile.metric_name, profile.canonical_label, *profile.aliases]
+    normalised_names = [normalize_metric_text(value) for value in profile_names if str(value or "").strip()]
+    score = 0.0
+    if metric_name:
+        if metric_name in normalised_names:
+            score += 100.0
+        else:
+            compact_name = compact_metric_text(metric_name)
+            if compact_name and compact_name in {compact_metric_text(value) for value in normalised_names}:
+                score += 90.0
+            metric_tokens = set(tokenize_metric_text(metric_name))
+            best_overlap = 0.0
+            for candidate_name in normalised_names:
+                candidate_tokens = set(tokenize_metric_text(candidate_name))
+                if metric_tokens and candidate_tokens:
+                    best_overlap = max(best_overlap, len(metric_tokens & candidate_tokens) / len(metric_tokens | candidate_tokens))
+            score += 45.0 * best_overlap
+
+    metric_unit = str(getattr(metric, "unit", "") or "")
+    if metric_unit:
+        if normalize_metric_text(metric_unit) == normalize_metric_text(profile.unit):
+            score += 35.0
+        else:
+            metric_family = _profile_unit_family(metric_unit)
+            profile_family = _profile_unit_family(profile.unit)
+            if metric_family and metric_family == profile_family:
+                score += 24.0
+            elif metric_family and profile_family:
+                score -= 30.0
+    return score
+
+
+def _select_profile_candidate(metric: Any, candidates: Sequence[MetricRetrievalProfile]) -> Optional[MetricRetrievalProfile]:
+    unique: List[MetricRetrievalProfile] = []
+    seen = set()
+    for profile in candidates:
+        key = (profile.metric_id, profile.metric_code, profile.metric_name, profile.unit)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(profile)
+    if not unique:
+        return None
+    if len(unique) == 1:
+        return unique[0]
+    if isinstance(metric, str):
+        return None
+    ranked = sorted(
+        ((_profile_candidate_score(metric, profile), profile) for profile in unique),
+        key=lambda item: item[0],
+        reverse=True,
+    )
+    if not ranked or ranked[0][0] <= 0:
+        return None
+    if len(ranked) > 1 and abs(ranked[0][0] - ranked[1][0]) < 1e-9:
+        return None
+    return ranked[0][1]
+
+
 def find_metric_profile(metric: Any, profile_dir: Optional[str] = None) -> Optional[MetricRetrievalProfile]:
     """Find a generated profile matching an existing metric object or metric code string."""
     index = build_profile_index(profile_dir)
-    if isinstance(metric, str):
-        keys = [metric, compact_metric_text(metric)]
-    else:
-        keys = [
-            getattr(metric, "metric_code", ""),
-            getattr(metric, "metric_id", ""),
-            compact_metric_text(getattr(metric, "metric_code", "")),
-            compact_metric_text(getattr(metric, "metric_id", "")),
-        ]
-    for key in keys:
+    metric_id = metric if isinstance(metric, str) else getattr(metric, "metric_id", "")
+    id_candidates: List[MetricRetrievalProfile] = []
+    for key in [metric_id, compact_metric_text(metric_id)]:
         key_norm = str(key or "").strip().lower()
-        if not key_norm:
-            continue
-        if key_norm in index["by_code"]:
-            return index["by_code"][key_norm]
-        if key_norm in index["by_id"]:
-            return index["by_id"][key_norm]
+        if key_norm:
+            id_candidates.extend(index["by_id"].get(key_norm, []))
+    selected = _select_profile_candidate(metric, id_candidates)
+    if selected is not None:
+        return selected
+
+    metric_code = metric if isinstance(metric, str) else getattr(metric, "metric_code", "")
+    code_candidates: List[MetricRetrievalProfile] = []
+    for key in [metric_code, compact_metric_text(metric_code)]:
+        key_norm = str(key or "").strip().lower()
+        if key_norm:
+            code_candidates.extend(index["by_code"].get(key_norm, []))
+    selected = _select_profile_candidate(metric, code_candidates)
+    if selected is not None:
+        return selected
+
     if not isinstance(metric, str):
         name = normalize_metric_text(getattr(metric, "metric_name", ""))
-        for profile in index["profiles"]:
-            if name and name in {normalize_metric_text(profile.metric_name), normalize_metric_text(profile.canonical_label)}:
-                return profile
+        name_candidates = [
+            profile for profile in index["profiles"]
+            if name and name in {
+                normalize_metric_text(profile.metric_name),
+                normalize_metric_text(profile.canonical_label),
+                *(normalize_metric_text(alias) for alias in profile.aliases),
+            }
+        ]
+        return _select_profile_candidate(metric, name_candidates)
     return None
 
 
@@ -353,22 +563,28 @@ def build_metric_retrieval_profile(metric: ESGMetric, semantic_expansion: Option
     source = str(getattr(getattr(metric, "source", ""), "value", getattr(metric, "source", "")) or "")
     aliases: List[str] = []
     aliases.extend(_metric_name_variants(metric_name))
-    if metric_code:
-        aliases.append(metric_code)
-    if topic:
-        aliases.append(topic)
     aliases.extend(str(k) for k in (getattr(metric, "keywords", None) or []) if str(k).strip())
     aliases.extend(_definition_phrases(definition, limit=5))
-    aliases.extend(_unit_aliases(unit))
     if semantic_expansion is not None:
         if getattr(semantic_expansion, "semantic_description", None):
             aliases.extend(_definition_phrases(str(semantic_expansion.semantic_description), limit=3))
         aliases.extend(str(k) for k in (getattr(semantic_expansion, "expanded_keywords", None) or []) if str(k).strip())
-    aliases = _dedupe_keep_order(aliases)
-    anchor_seed = " ".join([metric_name, metric_code, topic, definition, " ".join(aliases)])
-    anchor_terms = _dedupe_keep_order(tokenize_metric_text(anchor_seed))[:36]
-    bm25_terms = _dedupe_keep_order(
-        aliases + anchor_terms + [metric_name, metric_code, topic] + list(str(k) for k in (getattr(metric, "keywords", None) or []) if str(k).strip())
+    unit_signals = _unit_signal_set(unit)
+    aliases = _without_standalone_signals(
+        aliases,
+        unit_signals | _normalized_signal_set([metric_code, topic]),
+    )
+    anchor_seed = " ".join([metric_name, metric_code, definition, " ".join(aliases)])
+    anchor_terms = _without_standalone_signals(
+        tokenize_metric_text(anchor_seed),
+        unit_signals | _topic_signal_set(topic),
+    )[:36]
+    bm25_terms = _without_standalone_signals(
+        aliases
+        + anchor_terms
+        + [metric_name, metric_code, topic]
+        + list(str(k) for k in (getattr(metric, "keywords", None) or []) if str(k).strip()),
+        unit_signals,
     )
     dense_parts = []
     if metric_code:
@@ -377,8 +593,6 @@ def build_metric_retrieval_profile(metric: ESGMetric, semantic_expansion: Option
         dense_parts.append(f"Canonical metric name: {metric_name}")
     if topic:
         dense_parts.append(f"Disclosure topic: {topic}")
-    if unit:
-        dense_parts.append(f"Expected unit: {unit}")
     if definition:
         dense_parts.append(f"Metric definition: {definition}")
     if semantic_expansion is not None and getattr(semantic_expansion, "semantic_description", None):
@@ -400,6 +614,25 @@ def build_metric_retrieval_profile(metric: ESGMetric, semantic_expansion: Option
         dense_query="\n".join(dense_parts).strip(),
         anchor_terms=anchor_terms,
         preferred_chunk_types=["table-row", "table", "paragraph", "index", "footnote"],
+        expected_units=_dedupe_keep_order([unit, *_unit_aliases(unit)]),
+        year_sensitive=True,
+        reject_values_from=[
+            "metric_code",
+            "reference_index",
+            "page_number",
+            "row_or_column_number",
+            "standalone_year",
+        ],
+        year_rules={
+            "extract_all_reported_years": True,
+            "preserve_source_year_labels": True,
+            "do_not_treat_standalone_year_as_value": True,
+            "select_requested_year_only_at_final_use": True,
+        },
+        value_selection_rules={
+            "preserve_cell_and_row_labels": True,
+            "do_not_select_first_of_multiple_unlabeled_values": True,
+        },
     )
 
 

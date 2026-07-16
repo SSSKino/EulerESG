@@ -1,8 +1,9 @@
 """Semantic evidence retrieval."""
 
 import os
+import re
 import threading
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 import numpy as np
 import torch
@@ -41,11 +42,11 @@ class SemanticRetriever:
             self._init_embedding_model()
             self._init_reranker()
 
-    def _ensure_models(self):
+    def _ensure_models(self, include_reranker: bool = True):
         if self.embedding_model is None:
             self._init_embedding_model()
         # Reranker is optional. Load lazily only once, respecting fallback behavior.
-        if not self._reranker_initialized:
+        if include_reranker and not self._reranker_initialized:
             self._init_reranker()
 
     def _init_embedding_model(self):
@@ -108,8 +109,6 @@ class SemanticRetriever:
             focus_terms.append(f"canonical metric '{metric_name}'")
         if metric_code:
             focus_terms.append(f"standard code '{metric_code}'")
-        if topic:
-            focus_terms.append(f"topic '{topic}'")
         for alias in profile.aliases[:8]:
             if alias and alias not in {metric_name, metric_code, topic}:
                 focus_terms.append(f"alias '{alias}'")
@@ -118,18 +117,128 @@ class SemanticRetriever:
         focus_clause = ", ".join(focus_terms) if focus_terms else "the target canonical ESG metric"
         avoid_clause = (" Avoid confusing it with: " + "; ".join(avoid_terms) + ".") if avoid_terms else ""
         profile_instruction = profile.rerank_instruction or "Judge whether the candidate evidence directly or indirectly discloses this exact canonical metric, not merely a related ESG topic."
+        if profile.unit:
+            profile_instruction = re.sub(
+                rf",?\s*expected\s+unit\s*:\s*{re.escape(profile.unit)}",
+                "",
+                profile_instruction,
+                flags=re.IGNORECASE,
+            )
         return (
             "ESG report exact-metric evidence ranking. "
             f"{profile_instruction} "
             f"Prioritize passages explicitly matching {focus_clause}. "
-            "Prefer direct metric values, table rows, standard-index rows, or explicit narrative disclosure for the exact canonical metric. "
-            "Do not let broad topic similarity, shared units, adjacent ESG topics, future goals, or generic commitments outrank exact code or exact alias evidence."
+            "Prefer labeled data cells, real data rows, explicit numeric or narrative disclosures, and actual data found on an internal PDF link target. "
+            "Treat a code-only framework index as navigation evidence and never rank it above real data solely because the code matches. "
+            "Evaluate linked target-page passages by the same metric relevance rules, while giving relevant linked data modest extra attention. "
+            "The industry topic is only secondary context. Units, %, percent, and percentage alone are not relevance signals. "
+            "Do not let broad topic similarity, adjacent ESG topics, future goals, or generic commitments outrank evidence for the exact metric identity."
             f"{avoid_clause}"
         )
 
-    def search_by_semantic(self, report_content: ReportContent, 
+    def _build_unified_rerank_query(
+        self,
+        metric: ESGMetric,
+        semantic_expansion: Optional[SemanticExpansion] = None,
+    ) -> str:
+        profile = build_metric_retrieval_profile(metric, semantic_expansion)
+        parts = []
+        if profile.metric_code:
+            parts.append(f"Canonical code: {profile.metric_code}")
+        if profile.metric_name:
+            parts.append(f"Canonical metric: {profile.metric_name}")
+        if profile.definition:
+            parts.append(f"Definition: {profile.definition}")
+        if profile.aliases:
+            parts.append("Identity aliases: " + "; ".join(profile.aliases[:12]))
+        if profile.topic:
+            parts.append(f"Secondary industry topic: {profile.topic}")
+        return "\n".join(parts)
+
+    def rerank_candidates(
+        self,
+        candidates: Sequence[RetrievalResult],
+        metric: ESGMetric,
+        semantic_expansion: Optional[SemanticExpansion] = None,
+    ) -> List[RetrievalResult]:
+        """Apply one Qwen3 pass to candidates from every retrieval channel."""
+        values = list(candidates)
+        if not values:
+            return []
+        enabled = bool(
+            getattr(
+                self.config,
+                "use_reranker",
+                getattr(self.config, "use_semantic_retrieval", True),
+            )
+        )
+        if not enabled:
+            return values
+        if not self._reranker_initialized:
+            self._init_reranker()
+        if self.reranker is None:
+            return values
+
+        query_text = self._build_unified_rerank_query(metric, semantic_expansion)
+        instruction = self._build_rerank_instruction(metric, semantic_expansion)
+        passages = []
+        for candidate in values:
+            retrieval_type = str(candidate.retrieval_type or "")
+            source_note = "Internal PDF linked target candidate." if "linked_page" in retrieval_type else "Report candidate."
+            passages.append(
+                "\n".join(
+                    [
+                        source_note,
+                        f"Retrieval channels: {retrieval_type}",
+                        candidate.content or "",
+                    ]
+                )
+            )
+        pairs = [[query_text, passage] for passage in passages]
+        try:
+            with self._reranker_lock:
+                try:
+                    scores = self.reranker.compute_score(
+                        pairs,
+                        normalize=True,
+                        instruction=instruction,
+                    )
+                except TypeError:
+                    scores = self.reranker.compute_score(pairs, normalize=True)
+            if not isinstance(scores, list):
+                scores = [scores]
+            if len(scores) != len(values):
+                logger.warning(
+                    "Unified reranker returned an unexpected score count: "
+                    f"expected={len(values)}, actual={len(scores)}"
+                )
+                return values
+        except Exception as exc:
+            logger.warning(f"Unified candidate reranking failed; keeping deterministic order: {exc}")
+            return values
+
+        reranked = []
+        for candidate, raw_score in zip(values, scores):
+            qwen_score = _clamp_score(float(raw_score))
+            final_score = _clamp_score(0.20 * float(candidate.score or 0.0) + 0.80 * qwen_score)
+            retrieval_type = str(candidate.retrieval_type or "")
+            if "qwen_unified_rerank" not in retrieval_type:
+                retrieval_type += "+qwen_unified_rerank"
+            reranked.append(
+                candidate.model_copy(
+                    update={
+                        "score": final_score,
+                        "retrieval_type": retrieval_type,
+                    }
+                )
+            )
+        reranked.sort(key=lambda item: item.score, reverse=True)
+        return reranked
+
+    def search_by_semantic(self, report_content: ReportContent,
                           metric: ESGMetric,
-                          semantic_expansion: Optional[SemanticExpansion] = None) -> List[RetrievalResult]:
+                          semantic_expansion: Optional[SemanticExpansion] = None,
+                          apply_reranker: bool = True) -> List[RetrievalResult]:
         """
         Search by semantic similarity
         
@@ -141,7 +250,7 @@ class SemanticRetriever:
             List[RetrievalResult]: Retrieval results
         """
         try:
-            self._ensure_models()
+            self._ensure_models(include_reranker=apply_reranker)
             query_text = self._build_semantic_query(metric, semantic_expansion)
             if not query_text:
                 raise ValueError("No semantic query text available")
@@ -153,7 +262,7 @@ class SemanticRetriever:
             ).reshape(1, -1)
             target_window = _target_window_size(self.config, metric, observed_matches=0)
             pool_size = _internal_pool_size(self.config, metric, observed_matches=0, channel="semantic")
-            preselect_limit = min(pool_size, max(1, int(getattr(self, "reranker_top_k", pool_size) or pool_size))) if self.reranker is not None else pool_size
+            preselect_limit = min(pool_size, max(1, int(getattr(self, "reranker_top_k", pool_size) or pool_size))) if apply_reranker and self.reranker is not None else pool_size
             
             # Get report segments' embeddings once per report object and reuse the
             # same matrix across metrics. This avoids rebuilding a large numpy array
@@ -197,10 +306,11 @@ class SemanticRetriever:
                     + _segment_structure_bonus(segment, expected_unit=getattr(metric, "unit", None), prefer_narrative=not _is_quantitative_metric(metric))
                     + _qualitative_relevance_adjustment(metric, getattr(segment, "content", "") or "", anchor_terms, getattr(segment, "segment_type", ""))
                     + _metric_evidence_quality_adjustment(metric, segment, anchor_terms)
+                    + _topic_relevance_adjustment(metric, getattr(segment, "content", "") or "")
                 )
 
             # Use reranker if available, otherwise fallback to cosine similarity
-            if self.reranker is not None:
+            if apply_reranker and self.reranker is not None:
                 pre_candidates = []
                 for segment, similarity in zip(segments, similarities):
                     boosted = _boost_semantic_score(segment, similarity)

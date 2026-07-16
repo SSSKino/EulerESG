@@ -11,7 +11,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of approach to identifying and addressing data security risks",
-        "SV-ED-230a.1 Description of approach to identifying and addressing data security risks"
+        "SV-ED-230a.1 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks"
       ],
       "bm25_terms": [
         "SV-ED-230a.1",
@@ -20,10 +21,25 @@
         "identifying",
         "addressing",
         "security",
-        "risks"
+        "risks",
+        "Description of approach to identifying and addressing data security risks",
+        "SV-ED-230a.1 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks",
+        "identifying addressing",
+        "addressing security",
+        "security risks",
+        "Description of approach to identifying",
+        "addressing data security risks",
+        "Description of approach to identifying and addressing data security",
+        "The entity shall describe its approach to identifying information system vulnerabilities that may pose a data"
       ],
-      "dense_query": "Find disclosures for SV-ED-230a.1 Description of approach to identifying and addressing data security risks related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.1 'Description of approach to identifying and addressing data security risks', under 'Data Security'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.1 'Description of approach to identifying and addressing data security risks', under 'Data Security'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers SV-ED-230a.1 'Description of approach to identifying and addressing data security risks'.",
+        "When SV-ED-230a.1 'Description of approach to identifying and addressing data security risks' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-230a.1 'Description of approach to identifying and addressing data security risks', including: Description of approach to identifying and addressing data security risks; SV-ED-230a.1 Description of approach to identifying and addressing data security risks; approach to identifying and addressing data security risks.",
+        "Find disclosures for SV-ED-230a.1 Description of approach to identifying and addressing data security risks related to Data Security.",
         "Retrieve exact report evidence for SV-ED-230a.1 Description of approach to identifying and addressing data security risks, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-230a.1 Description of approach to identifying and addressing data security risks.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-230a.1 Description of approach to identifying and addressing data security risks related to Data Security.",
@@ -37,7 +53,14 @@
         "identifying",
         "addressing",
         "security",
-        "risks"
+        "risks",
+        "SV-ED-230a.1 Description of approach to identifying and addressing data security risks",
+        "approach to identifying and addressing data security risks",
+        "identifying addressing",
+        "addressing security",
+        "security risks",
+        "Description of approach to identifying",
+        "addressing data security risks"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -47,7 +70,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -59,20 +84,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of approach to identifying and addressing data security risks'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of approach to identifying and addressing data security risks' (SV-ED-230a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-230a.2",
@@ -85,7 +158,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of policies and practices relating to collection, usage, and retention of student information",
-        "SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information"
+        "SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information",
+        "policies and practices relating to collection, usage, and retention of student information"
       ],
       "bm25_terms": [
         "SV-ED-230a.2",
@@ -96,10 +170,30 @@
         "usage",
         "retention",
         "student",
-        "Security"
+        "Security",
+        "Description of policies and practices relating to collection, usage, and retention of student information",
+        "SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information",
+        "policies and practices relating to collection, usage, and retention of student information",
+        "policies practices",
+        "practices relating",
+        "relating",
+        "relating collection",
+        "collection usage",
+        "usage retention",
+        "retention student",
+        "Description of policies",
+        "practices relating to collection",
+        "retention of student information",
+        "Description of policies and practices relating to collection, usage",
+        "and retention of student information"
       ],
-      "dense_query": "Find disclosures for SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.2 'Description of policies and practices relating to collection, usage, and retention of student information', under 'Data Security'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.2 'Description of policies and practices relating to collection, usage, and retention of student information', under 'Data Security'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers SV-ED-230a.2 'Description of policies and practices relating to collection, usage, and retention of student information'.",
+        "When SV-ED-230a.2 'Description of policies and practices relating to collection, usage, and retention of student information' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-230a.2 'Description of policies and practices relating to collection, usage, and retention of student information', including: Description of policies and practices relating to collection, usage, and retention of student information; SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information; policies and practices relating to collection, usage, and retention of student information.",
+        "Find disclosures for SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information related to Data Security.",
         "Retrieve exact report evidence for SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information related to Data Security.",
@@ -115,7 +209,19 @@
         "usage",
         "retention",
         "student",
-        "Security"
+        "Security",
+        "SV-ED-230a.2 Description of policies and practices relating to collection, usage, and retention of student information",
+        "policies and practices relating to collection, usage, and retention of student information",
+        "policies practices",
+        "practices relating",
+        "relating",
+        "relating collection",
+        "collection usage",
+        "usage retention",
+        "retention student",
+        "Description of policies",
+        "practices relating to collection",
+        "retention of student information"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -125,7 +231,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -137,20 +245,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies and practices relating to collection, usage, and retention of student information'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies and practices relating to collection, usage, and retention of student information' (SV-ED-230a.2). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-230a.3.01",
@@ -174,10 +330,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of data breaches",
+        "Number of data breaches",
+        "SV-ED-230a.3 (1) Number of data breaches",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of students affected"
       ],
-      "dense_query": "Find disclosures for SV-ED-230a.3 (1) Number of data breaches with unit Number related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.3 '(1) Number of data breaches', under 'Data Security', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.3 '(1) Number of data breaches', under 'Data Security', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-230a.3 '(1) Number of data breaches'; retain every reported year and label.",
+        "When SV-ED-230a.3 '(1) Number of data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-230a.3 '(1) Number of data breaches', including: (1) Number of data breaches; Number of data breaches; SV-ED-230a.3 (1) Number of data breaches.",
+        "Disambiguate SV-ED-230a.3 '(1) Number of data breaches' from sibling metrics sharing SV-ED-230a.3: (2) Percentage that are personal data breaches; (3) Number of students affected.",
+        "Find disclosures for SV-ED-230a.3 (1) Number of data breaches with unit Number related to Data Security.",
         "Retrieve exact report evidence for SV-ED-230a.3 (1) Number of data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-230a.3 (1) Number of data breaches with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-230a.3 (1) Number of data breaches related to Data Security.",
@@ -185,20 +352,24 @@
       ],
       "anchor_terms": [
         "SV-ED-230a.3",
+        "(1) Number of data breaches",
         "Number of data breaches",
         "data breach",
         "breaches",
         "Security",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "SV-ED-230a.3 (1) Number of data breaches"
       ],
       "negative_anchor_terms": [
         "Percentage that are personal data breaches",
         "Number of students affected",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(2) Percentage that are personal data breaches",
+        "(3) Number of students affected"
       ],
       "similar_metric_warnings": [
         {
@@ -215,7 +386,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -223,24 +396,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of data breaches'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of data breaches' (SV-ED-230a.3, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage that are personal data breaches; (3) Number of students affected."
     },
     {
       "metric_id": "SV-ED-230a.3.02",
@@ -254,7 +475,8 @@
       "aliases": [
         "(2) Percentage that are personal data breaches",
         "Percentage that are personal data breaches",
-        "SV-ED-230a.3 (2) Percentage that are personal data breaches"
+        "SV-ED-230a.3 (2) Percentage that are personal data breaches",
+        "(2) Percent that are personal data breaches"
       ],
       "bm25_terms": [
         "SV-ED-230a.3",
@@ -266,10 +488,27 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage that are personal data breaches",
+        "Percentage that are personal data breaches",
+        "SV-ED-230a.3 (2) Percentage that are personal data breaches",
+        "(2) Percent that are personal data breaches",
+        "that",
+        "that are",
+        "are",
+        "are personal",
+        "personal breaches",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of students affected"
       ],
-      "dense_query": "Find disclosures for SV-ED-230a.3 (2) Percentage that are personal data breaches with unit Percentage (%) related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.3 '(2) Percentage that are personal data breaches', under 'Data Security', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.3 '(2) Percentage that are personal data breaches', under 'Data Security', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-230a.3 '(2) Percentage that are personal data breaches'; retain every reported year and label.",
+        "When SV-ED-230a.3 '(2) Percentage that are personal data breaches' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-230a.3 '(2) Percentage that are personal data breaches', including: (2) Percentage that are personal data breaches; Percentage that are personal data breaches; SV-ED-230a.3 (2) Percentage that are personal data breaches; (2) Percent that are personal data breaches.",
+        "Disambiguate SV-ED-230a.3 '(2) Percentage that are personal data breaches' from sibling metrics sharing SV-ED-230a.3: (1) Number of data breaches; (3) Number of students affected.",
+        "Find disclosures for SV-ED-230a.3 (2) Percentage that are personal data breaches with unit Percentage (%) related to Data Security.",
         "Retrieve exact report evidence for SV-ED-230a.3 (2) Percentage that are personal data breaches, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-230a.3 (2) Percentage that are personal data breaches with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-230a.3 (2) Percentage that are personal data breaches related to Data Security.",
@@ -277,6 +516,7 @@
       ],
       "anchor_terms": [
         "SV-ED-230a.3",
+        "(2) Percentage that are personal data breaches",
         "Percentage that are personal data breaches",
         "data breach",
         "personal data",
@@ -286,14 +526,23 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-ED-230a.3 (2) Percentage that are personal data breaches",
+        "(2) Percent that are personal data breaches",
+        "that",
+        "that are",
+        "are",
+        "are personal",
+        "personal breaches"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
         "Number of students affected",
         "cybersecurity policy",
         "data security risk description",
-        "privacy policy only"
+        "privacy policy only",
+        "(1) Number of data breaches",
+        "(3) Number of students affected"
       ],
       "similar_metric_warnings": [
         {
@@ -310,7 +559,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -318,11 +569,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage that are personal data breaches', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -334,9 +611,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage that are personal data breaches' (SV-ED-230a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (3) Number of students affected."
     },
     {
       "metric_id": "SV-ED-230a.3.03",
@@ -360,10 +660,22 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(3) Number of students affected",
+        "Number of students affected",
+        "SV-ED-230a.3 (3) Number of students affected",
+        "students affected",
+        "(1) Number of data breaches, (2) percentage that are personal data",
+        "breaches, (3) number of students affected"
       ],
-      "dense_query": "Find disclosures for SV-ED-230a.3 (3) Number of students affected with unit Number related to Data Security.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.3 '(3) Number of students affected', under 'Data Security', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-230a.3 '(3) Number of students affected', under 'Data Security', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-230a.3 '(3) Number of students affected'; retain every reported year and label.",
+        "When SV-ED-230a.3 '(3) Number of students affected' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-230a.3 '(3) Number of students affected', including: (3) Number of students affected; Number of students affected; SV-ED-230a.3 (3) Number of students affected.",
+        "Disambiguate SV-ED-230a.3 '(3) Number of students affected' from sibling metrics sharing SV-ED-230a.3: (1) Number of data breaches; (2) Percentage that are personal data breaches.",
+        "Find disclosures for SV-ED-230a.3 (3) Number of students affected with unit Number related to Data Security.",
         "Retrieve exact report evidence for SV-ED-230a.3 (3) Number of students affected, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-230a.3 (3) Number of students affected with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-230a.3 (3) Number of students affected related to Data Security.",
@@ -371,17 +683,22 @@
       ],
       "anchor_terms": [
         "SV-ED-230a.3",
+        "(3) Number of students affected",
         "Number of students affected",
         "students",
         "affected",
         "Security",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "SV-ED-230a.3 (3) Number of students affected",
+        "students affected"
       ],
       "negative_anchor_terms": [
         "Number of data breaches",
-        "Percentage that are personal data breaches"
+        "Percentage that are personal data breaches",
+        "(1) Number of data breaches",
+        "(2) Percentage that are personal data breaches"
       ],
       "similar_metric_warnings": [
         {
@@ -398,7 +715,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -406,24 +725,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Number of students affected'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Number of students affected' (SV-ED-230a.3, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of data breaches; (2) Percentage that are personal data breaches."
     },
     {
       "metric_id": "SV-ED-260a.1",
@@ -449,10 +816,18 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Graduation rate",
+        "SV-ED-260a.1 Graduation rate",
+        "The entity shall calculate the graduation rate as the percentage of completers in the revised adjusted cohort who"
       ],
-      "dense_query": "Find disclosures for SV-ED-260a.1 Graduation rate with unit Percentage (%) related to Quality of Education & Gainful Employment.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-260a.1 'Graduation rate', under 'Quality of Education & Gainful Employment', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-260a.1 'Graduation rate', under 'Quality of Education & Gainful Employment', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-260a.1 'Graduation rate'; retain every reported year and label.",
+        "When SV-ED-260a.1 'Graduation rate' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-260a.1 'Graduation rate', including: Graduation rate; SV-ED-260a.1 Graduation rate.",
+        "Find disclosures for SV-ED-260a.1 Graduation rate with unit Percentage (%) related to Quality of Education & Gainful Employment.",
         "Retrieve exact report evidence for SV-ED-260a.1 Graduation rate, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-260a.1 Graduation rate with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-260a.1 Graduation rate related to Quality of Education & Gainful Employment.",
@@ -470,7 +845,8 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-ED-260a.1 Graduation rate"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -479,7 +855,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -487,11 +865,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Graduation rate', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -503,9 +907,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Graduation rate' (SV-ED-260a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-260a.2",
@@ -532,10 +959,20 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "On-time completion rate",
+        "SV-ED-260a.2 On-time completion rate",
+        "On-time completion",
+        "completion rate",
+        "The entity shall calculate the on-time completion rate as the percentage of completers who are conferred a formal"
       ],
-      "dense_query": "Find disclosures for SV-ED-260a.2 On-time completion rate with unit Percentage (%) related to Quality of Education & Gainful Employment.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-260a.2 'On-time completion rate', under 'Quality of Education & Gainful Employment', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-260a.2 'On-time completion rate', under 'Quality of Education & Gainful Employment', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-260a.2 'On-time completion rate'; retain every reported year and label.",
+        "When SV-ED-260a.2 'On-time completion rate' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-260a.2 'On-time completion rate', including: On-time completion rate; SV-ED-260a.2 On-time completion rate.",
+        "Find disclosures for SV-ED-260a.2 On-time completion rate with unit Percentage (%) related to Quality of Education & Gainful Employment.",
         "Retrieve exact report evidence for SV-ED-260a.2 On-time completion rate, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-260a.2 On-time completion rate with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-260a.2 On-time completion rate related to Quality of Education & Gainful Employment.",
@@ -554,7 +991,10 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-ED-260a.2 On-time completion rate",
+        "On-time completion",
+        "completion rate"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -563,7 +1003,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -571,11 +1013,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'On-time completion rate', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -587,9 +1055,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'On-time completion rate' (SV-ED-260a.2, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-260a.3",
@@ -616,10 +1107,20 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Job placement rate",
+        "SV-ED-260a.3 Job placement rate",
+        "Job placement",
+        "placement rate",
+        "The entity shall disclose the job placement rate for completers"
       ],
-      "dense_query": "Find disclosures for SV-ED-260a.3 Job placement rate with unit Percentage (%) related to Quality of Education & Gainful Employment.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-260a.3 'Job placement rate', under 'Quality of Education & Gainful Employment', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-260a.3 'Job placement rate', under 'Quality of Education & Gainful Employment', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-260a.3 'Job placement rate'; retain every reported year and label.",
+        "When SV-ED-260a.3 'Job placement rate' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-260a.3 'Job placement rate', including: Job placement rate; SV-ED-260a.3 Job placement rate.",
+        "Find disclosures for SV-ED-260a.3 Job placement rate with unit Percentage (%) related to Quality of Education & Gainful Employment.",
         "Retrieve exact report evidence for SV-ED-260a.3 Job placement rate, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-260a.3 Job placement rate with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-260a.3 Job placement rate related to Quality of Education & Gainful Employment.",
@@ -638,7 +1139,10 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "SV-ED-260a.3 Job placement rate",
+        "Job placement",
+        "placement rate"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -647,7 +1151,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -655,11 +1161,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Job placement rate', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -671,9 +1203,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Job placement rate' (SV-ED-260a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-260a.6",
@@ -686,7 +1241,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of policies relating to student indebtedness and programme loan defaults",
-        "SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults"
+        "SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults",
+        "policies relating to student indebtedness and programme loan defaults"
       ],
       "bm25_terms": [
         "SV-ED-260a.6",
@@ -700,10 +1256,28 @@
         "Quality",
         "Education",
         "Gainful",
-        "Employment"
+        "Employment",
+        "Description of policies relating to student indebtedness and programme loan defaults",
+        "SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults",
+        "policies relating to student indebtedness and programme loan defaults",
+        "policies relating",
+        "relating",
+        "relating student",
+        "student indebtedness",
+        "indebtedness programme",
+        "programme loan",
+        "loan defaults",
+        "Description of policies relating to student indebtedness",
+        "programme loan defaults",
+        "Description of policies relating to student indebtedness and"
       ],
-      "dense_query": "Find disclosures for SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults related to Quality of Education & Gainful Employment.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-260a.6 'Description of policies relating to student indebtedness and programme loan defaults', under 'Quality of Education & Gainful Employment'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-260a.6 'Description of policies relating to student indebtedness and programme loan defaults', under 'Quality of Education & Gainful Employment'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers SV-ED-260a.6 'Description of policies relating to student indebtedness and programme loan defaults'.",
+        "When SV-ED-260a.6 'Description of policies relating to student indebtedness and programme loan defaults' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-260a.6 'Description of policies relating to student indebtedness and programme loan defaults', including: Description of policies relating to student indebtedness and programme loan defaults; SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults; policies relating to student indebtedness and programme loan defaults.",
+        "Find disclosures for SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults related to Quality of Education & Gainful Employment.",
         "Retrieve exact report evidence for SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults related to Quality of Education & Gainful Employment.",
@@ -722,7 +1296,18 @@
         "Quality",
         "Education",
         "Gainful",
-        "Employment"
+        "Employment",
+        "SV-ED-260a.6 Description of policies relating to student indebtedness and programme loan defaults",
+        "policies relating to student indebtedness and programme loan defaults",
+        "policies relating",
+        "relating",
+        "relating student",
+        "student indebtedness",
+        "indebtedness programme",
+        "programme loan",
+        "loan defaults",
+        "Description of policies relating to student indebtedness",
+        "programme loan defaults"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -732,7 +1317,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -744,20 +1331,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of policies relating to student indebtedness and programme loan defaults'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of policies relating to student indebtedness and programme loan defaults' (SV-ED-260a.6). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-270a.1",
@@ -791,10 +1426,34 @@
         "outcomes",
         "Marketing",
         "Recruiting",
-        "Practices"
+        "Practices",
+        "(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes",
+        "Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes",
+        "Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and discussion of outcomes",
+        "SV-ED-270a.1 (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes",
+        "policies ensure",
+        "ensure key",
+        "key performance",
+        "performance statistics",
+        "statistics prospective",
+        "prospective students",
+        "students advance",
+        "advance collecting",
+        "collecting any",
+        "any",
+        "any fees",
+        "fees outcomes",
+        "discussion of outcomes",
+        "(1) Description of policies to ensure disclosure of key performance",
+        "statistics to prospective students in advance of collecting any fees and"
       ],
-      "dense_query": "Find disclosures for SV-ED-270a.1 (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes related to Marketing & Recruiting Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.1 '(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes', under 'Marketing & Recruiting Practices'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.1 '(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes', under 'Marketing & Recruiting Practices'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers SV-ED-270a.1 '(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes'.",
+        "When SV-ED-270a.1 '(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-270a.1 '(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes', including: (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes; Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes; Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and discussion of outcomes; SV-ED-270a.1 (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes.",
+        "Find disclosures for SV-ED-270a.1 (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes related to Marketing & Recruiting Practices.",
         "Retrieve exact report evidence for SV-ED-270a.1 (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-270a.1 (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-270a.1 (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes related to Marketing & Recruiting Practices.",
@@ -802,6 +1461,7 @@
       ],
       "anchor_terms": [
         "SV-ED-270a.1",
+        "(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes",
         "Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes",
         "Description",
         "policies",
@@ -814,7 +1474,23 @@
         "advance",
         "collecting",
         "fees",
-        "discussion"
+        "discussion",
+        "Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and discussion of outcomes",
+        "SV-ED-270a.1 (1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes",
+        "policies ensure",
+        "ensure key",
+        "key performance",
+        "performance statistics",
+        "statistics prospective",
+        "prospective students",
+        "students advance",
+        "advance collecting",
+        "collecting any",
+        "any",
+        "any fees",
+        "fees outcomes",
+        "outcomes",
+        "discussion of outcomes"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -824,7 +1500,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -836,20 +1514,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses '(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Description of policies to ensure disclosure of key performance statistics to prospective students in advance of collecting any fees and (2) discussion of outcomes' (SV-ED-270a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-270a.2",
@@ -883,10 +1609,33 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures",
+        "Monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures",
+        "SV-ED-270a.2 Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated advertising",
+        "advertising marketing",
+        "marketing mandatory",
+        "mandatory disclosures",
+        "Total amount of monetary losses as a result of legal proceedings associated with advertising",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with advertising, marketing, and mandatory disclosures"
       ],
-      "dense_query": "Find disclosures for SV-ED-270a.2 Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures with unit Presentation currency related to Marketing & Recruiting Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.2 'Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.2 'Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-270a.2 'Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures'; retain every reported year and label.",
+        "When SV-ED-270a.2 'Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-270a.2 'Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures', including: Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures; Monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures; SV-ED-270a.2 Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures.",
+        "Find disclosures for SV-ED-270a.2 Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures with unit Presentation currency related to Marketing & Recruiting Practices.",
         "Retrieve exact report evidence for SV-ED-270a.2 Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-270a.2 Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-270a.2 Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures related to Marketing & Recruiting Practices.",
@@ -910,7 +1659,21 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures",
+        "SV-ED-270a.2 Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated advertising",
+        "advertising marketing",
+        "marketing mandatory",
+        "mandatory disclosures",
+        "Total amount of monetary losses as a result of legal proceedings associated with advertising",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -924,7 +1687,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -932,25 +1697,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with advertising, marketing, and mandatory disclosures' (SV-ED-270a.2, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-270a.3.01",
@@ -980,10 +1794,28 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "(1) Instruction and student services expenses",
+        "Instruction and student services expenses",
+        "SV-ED-270a.3 (1) Instruction and student services expenses",
+        "Instruction student",
+        "student services",
+        "services expenses",
+        "student services expenses",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "(1) Instruction and student services expenses and (2) marketing",
+        "and recruiting expenses"
       ],
-      "dense_query": "Find disclosures for SV-ED-270a.3 (1) Instruction and student services expenses with unit Presentation currency related to Marketing & Recruiting Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.3 '(1) Instruction and student services expenses', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.3 '(1) Instruction and student services expenses', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-270a.3 '(1) Instruction and student services expenses'; retain every reported year and label.",
+        "When SV-ED-270a.3 '(1) Instruction and student services expenses' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-270a.3 '(1) Instruction and student services expenses', including: (1) Instruction and student services expenses; Instruction and student services expenses; SV-ED-270a.3 (1) Instruction and student services expenses.",
+        "Disambiguate SV-ED-270a.3 '(1) Instruction and student services expenses' from sibling metrics sharing SV-ED-270a.3: (2) Marketing and recruiting expenses.",
+        "Find disclosures for SV-ED-270a.3 (1) Instruction and student services expenses with unit Presentation currency related to Marketing & Recruiting Practices.",
         "Retrieve exact report evidence for SV-ED-270a.3 (1) Instruction and student services expenses, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-270a.3 (1) Instruction and student services expenses with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-270a.3 (1) Instruction and student services expenses related to Marketing & Recruiting Practices.",
@@ -991,6 +1823,7 @@
       ],
       "anchor_terms": [
         "SV-ED-270a.3",
+        "(1) Instruction and student services expenses",
         "Instruction and student services expenses",
         "Instruction",
         "student",
@@ -1002,10 +1835,18 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "SV-ED-270a.3 (1) Instruction and student services expenses",
+        "Instruction student",
+        "student services",
+        "services expenses",
+        "student services expenses",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
-        "Marketing and recruiting expenses"
+        "Marketing and recruiting expenses",
+        "(2) Marketing and recruiting expenses"
       ],
       "similar_metric_warnings": [
         {
@@ -1018,7 +1859,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1026,25 +1869,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Instruction and student services expenses', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Instruction and student services expenses' (SV-ED-270a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Marketing and recruiting expenses."
     },
     {
       "metric_id": "SV-ED-270a.3.02",
@@ -1071,10 +1963,26 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "(2) Marketing and recruiting expenses",
+        "Marketing and recruiting expenses",
+        "SV-ED-270a.3 (2) Marketing and recruiting expenses",
+        "Marketing recruiting",
+        "recruiting expenses",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "(1) Instruction and student services expenses and (2) marketing",
+        "and recruiting expenses"
       ],
-      "dense_query": "Find disclosures for SV-ED-270a.3 (2) Marketing and recruiting expenses with unit Presentation currency related to Marketing & Recruiting Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.3 '(2) Marketing and recruiting expenses', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.3 '(2) Marketing and recruiting expenses', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-270a.3 '(2) Marketing and recruiting expenses'; retain every reported year and label.",
+        "When SV-ED-270a.3 '(2) Marketing and recruiting expenses' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-270a.3 '(2) Marketing and recruiting expenses', including: (2) Marketing and recruiting expenses; Marketing and recruiting expenses; SV-ED-270a.3 (2) Marketing and recruiting expenses.",
+        "Disambiguate SV-ED-270a.3 '(2) Marketing and recruiting expenses' from sibling metrics sharing SV-ED-270a.3: (1) Instruction and student services expenses.",
+        "Find disclosures for SV-ED-270a.3 (2) Marketing and recruiting expenses with unit Presentation currency related to Marketing & Recruiting Practices.",
         "Retrieve exact report evidence for SV-ED-270a.3 (2) Marketing and recruiting expenses, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-270a.3 (2) Marketing and recruiting expenses with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-270a.3 (2) Marketing and recruiting expenses related to Marketing & Recruiting Practices.",
@@ -1082,6 +1990,7 @@
       ],
       "anchor_terms": [
         "SV-ED-270a.3",
+        "(2) Marketing and recruiting expenses",
         "Marketing and recruiting expenses",
         "Marketing",
         "recruiting",
@@ -1090,10 +1999,16 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "SV-ED-270a.3 (2) Marketing and recruiting expenses",
+        "Marketing recruiting",
+        "recruiting expenses",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
-        "Instruction and student services expenses"
+        "Instruction and student services expenses",
+        "(1) Instruction and student services expenses"
       ],
       "similar_metric_warnings": [
         {
@@ -1106,7 +2021,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1114,25 +2031,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Marketing and recruiting expenses', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Marketing and recruiting expenses' (SV-ED-270a.3, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Instruction and student services expenses."
     },
     {
       "metric_id": "SV-ED-270a.4.01",
@@ -1162,10 +2128,29 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Revenue from: (1) government-funded student aid",
+        "Revenue from: government-funded student aid",
+        "SV-ED-270a.4 Revenue from: (1) government-funded student aid",
+        "Revenue government-funded",
+        "government-funded student",
+        "student aid",
+        "Revenue from",
+        "government-funded student aid",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Revenue from: (1) government-funded student aid and (2) private",
+        "student loans"
       ],
-      "dense_query": "Find disclosures for SV-ED-270a.4 Revenue from: (1) government-funded student aid with unit Presentation currency related to Marketing & Recruiting Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.4 'Revenue from: (1) government-funded student aid', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.4 'Revenue from: (1) government-funded student aid', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-270a.4 'Revenue from: (1) government-funded student aid'; retain every reported year and label.",
+        "When SV-ED-270a.4 'Revenue from: (1) government-funded student aid' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-270a.4 'Revenue from: (1) government-funded student aid', including: Revenue from: (1) government-funded student aid; Revenue from: government-funded student aid; SV-ED-270a.4 Revenue from: (1) government-funded student aid.",
+        "Disambiguate SV-ED-270a.4 'Revenue from: (1) government-funded student aid' from sibling metrics sharing SV-ED-270a.4: Revenue from: (2) private student loans.",
+        "Find disclosures for SV-ED-270a.4 Revenue from: (1) government-funded student aid with unit Presentation currency related to Marketing & Recruiting Practices.",
         "Retrieve exact report evidence for SV-ED-270a.4 Revenue from: (1) government-funded student aid, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-270a.4 Revenue from: (1) government-funded student aid with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-270a.4 Revenue from: (1) government-funded student aid related to Marketing & Recruiting Practices.",
@@ -1184,7 +2169,16 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Revenue from: government-funded student aid",
+        "SV-ED-270a.4 Revenue from: (1) government-funded student aid",
+        "Revenue government-funded",
+        "government-funded student",
+        "student aid",
+        "Revenue from",
+        "government-funded student aid",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "Revenue from: (2) private student loans"
@@ -1200,7 +2194,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1208,25 +2204,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Revenue from: (1) government-funded student aid', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Revenue from: (1) government-funded student aid' (SV-ED-270a.4, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Revenue from: (2) private student loans."
     },
     {
       "metric_id": "SV-ED-270a.4.02",
@@ -1256,10 +2301,28 @@
         "reporting currency",
         "reporting",
         "monetary amount",
-        "monetary"
+        "monetary",
+        "Revenue from: (2) private student loans",
+        "Revenue from: private student loans",
+        "SV-ED-270a.4 Revenue from: (2) private student loans",
+        "Revenue private",
+        "private student",
+        "student loans",
+        "Revenue from",
+        "private student loans",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Revenue from: (1) government-funded student aid and (2) private"
       ],
-      "dense_query": "Find disclosures for SV-ED-270a.4 Revenue from: (2) private student loans with unit Presentation currency related to Marketing & Recruiting Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.4 'Revenue from: (2) private student loans', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-270a.4 'Revenue from: (2) private student loans', under 'Marketing & Recruiting Practices', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-270a.4 'Revenue from: (2) private student loans'; retain every reported year and label.",
+        "When SV-ED-270a.4 'Revenue from: (2) private student loans' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-270a.4 'Revenue from: (2) private student loans', including: Revenue from: (2) private student loans; Revenue from: private student loans; SV-ED-270a.4 Revenue from: (2) private student loans.",
+        "Disambiguate SV-ED-270a.4 'Revenue from: (2) private student loans' from sibling metrics sharing SV-ED-270a.4: Revenue from: (1) government-funded student aid.",
+        "Find disclosures for SV-ED-270a.4 Revenue from: (2) private student loans with unit Presentation currency related to Marketing & Recruiting Practices.",
         "Retrieve exact report evidence for SV-ED-270a.4 Revenue from: (2) private student loans, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-270a.4 Revenue from: (2) private student loans with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-270a.4 Revenue from: (2) private student loans related to Marketing & Recruiting Practices.",
@@ -1278,7 +2341,16 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Revenue from: private student loans",
+        "SV-ED-270a.4 Revenue from: (2) private student loans",
+        "Revenue private",
+        "private student",
+        "student loans",
+        "Revenue from",
+        "private student loans",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "Revenue from: (1) government-funded student aid"
@@ -1294,7 +2366,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1302,25 +2376,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Revenue from: (2) private student loans', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Revenue from: (2) private student loans' (SV-ED-270a.4, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Revenue from: (1) government-funded student aid."
     },
     {
       "metric_id": "SV-ED-000.A",
@@ -1334,7 +2457,8 @@
       "aliases": [
         "Number of students enrolled",
         "Count of students enrolled",
-        "SV-ED-000.A Number of students enrolled"
+        "SV-ED-000.A Number of students enrolled",
+        "Total number of students enrolled"
       ],
       "bm25_terms": [
         "SV-ED-000.A",
@@ -1343,10 +2467,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of students enrolled",
+        "Count of students enrolled",
+        "SV-ED-000.A Number of students enrolled",
+        "Total number of students enrolled",
+        "students enrolled",
+        "Note to SV-ED-000.A – Students enrolled is defined as those students who have matriculated into a programme for which a degree"
       ],
-      "dense_query": "Find disclosures for SV-ED-000.A Number of students enrolled with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-000.A 'Number of students enrolled', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-000.A 'Number of students enrolled', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-000.A 'Number of students enrolled'; retain every reported year and label.",
+        "When SV-ED-000.A 'Number of students enrolled' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-000.A 'Number of students enrolled', including: Number of students enrolled; Count of students enrolled; SV-ED-000.A Number of students enrolled; Total number of students enrolled.",
+        "Find disclosures for SV-ED-000.A Number of students enrolled with unit Number.",
         "Retrieve exact report evidence for SV-ED-000.A Number of students enrolled, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-000.A Number of students enrolled with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-000.A Number of students enrolled.",
@@ -1359,7 +2494,11 @@
         "enrolled",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of students enrolled",
+        "SV-ED-000.A Number of students enrolled",
+        "Total number of students enrolled",
+        "students enrolled"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1368,7 +2507,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1376,24 +2517,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of students enrolled'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of students enrolled' (SV-ED-000.A, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-000.B",
@@ -1407,7 +2596,8 @@
       "aliases": [
         "Number of applications received for enrollment",
         "Count of applications received for enrollment",
-        "SV-ED-000.B Number of applications received for enrollment"
+        "SV-ED-000.B Number of applications received for enrollment",
+        "Total number of applications received for enrollment"
       ],
       "bm25_terms": [
         "SV-ED-000.B",
@@ -1417,10 +2607,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of applications received for enrollment",
+        "Count of applications received for enrollment",
+        "SV-ED-000.B Number of applications received for enrollment",
+        "Total number of applications received for enrollment",
+        "applications received",
+        "received enrollment"
       ],
-      "dense_query": "Find disclosures for SV-ED-000.B Number of applications received for enrollment with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-000.B 'Number of applications received for enrollment', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-000.B 'Number of applications received for enrollment', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-000.B 'Number of applications received for enrollment'; retain every reported year and label.",
+        "When SV-ED-000.B 'Number of applications received for enrollment' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-000.B 'Number of applications received for enrollment', including: Number of applications received for enrollment; Count of applications received for enrollment; SV-ED-000.B Number of applications received for enrollment; Total number of applications received for enrollment.",
+        "Find disclosures for SV-ED-000.B Number of applications received for enrollment with unit Number.",
         "Retrieve exact report evidence for SV-ED-000.B Number of applications received for enrollment, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-000.B Number of applications received for enrollment with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-000.B Number of applications received for enrollment.",
@@ -1434,7 +2635,12 @@
         "enrollment",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of applications received for enrollment",
+        "SV-ED-000.B Number of applications received for enrollment",
+        "Total number of applications received for enrollment",
+        "applications received",
+        "received enrollment"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1443,7 +2649,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1451,24 +2659,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of applications received for enrollment'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of applications received for enrollment' (SV-ED-000.B, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "SV-ED-000.C.01",
@@ -1491,10 +2747,23 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Average registered credits per student",
+        "SV-ED-000.C Average registered credits per student",
+        "Average",
+        "Average registered",
+        "registered credits",
+        "credits student",
+        "Average registered credits per student, percentage online"
       ],
-      "dense_query": "Find disclosures for SV-ED-000.C Average registered credits per student with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-000.C 'Average registered credits per student', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-000.C 'Average registered credits per student', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-000.C 'Average registered credits per student'; retain every reported year and label.",
+        "When SV-ED-000.C 'Average registered credits per student' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-000.C 'Average registered credits per student', including: Average registered credits per student; SV-ED-000.C Average registered credits per student.",
+        "Disambiguate SV-ED-000.C 'Average registered credits per student' from sibling metrics sharing SV-ED-000.C: Percentage of registered credits that are online.",
+        "Find disclosures for SV-ED-000.C Average registered credits per student with unit Number.",
         "Retrieve exact report evidence for SV-ED-000.C Average registered credits per student, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-000.C Average registered credits per student with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-000.C Average registered credits per student.",
@@ -1508,7 +2777,12 @@
         "student",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "SV-ED-000.C Average registered credits per student",
+        "Average",
+        "Average registered",
+        "registered credits",
+        "credits student"
       ],
       "negative_anchor_terms": [
         "Percentage of registered credits that are online"
@@ -1524,7 +2798,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1532,24 +2808,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Average registered credits per student'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Average registered credits per student' (SV-ED-000.C, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Percentage of registered credits that are online."
     },
     {
       "metric_id": "SV-ED-000.C.02",
@@ -1573,10 +2897,26 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of registered credits that are online",
+        "Percent of registered credits that are online",
+        "SV-ED-000.C Percentage of registered credits that are online",
+        "registered credits",
+        "credits that",
+        "that",
+        "that are",
+        "are",
+        "are online",
+        "Average registered credits per student, percentage online"
       ],
-      "dense_query": "Find disclosures for SV-ED-000.C Percentage of registered credits that are online with unit Percentage (%).",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-000.C 'Percentage of registered credits that are online', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-000.C 'Percentage of registered credits that are online', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-000.C 'Percentage of registered credits that are online'; retain every reported year and label.",
+        "When SV-ED-000.C 'Percentage of registered credits that are online' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-000.C 'Percentage of registered credits that are online', including: Percentage of registered credits that are online; Percent of registered credits that are online; SV-ED-000.C Percentage of registered credits that are online.",
+        "Disambiguate SV-ED-000.C 'Percentage of registered credits that are online' from sibling metrics sharing SV-ED-000.C: Average registered credits per student.",
+        "Find disclosures for SV-ED-000.C Percentage of registered credits that are online with unit Percentage (%).",
         "Retrieve exact report evidence for SV-ED-000.C Percentage of registered credits that are online, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-000.C Percentage of registered credits that are online with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-000.C Percentage of registered credits that are online.",
@@ -1591,7 +2931,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of registered credits that are online",
+        "SV-ED-000.C Percentage of registered credits that are online",
+        "registered credits",
+        "credits that",
+        "that",
+        "that are",
+        "are",
+        "are online"
       ],
       "negative_anchor_terms": [
         "Average registered credits per student"
@@ -1607,7 +2955,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1615,11 +2965,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of registered credits that are online', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -1631,9 +3007,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of registered credits that are online' (SV-ED-000.C, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Average registered credits per student."
     },
     {
       "metric_id": "SV-ED-000.D.01",
@@ -1648,7 +3047,8 @@
         "Number of: (1) teaching staff",
         "Number of: teaching staff",
         "Count of: (1) teaching staff",
-        "SV-ED-000.D Number of: (1) teaching staff"
+        "SV-ED-000.D Number of: (1) teaching staff",
+        "Total number of: (1) teaching staff"
       ],
       "bm25_terms": [
         "SV-ED-000.D",
@@ -1657,10 +3057,25 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of: (1) teaching staff",
+        "Number of: teaching staff",
+        "Count of: (1) teaching staff",
+        "SV-ED-000.D Number of: (1) teaching staff",
+        "Total number of: (1) teaching staff",
+        "teaching staff",
+        "Number of",
+        "Number of: (1) teaching staff and (2) all other staff",
+        "Note to SV-ED-000.D – Teaching staff include any faculty, adjunct and visiting faculty, instructors, and other educators directly involved in"
       ],
-      "dense_query": "Find disclosures for SV-ED-000.D Number of: (1) teaching staff with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-000.D 'Number of: (1) teaching staff', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-000.D 'Number of: (1) teaching staff', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-000.D 'Number of: (1) teaching staff'; retain every reported year and label.",
+        "When SV-ED-000.D 'Number of: (1) teaching staff' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-000.D 'Number of: (1) teaching staff', including: Number of: (1) teaching staff; Number of: teaching staff; Count of: (1) teaching staff; SV-ED-000.D Number of: (1) teaching staff; Total number of: (1) teaching staff.",
+        "Disambiguate SV-ED-000.D 'Number of: (1) teaching staff' from sibling metrics sharing SV-ED-000.D: Number of: (2) all other staff.",
+        "Find disclosures for SV-ED-000.D Number of: (1) teaching staff with unit Number.",
         "Retrieve exact report evidence for SV-ED-000.D Number of: (1) teaching staff, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-000.D Number of: (1) teaching staff with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-000.D Number of: (1) teaching staff.",
@@ -1673,7 +3088,13 @@
         "staff",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of: teaching staff",
+        "Count of: (1) teaching staff",
+        "SV-ED-000.D Number of: (1) teaching staff",
+        "Total number of: (1) teaching staff",
+        "teaching staff",
+        "Number of"
       ],
       "negative_anchor_terms": [
         "Number of: (2) all other staff"
@@ -1689,7 +3110,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1697,24 +3120,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of: (1) teaching staff'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of: (1) teaching staff' (SV-ED-000.D, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of: (2) all other staff."
     },
     {
       "metric_id": "SV-ED-000.D.02",
@@ -1729,7 +3200,8 @@
         "Number of: (2) all other staff",
         "Number of: all other staff",
         "Count of: (2) all other staff",
-        "SV-ED-000.D Number of: (2) all other staff"
+        "SV-ED-000.D Number of: (2) all other staff",
+        "Total number of: (2) all other staff"
       ],
       "bm25_terms": [
         "SV-ED-000.D",
@@ -1738,10 +3210,28 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of: (2) all other staff",
+        "Number of: all other staff",
+        "Count of: (2) all other staff",
+        "SV-ED-000.D Number of: (2) all other staff",
+        "Total number of: (2) all other staff",
+        "all",
+        "all other",
+        "other staff",
+        "Number of",
+        "all other staff",
+        "Number of: (1) teaching staff and (2) all other staff",
+        "Note to SV-ED-000.D – Teaching staff include any faculty, adjunct and visiting faculty, instructors, and other educators directly involved in"
       ],
-      "dense_query": "Find disclosures for SV-ED-000.D Number of: (2) all other staff with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric SV-ED-000.D 'Number of: (2) all other staff', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric SV-ED-000.D 'Number of: (2) all other staff', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for SV-ED-000.D 'Number of: (2) all other staff'; retain every reported year and label.",
+        "When SV-ED-000.D 'Number of: (2) all other staff' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for SV-ED-000.D 'Number of: (2) all other staff', including: Number of: (2) all other staff; Number of: all other staff; Count of: (2) all other staff; SV-ED-000.D Number of: (2) all other staff; Total number of: (2) all other staff.",
+        "Disambiguate SV-ED-000.D 'Number of: (2) all other staff' from sibling metrics sharing SV-ED-000.D: Number of: (1) teaching staff.",
+        "Find disclosures for SV-ED-000.D Number of: (2) all other staff with unit Number.",
         "Retrieve exact report evidence for SV-ED-000.D Number of: (2) all other staff, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches SV-ED-000.D Number of: (2) all other staff with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for SV-ED-000.D Number of: (2) all other staff.",
@@ -1754,7 +3244,16 @@
         "staff",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Number of: all other staff",
+        "Count of: (2) all other staff",
+        "SV-ED-000.D Number of: (2) all other staff",
+        "Total number of: (2) all other staff",
+        "all",
+        "all other",
+        "other staff",
+        "Number of",
+        "all other staff"
       ],
       "negative_anchor_terms": [
         "Number of: (1) teaching staff"
@@ -1770,7 +3269,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1778,24 +3279,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of: (2) all other staff'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of: (2) all other staff' (SV-ED-000.D, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: Number of: (1) teaching staff."
     }
   ]
 }

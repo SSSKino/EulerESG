@@ -31,10 +31,30 @@
         "CO2-e",
         "metric tonnes CO2-e",
         "CO2",
-        "equivalent"
+        "equivalent",
+        "Gross global Scope 1 emissions",
+        "Scope 1 GHG emissions",
+        "Gross Scope 1 greenhouse gas emissions",
+        "TR-AL-110a.1 Gross global Scope 1 emissions",
+        "Gross",
+        "Gross global",
+        "global",
+        "global Scope",
+        "Scope emissions",
+        "Metric tonnes (t) CO₂-e",
+        "metric tons",
+        "metric tonnes",
+        "tons",
+        "t",
+        "The entity shall disclose its gross global Scope 1 greenhouse gas (GHG) emissions to the atmosphere of the"
       ],
-      "dense_query": "Find disclosures for TR-AL-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.1 'Gross global Scope 1 emissions', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.1 'Gross global Scope 1 emissions', under 'Greenhouse Gas Emissions', with expected unit 'Metric tonnes (t) CO₂-e'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-110a.1 'Gross global Scope 1 emissions'; retain every reported year and label.",
+        "When TR-AL-110a.1 'Gross global Scope 1 emissions' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-110a.1 'Gross global Scope 1 emissions', including: Gross global Scope 1 emissions; Scope 1 GHG emissions; Gross Scope 1 greenhouse gas emissions; TR-AL-110a.1 Gross global Scope 1 emissions.",
+        "Find disclosures for TR-AL-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-AL-110a.1 Gross global Scope 1 emissions, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-110a.1 Gross global Scope 1 emissions with unit Metric tonnes (t) CO₂-e.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-110a.1 Gross global Scope 1 emissions related to Greenhouse Gas Emissions.",
@@ -53,7 +73,20 @@
         "Metric tonnes (t) CO₂-e",
         "t CO2-e",
         "metric tonnes CO2-e",
-        "tonnes CO2 equivalent"
+        "tonnes CO2 equivalent",
+        "Scope 1 GHG emissions",
+        "Gross Scope 1 greenhouse gas emissions",
+        "TR-AL-110a.1 Gross global Scope 1 emissions",
+        "Gross",
+        "Gross global",
+        "global",
+        "global Scope",
+        "Scope emissions",
+        "metric tons",
+        "metric tonnes",
+        "tonnes",
+        "tons",
+        "t"
       ],
       "negative_anchor_terms": [
         "Scope 2",
@@ -73,7 +106,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -81,30 +116,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Gross global Scope 1 emissions', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "mass",
         "expected_units": [
           "Metric tonnes (t) CO₂-e",
-          "t CO2-e",
-          "metric tonnes CO2-e",
-          "tonnes CO2 equivalent",
-          "CO2-e",
-          "Metric tonnes (t)",
           "metric tonnes",
+          "metric tons",
           "tonnes",
+          "tons",
           "t"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Gross global Scope 1 emissions' (TR-AL-110a.1, expected unit: Metric tonnes (t) CO₂-e). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-110a.2",
@@ -139,10 +220,31 @@
         "against",
         "those",
         "Greenhouse",
-        "Gas"
+        "Gas",
+        "Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "TR-AL-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "long- short-term",
+        "short-term strategy",
+        "strategy plan",
+        "plan manage",
+        "manage Scope",
+        "Scope emissions",
+        "emissions emissions",
+        "emissions reduction",
+        "reduction targets",
+        "targets analysis",
+        "analysis performance",
+        "performance against",
+        "Discussion of long- and short-term strategy or plan to manage",
+        "Scope 1 emissions, emissions reduction targets, and an analysis of performance"
       ],
-      "dense_query": "Find disclosures for TR-AL-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', under 'Greenhouse Gas Emissions'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', under 'Greenhouse Gas Emissions'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers TR-AL-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets'.",
+        "When TR-AL-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-110a.2 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets', including: Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets; TR-AL-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets.",
+        "Find disclosures for TR-AL-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-AL-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets related to Greenhouse Gas Emissions.",
@@ -162,7 +264,24 @@
         "manage",
         "Scope",
         "emissions",
-        "reduction"
+        "reduction",
+        "TR-AL-110a.2 Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets",
+        "long- short-term",
+        "short-term strategy",
+        "strategy plan",
+        "plan manage",
+        "manage Scope",
+        "Scope emissions",
+        "emissions emissions",
+        "emissions reduction",
+        "reduction targets",
+        "targets",
+        "targets analysis",
+        "analysis",
+        "analysis performance",
+        "performance",
+        "performance against",
+        "against"
       ],
       "negative_anchor_terms": [
         "Scope 2",
@@ -183,7 +302,9 @@
         "paragraph",
         "list-item",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -195,20 +316,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "direct metric value with supporting explanation, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Discussion of long- and short-term strategy or plan to manage Scope 1 emissions, emissions reduction targets, and an analysis of performance against those targets' (TR-AL-110a.2, no fixed unit). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-110a.3.01",
@@ -235,10 +404,22 @@
         "Emissions",
         "Gigajoules",
         "GJ",
-        "Gigajoules (GJ)"
+        "Gigajoules (GJ)",
+        "(1) Total fuel consumed",
+        "Total fuel consumed",
+        "TR-AL-110a.3 (1) Total fuel consumed",
+        "gigajoule",
+        "(1) Total fuel consumed, (2) percentage alternative and",
+        "(3) percentage sustainable"
       ],
-      "dense_query": "Find disclosures for TR-AL-110a.3 (1) Total fuel consumed with unit Gigajoules (GJ) related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.3 '(1) Total fuel consumed', under 'Greenhouse Gas Emissions', with expected unit 'Gigajoules (GJ)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.3 '(1) Total fuel consumed', under 'Greenhouse Gas Emissions', with expected unit 'Gigajoules (GJ)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-110a.3 '(1) Total fuel consumed'; retain every reported year and label.",
+        "When TR-AL-110a.3 '(1) Total fuel consumed' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-110a.3 '(1) Total fuel consumed', including: (1) Total fuel consumed; Total fuel consumed; TR-AL-110a.3 (1) Total fuel consumed.",
+        "Disambiguate TR-AL-110a.3 '(1) Total fuel consumed' from sibling metrics sharing TR-AL-110a.3: (2) Percentage of fuel consumption that was alternative fuel; (3) Percentage of fuel consumed that was sustainable fuel.",
+        "Find disclosures for TR-AL-110a.3 (1) Total fuel consumed with unit Gigajoules (GJ) related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-AL-110a.3 (1) Total fuel consumed, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-110a.3 (1) Total fuel consumed with unit Gigajoules (GJ).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-110a.3 (1) Total fuel consumed related to Greenhouse Gas Emissions.",
@@ -246,6 +427,7 @@
       ],
       "anchor_terms": [
         "TR-AL-110a.3",
+        "(1) Total fuel consumed",
         "Total fuel consumed",
         "Greenhouse Gas",
         "fuel consumed",
@@ -256,13 +438,17 @@
         "Emissions",
         "Gigajoules (GJ)",
         "GJ",
-        "gigajoules"
+        "gigajoules",
+        "TR-AL-110a.3 (1) Total fuel consumed",
+        "gigajoule"
       ],
       "negative_anchor_terms": [
         "Percentage of fuel consumption that was alternative fuel",
         "Percentage of fuel consumed that was sustainable fuel",
         "electricity consumed",
-        "energy consumed from grid electricity"
+        "energy consumed from grid electricity",
+        "(2) Percentage of fuel consumption that was alternative fuel",
+        "(3) Percentage of fuel consumed that was sustainable fuel"
       ],
       "similar_metric_warnings": [
         {
@@ -279,7 +465,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -287,24 +475,76 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Total fuel consumed', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "energy",
         "expected_units": [
           "Gigajoules (GJ)",
           "GJ",
-          "gigajoules"
+          "MWh",
+          "kWh",
+          "MJ",
+          "kJ"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Total fuel consumed' (TR-AL-110a.3, expected unit: Gigajoules (GJ)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Percentage of fuel consumption that was alternative fuel; (3) Percentage of fuel consumed that was sustainable fuel."
     },
     {
       "metric_id": "TR-AL-110a.3.02",
@@ -318,7 +558,8 @@
       "aliases": [
         "(2) Percentage of fuel consumption that was alternative fuel",
         "Percentage of fuel consumption that was alternative fuel",
-        "TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel"
+        "TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel",
+        "(2) Percent of fuel consumption that was alternative fuel"
       ],
       "bm25_terms": [
         "TR-AL-110a.3",
@@ -332,10 +573,29 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(2) Percentage of fuel consumption that was alternative fuel",
+        "Percentage of fuel consumption that was alternative fuel",
+        "TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel",
+        "(2) Percent of fuel consumption that was alternative fuel",
+        "fuel consumption",
+        "consumption that",
+        "that",
+        "that was",
+        "was",
+        "was alternative",
+        "alternative fuel",
+        "(1) Total fuel consumed, (2) percentage alternative and",
+        "(3) percentage sustainable"
       ],
-      "dense_query": "Find disclosures for TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel with unit Percentage (%) related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.3 '(2) Percentage of fuel consumption that was alternative fuel', under 'Greenhouse Gas Emissions', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.3 '(2) Percentage of fuel consumption that was alternative fuel', under 'Greenhouse Gas Emissions', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-110a.3 '(2) Percentage of fuel consumption that was alternative fuel'; retain every reported year and label.",
+        "When TR-AL-110a.3 '(2) Percentage of fuel consumption that was alternative fuel' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-110a.3 '(2) Percentage of fuel consumption that was alternative fuel', including: (2) Percentage of fuel consumption that was alternative fuel; Percentage of fuel consumption that was alternative fuel; TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel; (2) Percent of fuel consumption that was alternative fuel.",
+        "Disambiguate TR-AL-110a.3 '(2) Percentage of fuel consumption that was alternative fuel' from sibling metrics sharing TR-AL-110a.3: (1) Total fuel consumed; (3) Percentage of fuel consumed that was sustainable fuel.",
+        "Find disclosures for TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel with unit Percentage (%) related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel related to Greenhouse Gas Emissions.",
@@ -343,6 +603,7 @@
       ],
       "anchor_terms": [
         "TR-AL-110a.3",
+        "(2) Percentage of fuel consumption that was alternative fuel",
         "Percentage of fuel consumption that was alternative fuel",
         "Greenhouse Gas",
         "fuel",
@@ -354,11 +615,22 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "TR-AL-110a.3 (2) Percentage of fuel consumption that was alternative fuel",
+        "(2) Percent of fuel consumption that was alternative fuel",
+        "fuel consumption",
+        "consumption that",
+        "that",
+        "that was",
+        "was",
+        "was alternative",
+        "alternative fuel"
       ],
       "negative_anchor_terms": [
         "Total fuel consumed",
-        "Percentage of fuel consumed that was sustainable fuel"
+        "Percentage of fuel consumed that was sustainable fuel",
+        "(1) Total fuel consumed",
+        "(3) Percentage of fuel consumed that was sustainable fuel"
       ],
       "similar_metric_warnings": [
         {
@@ -375,7 +647,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -383,11 +657,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Percentage of fuel consumption that was alternative fuel', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -399,9 +699,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Percentage of fuel consumption that was alternative fuel' (TR-AL-110a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total fuel consumed; (3) Percentage of fuel consumed that was sustainable fuel."
     },
     {
       "metric_id": "TR-AL-110a.3.03",
@@ -415,7 +738,8 @@
       "aliases": [
         "(3) Percentage of fuel consumed that was sustainable fuel",
         "Percentage of fuel consumed that was sustainable fuel",
-        "TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel"
+        "TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel",
+        "(3) Percent of fuel consumed that was sustainable fuel"
       ],
       "bm25_terms": [
         "TR-AL-110a.3",
@@ -430,10 +754,28 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "(3) Percentage of fuel consumed that was sustainable fuel",
+        "Percentage of fuel consumed that was sustainable fuel",
+        "TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel",
+        "(3) Percent of fuel consumed that was sustainable fuel",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was sustainable",
+        "sustainable fuel",
+        "(1) Total fuel consumed, (2) percentage alternative and",
+        "(3) percentage sustainable"
       ],
-      "dense_query": "Find disclosures for TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel with unit Percentage (%) related to Greenhouse Gas Emissions.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.3 '(3) Percentage of fuel consumed that was sustainable fuel', under 'Greenhouse Gas Emissions', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-110a.3 '(3) Percentage of fuel consumed that was sustainable fuel', under 'Greenhouse Gas Emissions', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-110a.3 '(3) Percentage of fuel consumed that was sustainable fuel'; retain every reported year and label.",
+        "When TR-AL-110a.3 '(3) Percentage of fuel consumed that was sustainable fuel' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-110a.3 '(3) Percentage of fuel consumed that was sustainable fuel', including: (3) Percentage of fuel consumed that was sustainable fuel; Percentage of fuel consumed that was sustainable fuel; TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel; (3) Percent of fuel consumed that was sustainable fuel.",
+        "Disambiguate TR-AL-110a.3 '(3) Percentage of fuel consumed that was sustainable fuel' from sibling metrics sharing TR-AL-110a.3: (1) Total fuel consumed; (2) Percentage of fuel consumption that was alternative fuel.",
+        "Find disclosures for TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel with unit Percentage (%) related to Greenhouse Gas Emissions.",
         "Retrieve exact report evidence for TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel related to Greenhouse Gas Emissions.",
@@ -441,6 +783,7 @@
       ],
       "anchor_terms": [
         "TR-AL-110a.3",
+        "(3) Percentage of fuel consumed that was sustainable fuel",
         "Percentage of fuel consumed that was sustainable fuel",
         "Greenhouse Gas",
         "fuel consumed",
@@ -453,13 +796,23 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "TR-AL-110a.3 (3) Percentage of fuel consumed that was sustainable fuel",
+        "(3) Percent of fuel consumed that was sustainable fuel",
+        "consumed that",
+        "that",
+        "that was",
+        "was",
+        "was sustainable",
+        "sustainable fuel"
       ],
       "negative_anchor_terms": [
         "Total fuel consumed",
         "Percentage of fuel consumption that was alternative fuel",
         "electricity consumed",
-        "energy consumed from grid electricity"
+        "energy consumed from grid electricity",
+        "(1) Total fuel consumed",
+        "(2) Percentage of fuel consumption that was alternative fuel"
       ],
       "similar_metric_warnings": [
         {
@@ -476,7 +829,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -484,11 +839,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(3) Percentage of fuel consumed that was sustainable fuel', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -500,9 +881,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(3) Percentage of fuel consumed that was sustainable fuel' (TR-AL-110a.3, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Total fuel consumed; (2) Percentage of fuel consumption that was alternative fuel."
     },
     {
       "metric_id": "TR-AL-310a.1",
@@ -530,10 +934,26 @@
         "%",
         "Percentage (%)",
         "percent",
-        "percentage"
+        "percentage",
+        "Percentage of active workforce employed under collective agreements",
+        "Percent of active workforce employed under collective agreements",
+        "TR-AL-310a.1 Percentage of active workforce employed under collective agreements",
+        "active workforce",
+        "workforce employed",
+        "employed under",
+        "under",
+        "under collective",
+        "collective agreements",
+        "Percentage of active workforce employed under collective",
+        "The entity shall disclose the percentage of employees in the active workforce employed under collective"
       ],
-      "dense_query": "Find disclosures for TR-AL-310a.1 Percentage of active workforce employed under collective agreements with unit Percentage (%) related to Labour Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-310a.1 'Percentage of active workforce employed under collective agreements', under 'Labour Practices', with expected unit 'Percentage (%)'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-310a.1 'Percentage of active workforce employed under collective agreements', under 'Labour Practices', with expected unit 'Percentage (%)'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-310a.1 'Percentage of active workforce employed under collective agreements'; retain every reported year and label.",
+        "When TR-AL-310a.1 'Percentage of active workforce employed under collective agreements' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-310a.1 'Percentage of active workforce employed under collective agreements', including: Percentage of active workforce employed under collective agreements; Percent of active workforce employed under collective agreements; TR-AL-310a.1 Percentage of active workforce employed under collective agreements.",
+        "Find disclosures for TR-AL-310a.1 Percentage of active workforce employed under collective agreements with unit Percentage (%) related to Labour Practices.",
         "Retrieve exact report evidence for TR-AL-310a.1 Percentage of active workforce employed under collective agreements, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-310a.1 Percentage of active workforce employed under collective agreements with unit Percentage (%).",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-310a.1 Percentage of active workforce employed under collective agreements related to Labour Practices.",
@@ -552,7 +972,15 @@
         "Percentage (%)",
         "%",
         "percent",
-        "percentage"
+        "percentage",
+        "Percent of active workforce employed under collective agreements",
+        "TR-AL-310a.1 Percentage of active workforce employed under collective agreements",
+        "active workforce",
+        "workforce employed",
+        "employed under",
+        "under",
+        "under collective",
+        "collective agreements"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -561,7 +989,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -569,11 +999,37 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Percentage of active workforce employed under collective agreements', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "percentage",
@@ -585,9 +1041,32 @@
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Normalize percentages consistently and preserve the denominator, category, region, product type, or scope stated by the metric."
+        "normalization_notes": "Preserve every labeled reporting-year percentage and its source label; do not convert a percentage to a fraction. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Percentage of active workforce employed under collective agreements' (TR-AL-310a.1, expected unit: Percentage (%)). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-310a.2.01",
@@ -612,10 +1091,22 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "(1) Number of work stoppages",
+        "Number of work stoppages",
+        "TR-AL-310a.2 (1) Number of work stoppages",
+        "work stoppages",
+        "(1) Number of work stoppages and (2) total days idle",
+        "The entity shall disclose (1) the number of work stoppages involving 1,000 or more workers lasting one full shift or"
       ],
-      "dense_query": "Find disclosures for TR-AL-310a.2 (1) Number of work stoppages with unit Number related to Labour Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-310a.2 '(1) Number of work stoppages', under 'Labour Practices', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-310a.2 '(1) Number of work stoppages', under 'Labour Practices', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-310a.2 '(1) Number of work stoppages'; retain every reported year and label.",
+        "When TR-AL-310a.2 '(1) Number of work stoppages' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-310a.2 '(1) Number of work stoppages', including: (1) Number of work stoppages; Number of work stoppages; TR-AL-310a.2 (1) Number of work stoppages.",
+        "Disambiguate TR-AL-310a.2 '(1) Number of work stoppages' from sibling metrics sharing TR-AL-310a.2: (2) Total days idle.",
+        "Find disclosures for TR-AL-310a.2 (1) Number of work stoppages with unit Number related to Labour Practices.",
         "Retrieve exact report evidence for TR-AL-310a.2 (1) Number of work stoppages, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-310a.2 (1) Number of work stoppages with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-310a.2 (1) Number of work stoppages related to Labour Practices.",
@@ -623,6 +1114,7 @@
       ],
       "anchor_terms": [
         "TR-AL-310a.2",
+        "(1) Number of work stoppages",
         "Number of work stoppages",
         "work",
         "stoppages",
@@ -630,10 +1122,13 @@
         "Practices",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "TR-AL-310a.2 (1) Number of work stoppages",
+        "work stoppages"
       ],
       "negative_anchor_terms": [
-        "Total days idle"
+        "Total days idle",
+        "(2) Total days idle"
       ],
       "similar_metric_warnings": [
         {
@@ -646,7 +1141,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -654,24 +1151,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(1) Number of work stoppages'; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(1) Number of work stoppages' (TR-AL-310a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (2) Total days idle."
     },
     {
       "metric_id": "TR-AL-310a.2.02",
@@ -693,10 +1238,21 @@
         "idle",
         "Labour",
         "Practices",
-        "Days idle"
+        "Days idle",
+        "(2) Total days idle",
+        "Total days idle",
+        "TR-AL-310a.2 (2) Total days idle",
+        "(1) Number of work stoppages and (2) total days idle",
+        "The entity shall disclose (1) the number of work stoppages involving 1,000 or more workers lasting one full shift or"
       ],
-      "dense_query": "Find disclosures for TR-AL-310a.2 (2) Total days idle with unit Days idle related to Labour Practices.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-310a.2 '(2) Total days idle', under 'Labour Practices', with expected unit 'Days idle'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-310a.2 '(2) Total days idle', under 'Labour Practices', with expected unit 'Days idle'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-310a.2 '(2) Total days idle'; retain every reported year and label.",
+        "When TR-AL-310a.2 '(2) Total days idle' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-310a.2 '(2) Total days idle', including: (2) Total days idle; Total days idle; TR-AL-310a.2 (2) Total days idle.",
+        "Disambiguate TR-AL-310a.2 '(2) Total days idle' from sibling metrics sharing TR-AL-310a.2: (1) Number of work stoppages.",
+        "Find disclosures for TR-AL-310a.2 (2) Total days idle with unit Days idle related to Labour Practices.",
         "Retrieve exact report evidence for TR-AL-310a.2 (2) Total days idle, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-310a.2 (2) Total days idle with unit Days idle.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-310a.2 (2) Total days idle related to Labour Practices.",
@@ -704,15 +1260,18 @@
       ],
       "anchor_terms": [
         "TR-AL-310a.2",
+        "(2) Total days idle",
         "Total days idle",
         "days",
         "idle",
         "Labour",
         "Practices",
-        "Days idle"
+        "Days idle",
+        "TR-AL-310a.2 (2) Total days idle"
       ],
       "negative_anchor_terms": [
-        "Number of work stoppages"
+        "Number of work stoppages",
+        "(1) Number of work stoppages"
       ],
       "similar_metric_warnings": [
         {
@@ -725,7 +1284,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -733,22 +1294,75 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for '(2) Total days idle', preserving the reported unit, scale, and year; the evidence label must identify this component rather than a sibling sharing the same Code",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": true,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "duration",
         "expected_units": [
-          "Days idle"
+          "Days idle",
+          "days",
+          "hours",
+          "months",
+          "years"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": true,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": true,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric '(2) Total days idle' (TR-AL-310a.2, expected unit: Days idle). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values. This Code is shared: require the current component label and do not substitute these siblings: (1) Number of work stoppages."
     },
     {
       "metric_id": "TR-AL-520a.1",
@@ -780,10 +1394,31 @@
         "currency",
         "reporting currency",
         "reporting",
-        "monetary amount"
+        "monetary amount",
+        "Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "TR-AL-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour regulations",
+        "Presentation currency",
+        "USD",
+        "dollars",
+        "Total amount of monetary losses as a result of legal proceedings",
+        "associated with anti-competitive behaviour regulations"
       ],
-      "dense_query": "Find disclosures for TR-AL-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency related to Competitive Behaviour.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', under 'Competitive Behaviour', with expected unit 'Presentation currency'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', under 'Competitive Behaviour', with expected unit 'Presentation currency'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations'; retain every reported year and label.",
+        "When TR-AL-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-520a.1 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', including: Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations; Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations; TR-AL-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations.",
+        "Find disclosures for TR-AL-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency related to Competitive Behaviour.",
         "Retrieve exact report evidence for TR-AL-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations with unit Presentation currency.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations related to Competitive Behaviour.",
@@ -805,7 +1440,19 @@
         "Presentation currency",
         "reporting currency",
         "monetary amount",
-        "currency"
+        "currency",
+        "Monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "TR-AL-520a.1 Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+        "losses result",
+        "result",
+        "result legal",
+        "proceedings associated",
+        "associated",
+        "associated anti-competitive",
+        "anti-competitive behaviour",
+        "behaviour regulations",
+        "USD",
+        "dollars"
       ],
       "negative_anchor_terms": [
         "operating expenses",
@@ -819,7 +1466,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -827,25 +1476,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
           "Presentation currency",
           "reporting currency",
-          "monetary amount",
-          "currency"
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations' (TR-AL-520a.1, expected unit: Presentation currency). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-540a.1",
@@ -858,7 +1556,8 @@
       "disclosure_type": "qualitative",
       "aliases": [
         "Description of implementation and outcomes of a Safety Management System",
-        "TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System"
+        "TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System",
+        "implementation and outcomes of a Safety Management System"
       ],
       "bm25_terms": [
         "TR-AL-540a.1",
@@ -868,10 +1567,25 @@
         "Safety",
         "Management",
         "System",
-        "Accident"
+        "Accident",
+        "Description of implementation and outcomes of a Safety Management System",
+        "TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System",
+        "implementation and outcomes of a Safety Management System",
+        "implementation outcomes",
+        "outcomes Safety",
+        "Safety Management",
+        "Management System",
+        "Description of implementation",
+        "outcomes of a Safety Management System",
+        "Description of implementation and outcomes of a Safety"
       ],
-      "dense_query": "Find disclosures for TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System related to Accident & Safety Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-540a.1 'Description of implementation and outcomes of a Safety Management System', under 'Accident & Safety Management'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-540a.1 'Description of implementation and outcomes of a Safety Management System', under 'Accident & Safety Management'.",
+        "Find an explicit policy, practice, procedure, or narrative that directly answers TR-AL-540a.1 'Description of implementation and outcomes of a Safety Management System'.",
+        "When TR-AL-540a.1 'Description of implementation and outcomes of a Safety Management System' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-540a.1 'Description of implementation and outcomes of a Safety Management System', including: Description of implementation and outcomes of a Safety Management System; TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System; implementation and outcomes of a Safety Management System.",
+        "Find disclosures for TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System related to Accident & Safety Management.",
         "Retrieve exact report evidence for TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System related to Accident & Safety Management.",
@@ -886,7 +1600,15 @@
         "Safety",
         "Management",
         "System",
-        "Accident"
+        "Accident",
+        "TR-AL-540a.1 Description of implementation and outcomes of a Safety Management System",
+        "implementation and outcomes of a Safety Management System",
+        "implementation outcomes",
+        "outcomes Safety",
+        "Safety Management",
+        "Management System",
+        "Description of implementation",
+        "outcomes of a Safety Management System"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -896,7 +1618,9 @@
         "table-row",
         "table",
         "index",
-        "footnote"
+        "footnote",
+        "body-text",
+        "heading"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -908,20 +1632,68 @@
           "policy section",
           "risk management section",
           "governance section",
-          "management discussion"
+          "management discussion",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context"
         ],
-        "preferred_evidence_style": "explicit policy, process, strategy, risk management, or management discussion disclosure",
+        "preferred_evidence_style": "an explicit narrative or labeled table field that directly addresses 'Description of implementation and outcomes of a Safety Management System'",
         "requires_numeric_value": false,
-        "requires_unit": false
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "paragraph",
+          "policy",
+          "procedure",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": false,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "text",
         "expected_units": [],
         "year_sensitive": true,
         "allow_qualitative_disclosure": true,
-        "normalization_notes": "Extract the relevant narrative disclosure without numeric normalization."
+        "normalization_notes": "Retain only explicit report statements that address the exact metric; do not infer disclosure from a related topic. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "narrative",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": false,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": false
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": false,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Description of implementation and outcomes of a Safety Management System' (TR-AL-540a.1). Prefer explicit narrative evidence that answers this metric, including link-source context and an internally linked target page. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-540a.2",
@@ -935,7 +1707,8 @@
       "aliases": [
         "Number of aviation accidents",
         "Count of aviation accidents",
-        "TR-AL-540a.2 Number of aviation accidents"
+        "TR-AL-540a.2 Number of aviation accidents",
+        "Total number of aviation accidents"
       ],
       "bm25_terms": [
         "TR-AL-540a.2",
@@ -947,10 +1720,21 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of aviation accidents",
+        "Count of aviation accidents",
+        "TR-AL-540a.2 Number of aviation accidents",
+        "Total number of aviation accidents",
+        "aviation accidents",
+        "The entity shall disclose the total number of aviation accidents"
       ],
-      "dense_query": "Find disclosures for TR-AL-540a.2 Number of aviation accidents with unit Number related to Accident & Safety Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-540a.2 'Number of aviation accidents', under 'Accident & Safety Management', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-540a.2 'Number of aviation accidents', under 'Accident & Safety Management', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-540a.2 'Number of aviation accidents'; retain every reported year and label.",
+        "When TR-AL-540a.2 'Number of aviation accidents' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-540a.2 'Number of aviation accidents', including: Number of aviation accidents; Count of aviation accidents; TR-AL-540a.2 Number of aviation accidents; Total number of aviation accidents.",
+        "Find disclosures for TR-AL-540a.2 Number of aviation accidents with unit Number related to Accident & Safety Management.",
         "Retrieve exact report evidence for TR-AL-540a.2 Number of aviation accidents, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-540a.2 Number of aviation accidents with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-540a.2 Number of aviation accidents related to Accident & Safety Management.",
@@ -966,7 +1750,11 @@
         "Management",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of aviation accidents",
+        "TR-AL-540a.2 Number of aviation accidents",
+        "Total number of aviation accidents",
+        "aviation accidents"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -975,7 +1763,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -983,24 +1773,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of aviation accidents'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of aviation accidents' (TR-AL-540a.2, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-540a.3",
@@ -1014,7 +1852,8 @@
       "aliases": [
         "Number of governmental enforcement actions of aviation safety regulations",
         "Count of governmental enforcement actions of aviation safety regulations",
-        "TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations"
+        "TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations",
+        "Total number of governmental enforcement actions of aviation safety regulations"
       ],
       "bm25_terms": [
         "TR-AL-540a.3",
@@ -1029,10 +1868,26 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of governmental enforcement actions of aviation safety regulations",
+        "Count of governmental enforcement actions of aviation safety regulations",
+        "TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations",
+        "Total number of governmental enforcement actions of aviation safety regulations",
+        "governmental enforcement",
+        "enforcement actions",
+        "actions aviation",
+        "aviation safety",
+        "safety regulations",
+        "Number of governmental enforcement actions of aviation safety",
+        "The entity shall disclose the total number of enforcement actions from applicable jurisdictional legal or regulatory"
       ],
-      "dense_query": "Find disclosures for TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations with unit Number related to Accident & Safety Management.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-540a.3 'Number of governmental enforcement actions of aviation safety regulations', under 'Accident & Safety Management', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-540a.3 'Number of governmental enforcement actions of aviation safety regulations', under 'Accident & Safety Management', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-540a.3 'Number of governmental enforcement actions of aviation safety regulations'; retain every reported year and label.",
+        "When TR-AL-540a.3 'Number of governmental enforcement actions of aviation safety regulations' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-540a.3 'Number of governmental enforcement actions of aviation safety regulations', including: Number of governmental enforcement actions of aviation safety regulations; Count of governmental enforcement actions of aviation safety regulations; TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations; Total number of governmental enforcement actions of aviation safety regulations.",
+        "Find disclosures for TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations with unit Number related to Accident & Safety Management.",
         "Retrieve exact report evidence for TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations related to Accident & Safety Management.",
@@ -1051,7 +1906,15 @@
         "Management",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of governmental enforcement actions of aviation safety regulations",
+        "TR-AL-540a.3 Number of governmental enforcement actions of aviation safety regulations",
+        "Total number of governmental enforcement actions of aviation safety regulations",
+        "governmental enforcement",
+        "enforcement actions",
+        "actions aviation",
+        "aviation safety",
+        "safety regulations"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1060,7 +1923,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1068,24 +1933,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of governmental enforcement actions of aviation safety regulations'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of governmental enforcement actions of aviation safety regulations' (TR-AL-540a.3, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-000.A",
@@ -1105,10 +2018,22 @@
         "Available",
         "seat",
         "kilometres",
-        "ASK"
+        "ASK",
+        "Available seat kilometres (ASK)",
+        "TR-AL-000.A Available seat kilometres (ASK)",
+        "Available seat",
+        "seat kilometres",
+        "kilometres ASK",
+        "Available seat kilometres (ASK",
+        "Note to TR-AL-000.A – Available seat kilometres (ASK) is defined as the maximum potential cumulative kilometres travelled by"
       ],
-      "dense_query": "Find disclosures for TR-AL-000.A Available seat kilometres (ASK) with unit ASK.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-000.A 'Available seat kilometres (ASK)', with expected unit 'ASK'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-000.A 'Available seat kilometres (ASK)', with expected unit 'ASK'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-000.A 'Available seat kilometres (ASK)'; retain every reported year and label.",
+        "When TR-AL-000.A 'Available seat kilometres (ASK)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-000.A 'Available seat kilometres (ASK)', including: Available seat kilometres (ASK); TR-AL-000.A Available seat kilometres (ASK).",
+        "Find disclosures for TR-AL-000.A Available seat kilometres (ASK) with unit ASK.",
         "Retrieve exact report evidence for TR-AL-000.A Available seat kilometres (ASK), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-000.A Available seat kilometres (ASK) with unit ASK.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-000.A Available seat kilometres (ASK).",
@@ -1120,7 +2045,12 @@
         "Available",
         "seat",
         "kilometres",
-        "ASK"
+        "ASK",
+        "TR-AL-000.A Available seat kilometres (ASK)",
+        "Available seat",
+        "seat kilometres",
+        "kilometres ASK",
+        "Available seat kilometres (ASK"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1129,7 +2059,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1137,22 +2069,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Available seat kilometres (ASK)', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "number",
         "expected_units": [
           "ASK"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Available seat kilometres (ASK)' (TR-AL-000.A, expected unit: ASK). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-000.B",
@@ -1173,10 +2154,20 @@
         "load",
         "factor",
         "Rate",
-        "ratio"
+        "ratio",
+        "Passenger load factor",
+        "TR-AL-000.B Passenger load factor",
+        "Passenger load",
+        "load factor",
+        "Note to TR-AL-000.B – Load factor is a measure of capacity utilisation and is calculated as passenger kilometres travelled divided by"
       ],
-      "dense_query": "Find disclosures for TR-AL-000.B Passenger load factor with unit Rate.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-000.B 'Passenger load factor', with expected unit 'Rate'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-000.B 'Passenger load factor', with expected unit 'Rate'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-000.B 'Passenger load factor'; retain every reported year and label.",
+        "When TR-AL-000.B 'Passenger load factor' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-000.B 'Passenger load factor', including: Passenger load factor; TR-AL-000.B Passenger load factor.",
+        "Find disclosures for TR-AL-000.B Passenger load factor with unit Rate.",
         "Retrieve exact report evidence for TR-AL-000.B Passenger load factor, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-000.B Passenger load factor with unit Rate.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-000.B Passenger load factor.",
@@ -1189,7 +2180,10 @@
         "load",
         "factor",
         "Rate",
-        "ratio"
+        "ratio",
+        "TR-AL-000.B Passenger load factor",
+        "Passenger load",
+        "load factor"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1198,7 +2192,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1206,23 +2202,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Passenger load factor', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "rate",
         "expected_units": [
-          "Rate",
-          "ratio"
+          "Rate"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve the rate basis, reporting year, numerator or event label, and denominator when stated. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Passenger load factor' (TR-AL-000.B, expected unit: Rate). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-000.C",
@@ -1242,10 +2286,22 @@
         "Revenue",
         "passenger",
         "kilometres",
-        "RPK"
+        "RPK",
+        "Revenue passenger kilometres (RPK)",
+        "TR-AL-000.C Revenue passenger kilometres (RPK)",
+        "Revenue passenger",
+        "passenger kilometres",
+        "kilometres RPK",
+        "Revenue passenger kilometres (RPK",
+        "Note to TR-AL-000.C – Revenue passenger kilometres (RPK) is defined as the cumulative total kilometres travelled by revenue"
       ],
-      "dense_query": "Find disclosures for TR-AL-000.C Revenue passenger kilometres (RPK) with unit RPK.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-000.C 'Revenue passenger kilometres (RPK)', with expected unit 'RPK'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-000.C 'Revenue passenger kilometres (RPK)', with expected unit 'RPK'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-000.C 'Revenue passenger kilometres (RPK)'; retain every reported year and label.",
+        "When TR-AL-000.C 'Revenue passenger kilometres (RPK)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-000.C 'Revenue passenger kilometres (RPK)', including: Revenue passenger kilometres (RPK); TR-AL-000.C Revenue passenger kilometres (RPK).",
+        "Find disclosures for TR-AL-000.C Revenue passenger kilometres (RPK) with unit RPK.",
         "Retrieve exact report evidence for TR-AL-000.C Revenue passenger kilometres (RPK), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-000.C Revenue passenger kilometres (RPK) with unit RPK.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-000.C Revenue passenger kilometres (RPK).",
@@ -1257,7 +2313,12 @@
         "Revenue",
         "passenger",
         "kilometres",
-        "RPK"
+        "RPK",
+        "TR-AL-000.C Revenue passenger kilometres (RPK)",
+        "Revenue passenger",
+        "passenger kilometres",
+        "kilometres RPK",
+        "Revenue passenger kilometres (RPK"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1266,7 +2327,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1274,22 +2337,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Revenue passenger kilometres (RPK)', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
         "value_type": "currency",
         "expected_units": [
-          "RPK"
+          "reporting currency",
+          "presentation currency",
+          "USD",
+          "dollars"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported presentation currency and reporting period; do not convert currency unless a downstream normalization step explicitly requires it."
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Revenue passenger kilometres (RPK)' (TR-AL-000.C, expected unit: RPK). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-000.D",
@@ -1312,10 +2427,21 @@
         "Litres/RTK",
         "Litres",
         "litres per RTK",
-        "L/RTK"
+        "L/RTK",
+        "Revenue tonne-kilometres (RTK)",
+        "TR-AL-000.D Revenue tonne-kilometres (RTK)",
+        "Revenue tonne-kilometres",
+        "tonne-kilometres RTK",
+        "Revenue tonne-kilometres (RTK",
+        "Note to TR-AL-000.D – Revenue tonne-kilometres (RTK) is defined as one metric tonne of revenue traffic transported one kilometre. RTK"
       ],
-      "dense_query": "Find disclosures for TR-AL-000.D Revenue tonne-kilometres (RTK) with unit RTK.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-000.D 'Revenue tonne-kilometres (RTK)', with expected unit 'RTK'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-000.D 'Revenue tonne-kilometres (RTK)', with expected unit 'RTK'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-000.D 'Revenue tonne-kilometres (RTK)'; retain every reported year and label.",
+        "When TR-AL-000.D 'Revenue tonne-kilometres (RTK)' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-000.D 'Revenue tonne-kilometres (RTK)', including: Revenue tonne-kilometres (RTK); TR-AL-000.D Revenue tonne-kilometres (RTK).",
+        "Find disclosures for TR-AL-000.D Revenue tonne-kilometres (RTK) with unit RTK.",
         "Retrieve exact report evidence for TR-AL-000.D Revenue tonne-kilometres (RTK), including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-000.D Revenue tonne-kilometres (RTK) with unit RTK.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-000.D Revenue tonne-kilometres (RTK).",
@@ -1329,7 +2455,11 @@
         "RTK",
         "Litres/RTK",
         "litres per RTK",
-        "L/RTK"
+        "L/RTK",
+        "TR-AL-000.D Revenue tonne-kilometres (RTK)",
+        "Revenue tonne-kilometres",
+        "tonne-kilometres RTK",
+        "Revenue tonne-kilometres (RTK"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1338,7 +2468,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1346,25 +2478,71 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Revenue tonne-kilometres (RTK)', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "mixed",
+        "value_type": "transport_activity",
         "expected_units": [
-          "RTK",
-          "Litres/RTK",
-          "litres per RTK",
-          "L/RTK"
+          "RTK"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Extract each required component separately and preserve its original unit, denominator, category, and reporting-period context."
+        "normalization_notes": "Preserve the transport-activity value, reporting year, transport-mode label, and RTK unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Revenue tonne-kilometres (RTK)' (TR-AL-000.D, expected unit: RTK). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-000.E",
@@ -1378,7 +2556,8 @@
       "aliases": [
         "Number of departures",
         "Count of departures",
-        "TR-AL-000.E Number of departures"
+        "TR-AL-000.E Number of departures",
+        "Total number of departures"
       ],
       "bm25_terms": [
         "TR-AL-000.E",
@@ -1386,10 +2565,19 @@
         "Number",
         "count",
         "absolute number",
-        "absolute"
+        "absolute",
+        "Number of departures",
+        "Count of departures",
+        "TR-AL-000.E Number of departures",
+        "Total number of departures"
       ],
-      "dense_query": "Find disclosures for TR-AL-000.E Number of departures with unit Number.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-000.E 'Number of departures', with expected unit 'Number'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-000.E 'Number of departures', with expected unit 'Number'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-000.E 'Number of departures'; retain every reported year and label.",
+        "When TR-AL-000.E 'Number of departures' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-000.E 'Number of departures', including: Number of departures; Count of departures; TR-AL-000.E Number of departures; Total number of departures.",
+        "Find disclosures for TR-AL-000.E Number of departures with unit Number.",
         "Retrieve exact report evidence for TR-AL-000.E Number of departures, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-000.E Number of departures with unit Number.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-000.E Number of departures.",
@@ -1401,7 +2589,10 @@
         "departures",
         "Number",
         "count",
-        "absolute number"
+        "absolute number",
+        "Count of departures",
+        "TR-AL-000.E Number of departures",
+        "Total number of departures"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1410,7 +2601,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1418,24 +2611,72 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Number of departures'",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": false,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "number",
+        "value_type": "count",
         "expected_units": [
           "Number",
-          "count",
-          "absolute number"
+          "count"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": "Preserve the reported unit and scale; convert only when the source explicitly provides equivalent units."
+        "normalization_notes": "Preserve every labeled reporting-year count and the population or event label to which it applies. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Number of departures' (TR-AL-000.E, expected unit: Number). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     },
     {
       "metric_id": "TR-AL-000.F",
@@ -1454,10 +2695,20 @@
         "TR-AL-000.F",
         "age",
         "fleet",
-        "Years"
+        "Years",
+        "Average age of fleet",
+        "TR-AL-000.F Average age of fleet",
+        "Average",
+        "Average age",
+        "age fleet"
       ],
-      "dense_query": "Find disclosures for TR-AL-000.F Average age of fleet with unit Years.",
+      "dense_query": "Retrieve current-report evidence for the exact SASB metric TR-AL-000.F 'Average age of fleet', with expected unit 'Years'.",
       "dense_queries": [
+        "Retrieve current-report evidence for the exact SASB metric TR-AL-000.F 'Average age of fleet', with expected unit 'Years'.",
+        "Find a labeled table cell, table row, chart value, or explicit disclosure sentence for TR-AL-000.F 'Average age of fleet'; retain every reported year and label.",
+        "When TR-AL-000.F 'Average age of fleet' appears in an internal PDF link or framework index, evaluate both the link-source context and the internally linked target-page evidence.",
+        "Match report wording for TR-AL-000.F 'Average age of fleet', including: Average age of fleet; TR-AL-000.F Average age of fleet.",
+        "Find disclosures for TR-AL-000.F Average age of fleet with unit Years.",
         "Retrieve exact report evidence for TR-AL-000.F Average age of fleet, including the SASB metric row, table value, or explicit disclosure sentence.",
         "Find ESG or sustainability report evidence that directly matches TR-AL-000.F Average age of fleet with unit Years.",
         "Locate SASB index, data table, appendix, footnote, or narrative disclosure for TR-AL-000.F Average age of fleet.",
@@ -1468,7 +2719,11 @@
         "Average age of fleet",
         "age",
         "fleet",
-        "Years"
+        "Years",
+        "TR-AL-000.F Average age of fleet",
+        "Average",
+        "Average age",
+        "age fleet"
       ],
       "negative_anchor_terms": [],
       "similar_metric_warnings": [],
@@ -1477,7 +2732,9 @@
         "table",
         "paragraph",
         "index",
-        "footnote"
+        "footnote",
+        "table-cell",
+        "body-text"
       ],
       "evidence_hints": {
         "likely_locations": [
@@ -1485,22 +2742,74 @@
           "ESG data table",
           "performance metrics table",
           "appendix",
-          "footnotes"
+          "footnotes",
+          "SASB or reporting-framework index",
+          "data appendix",
+          "internal link source context",
+          "internally linked target page"
         ],
-        "preferred_evidence_style": "direct metric value, table row, or explicit disclosure sentence",
+        "preferred_evidence_style": "a labeled data cell, table row, chart value, or explicit sentence for 'Average age of fleet', preserving the reported unit, scale, and year",
         "requires_numeric_value": true,
-        "requires_unit": true
+        "requires_unit": true,
+        "requires_metric_identity": true,
+        "reject_navigation_only": true,
+        "valid_source_types": [
+          "table-cell",
+          "table-row",
+          "chart-value",
+          "explicit-sentence",
+          "linked-page"
+        ],
+        "linked_page_evidence": {
+          "include_source_context": true,
+          "include_target_page": true,
+          "external_links": "ignore"
+        },
+        "direct_disclosure_rules": {
+          "requires_exact_metric_code": true,
+          "requires_real_data_cell_or_explicit_value": true,
+          "requires_component_label_when_code_shared": false,
+          "code_or_index_reference_alone_is_insufficient": true,
+          "multiple_values_require_labeled_component_matching": true
+        },
+        "requires_dimension_labels": false
       },
       "extraction_hints": {
-        "value_type": "unknown",
+        "value_type": "duration",
         "expected_units": [
-          "Years"
+          "Years",
+          "days",
+          "hours",
+          "months"
         ],
         "year_sensitive": true,
         "allow_qualitative_disclosure": false,
-        "normalization_notes": ""
+        "normalization_notes": "Preserve every labeled reporting-year value, source scale, unit, and qualifier; convert only when the source explicitly supports an equivalent unit. Never use a metric-code suffix, reference-index number, page number, row or column number, or standalone year as the reported value.",
+        "output_shape": "time_series",
+        "variable_dimensions": [],
+        "reject_values_from": [
+          "metric_code",
+          "reference_index",
+          "page_number",
+          "row_or_column_number",
+          "standalone_year"
+        ],
+        "requires_value_label": false,
+        "year_rules": {
+          "extract_all_reported_years": true,
+          "preserve_source_year_labels": true,
+          "do_not_treat_standalone_year_as_value": true,
+          "select_requested_year_only_at_final_use": true
+        },
+        "value_selection_rules": {
+          "preserve_cell_and_row_labels": true,
+          "match_current_component_before_sibling_values": false,
+          "do_not_select_first_of_multiple_unlabeled_values": true,
+          "preserve_reported_unit_and_scale": true,
+          "preserve_variable_dimension_labels": false
+        }
       },
-      "rerank_instruction": "Judge whether the candidate evidence directly or indirectly discloses this exact canonical SASB metric, not merely a related ESG topic."
+      "rerank_instruction": "Rank evidence only for the exact SASB metric 'Average age of fleet' (TR-AL-000.F, expected unit: Years). Prefer a labeled data cell, row, chart value, or explicit sentence with its reporting year. Reject navigation-only rows, framework indexes without a data value, Code suffixes, page numbers, row or column numbers, and standalone years as metric values."
     }
   ]
 }

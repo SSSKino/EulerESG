@@ -18,6 +18,36 @@ _lock = threading.Lock()
 _cached_rerankers: Dict[tuple[str, str, bool, str, str], object] = {}
 
 
+def _positive_env_int(name: str, default: int, *, minimum: int = 1) -> int:
+    try:
+        return max(minimum, int(os.getenv(name, str(default)) or str(default)))
+    except (TypeError, ValueError):
+        return max(minimum, default)
+
+
+def _env_limit_or_model(
+    name: str,
+    default: int,
+    model_limit: int,
+    *,
+    minimum: int = 1,
+) -> int:
+    raw = str(os.getenv(name, str(default)) or str(default)).strip().lower()
+    if raw in {"auto", "model", "max"}:
+        return max(minimum, int(model_limit))
+    try:
+        return max(minimum, int(raw))
+    except (TypeError, ValueError):
+        return max(minimum, default)
+
+
+def _truncate_for_rerank(value: object, max_chars: int) -> str:
+    text = str(value or "").strip()
+    if len(text) <= max_chars:
+        return text
+    return text[:max_chars].rstrip()
+
+
 def _torch_dtype_from_reranker_precision(torch_module, *, device: str, use_fp16: bool):
     """Map Docker-configured reranker precision to a transformers dtype."""
     dtype = get_configured_rerank_model_dtype("float16" if use_fp16 else "float32")
@@ -78,12 +108,55 @@ class _QwenReranker:
             self.token_false_id = self.tokenizer("no", add_special_tokens=False).input_ids[0]
             self.token_true_id = self.tokenizer("yes", add_special_tokens=False).input_ids[0]
 
-        model_max_length = getattr(self.tokenizer, "model_max_length", 8192) or 8192
-        if model_max_length is None or model_max_length <= 0 or model_max_length > 32768:
-            model_max_length = 8192
-        self.max_length = int(min(8192, model_max_length))
+        model_context_limit = getattr(self.model.config, "max_position_embeddings", None)
+        try:
+            model_context_limit = int(model_context_limit)
+        except (TypeError, ValueError):
+            model_context_limit = 0
+        if model_context_limit < 512:
+            tokenizer_limit = getattr(self.tokenizer, "model_max_length", 8192) or 8192
+            try:
+                tokenizer_limit = int(tokenizer_limit)
+            except (TypeError, ValueError):
+                tokenizer_limit = 8192
+            model_context_limit = tokenizer_limit if 512 <= tokenizer_limit <= 1_000_000 else 8192
+
+        configured_max_length = _env_limit_or_model(
+            "LOCAL_RERANKER_MAX_LENGTH",
+            2048,
+            model_context_limit,
+            minimum=512,
+        )
+        self.model_context_limit = int(model_context_limit)
+        self.max_length = int(min(configured_max_length, self.model_context_limit))
+        self.batch_size = _positive_env_int("LOCAL_RERANKER_BATCH_SIZE", 4)
+        self.max_query_chars = _positive_env_int("LOCAL_RERANKER_MAX_QUERY_CHARS", 1600, minimum=256)
+        self.max_instruction_chars = _positive_env_int(
+            "LOCAL_RERANKER_MAX_INSTRUCTION_CHARS", 1200, minimum=256
+        )
+        self.max_passage_chars = _env_limit_or_model(
+            "LOCAL_RERANKER_MAX_CHARS_PER_PASSAGE",
+            1200,
+            self.model_context_limit,
+            minimum=256,
+        )
+        self.max_padded_chars_per_batch = _env_limit_or_model(
+            "LOCAL_RERANKER_MAX_PADDED_CHARS_PER_BATCH",
+            self.model_context_limit,
+            self.model_context_limit,
+            minimum=1024,
+        )
         self.prefix_tokens = self.tokenizer.encode(self._SYSTEM_PREFIX, add_special_tokens=False)
         self.suffix_tokens = self.tokenizer.encode(self._ASSISTANT_SUFFIX, add_special_tokens=False)
+        logger.info(
+            "[Rerank] Qwen runtime batch=%s max_length=%s model_limit=%s "
+            "passage_chars=%s padded_chars_per_batch=%s",
+            self.batch_size,
+            self.max_length,
+            self.model_context_limit,
+            self.max_passage_chars,
+            self.max_padded_chars_per_batch,
+        )
 
     @classmethod
     def _format_instruction(cls, instruction: str | None, query: str, doc: str) -> str:
@@ -110,18 +183,7 @@ class _QwenReranker:
             inputs[key] = inputs[key].to(self.model.device)
         return inputs
 
-    def compute_score(self, sentence_pairs: Sequence[Sequence[str]], normalize: bool = False, instruction: str | None = None):
-        if not sentence_pairs:
-            return []
-
-        formatted: List[str] = []
-        for pair in sentence_pairs:
-            if len(pair) < 2:
-                raise ValueError("Each rerank pair must contain [query, document]")
-            query = str(pair[0] or "")
-            doc = str(pair[1] or "")
-            formatted.append(self._format_instruction(instruction, query, doc))
-
+    def _score_formatted_batch(self, formatted: Sequence[str]) -> List[float]:
         inputs = self._process_inputs(formatted)
         with self._torch.no_grad():
             batch_scores = self.model(**inputs).logits[:, -1, :]
@@ -130,6 +192,51 @@ class _QwenReranker:
             pair_scores = self._torch.stack([false_vector, true_vector], dim=1)
             pair_scores = self._torch.nn.functional.log_softmax(pair_scores, dim=1)
             probs = pair_scores[:, 1].exp().detach().float().cpu().tolist()
+        return [float(value) for value in probs]
+
+    def _formatted_batches(self, formatted: Sequence[str]):
+        batch_size = max(1, int(getattr(self, "batch_size", 4) or 4))
+        padded_char_budget = max(
+            1,
+            int(getattr(self, "max_padded_chars_per_batch", 2**31 - 1) or 2**31 - 1),
+        )
+        current: List[str] = []
+        padded_width = 0
+        for item in formatted:
+            item_width = max(1, len(item))
+            projected_width = max(padded_width, item_width)
+            projected_cost = projected_width * (len(current) + 1)
+            if current and (
+                len(current) >= batch_size
+                or projected_cost > padded_char_budget
+            ):
+                yield current
+                current = []
+                padded_width = 0
+            current.append(item)
+            padded_width = max(padded_width, item_width)
+        if current:
+            yield current
+
+    def compute_score(self, sentence_pairs: Sequence[Sequence[str]], normalize: bool = False, instruction: str | None = None):
+        if not sentence_pairs:
+            return []
+
+        safe_instruction = _truncate_for_rerank(
+            instruction or self._DEFAULT_INSTRUCTION,
+            getattr(self, "max_instruction_chars", 1200),
+        )
+        formatted: List[str] = []
+        for pair in sentence_pairs:
+            if len(pair) < 2:
+                raise ValueError("Each rerank pair must contain [query, document]")
+            query = _truncate_for_rerank(pair[0], getattr(self, "max_query_chars", 1600))
+            doc = _truncate_for_rerank(pair[1], getattr(self, "max_passage_chars", 1200))
+            formatted.append(self._format_instruction(safe_instruction, query, doc))
+
+        probs: List[float] = []
+        for batch in self._formatted_batches(formatted):
+            probs.extend(self._score_formatted_batch(batch))
 
         if normalize:
             return probs
