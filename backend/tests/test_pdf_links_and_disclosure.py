@@ -866,6 +866,92 @@ class RetrievalNoiseControlTests(unittest.TestCase):
             all("linked_page" in item.retrieval_type for item in result.combined_results)
         )
 
+    def test_unavailable_links_use_whole_report_and_retain_code_row(self):
+        metric = self._metric_with_topic()
+        link_cases = {
+            "external": {
+                "link_type": "external_ignored",
+                "anchor_text": "Employee engagement details",
+                "source_page": 1,
+                "uri": "https://example.com/report-data",
+            },
+            "outside_report": {
+                "link_type": "internal",
+                "anchor_text": "Employee engagement details",
+                "source_page": 1,
+                "target_page": 999,
+            },
+        }
+
+        for case_name, link in link_cases.items():
+            with self.subTest(case=case_name):
+                source = _table_segment(
+                    f"source-index-{case_name}",
+                    "table_row",
+                    f"Reporting frameworks index | SASB {metric.metric_code}",
+                    page=1,
+                    links=[link],
+                )
+                global_data = TextSegment(
+                    segment_id=f"global-data-{case_name}",
+                    content="Employee engagement as a percentage: 87%",
+                    page_number=50,
+                    position_y=1,
+                )
+                report = _report([source, global_data])
+                report.embeddings = [
+                    SegmentEmbedding(
+                        segment_id=global_data.segment_id,
+                        embedding=[0.1, 0.2],
+                    )
+                ]
+                config = ProcessingConfig(top_k=46)
+                object.__setattr__(config, "use_keyword_retrieval", True)
+                object.__setattr__(config, "use_semantic_retrieval", True)
+                object.__setattr__(config, "use_reranker", True)
+                retriever = DualChannelRetriever(config)
+                semantic_scopes = []
+
+                def fake_semantic(target_report, target_metric, semantic_expansion=None, apply_reranker=True):
+                    semantic_scopes.append(
+                        [segment.segment_id for segment in target_report.document_content.segments]
+                    )
+                    return [
+                        RetrievalResult(
+                            segment_id=global_data.segment_id,
+                            content=global_data.content,
+                            page_number=global_data.page_number,
+                            score=0.80,
+                            retrieval_type="semantic",
+                            metric_id=metric.metric_id,
+                        )
+                    ]
+
+                def fake_rerank(candidates, target_metric, semantic_expansion=None):
+                    # Simulate Qwen dropping the navigation row. The fallback
+                    # retention step must restore it after whole-report ranking.
+                    return [
+                        item for item in candidates
+                        if item.segment_id != source.segment_id
+                    ]
+
+                retriever.semantic_retriever.search_by_semantic = fake_semantic
+                retriever.semantic_retriever.rerank_candidates = fake_rerank
+                result = retriever.retrieve_for_metric(report, metric)
+
+                self.assertEqual(
+                    semantic_scopes,
+                    [[source.segment_id, global_data.segment_id]],
+                )
+                by_id = {item.segment_id: item for item in result.combined_results}
+                self.assertIn(global_data.segment_id, by_id)
+                self.assertIn(source.segment_id, by_id)
+                self.assertIn(
+                    "link_fallback_code_context",
+                    by_id[source.segment_id].retrieval_type,
+                )
+                self.assertNotIn("linked_page", by_id[source.segment_id].retrieval_type)
+
 
 class DirectDisclosureTests(unittest.TestCase):
     def setUp(self):

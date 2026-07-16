@@ -58,6 +58,10 @@ class DualChannelRetriever:
                 exact_alias_results = self.keyword_retriever.search_exact_alias(report_content, metric, profile)
                 bm25_results = self.keyword_retriever.search_bm25(report_content, metric, profile)
             keyword_elapsed = time.perf_counter() - keyword_started
+            link_code_context_results = self._linked_code_context_results(
+                report_content,
+                exact_code_results,
+            )
 
             linked_started = time.perf_counter()
             linked_page_results = self._search_linked_pages(
@@ -121,6 +125,12 @@ class DualChannelRetriever:
                 channel_results=channel_results,
                 profile=profile,
             )
+            if not linked_second_pass and link_code_context_results:
+                combined_results = self._retain_link_fallback_code_context(
+                    combined_results,
+                    link_code_context_results,
+                    capacity=max(11, len(combined_results)),
+                )
 
             result = MetricRetrievalResult(
                 metric_id=getattr(metric, "metric_id", profile.metric_id),
@@ -137,6 +147,7 @@ class DualChannelRetriever:
                 f"keyword={keyword_elapsed:.2f}s, semantic={semantic_elapsed:.2f}s, "
                 f"linked={linked_elapsed:.2f}s, "
                 f"mode={'linked_second_pass' if linked_second_pass else 'whole_report'}, "
+                f"link_fallback_code_rows={len(link_code_context_results) if not linked_second_pass else 0}, "
                 f"discovery_candidates={len(exact_code_results) + len(exact_alias_results) + len(bm25_results)}"
             )
             return result
@@ -163,6 +174,79 @@ class DualChannelRetriever:
             return str(table_id), int(row_index)
         except Exception:
             return None
+
+    @classmethod
+    def _linked_code_context_results(
+        cls,
+        report_content: ReportContent,
+        exact_code_results: Sequence[RetrievalResult],
+    ) -> List[RetrievalResult]:
+        """Return exact-Code rows that contain link metadata in the same row."""
+        segments = list(report_content.document_content.segments or [])
+        by_id = {
+            str(getattr(segment, "segment_id", "") or ""): segment
+            for segment in segments
+        }
+        by_row: Dict[tuple[str, int], List[object]] = {}
+        for segment in segments:
+            row_key = cls._row_key(segment)
+            if row_key is not None:
+                by_row.setdefault(row_key, []).append(segment)
+
+        contexts: List[RetrievalResult] = []
+        seen = set()
+        for result in exact_code_results:
+            segment = by_id.get(str(getattr(result, "segment_id", "") or ""))
+            if segment is None:
+                continue
+            related = [segment]
+            row_key = cls._row_key(segment)
+            if row_key is not None:
+                related.extend(by_row.get(row_key, []))
+            has_link = any(
+                isinstance(getattr(item, "structured_data", None), dict)
+                and any(
+                    isinstance(link, dict)
+                    for link in ((getattr(item, "structured_data", None) or {}).get("pdf_links") or [])
+                )
+                for item in related
+            )
+            if not has_link or result.segment_id in seen:
+                continue
+            seen.add(result.segment_id)
+            contexts.append(result)
+        return contexts
+
+    @staticmethod
+    def _retain_link_fallback_code_context(
+        results: Sequence[RetrievalResult],
+        required_contexts: Sequence[RetrievalResult],
+        capacity: int,
+    ) -> List[RetrievalResult]:
+        """Keep unresolved-link Code rows without promoting them as data."""
+        values = list(results)
+        by_id = {item.segment_id: index for index, item in enumerate(values)}
+        missing: List[RetrievalResult] = []
+        seen = set()
+        for context in required_contexts:
+            if context.segment_id in seen:
+                continue
+            seen.add(context.segment_id)
+            existing_index = by_id.get(context.segment_id)
+            selected = values[existing_index] if existing_index is not None else context
+            retrieval_type = str(selected.retrieval_type or "")
+            if "link_fallback_code_context" not in retrieval_type:
+                retrieval_type += "+link_fallback_code_context"
+            marked = selected.model_copy(update={"retrieval_type": retrieval_type})
+            if existing_index is None:
+                missing.append(marked)
+            else:
+                values[existing_index] = marked
+
+        limit = max(1, int(capacity or 1))
+        if missing:
+            values = values[:max(0, limit - len(missing))] + missing[:limit]
+        return values[:limit]
 
     @classmethod
     def _link_source_rank(cls, segment, anchor_text: str) -> int:

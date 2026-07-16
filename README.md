@@ -4,12 +4,13 @@
 
 - PaddleOCR-VL v1.6，本地版面检测 + 独立 vLLM 识别服务
 - compose 自动模型预检
-- 默认两个 PaddleOCR worker，每个 worker 同时处理一个 2 页任务
+- 默认两个 PaddleOCR worker，每个 worker 同时处理一个 7 页任务
 - SSE 前端进度
 - 前端不显示后端日志/PaddleOCR 内部细节
-- `PADDLEOCR_PAGE_BATCH_SIZE: '2'`
+- `PADDLEOCR_PAGE_BATCH_SIZE: '7'`
 - `PADDLEOCR_BATCH_TIMEOUT_SECONDS: '1200'`
 - `PADDLEOCR_VL_REC_MAX_CONCURRENCY: '16'`
+- `PADDLEOCR_PREFLIGHT_ON_START: 'true'`
 - vLLM `gpu-memory-utilization: 0.40`
 - Paddle 空闲 30 分钟后释放，最多处理 500 个任务后才重启
 
@@ -21,9 +22,9 @@
 
 - 客户端并发：`PADDLEOCR_VL_REC_MAX_CONCURRENCY`，RTX 3090 初始值 16。
 - 服务端序列上限：`max-num-seqs: 32`。
-- 单次调度 token 上限：`max-num-batched-tokens: 16384`。
+- 单次调度 token 上限：`max-num-batched-tokens: 32768`。
 - 显存目标：`gpu-memory-utilization: 0.40`，为同卡版面模型和 4B reranker 留空间。
-- 页级并发：两个 worker 各处理一个 2 页任务，因此最多 4 页同时处于解析流程。
+- 页级并发：两个 worker 各处理一个 7 页任务，因此最多 14 页同时处于解析流程。
 
 backend 启动前由 `backend-model-init` 检查 embedding 与 reranker 缓存。模型保存在
 `hf_cache` volume，报告运行期间只使用本地缓存，不会在 OCR 完成后临时联网下载。
@@ -65,9 +66,9 @@ docker compose up --build
 对于 116 页 PDF，应该看到：
 
 ```text
-PADDLEOCR_PAGE_BATCH_SIZE='2', effective=2
-pages=116, units=58, batch_size=2
-开始 page-batch ... pages=1-8
+PADDLEOCR_PAGE_BATCH_SIZE='7', effective=7
+pages=116, units=17, batch_size=7
+开始 page-batch ... pages=1-7
 ```
 
 前端页面只显示用户友好的进度，不显示后端日志、worker id、文件系统路径或 PaddleOCR batch 明细。

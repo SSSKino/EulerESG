@@ -46,7 +46,9 @@ x-paddleocr-worker-env: &paddleocr-worker-env
   PADDLEOCR_REQUEUE_ON_MODEL_ERROR: 'true'
   PADDLEOCR_ALLOW_MODEL_DOWNLOAD: 'false'
   PADDLEOCR_REQUIRE_PREFLIGHT_MARKER: 'true'
-  PADDLEOCR_PREFLIGHT_ON_START: 'false'
+  # Warm each queue worker before it starts consuming Redis tasks. Model loads
+  # remain serialized by PADDLEOCR_SERIALIZE_MODEL_LOAD.
+  PADDLEOCR_PREFLIGHT_ON_START: 'true'
 
   # 模型生命周期。
   PADDLEOCR_UNLOAD_AFTER_TASK: 'false'
