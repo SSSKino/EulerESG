@@ -1,0 +1,16 @@
+{
+  "file_id": "4f02de54-0703-4574-99fb-83feae035f38",
+  "framework": "SASB",
+  "default_scope_key": "Hardware",
+  "outputs": [
+    {
+      "scope_key": "Hardware",
+      "json_filename": "Hardware_4f02de54-0703-4574-99fb-83feae035f38_compliance.json",
+      "sasb_metrics_filename": "Hardware_4f02de54-0703-4574-99fb-83feae035f38_sasb_metrics.json",
+      "overall_score": 0.22916666666666666
+    }
+  ],
+  "expected_scope_keys": [
+    "Hardware"
+  ]
+}

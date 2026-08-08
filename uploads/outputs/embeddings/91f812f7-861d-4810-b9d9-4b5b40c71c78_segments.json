@@ -1,0 +1,896 @@
+[
+  {
+    "segment_id": "P001_S000",
+    "content": "Statement of Direction",
+    "page_number": 1,
+    "position_y": 81.8955307006836
+  },
+  {
+    "segment_id": "P001_S001",
+    "content": "Oracle Environmental and Social Impact Datasheet",
+    "page_number": 1,
+    "position_y": 335.8602294921875
+  },
+  {
+    "segment_id": "P001_S002",
+    "content": "To view the full report, visit oracle.com/social-impact",
+    "page_number": 1,
+    "position_y": 462.7655029296875
+  },
+  {
+    "segment_id": "P001_S003",
+    "content": "January 2026, Version 5 Copyright © 2026, Oracle and/or its affiliates Public",
+    "page_number": 1,
+    "position_y": 528.4110717773438
+  },
+  {
+    "segment_id": "P001_S004",
+    "content": "1 Datasheet / Oracle Social Impact / Version 5",
+    "page_number": 1,
+    "position_y": 744.4929809570312
+  },
+  {
+    "segment_id": "P001_S005",
+    "content": "Copyright © 2026, Oracle and/or its affiliates / Public",
+    "page_number": 1,
+    "position_y": 757.4940185546875
+  },
+  {
+    "segment_id": "P002_T000",
+    "content": "**[表格]**\n\n| 2025 GOALS | FY25 PROGRESS |  |  |\n| ---------- | ------------- | --- | --- |\n|  |  |  |  |\n| 100% electricity usage from renewable sources across all operationsi | 91% renewable electricity coverage. |  |  |\n|  |  |  |  |\n| 100% of key suppliers have an environmental program in place |  | 100% of key high spend tier 1 and strategic tier 2 suppliers have an |  |\n|  |  | environmental program in place.ii |  |\n|  |  |  |  |\n|  | 100% of key indirect suppliers have an environmental program in place.iii |  |  |\n|  |  |  |  |\n| 80% of key suppliers have emissions reductions targets in place |  | 100% of key high spend tier 1 and strategic tier 2 suppliers have emission |  |\n|  |  | reduction targets in place. |  |\n|  |  |  |  |\n|  | 81% of key indirect suppliers have emission reduction targets in place. |  |  |\n|  |  |  |  |\n| 33% reduction in potable water per square footiv | 53% reduction in use of RE&F potable water. |  |  |\n|  |  |  |  |\n| 33% reduction in waste to landfill per square footiv | 63% reduction RE&F waste to landfill. |  |  |\n|  |  |  |  |\n| 25% reduction in employee air travel emissionsv | 68% reduction in employee air travel emissions.vi |  |  |",
+    "page_number": 2,
+    "position_y": 310.55833943684894
+  },
+  {
+    "segment_id": "P002_S000",
+    "content": "Net Zero Targets",
+    "page_number": 2,
+    "position_y": 149.5389862060547
+  },
+  {
+    "segment_id": "P002_S001",
+    "content": "Oracle has set targets to achieve net-zero emissions by 2050 and to halve our Scope 1, Scope 2, and Scope 3 greenhouse gas emissions by 2030, relative to a 2020 baseline. To achieve and maintain net zero, Oracle plans to use high-quality carbon offsets for no more than 10% of total base year emissions that cannot be eliminated directly.",
+    "page_number": 2,
+    "position_y": 170.9154815673828
+  },
+  {
+    "segment_id": "P002_S002",
+    "content": "These targets have been approved by the Exponential Roadmap Initiative, partner of the UN Climate Change High-level Champions Race to Zero campaign.",
+    "page_number": 2,
+    "position_y": 218.9455108642578
+  },
+  {
+    "segment_id": "P002_S003",
+    "content": "2025 Goals and Progress",
+    "page_number": 2,
+    "position_y": 292.5890197753906
+  },
+  {
+    "segment_id": "P002_S004",
+    "content": "2025 GOALS FY25 PROGRESS",
+    "page_number": 2,
+    "position_y": 319.46649169921875
+  },
+  {
+    "segment_id": "P002_S005",
+    "content": "100% electricity usage from renewable sources across all operationsi 91% renewable electricity coverage.",
+    "page_number": 2,
+    "position_y": 337.5950012207031
+  },
+  {
+    "segment_id": "P002_S006",
+    "content": "100% of key suppliers have an environmental program in place 100% of key high spend tier 1 and strategic tier 2 suppliers have an environmental program in place.ii",
+    "page_number": 2,
+    "position_y": 357.98748779296875
+  },
+  {
+    "segment_id": "P002_S007",
+    "content": "100% of key indirect suppliers have an environmental program in place.iii",
+    "page_number": 2,
+    "position_y": 383.614990234375
+  },
+  {
+    "segment_id": "P002_S008",
+    "content": "80% of key suppliers have emissions reductions targets in place 100% of key high spend tier 1 and strategic tier 2 suppliers have emission reduction targets in place.",
+    "page_number": 2,
+    "position_y": 403.98748779296875
+  },
+  {
+    "segment_id": "P002_S009",
+    "content": "81% of key indirect suppliers have emission reduction targets in place.",
+    "page_number": 2,
+    "position_y": 430.2674865722656
+  },
+  {
+    "segment_id": "P002_S010",
+    "content": "33% reduction in potable water per square footiv 53% reduction in use of RE&F potable water.",
+    "page_number": 2,
+    "position_y": 447.3949890136719
+  },
+  {
+    "segment_id": "P002_S011",
+    "content": "33% reduction in waste to landfill per square footiv 63% reduction RE&F waste to landfill.",
+    "page_number": 2,
+    "position_y": 467.1449890136719
+  },
+  {
+    "segment_id": "P002_S012",
+    "content": "25% reduction in employee air travel emissionsv 68% reduction in employee air travel emissions.vi",
+    "page_number": 2,
+    "position_y": 486.8949890136719
+  },
+  {
+    "segment_id": "P002_S013",
+    "content": "2 Datasheet / Oracle Social Impact / Version 5",
+    "page_number": 2,
+    "position_y": 744.4929809570312
+  },
+  {
+    "segment_id": "P002_S014",
+    "content": "Copyright © 2026, Oracle and/or its affiliates / Public",
+    "page_number": 2,
+    "position_y": 757.4940185546875
+  },
+  {
+    "segment_id": "P003_T000",
+    "content": "**[表格]**\n\n|  | ENERGY AND RENEWABLES |  | FY2024 |  |  | FY2025 |  |\n| --- | --------------------- | --- | ------ | --- | --- | ------ | --- |\n|  |  |  |  |  |  |  |  |\n|  | Total Energy use [MWh]vii |  | 3,899,503 |  |  | 5,155,385 |  |\n|  |  |  |  |  |  |  |  |\n|  | Renewable Electricity use [MWh]viii |  | 3,162,353 |  |  | 4,645,576 |  |\n|  |  |  |  |  |  |  |  |\n|  | Renewable electricity use in real estate & facilities [%] |  | 59% |  |  | 85% |  |\n|  |  |  |  |  |  |  |  |\n| Renewable electricity use in the cloud [%] |  |  | 88% |  | 92% |  |  |",
+    "page_number": 3,
+    "position_y": 58.436279296875
+  },
+  {
+    "segment_id": "P003_T001",
+    "content": "**[表格]**\n\n|  | GHG EMISSIONS INVENTORYix |  | FY2024 |  |  | FY2025 |  |\n| --- | ------------------------- | --- | ------ | --- | --- | ------ | --- |\n|  |  |  |  |  |  |  |  |\n|  | Scope 1 greenhouse gas emissions [metric tons CO2e] |  | 29,930 |  |  | 27,532 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 2 greenhouse gas emissions | location-based method [metric tons CO2e] |  | 1,234,873 |  |  | 1,600,371 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 2 greenhouse gas emissions | market-based method [metric tons CO2e] |  | 271,188 |  |  | 237,251 |  |\n|  |  |  |  |  |  |  |  |\n|  | Total Scope 1 and 2 emissions | location-based method [metric tons CO2e] |  | 1,264,803 |  |  | 1,627,902 |  |\n|  |  |  |  |  |  |  |  |\n|  | Total Scope 1 and 2 emissions | market-based method [metric tons CO2e] |  | 301,118 |  |  | 264,782 |  |\n|  |  |  |  |  |  |  |  |\n|  | Total Scope 3 greenhouse gas emissions [metric tons CO2e]x |  | 2,687,388 |  |  | 8,526,170 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.1 Purchased Goods & Services |  | 575,348 |  |  | 585,673 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.2 Capital Goods |  | 1,292,716 |  |  | 6,961,412 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.3 FERA |  | 150,380 |  |  | 164,318 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.4 Upstream Transportation and Distribution |  | 43,076 |  |  | 83,818 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.5 Waste |  | 1,733 |  |  | 1,490 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.6 Business Travel |  | 82,056 |  |  | 58,338 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.7 Employee Commute |  | 60,827 |  |  | 62,069 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.8 Upstream Leased Assets |  | 387,910 |  |  | 512,280 |  |\n|  |  |  |  |  |  |  |  |\n|  | Scope 3.11 Use of Sold Products |  | 93,340 |  |  | 96,771 |  |\n|  |  |  |  |  |  |  |  |\n|  | Total Scope 1, 2 and 3 emissions | market-based method [metric tons CO2e] |  | 2,988,506 |  |  | 8,790,952 |  |",
+    "page_number": 3,
+    "position_y": 177.3287353515625
+  },
+  {
+    "segment_id": "P003_T002",
+    "content": "**[表格]**\n\n|  | INTENSITY METRICS |  | FY2024 |  |  | FY2025 |  |\n| --- | ----------------- | --- | ------ | --- | --- | ------ | --- |\n|  |  |  |  |  |  |  |  |\n| Scope 1 and 2 emissions per energy used | market-based method [kg CO2e/kWh] |  | 0.08 |  |  | 0.05 |  |  |\n|  |  |  |  |  |  |  |  |\n| Scope 1 and 2 emissions intensity per revenue | market-based method [metric tons CO2e per USD] |  | 0.00000568 |  |  | 0.00000464 |  |  |",
+    "page_number": 3,
+    "position_y": 521.2012634277344
+  },
+  {
+    "segment_id": "P003_T003",
+    "content": "**[表格]**\n\n| WATER AND WASTExi | FY2024 | FY2025 |\n| ----------------- | ------ | ------ |\n|  |  |  |\n| Potable water use [liters] | 823,812,530 | 801,872,356 |\n|  |  |  |\n| Water recycled [liters] | 378,290,464 | 377,785,548 |\n|  |  |  |\n| Waste to landfill [liters] | 8,430,157 | 7,305,771 |\n|  |  |  |\n| Potable water use per square foot [liters per square foot] | 43 | 42 |\n|  |  |  |\n| Waste to landfill per square foot [liters per square foot] | 0.54 | 0.47 |",
+    "page_number": 3,
+    "position_y": 599.1583455403646
+  },
+  {
+    "segment_id": "P003_S000",
+    "content": "ENERGY AND RENEWABLES FY2024 FY2025",
+    "page_number": 3,
+    "position_y": 64.14952850341797
+  },
+  {
+    "segment_id": "P003_S001",
+    "content": "Total Energy use [MWh]vii 3,899,503 5,155,385",
+    "page_number": 3,
+    "position_y": 84.52503204345703
+  },
+  {
+    "segment_id": "P003_S002",
+    "content": "Renewable Electricity use [MWh]viii 3,162,353 4,645,576",
+    "page_number": 3,
+    "position_y": 103.77503204345703
+  },
+  {
+    "segment_id": "P003_S003",
+    "content": "Renewable electricity use in real estate & facilities [%] 59% 85%",
+    "page_number": 3,
+    "position_y": 123.41748809814453
+  },
+  {
+    "segment_id": "P003_S004",
+    "content": "Renewable electricity use in the cloud [%] 88% 92%",
+    "page_number": 3,
+    "position_y": 142.66748046875
+  },
+  {
+    "segment_id": "P003_S005",
+    "content": "GHG EMISSIONS INVENTORYix FY2024 FY2025",
+    "page_number": 3,
+    "position_y": 183.16949462890625
+  },
+  {
+    "segment_id": "P003_S006",
+    "content": "Scope 1 greenhouse gas emissions [metric tons CO2e] 29,930 27,532",
+    "page_number": 3,
+    "position_y": 204.197509765625
+  },
+  {
+    "segment_id": "P003_S007",
+    "content": "Scope 2 greenhouse gas emissions | location-based method [metric tons CO2e] 1,234,873 1,600,371",
+    "page_number": 3,
+    "position_y": 223.197509765625
+  },
+  {
+    "segment_id": "P003_S008",
+    "content": "Scope 2 greenhouse gas emissions | market-based method [metric tons CO2e] 271,188 237,251",
+    "page_number": 3,
+    "position_y": 242.447509765625
+  },
+  {
+    "segment_id": "P003_S009",
+    "content": "Total Scope 1 and 2 emissions | location-based method [metric tons CO2e] 1,264,803 1,627,902",
+    "page_number": 3,
+    "position_y": 261.697509765625
+  },
+  {
+    "segment_id": "P003_S010",
+    "content": "Total Scope 1 and 2 emissions | market-based method [metric tons CO2e] 301,118 264,782",
+    "page_number": 3,
+    "position_y": 280.7174987792969
+  },
+  {
+    "segment_id": "P003_S011",
+    "content": "Total Scope 3 greenhouse gas emissions [metric tons CO2e]x 2,687,388 8,526,170",
+    "page_number": 3,
+    "position_y": 299.3450012207031
+  },
+  {
+    "segment_id": "P003_S012",
+    "content": "Scope 3.1 Purchased Goods & Services 575,348 585,673",
+    "page_number": 3,
+    "position_y": 318.9674987792969
+  },
+  {
+    "segment_id": "P003_S013",
+    "content": "Scope 3.2 Capital Goods 1,292,716 6,961,412",
+    "page_number": 3,
+    "position_y": 338.2174987792969
+  },
+  {
+    "segment_id": "P003_S014",
+    "content": "Scope 3.3 FERA 150,380 164,318",
+    "page_number": 3,
+    "position_y": 357.48748779296875
+  },
+  {
+    "segment_id": "P003_S015",
+    "content": "Scope 3.4 Upstream Transportation and Distribution 43,076 83,818",
+    "page_number": 3,
+    "position_y": 376.48748779296875
+  },
+  {
+    "segment_id": "P003_S016",
+    "content": "Scope 3.5 Waste 1,733 1,490",
+    "page_number": 3,
+    "position_y": 395.73748779296875
+  },
+  {
+    "segment_id": "P003_S017",
+    "content": "Scope 3.6 Business Travel 82,056 58,338",
+    "page_number": 3,
+    "position_y": 414.73748779296875
+  },
+  {
+    "segment_id": "P003_S018",
+    "content": "Scope 3.7 Employee Commute 60,827 62,069",
+    "page_number": 3,
+    "position_y": 434.0174865722656
+  },
+  {
+    "segment_id": "P003_S019",
+    "content": "Scope 3.8 Upstream Leased Assets 387,910 512,280",
+    "page_number": 3,
+    "position_y": 453.2674865722656
+  },
+  {
+    "segment_id": "P003_S020",
+    "content": "Scope 3.11 Use of Sold Products 93,340 96,771",
+    "page_number": 3,
+    "position_y": 472.7674865722656
+  },
+  {
+    "segment_id": "P003_S021",
+    "content": "Total Scope 1, 2 and 3 emissions | market-based method [metric tons CO2e] 2,988,506 8,790,952",
+    "page_number": 3,
+    "position_y": 492.0174865722656
+  },
+  {
+    "segment_id": "P003_S022",
+    "content": "INTENSITY METRICS FY2024 FY2025",
+    "page_number": 3,
+    "position_y": 527.7865600585938
+  },
+  {
+    "segment_id": "P003_S023",
+    "content": "Scope 1 and 2 emissions per energy used | market-based method [kg CO2e/kWh] 0.08 0.05",
+    "page_number": 3,
+    "position_y": 548.0374755859375
+  },
+  {
+    "segment_id": "P003_S024",
+    "content": "Scope 1 and 2 emissions intensity per revenue | market-based method [metric tons CO2e per USD] 0.00000568 0.00000464",
+    "page_number": 3,
+    "position_y": 568.5374755859375
+  },
+  {
+    "segment_id": "P003_S025",
+    "content": "WATER AND WASTExi FY2024 FY2025",
+    "page_number": 3,
+    "position_y": 606.0695190429688
+  },
+  {
+    "segment_id": "P003_S026",
+    "content": "Potable water use [liters] 823,812,530 801,872,356",
+    "page_number": 3,
+    "position_y": 626.3175048828125
+  },
+  {
+    "segment_id": "P003_S027",
+    "content": "Water recycled [liters] 378,290,464 377,785,548",
+    "page_number": 3,
+    "position_y": 647.0675048828125
+  },
+  {
+    "segment_id": "P003_S028",
+    "content": "Waste to landfill [liters] 8,430,157 7,305,771",
+    "page_number": 3,
+    "position_y": 667.8474731445312
+  },
+  {
+    "segment_id": "P003_S029",
+    "content": "Potable water use per square foot [liters per square foot] 43 42",
+    "page_number": 3,
+    "position_y": 688.3424682617188
+  },
+  {
+    "segment_id": "P003_S030",
+    "content": "Waste to landfill per square foot [liters per square foot] 0.54 0.47",
+    "page_number": 3,
+    "position_y": 709.0924682617188
+  },
+  {
+    "segment_id": "P003_S031",
+    "content": "3 Datasheet / Oracle Social Impact / Version 5",
+    "page_number": 3,
+    "position_y": 744.4929809570312
+  },
+  {
+    "segment_id": "P003_S032",
+    "content": "Copyright © 2026, Oracle and/or its affiliates / Public",
+    "page_number": 3,
+    "position_y": 757.4940185546875
+  },
+  {
+    "segment_id": "P004_T000",
+    "content": "**[表格]**\n\n| ELECTRONIC WASTE xii | FY2023 | FY2024 | FY2025 |\n| -------------------- | ------ | ------ | ------ |\n|  |  |  |  |\n| Electronic waste collected [pounds] | 4,044,734 | 10,853,361 | 7,517,639 |\n|  |  |  |  |\n| Electronic waste reused [pounds] | 512,870 | 546,298 | 382,535 |\n|  |  |  |  |\n| Electronic waste recycled [pounds] | 3,174,004 | 7,820,940 | 8,566,426 |\n|  |  |  |  |\n| Electronic waste landfilled [pounds] | 11,769 | 20,664 | 54,475 |\n|  |  |  |  |\n| Electronic waste reused or recycled [percentage] | 99.7 | 99.8 | 99.4 |\n|  |  |  |  |\n| Electronic waste landfilled [percentage] | 0.3 | 0.2 | 0.6 |",
+    "page_number": 4,
+    "position_y": 45.988362630208336
+  },
+  {
+    "segment_id": "P004_T001",
+    "content": "**[表格]**\n\n| SUPPLY CHAIN AND PROCUREMENT |  |  | FY2023 |  |  | FY2024 |  |  | FY2025 |  |  |\n| ---------------------------- | --- | --- | ------ | --- | --- | ------ | --- | --- | ------ | --- | --- |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n| ISO 14001 certifications [number of owned manufacturing facilities] |  |  | 1 |  |  | 1 |  |  | 1 |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n| ISO 14001 certifications [% of owned manufacturing facilities] |  |  | 100 |  |  | 100 |  |  | 100 |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n| Responsible Business Alliance (RBA) audits [number of audits] |  |  | 62 |  |  | 74 |  |  | 81 |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n| Key indirect suppliers with an environmental program in place [percentage] |  |  | 88 |  |  | 93 |  |  | 100 |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n| Key indirect suppliers with an emission reduction target in place [percentage] |  |  | 79 |  |  | 82 |  |  | 81 |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n|  |  |  |  | CY2022 |  |  | CY2023 |  |  | CY2024 |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n| Key high spend tier 1 and strategic tier 2 suppliers with an environmental program in place [%] |  |  | 88 |  |  | 88 |  |  | 100 |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n| Key high spend tier 1 and strategic tier 2 suppliers with an emission reduction target in place [%] |  |  | 82 |  |  | 82 |  |  | 100 |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |\n|  | Responses from first-tier suppliers on conflict minerals [%] |  |  | 86 |  |  | 93 |  |  | 81 |  |",
+    "page_number": 4,
+    "position_y": 207.0383504231771
+  },
+  {
+    "segment_id": "P004_T002",
+    "content": "**[表格]**\n\n| HEALTH AND SAFETYxiii | CY2022 | CY2023 | CY2024 |\n| --------------------- | ------ | ------ | ------ |\n|  |  |  |  |\n| Total Case Incident Rate [Total Recordable Cases x 200,000 hours worked/total hours worked by all employees] |  |  |  |\n|  |  |  |  |\n| United States | 0.077 | 0.055 | 0.050 |\n|  |  |  |  |\n| Canada | 0 | 0 | 0 |",
+    "page_number": 4,
+    "position_y": 425.413330078125
+  },
+  {
+    "segment_id": "P004_T003",
+    "content": "**[表格]**\n\n| WORKFORCE | FY2023 | FY2024 | FY2025 |\n| --------- | ------ | ------ | ------ |\n|  |  |  |  |\n| Employees | 158,400 | 160,053 | 163,321 |\n|  |  |  |  |\n| Americas | 73,758 | 70,129 | 70,948 |\n|  |  |  |  |\n| Asia Pacific | 57,822 | 63,240 | 64,765 |\n|  |  |  |  |\n| Europe, Middle East, and Africa | 26,820 | 26,684 | 27,152 |\n|  |  |  |  |\n| Training delivered to employees [hours in millions] | 3.6 | 5.7 | 4.7 |\n|  |  |  |  |\n| Employees who completed global compliance training [percentage]xiv | 99.9 | 99.9 | 99.9 |",
+    "page_number": 4,
+    "position_y": 527.4616902669271
+  },
+  {
+    "segment_id": "P004_S000",
+    "content": "ELECTRONIC WASTE xii FY2023 FY2024 FY2025",
+    "page_number": 4,
+    "position_y": 52.89952850341797
+  },
+  {
+    "segment_id": "P004_S001",
+    "content": "Electronic waste collected [pounds] 4,044,734 10,853,361 7,517,639",
+    "page_number": 4,
+    "position_y": 73.14752960205078
+  },
+  {
+    "segment_id": "P004_S002",
+    "content": "Electronic waste reused [pounds] 512,870 546,298 382,535",
+    "page_number": 4,
+    "position_y": 93.89752960205078
+  },
+  {
+    "segment_id": "P004_S003",
+    "content": "Electronic waste recycled [pounds] 3,174,004 7,820,940 8,566,426",
+    "page_number": 4,
+    "position_y": 114.66748809814453
+  },
+  {
+    "segment_id": "P004_S004",
+    "content": "Electronic waste landfilled [pounds] 11,769 20,664 54,475",
+    "page_number": 4,
+    "position_y": 135.16748046875
+  },
+  {
+    "segment_id": "P004_S005",
+    "content": "Electronic waste reused or recycled [percentage] 99.7 99.8 99.4",
+    "page_number": 4,
+    "position_y": 155.91748046875
+  },
+  {
+    "segment_id": "P004_S006",
+    "content": "Electronic waste landfilled [percentage] 0.3 0.2 0.6",
+    "page_number": 4,
+    "position_y": 176.41748046875
+  },
+  {
+    "segment_id": "P004_S007",
+    "content": "SUPPLY CHAIN AND PROCUREMENT FY2023 FY2024 FY2025",
+    "page_number": 4,
+    "position_y": 214.69651794433594
+  },
+  {
+    "segment_id": "P004_S008",
+    "content": "ISO 14001 certifications [number of owned manufacturing facilities] 1 1 1",
+    "page_number": 4,
+    "position_y": 234.197509765625
+  },
+  {
+    "segment_id": "P004_S009",
+    "content": "ISO 14001 certifications [% of owned manufacturing facilities] 100 100 100",
+    "page_number": 4,
+    "position_y": 254.947509765625
+  },
+  {
+    "segment_id": "P004_S010",
+    "content": "Responsible Business Alliance (RBA) audits [number of audits] 62 74 81",
+    "page_number": 4,
+    "position_y": 275.4674987792969
+  },
+  {
+    "segment_id": "P004_S011",
+    "content": "Key indirect suppliers with an environmental program in place [percentage] 88 93 100",
+    "page_number": 4,
+    "position_y": 296.2174987792969
+  },
+  {
+    "segment_id": "P004_S012",
+    "content": "Key indirect suppliers with an emission reduction target in place [percentage] 79 82 81",
+    "page_number": 4,
+    "position_y": 316.9674987792969
+  },
+  {
+    "segment_id": "P004_S013",
+    "content": "CY2022 CY2023 CY2024",
+    "page_number": 4,
+    "position_y": 338.71649169921875
+  },
+  {
+    "segment_id": "P004_S014",
+    "content": "Key high spend tier 1 and strategic tier 2 suppliers with an environmental program in place [%] 88 88 100",
+    "page_number": 4,
+    "position_y": 358.23748779296875
+  },
+  {
+    "segment_id": "P004_S015",
+    "content": "Key high spend tier 1 and strategic tier 2 suppliers with an emission reduction target in place [%] 82 82 100",
+    "page_number": 4,
+    "position_y": 377.23748779296875
+  },
+  {
+    "segment_id": "P004_S016",
+    "content": "Responses from first-tier suppliers on conflict minerals [%] 86 93 81",
+    "page_number": 4,
+    "position_y": 395.864990234375
+  },
+  {
+    "segment_id": "P004_S017",
+    "content": "HEALTH AND SAFETYxiii CY2022 CY2023 CY2024",
+    "page_number": 4,
+    "position_y": 432.2695007324219
+  },
+  {
+    "segment_id": "P004_S018",
+    "content": "Total Case Incident Rate [Total Recordable Cases x 200,000 hours worked/total hours worked by all employees]",
+    "page_number": 4,
+    "position_y": 455.7674865722656
+  },
+  {
+    "segment_id": "P004_S019",
+    "content": "United States 0.077 0.055 0.050",
+    "page_number": 4,
+    "position_y": 476.5174865722656
+  },
+  {
+    "segment_id": "P004_S020",
+    "content": "Canada 0 0 0",
+    "page_number": 4,
+    "position_y": 497.0174865722656
+  },
+  {
+    "segment_id": "P004_S021",
+    "content": "WORKFORCE FY2023 FY2024 FY2025",
+    "page_number": 4,
+    "position_y": 535.0364990234375
+  },
+  {
+    "segment_id": "P004_S022",
+    "content": "Employees 158,400 160,053 163,321",
+    "page_number": 4,
+    "position_y": 554.7874755859375
+  },
+  {
+    "segment_id": "P004_S023",
+    "content": "Americas 73,758 70,129 70,948",
+    "page_number": 4,
+    "position_y": 575.5374755859375
+  },
+  {
+    "segment_id": "P004_S024",
+    "content": "Asia Pacific 57,822 63,240 64,765",
+    "page_number": 4,
+    "position_y": 596.0675048828125
+  },
+  {
+    "segment_id": "P004_S025",
+    "content": "Europe, Middle East, and Africa 26,820 26,684 27,152",
+    "page_number": 4,
+    "position_y": 616.8175048828125
+  },
+  {
+    "segment_id": "P004_S026",
+    "content": "Training delivered to employees [hours in millions] 3.6 5.7 4.7",
+    "page_number": 4,
+    "position_y": 637.3175048828125
+  },
+  {
+    "segment_id": "P004_S027",
+    "content": "Employees who completed global compliance training [percentage]xiv 99.9 99.9 99.9",
+    "page_number": 4,
+    "position_y": 657.4450073242188
+  },
+  {
+    "segment_id": "P004_S028",
+    "content": "4 Datasheet / Oracle Social Impact / Version 5",
+    "page_number": 4,
+    "position_y": 744.4929809570312
+  },
+  {
+    "segment_id": "P004_S029",
+    "content": "Copyright © 2026, Oracle and/or its affiliates / Public",
+    "page_number": 4,
+    "position_y": 757.4940185546875
+  },
+  {
+    "segment_id": "P005_T000",
+    "content": "**[表格]**\n\n| GIVING | FY2023 | FY2024 | FY2025 |\n| ------ | ------ | ------ | ------ |\n|  |  |  |  |\n| Total donations (grants, sponsorships, employee giving) [US$ millions] | 22.7 | 24,7 | 27.7 |\n|  |  |  |  |\n| Total organizations supported (grants, sponsorships, employee giving) | 7,000+ | 4,500+ | 2,500+ |\n|  |  |  |  |\n| Number of countries (grants, sponsorships, employee giving) | 60 | 56 | 47 |\n|  |  |  |  |\n| Employee matched donations [US$ millions] | 5.1 | 4.2 | 3.2 |\n|  |  |  |  |\n| Employee assistance fund: Number of grants awarded | 64 | 40 | 104 |\n|  |  |  |  |\n| Employee assistance fund: Grant amount awarded [US$] | 188,000 | 113,000 | 244,000 |",
+    "page_number": 5,
+    "position_y": 45.988362630208336
+  },
+  {
+    "segment_id": "P005_T001",
+    "content": "**[表格]**\n\n| EDUCATION | FY2023 | FY2024 | FY2025 |\n| --------- | ------ | ------ | ------ |\n|  |  |  |  |\n| Oracle Education Foundation volunteers | 192 | 219 | 245 |\n|  |  |  |  |\n| Oracle Education Foundation volunteering instances | 193 | 225 | 269 |\n|  |  |  |  |\n| Oracle Education Foundation volunteer hours | 3,662 | 4,431 | 5,412 |\n|  |  |  |  |\n| Oracle Education Foundation students served | 327 | 573 | 570 |\n|  |  |  |  |\n| Oracle Education Foundation student hours | 8,363 | 13,207 | 13,879 |\n|  |  |  |  |\n| Oracle Education Foundation student instances | 372 | 660 | 625 |",
+    "page_number": 5,
+    "position_y": 206.2883504231771
+  },
+  {
+    "segment_id": "P005_T002",
+    "content": "**[表格]**\n\n| HEALTH | FY2023 | FY2024 | FY2025 |\n| ------ | ------ | ------ | ------ |\n|  |  |  |  |\n| Oracle Health Foundation children supported by pediatric grants | 834 | 1,023 | 1,145 |\n|  |  |  |  |\n| Oracle Health Foundation total dollar amount of pediatric grants [US$ millions] | 2.4 | 2.6 | 2.5 |\n|  |  |  |  |\n| Oracle Health Foundation number of countries where grant recipients live | 41 | 36 | 33 |\n|  |  |  |  |\n| Oracle Health Foundation students served by school screenings | 16,743 | 17,046 | 17,991 |",
+    "page_number": 5,
+    "position_y": 366.4116617838542
+  },
+  {
+    "segment_id": "P005_T003",
+    "content": "**[表格]**\n\n| VOLUNTEERING | FY2023 | FY2024 | FY2025 |\n| ------------ | ------ | ------ | ------ |\n|  |  |  |  |\n| Number of volunteers | 22,966 | 30,137 | 45,006 |\n|  |  |  |  |\n| Volunteer hours donated | 101,006 | 126,369 | 167,141 |\n|  |  |  |  |\n| Number of projects | 1,603 | 2,121 | 2,587 |\n|  |  |  |  |\n| Number of organizations supported | 813 | 1,038 | 1,123 |\n|  |  |  |  |\n| Number of countries supported | 48 | 51 | 53 |",
+    "page_number": 5,
+    "position_y": 485.44166056315106
+  },
+  {
+    "segment_id": "P005_S000",
+    "content": "GIVING FY2023 FY2024 FY2025",
+    "page_number": 5,
+    "position_y": 53.64653015136719
+  },
+  {
+    "segment_id": "P005_S001",
+    "content": "Total donations (grants, sponsorships, employee giving) [US$ millions] 22.7 24,7 27.7",
+    "page_number": 5,
+    "position_y": 73.14752960205078
+  },
+  {
+    "segment_id": "P005_S002",
+    "content": "Total organizations supported (grants, sponsorships, employee giving) 7,000+ 4,500+ 2,500+",
+    "page_number": 5,
+    "position_y": 93.89752960205078
+  },
+  {
+    "segment_id": "P005_S003",
+    "content": "Number of countries (grants, sponsorships, employee giving) 60 56 47",
+    "page_number": 5,
+    "position_y": 114.66748809814453
+  },
+  {
+    "segment_id": "P005_S004",
+    "content": "Employee matched donations [US$ millions] 5.1 4.2 3.2",
+    "page_number": 5,
+    "position_y": 135.16748046875
+  },
+  {
+    "segment_id": "P005_S005",
+    "content": "Employee assistance fund: Number of grants awarded 64 40 104",
+    "page_number": 5,
+    "position_y": 155.91748046875
+  },
+  {
+    "segment_id": "P005_S006",
+    "content": "Employee assistance fund: Grant amount awarded [US$] 188,000 113,000 244,000",
+    "page_number": 5,
+    "position_y": 176.41748046875
+  },
+  {
+    "segment_id": "P005_S007",
+    "content": "EDUCATION FY2023 FY2024 FY2025",
+    "page_number": 5,
+    "position_y": 213.94651794433594
+  },
+  {
+    "segment_id": "P005_S008",
+    "content": "Oracle Education Foundation volunteers 192 219 245",
+    "page_number": 5,
+    "position_y": 233.447509765625
+  },
+  {
+    "segment_id": "P005_S009",
+    "content": "Oracle Education Foundation volunteering instances 193 225 269",
+    "page_number": 5,
+    "position_y": 254.1875
+  },
+  {
+    "segment_id": "P005_S010",
+    "content": "Oracle Education Foundation volunteer hours 3,662 4,431 5,412",
+    "page_number": 5,
+    "position_y": 274.7174987792969
+  },
+  {
+    "segment_id": "P005_S011",
+    "content": "Oracle Education Foundation students served 327 573 570",
+    "page_number": 5,
+    "position_y": 295.4674987792969
+  },
+  {
+    "segment_id": "P005_S012",
+    "content": "Oracle Education Foundation student hours 8,363 13,207 13,879",
+    "page_number": 5,
+    "position_y": 316.2174987792969
+  },
+  {
+    "segment_id": "P005_S013",
+    "content": "Oracle Education Foundation student instances 372 660 625",
+    "page_number": 5,
+    "position_y": 336.7174987792969
+  },
+  {
+    "segment_id": "P005_S014",
+    "content": "HEALTH FY2023 FY2024 FY2025",
+    "page_number": 5,
+    "position_y": 373.9864807128906
+  },
+  {
+    "segment_id": "P005_S015",
+    "content": "Oracle Health Foundation children supported by pediatric grants 834 1,023 1,145",
+    "page_number": 5,
+    "position_y": 393.73748779296875
+  },
+  {
+    "segment_id": "P005_S016",
+    "content": "Oracle Health Foundation total dollar amount of pediatric grants [US$ millions] 2.4 2.6 2.5",
+    "page_number": 5,
+    "position_y": 414.48748779296875
+  },
+  {
+    "segment_id": "P005_S017",
+    "content": "Oracle Health Foundation number of countries where grant recipients live 41 36 33",
+    "page_number": 5,
+    "position_y": 435.0174865722656
+  },
+  {
+    "segment_id": "P005_S018",
+    "content": "Oracle Health Foundation students served by school screenings 16,743 17,046 17,991",
+    "page_number": 5,
+    "position_y": 455.7674865722656
+  },
+  {
+    "segment_id": "P005_S019",
+    "content": "VOLUNTEERING FY2023 FY2024 FY2025",
+    "page_number": 5,
+    "position_y": 493.0164794921875
+  },
+  {
+    "segment_id": "P005_S020",
+    "content": "Number of volunteers 22,966 30,137 45,006",
+    "page_number": 5,
+    "position_y": 512.7875366210938
+  },
+  {
+    "segment_id": "P005_S021",
+    "content": "Volunteer hours donated 101,006 126,369 167,141",
+    "page_number": 5,
+    "position_y": 533.2874755859375
+  },
+  {
+    "segment_id": "P005_S022",
+    "content": "Number of projects 1,603 2,121 2,587",
+    "page_number": 5,
+    "position_y": 554.0374755859375
+  },
+  {
+    "segment_id": "P005_S023",
+    "content": "Number of organizations supported 813 1,038 1,123",
+    "page_number": 5,
+    "position_y": 574.5374755859375
+  },
+  {
+    "segment_id": "P005_S024",
+    "content": "Number of countries supported 48 51 53",
+    "page_number": 5,
+    "position_y": 595.3175048828125
+  },
+  {
+    "segment_id": "P005_S025",
+    "content": "5 Datasheet / Oracle Social Impact / Version 5",
+    "page_number": 5,
+    "position_y": 744.4929809570312
+  },
+  {
+    "segment_id": "P005_S026",
+    "content": "Copyright © 2026, Oracle and/or its affiliates / Public",
+    "page_number": 5,
+    "position_y": 757.4940185546875
+  },
+  {
+    "segment_id": "P006_S000",
+    "content": "iRenewable energy is measured relative to total electricity consumption across real estate and facilities and Oracle Cloud Infrastructure.",
+    "page_number": 6,
+    "position_y": 79.15052795410156
+  },
+  {
+    "segment_id": "P006_S001",
+    "content": "iiKey high spend tier 1 and strategic tier 2 suppliers, which are managed suppliers under contract with substantial spending that Oracle actively engages with for goods and services. Excluded from this definition are non-managed, low-spend, or one-time suppliers. Key high spend tier 1 and tier 2 suppliers are those we partner with for manufacturing our branded hardware, both for internal use and external distribution. Collectively, these key suppliers represent approximately 96% of the total supplier spends, tier1 and 2. Goals for key high spend tier 1 and tier 2 environmental program and emissions reduction targets report progress as of the end of CY24.",
+    "page_number": 6,
+    "position_y": 92.15052795410156
+  },
+  {
+    "segment_id": "P006_S002",
+    "content": "iiiKey indirect suppliers are suppliers with substantial spending that Oracle actively engages with for goods and services used internally. Excluded from this definition are landlords, utilities, one-time suppliers, related parties, and direct suppliers. Key indirect suppliers are those that collectively represent 80% of indirect supplier spend.",
+    "page_number": 6,
+    "position_y": 132.9204864501953
+  },
+  {
+    "segment_id": "P006_S003",
+    "content": "ivReduction in potable water and waste to landfill are measured relative to a 2015 base year.",
+    "page_number": 6,
+    "position_y": 159.9204864501953
+  },
+  {
+    "segment_id": "P006_S004",
+    "content": "vReduction in employee air travel emissions measured relative to a 2019 base year.",
+    "page_number": 6,
+    "position_y": 176.2899932861328
+  },
+  {
+    "segment_id": "P006_S005",
+    "content": "viEmployee air travel emissions reductions as reported in the 2024 Social Impact Datasheet are revised to reflect a 62% reduction.",
+    "page_number": 6,
+    "position_y": 191.1704864501953
+  },
+  {
+    "segment_id": "P006_S006",
+    "content": "viiIncludes energy consumption associated with Scopes 1 and 2 emissions.",
+    "page_number": 6,
+    "position_y": 209.2005157470703
+  },
+  {
+    "segment_id": "P006_S007",
+    "content": "viiiIncludes renewable electricity use associated with Scope 2 emissions.",
+    "page_number": 6,
+    "position_y": 225.5700225830078
+  },
+  {
+    "segment_id": "P006_S008",
+    "content": "ixOracle adheres to the GHG Protocol Corporate Accounting methodology, and reports both location-based and market-based emissions. Our inventory undergoes limited assurance for all scopes by a third party validator. In 2025 Oracle shifted from calendar year (CY) to fiscal year (FY) reporting to better align with financial disclosures. In FY25 we introduced relevant methodology updates (including more accurate Scope 3 emission factors and categorization and the addition of new Scope 3 categories). Oracle has not adjusted the base year with these changes, but will evaluate doing so for future reporting cycles.",
+    "page_number": 6,
+    "position_y": 240.2005157470703
+  },
+  {
+    "segment_id": "P006_S009",
+    "content": "xScope 3 emissions are calculated under the market-based methodology. Scope 3 emissions for categories 3.9, 3.10, 3.12, 3.13, 3.14 were evaluated and deemed not material or not applicable.",
+    "page_number": 6,
+    "position_y": 279.2982482910156
+  },
+  {
+    "segment_id": "P006_S010",
+    "content": "xiWater and waste goals are measured for Oracle-owned facilities and data centers.",
+    "page_number": 6,
+    "position_y": 303.22052001953125
+  },
+  {
+    "segment_id": "P006_S011",
+    "content": "xiiReflects revised electronic waste reused metrics for FY23 and FY24.",
+    "page_number": 6,
+    "position_y": 316.22052001953125
+  },
+  {
+    "segment_id": "P006_S012",
+    "content": "xiiiInjury rates refer to number of injuries per 100 employees working a full year, following U.S. Occupational Safety & Health Administration (OSHA) definitions to record injury data worldwide.",
+    "page_number": 6,
+    "position_y": 329.47052001953125
+  },
+  {
+    "segment_id": "P006_S013",
+    "content": "xivGlobal Compliance Training curriculum includes: Anti-Corruption Training, Conflict of Interest Training, Oracle Information Protection Awareness, Respectful Workplace, and Social Media Training.",
+    "page_number": 6,
+    "position_y": 351.7405090332031
+  },
+  {
+    "segment_id": "P006_S014",
+    "content": "To view the full report, visit oracle.com/social-impact/",
+    "page_number": 6,
+    "position_y": 394.3630065917969
+  },
+  {
+    "segment_id": "P006_S015",
+    "content": "Connect with us",
+    "page_number": 6,
+    "position_y": 536.5354614257812
+  },
+  {
+    "segment_id": "P006_S016",
+    "content": "Call +1.800.ORACLE1 or visit oracle.com. Outside North America, find your local office at: oracle.com/contact.",
+    "page_number": 6,
+    "position_y": 557.9110107421875
+  },
+  {
+    "segment_id": "P006_S017",
+    "content": "blogs.oracle.com facebook.com/oracle twitter.com/oracle",
+    "page_number": 6,
+    "position_y": 576.9219970703125
+  },
+  {
+    "segment_id": "P006_S018",
+    "content": "Copyright © 2026, Oracle and/or its affiliates. All rights reserved. This document is provided for information purposes only, and the contents hereof are subject to change without notice. This document is not warranted to be error-free, nor subject to any other warranties or conditions, whether expressed orally or implied in law, including implied warranties and conditions of merchantability or fitness for a particular purpose. We specifically disclaim any liability with respect to this document, and no contractual obligations are formed either directly or indirectly by this document. This document may not be reproduced or transmitted in any form or by any means, electronic or mechanical, for any purpose, without our prior written permission.",
+    "page_number": 6,
+    "position_y": 598.1940307617188
+  },
+  {
+    "segment_id": "P006_S019",
+    "content": "Oracle and Java are registered trademarks of Oracle and/or its affiliates. Other names may be trademarks of their respective owners.",
+    "page_number": 6,
+    "position_y": 598.1940307617188
+  },
+  {
+    "segment_id": "P006_S020",
+    "content": "Intel and Intel Xeon are trademarks or registered trademarks of Intel Corporation. All SPARC trademarks are used under license and are trademarks or registered trademarks of SPARC International, Inc. AMD, Opteron, the AMD logo, and the AMD Opteron logo are trademarks or registered trademarks of Advanced Micro Devices. UNIX is a registered trademark of The Open Group. 0120",
+    "page_number": 6,
+    "position_y": 626.1940307617188
+  },
+  {
+    "segment_id": "P006_S021",
+    "content": "Disclaimer: If you are unsure whether your data sheet needs a disclaimer, read the revenue recognition policy. If you have further questions about your content and the disclaimer requirements, e-mail REVREC_US@oracle.com.",
+    "page_number": 6,
+    "position_y": 670.2139892578125
+  },
+  {
+    "segment_id": "P006_S022",
+    "content": "This device has not been authorized as required by the rules of the Federal Communications Commission. This device is not, and may not be, offered for sale or lease, or sold or leased, until authorization is obtained.",
+    "page_number": 6,
+    "position_y": 682.2239990234375
+  },
+  {
+    "segment_id": "P006_S023",
+    "content": "6 Datasheet / Oracle Social Impact / Version 5",
+    "page_number": 6,
+    "position_y": 744.4929809570312
+  },
+  {
+    "segment_id": "P006_S024",
+    "content": "Copyright © 2026, Oracle and/or its affiliates / Public",
+    "page_number": 6,
+    "position_y": 757.4940185546875
+  }
+]

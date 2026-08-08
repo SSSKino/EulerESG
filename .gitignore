@@ -59,20 +59,11 @@ ESG-demo-main/frontend/next-env.d.ts
 *.zip
 
 # 上传的文件（如果包含敏感数据）
-uploads/
-backend/uploads/
 
 # 生成的报告和输出
-backend/outputs/*
-outputs/
+# backend/outputs/*
+# outputs/
 
-# 本地开发数据库
-backend/database.json
-
-# 数据库文件
-*.db
-*.sqlite
-*.sqlite3
 
 # Jupyter Notebook
 .ipynb_checkpoints

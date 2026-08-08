@@ -1,0 +1,1026 @@
+{
+  "report_id": "e39a6d61-ba8b-4dbc-ba72-e1942ae082f9",
+  "assessment_date": "2026-01-25T06:10:42.837710",
+  "total_metrics": 36,
+  "overall_score": 0.06944444444444445,
+  "total_metrics_analyzed": 36,
+  "overall_compliance_score": 0.06944444444444445,
+  "report_file_path": "outputs/compliance_report_e39a6d61-ba8b-4dbc-ba72-e1942ae082f9.md",
+  "framework": "SASB",
+  "disclosure_summary": {
+    "fully_disclosed": 0,
+    "partially_disclosed": 5,
+    "not_disclosed": 31
+  },
+  "metric_analyses": [
+    {
+      "metric_id": "sasb_0_1_Total_energy_consumed",
+      "metric_name": "(1) Total energy consumed",
+      "metric_code": "TC-SI-130a.1",
+      "disclosure_status": "partially_disclosed",
+      "reasoning": "All segments discuss energy-related topics such as reducing energy usage, energy-efficient services, and tools for measurement, but none provide a specific numerical value for total energy consumed. The information is qualitative and focused on efforts rather than direct quantitative disclosure.",
+      "unit": "Gigajoules (GJ), ",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 6,
+      "value": "Energy usage reduction efforts described",
+      "context": "reduce the energy usage of the console itself",
+      "evidence_segments": [
+        "P058_S003",
+        "P006_S008",
+        "P024_S004",
+        "P024_S010",
+        "P060_S004",
+        "P065_S004",
+        "P066_S004",
+        "P077_S012"
+      ],
+      "improvement_suggestions": [
+        "Include specific total energy consumption data in future disclosures",
+        "Provide annual energy usage metrics with units such as gigajoules",
+        "Enhance transparency by disclosing energy consumption across all operations and time periods"
+      ]
+    },
+    {
+      "metric_id": "sasb_1_2_percentage_grid_electricity",
+      "metric_name": "(2) percentage grid electricity",
+      "metric_code": "TC-SI-130a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "Based on a unified analysis of all segments, no segment contains a numeric value or explicit qualitative statement directly addressing the metric 'percentage grid electricity'. Segments 1, 6, 7, and 8 discuss efforts related to carbon-free electricity and grid infrastructure (e.g., 'bring more carbon-free electricity onto the grids' in Segment 1, 'expand carbon-free electricity and grid infrastructure' in Segments 6 and 7), but none provide data on the percentage. Segment 1 mentions a 29.9% reduction in Scope 1 and 2 emissions, which is related but not the specified metric. Other segments focus on tools, lifecycle assessments, and general sustainability efforts without referencing the percentage of grid electricity.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 5,
+      "value": "No specific data on the percentage of grid electricity found; discussions are qualitative and focus on carbon-free electricity initiatives, emission reductions, and infrastructure improvements, without mention of percentages, units, or year",
+      "context": "No specific data on the percentage of grid electricity found; discussions are qualitative and focus on carbon-free electricity initiatives, emission reductions, and infrastructure improvements, without mention of percentages, units, or years for this metric.",
+      "evidence_segments": [
+        "P005_S008",
+        "P024_S004",
+        "P024_S010",
+        "P058_S003",
+        "P060_S004",
+        "P081_S013",
+        "P082_S006",
+        "P082_S014"
+      ],
+      "improvement_suggestions": [
+        "Disclose the percentage of electricity consumed from the grid and its composition (e.g., renewable vs. non-renewable sources) to meet ESG compliance standards.",
+        "Provide targets or current metrics for grid electricity usage in future reports, including specific numbers and timelines.",
+        "Enhance transparency by linking carbon-free electricity efforts to quantifiable percentages in operational disclosures."
+      ]
+    },
+    {
+      "metric_id": "sasb_2_3_percentage_renewable",
+      "metric_name": "(3) percentage renewable",
+      "metric_code": "TC-SI-130a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All segments discuss Microsoft's environmental initiatives, such as LCA tools, carbon footprint reduction, infrastructure optimization, and sustainability tools, but none mention 'percentage renewable' or provide any quantitative or qualitative data related to renewable energy usage. Segments include keywords like environmental, footprint, and infrastructure, but the metric is not addressed.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 24,
+      "value": "No data on percentage renewable found; segments cover general environmental topics like carbon emissions, supply chain impacts, and sustainability tools without renewable energy specifics.",
+      "context": "No data on percentage renewable found; segments cover general environmental topics like carbon emissions, supply chain impacts, and sustainability tools without renewable energy specifics.",
+      "evidence_segments": [
+        "P024_S004",
+        "P024_S010",
+        "P058_S003",
+        "P060_S004",
+        "P006_S008",
+        "P008_S005",
+        "P009_S002",
+        "P014_S004"
+      ],
+      "improvement_suggestions": [
+        "Disclose the percentage of renewable energy used in operations, including annual figures and targets.",
+        "Include renewable energy metrics in sustainability reports or specific sections on energy sources."
+      ]
+    },
+    {
+      "metric_id": "sasb_3_1_Total_water_withdrawn",
+      "metric_name": "(1) Total water withdrawn",
+      "metric_code": "TC-SI-130a.2",
+      "disclosure_status": "fully_disclosed",
+      "reasoning": "All segments reference water in contexts such as LCA tools, sustainability management, cooling technologies, replenishment activities, and design practices, but none provide specific information on the total volume of water withdrawn by Microsoft. The discussions are qualitative, focusing on commitments, tools, and environmental impacts, without quantitative data or explicit statements related to the metric 'Total water withdrawn'.",
+      "unit": "Thousand cubic metres (m³),",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 37,
+      "value": "10377",
+      "context": "FY24 total water withdrawn = 10,377,000 m³ (shown in 'Total water consumption and withdrawal' chart in Water Table 5). Converted to 10,377 thousand m³ to match unit.",
+      "evidence_segments": [
+        "P024_S004",
+        "P058_S003",
+        "P015_S009",
+        "P016_S009",
+        "P024_S010",
+        "P030_S008",
+        "P050_S009",
+        "P056_S005"
+      ],
+      "improvement_suggestions": [
+        "Include annual total water withdrawn figures with units (e.g., gallons or liters) and time periods.",
+        "Provide breakdowns of water withdrawal by source, region, or operational segment to enhance transparency and comparability."
+      ]
+    },
+    {
+      "metric_id": "sasb_4_2_total_water_consumed",
+      "metric_name": "(2) total water consumed",
+      "metric_code": "TC-SI-130a.2",
+      "disclosure_status": "fully_disclosed",
+      "reasoning": "All segments were reviewed, and no direct numerical or specific qualitative disclosure of total water consumed was found. Segments discuss water-related initiatives such as cooling technologies, replenishment activities, and water-efficient designs, but these do not constitute disclosure of the total water consumption amount as per the SASB metric.",
+      "unit": "Thousand cubic metres (m³),",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 37,
+      "value": "5807",
+      "context": "FY24 total water consumed = 5,807,000 m³ (shown in 'Total water consumption and withdrawal' chart in Water Table 5). Converted to 5,807 thousand m³ to match unit.",
+      "evidence_segments": [
+        "P024_S004",
+        "P058_S003",
+        "P015_S009",
+        "P016_S009",
+        "P024_S010",
+        "P030_S008",
+        "P050_S009",
+        "P056_S005"
+      ],
+      "improvement_suggestions": [
+        "Disclose total water consumed annually with units (e.g., cubic meters) and time period.",
+        "Provide breakdown of water consumption by source or operational segment to enhance transparency."
+      ]
+    },
+    {
+      "metric_id": "sasb_5_3_percentage_of_each_in_regions_with_High_or_Ext",
+      "metric_name": "(3) percentage of each in regions with High or Extremely High Baseline Water Stress",
+      "metric_code": "TC-SI-130a.2",
+      "disclosure_status": "partially_disclosed",
+      "reasoning": "Across all segments, Microsoft discusses water management initiatives and acknowledges high stress regions, particularly in the context of replenishment projects. However, no specific percentage is disclosed for operations or assets in regions with High or Extremely High Baseline Water Stress, as required by the metric. Segments mention general water efforts, tools, and commitments, but lack quantitative data for this SASB metric.",
+      "unit": " Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 38,
+      "value": "Acknowledged high stress regions in water projects",
+      "context": "replenishment projects in high stress priority locations across the globe.",
+      "evidence_segments": [
+        "P058_S003",
+        "P016_S009",
+        "P024_S004",
+        "P038_S004",
+        "P060_S004",
+        "P077_S012",
+        "P088_S005",
+        "P004_S010"
+      ],
+      "improvement_suggestions": [
+        "Include specific percentage data on operations or assets in regions with high or extremely high water stress.",
+        "Align disclosures with SASB metrics by providing numeric values where required."
+      ]
+    },
+    {
+      "metric_id": "sasb_6_Discussion_of_the_integration_of_environmental_con",
+      "metric_name": "Discussion of the integration of environmental considerations into strategic planning for data centre needs",
+      "metric_code": "TC-SI-130a.3",
+      "disclosure_status": "partially_disclosed",
+      "reasoning": "Based on all segments, Microsoft discloses the integration of environmental considerations into data center needs through initiatives such as integrating biodiversity into datacenter development strategy, using tools like Ecosystem Intelligence, and applying sustainable design practices. Segment 3 provides a direct link to strategic planning, with other segments supporting with operational details. The disclosure is qualitative but clear, covering strategic aspects, though it lacks specific quantitative targets or comprehensive data points.",
+      "unit": "",
+      "category": "Discussion and Analysis",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 50,
+      "value": "Integrates biodiversity and environmental considerations into datacenter development strategy",
+      "context": "Microsoft has been integrating biodiversity considerations into our datacenter development strategy.",
+      "evidence_segments": [
+        "P024_S010",
+        "P049_S014",
+        "P050_S005",
+        "P050_S009",
+        "P056_S005",
+        "P058_S003",
+        "P060_S004",
+        "P061_S011"
+      ],
+      "improvement_suggestions": [
+        "Provide specific quantitative targets or metrics for environmental integration in strategic data center planning",
+        "Detail long-term strategic goals and how environmental considerations influence data center expansion or retrofitting decisions",
+        "Include year-over-year progress data on the integration's impact, such as carbon reduction percentages or biodiversity improvements"
+      ]
+    },
+    {
+      "metric_id": "sasb_7_Description_of_policies_and_practices_relating_to_",
+      "metric_name": "Description of policies and practices relating to targeted advertising and user privacy",
+      "metric_code": "TC-SI-220a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All retrieved segments focus on environmental sustainability practices, such as datacenter decarbonization, energy efficiency, logistics improvements, and carbon measurement tools. Keywords like 'practices', 'data', and 'targeted' in the segments refer to operational initiatives in environmental contexts, not to targeted advertising or user privacy. No segment mentions advertising, privacy, or related policies, indicating no disclosure for this metric.",
+      "unit": "",
+      "category": "Discussion and Analysis",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 14,
+      "value": "No data or information related to targeted advertising or user privacy found; segments discuss environmental topics like LEED certification, server energy reduction, logistics emissions, and LCA tools.",
+      "context": "No data or information related to targeted advertising or user privacy found; segments discuss environmental topics like LEED certification, server energy reduction, logistics emissions, and LCA tools.",
+      "evidence_segments": [
+        "P014_S003",
+        "P015_S002",
+        "P016_S006",
+        "P024_S004",
+        "P025_S003",
+        "P025_S010",
+        "P035_S006",
+        "P036_S006"
+      ],
+      "improvement_suggestions": [
+        "Include a dedicated section in ESG reports detailing policies and practices for targeted advertising and user privacy, such as data collection, consent mechanisms, and compliance with privacy regulations.",
+        "Enhance keyword retrieval to ensure segments relevant to advertising and privacy metrics are accurately captured in future analyses."
+      ]
+    },
+    {
+      "metric_id": "sasb_8_Number_of_users_whose_information_is_used_for_seco",
+      "metric_name": "Number of users whose information is used for secondary purposes",
+      "metric_code": "TC-SI-220a.2",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All retrieved segments (Segment IDs: P035_S003, P002_S040, P011_S013, P014_S004, P014_S008, P015_S013, P016_S007, P024_S008) discuss environmental sustainability topics such as datacenter cooling, water usage, emissions, energy efficiency, material usage, and reporting of environmental data. Keywords like 'data', 'used', 'information', and 'purposes' are matched but in contexts unrelated to user information or secondary purposes. No segment addresses the metric 'Number of users whose information is used for secondary purposes', indicating no disclosure on this specific data privacy aspect.",
+      "unit": "Number",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 35,
+      "value": 0.3,
+      "context": "No data on user information usage found; segments contain environmental data like water usage effectiveness (0.30 L/kWh in FY24), scope 3 emissions increase (26% from 2020), and discussions on AI applications, low-carbon materials, energy efficiency, and EPDs, but all unrelated to the metric.",
+      "evidence_segments": [
+        "P035_S003",
+        "P002_S040",
+        "P011_S013",
+        "P014_S004",
+        "P014_S008",
+        "P015_S013",
+        "P016_S007",
+        "P024_S008"
+      ],
+      "improvement_suggestions": [
+        "Include specific disclosures on data privacy metrics, such as the number of users affected by secondary information usage.",
+        "Enhance transparency by reporting on information handling practices and purposes in privacy or sustainability reports."
+      ]
+    },
+    {
+      "metric_id": "sasb_9_Total_amount_of_monetary_losses_as_a_result_of_leg",
+      "metric_name": "Total amount of monetary losses as a result of legal proceedings associated with user privacy",
+      "metric_code": "TC-SI-220a.3",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "Based on a unified analysis of all provided segments (P014_S003 to P043_S003), none of the segments contain information related to 'Total amount of monetary losses as a result of legal proceedings associated with user privacy.' The segments focus on environmental and operational topics such as datacenter certifications, AI tools for supply chain analysis, water loss detection, energy efficiency, water consumption, waste reduction, and community donations. Keywords like 'losses,' 'data,' 'result,' and 'amount' are used in contexts unrelated to legal proceedings or user privacy. Therefore, no disclosure for this metric is found.",
+      "unit": "Presentation currency",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 14,
+      "value": "No data found regarding monetary losses from legal proceedings associated with user privacy. Segments discuss other metrics such as water losses, energy usage, and waste reduction.",
+      "context": "No data found regarding monetary losses from legal proceedings associated with user privacy. Segments discuss other metrics such as water losses, energy usage, and waste reduction.",
+      "evidence_segments": [
+        "P014_S003",
+        "P023_S006",
+        "P031_S007",
+        "P036_S006",
+        "P037_S006",
+        "P038_S002",
+        "P041_S018",
+        "P043_S003"
+      ],
+      "improvement_suggestions": [
+        "Include a dedicated section in the ESG report covering legal proceedings and their financial impacts related to user privacy.",
+        "Report specific monetary figures for any losses from lawsuits, settlements, or fines involving privacy breaches to enhance transparency."
+      ]
+    },
+    {
+      "metric_id": "sasb_10_1_Number_of_law_enforcement_requests_for_user_in",
+      "metric_name": "(1) Number of law enforcement requests for user information",
+      "metric_code": "TC-SI-220a.4",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "Based on all provided segments, none address the metric 'Number of law enforcement requests for user information'. The segments focus on environmental sustainability, data transparency, user tools, and reporting, with keywords like 'information', 'data', and 'user', but no mention of law enforcement, user information requests, or related legal or privacy aspects. The content is centered on environmental initiatives and general data sharing, indicating no disclosure for this specific metric.",
+      "unit": "Number, ",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 80,
+      "value": "No data found for law enforcement requests for user information; segments discuss environmental data, tools, and transparency without referencing legal or security disclosures.",
+      "context": "No data found for law enforcement requests for user information; segments discuss environmental data, tools, and transparency without referencing legal or security disclosures.",
+      "evidence_segments": [
+        "P080_S004",
+        "P002_S040",
+        "P024_S008",
+        "P024_S013",
+        "P025_S014",
+        "P071_S004",
+        "P082_S011",
+        "P088_S009"
+      ],
+      "improvement_suggestions": [
+        "Include a dedicated section in reports to disclose the number of law enforcement requests for user information, specifying counts and jurisdictions if applicable.",
+        "Adopt and follow privacy standards (e.g., GDPR) that require transparency on such requests to enhance ESG compliance.",
+        "Expand reporting to cover user data protection and legal compliance metrics, ensuring alignment with industry best practices."
+      ]
+    },
+    {
+      "metric_id": "sasb_11_2_number_of_users_whose_information_was_requeste",
+      "metric_name": "(2) number of users whose information was requested",
+      "metric_code": "TC-SI-220a.4",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All provided segments focus on Microsoft's environmental sustainability reporting, data transparency, and user access to environmental data tools. However, none of the segments mention or provide any information related to the metric 'number of users whose information was requested', which is likely associated with data privacy or user information requests under ESG standards. Therefore, no disclosure for this specific metric is found in the segments.",
+      "unit": "Number, ",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 2,
+      "value": "No data found for the metric; segments contain environmental data reporting, user engagement with data platforms (e.g., Planetary Computer, Copilot tools), and transparency in sustainability practices, but no details on user information req",
+      "context": "No data found for the metric; segments contain environmental data reporting, user engagement with data platforms (e.g., Planetary Computer, Copilot tools), and transparency in sustainability practices, but no details on user information requests.",
+      "evidence_segments": [
+        "P002_S040",
+        "P024_S008",
+        "P024_S013",
+        "P025_S014",
+        "P071_S004",
+        "P080_S004",
+        "P082_S011",
+        "P088_S009"
+      ],
+      "improvement_suggestions": [
+        "Include metrics on user data requests to comply with SASB standards and enhance data privacy disclosures.",
+        "Add sections in future reports covering data governance and user information handling practices for better ESG transparency."
+      ]
+    },
+    {
+      "metric_id": "sasb_12__3_percentage_resulting_in_disclosure",
+      "metric_name": " (3) percentage resulting in disclosure",
+      "metric_code": "TC-SI-220a.4",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "Based on a unified analysis of all segments, while the company discusses enhancements in data collection, disclosure processes, and AI-powered improvements for ESG compliance, no specific percentage directly related to the metric 'percentage resulting in disclosure' is found. Segments mention efficiencies such as a 94% reduction in processing time and data analysis on carbon metrics, but these do not constitute a disclosed percentage for this metric, such as the proportion of data or entities resulting in disclosure.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 25,
+      "value": 94.0,
+      "context": "No numeric percentage for the metric was identified. Context includes discussions on supplier decarbonization efforts, automated survey processing with 94% time reduction, data analysis showing carbon sink decline and CO2 increase, and overall ESG reporting to standards like CDP and TCFD, but lacks a direct percentage disclosure for 'resulting in disclosure'.",
+      "evidence_segments": [
+        "P025_S004",
+        "P025_S008",
+        "P025_S014",
+        "P058_S006",
+        "P058_S008",
+        "P078_S011",
+        "P088_S005",
+        "P002_S010"
+      ],
+      "improvement_suggestions": [
+        "Disclose specific percentages related to disclosure outcomes, e.g., the percentage of suppliers or data points that result in formal disclosures.",
+        "Enhance granularity in reporting by including metrics on how disclosed information impacts sustainability goals or compliance rates."
+      ]
+    },
+    {
+      "metric_id": "sasb_13_List_of_countries_where_core_products_or_services_",
+      "metric_name": "List of countries where core products or services are subject to government-required monitoring, blocking, content filtering, or censoring",
+      "metric_code": "TC-SI-220a.5",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "Based on the unified analysis of all segments, none directly or indirectly address the metric 'List of countries where core products or services are subject to government-required monitoring, blocking, content filtering, or censoring.' The segments are focused on environmental sustainability topics such as emissions reduction, water efficiency, and product sustainability. The matched keywords (e.g., 'services,' 'products,' 'monitoring,' 'countries,' 'content') are used in different contexts unrelated to content regulation or censorship, such as environmental monitoring or material content. Therefore, no relevant disclosure is found.",
+      "unit": "",
+      "category": "Discussion and Analysis",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 13,
+      "value": "No specific data or list of countries found. All segments pertain to environmental initiatives without mention of government-required content actions, monitoring, blocking, filtering, or censoring.",
+      "context": "No specific data or list of countries found. All segments pertain to environmental initiatives without mention of government-required content actions, monitoring, blocking, filtering, or censoring.",
+      "evidence_segments": [
+        "P013_S003",
+        "P014_S004",
+        "P016_S010",
+        "P037_S005",
+        "P046_S013",
+        "P047_S013",
+        "P064_S011",
+        "P004_S003"
+      ],
+      "improvement_suggestions": [
+        "Include explicit disclosure on countries where core products or services face government-required content actions, such as monitoring or censoring, to enhance ESG compliance.",
+        "Add a dedicated section in sustainability or governance reports addressing digital rights, regulatory compliance, and content governance across operational regions."
+      ]
+    },
+    {
+      "metric_id": "sasb_14_1_Number_of_data_breaches",
+      "metric_name": "(1) Number of data breaches",
+      "metric_code": "TC-SI-230a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All segments provided focus on environmental sustainability, operational efficiency, transparency in reporting, and best practices for security, with keywords like 'security' and 'data' in some contexts. However, none of the segments explicitly mention or disclose any information related to data breaches, such as incident counts or cybersecurity incidents. The content is centered on topics like AI workload design, waste reduction, water efficiency, emissions, and datacenter transformations, which are not relevant to the specific metric 'Number of data breaches'.",
+      "unit": "Number,",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 61,
+      "value": "No specific data, unit, or year related to the number of data breaches was found in the provided segments.",
+      "context": "No specific data, unit, or year related to the number of data breaches was found in the provided segments.",
+      "evidence_segments": [
+        "P061_S011",
+        "P002_S010",
+        "P002_S021",
+        "P002_S040",
+        "P004_S009",
+        "P004_S010",
+        "P005_S003",
+        "P005_S007"
+      ],
+      "improvement_suggestions": [
+        "Disclose annual data on the number of data breaches, including incident counts and details.",
+        "Incorporate cybersecurity risk management and incident reporting into sustainability or ESG disclosures."
+      ]
+    },
+    {
+      "metric_id": "sasb_15_2_percentage_that_are_personal_data_breaches",
+      "metric_name": "(2) percentage that are personal data breaches",
+      "metric_code": "TC-SI-230a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "A unified analysis of all provided segments shows that they consistently focus on environmental sustainability aspects of datacenter operations, such as carbon footprint reduction, water usage efficiency, energy initiatives, and material innovations. No segment mentions personal data breaches, data privacy, or security incidents. The metric 'percentage that are personal data breaches' (sasb_15_2_percentage_that_are_personal_data_breaches) is not addressed in any content.",
+      "unit": "Number,",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 25,
+      "value": "No data on personal data breaches found. All segments discuss datacenter environmental impacts, including embodied carbon, water conservation, energy efficiency, and low-carbon materials, with no reference to data security or breach inciden",
+      "context": "No data on personal data breaches found. All segments discuss datacenter environmental impacts, including embodied carbon, water conservation, energy efficiency, and low-carbon materials, with no reference to data security or breach incidents.",
+      "evidence_segments": [
+        "P025_S014",
+        "P004_S009",
+        "P005_S009",
+        "P007_S009",
+        "P014_S008",
+        "P014_S012",
+        "P015_S009",
+        "P015_S013"
+      ],
+      "improvement_suggestions": [
+        "Include specific disclosures on personal data breach incidents and their percentages to align with SASB metric requirements.",
+        "Add a dedicated section in future reports covering data privacy and security metrics, such as breach rates and mitigation efforts."
+      ]
+    },
+    {
+      "metric_id": "sasb_16_3_number_of_users_affected",
+      "metric_name": "(3) number of users affected",
+      "metric_code": "TC-SI-230a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "After analyzing all segments, no numeric value or direct qualitative statement for the metric 'number of users affected' is found. Segments 3 and 4 mention 'users' qualitatively in contexts of empowerment and data access, but without quantification. Segment 8 provides a numeric value (1.5 million) related to water provision, which does not align with the metric's focus on users affected, as per the provided context.",
+      "unit": " Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 24,
+      "value": 3.0,
+      "context": "No specific numeric data or direct qualitative disclosure for 'number of users affected'. Segments 3 and 4 refer to users in general terms (e.g., 'empowering universities and organizations worldwide', 'enabling users to access energy data'), and Segment 8 mentions 1.5 million people provided with clean water, but this is not explicitly linked to users affected as per the metric.",
+      "evidence_segments": [
+        "P024_S004",
+        "P061_S011",
+        "P071_S004",
+        "P082_S011",
+        "P002_S010",
+        "P002_S021",
+        "P002_S040",
+        "P004_S009"
+      ],
+      "improvement_suggestions": [
+        "Define and disclose a specific count or estimate of users affected by relevant operations or data practices.",
+        "Include quantitative data in future reports to meet SASB metric requirements for ESG compliance.",
+        "Clarify the scope of 'users affected' in the disclosure to ensure alignment with the metric's intent."
+      ]
+    },
+    {
+      "metric_id": "sasb_17_Description_of_approach_to_identifying_and_address",
+      "metric_name": "Description of approach to identifying and addressing data security risks, including use of third-party cybersecurity standards",
+      "metric_code": "TC-SI-230a.2",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All segments (1-8) were analyzed, and none directly address the metric 'Description of approach to identifying and addressing data security risks, including use of third-party cybersecurity standards.' Segment 1 focuses on Scope 3 emissions and supplier standards for sustainability. Segment 2 discusses third-party audits for sustainability data collection. Segment 3 covers water-related risks and approach. Segment 4 mentions a circular economy approach with data center donations. Segment 5 refers to security in AI architecture but not specifically data security or third-party cybersecurity standards. Segment 6 involves climate risk assessment using data. Segment 7 is about energy data and AI tools for policy. Segment 8 details environmental data reporting and standards like GRI. Overall, the content is centered on environmental, sustainability, and general data topics, with no mention of data security risks or third-party cybersecurity frameworks.",
+      "unit": "",
+      "category": "Discussion and Analysis",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 5,
+      "value": "No specific data or description related to data security risks or third-party cybersecurity standards was found in the provided segments; all references to 'data,' 'risks,' 'approach,' or 'standards' are in contexts such as environmental su",
+      "context": "No specific data or description related to data security risks or third-party cybersecurity standards was found in the provided segments; all references to 'data,' 'risks,' 'approach,' or 'standards' are in contexts such as environmental sustainability, water management, or AI performance.",
+      "evidence_segments": [
+        "P005_S003",
+        "P024_S011",
+        "P038_S004",
+        "P043_S003",
+        "P061_S011",
+        "P070_S009",
+        "P082_S011",
+        "P088_S009"
+      ],
+      "improvement_suggestions": [
+        "Include a dedicated disclosure in reports detailing the company's approach to identifying and addressing data security risks, with clear methodologies and processes.",
+        "Explicitly mention adherence to third-party cybersecurity standards, such as ISO/IEC 27001, NIST frameworks, or industry-specific guidelines, with examples of implementation.",
+        "Provide qualitative or quantitative examples of data security risk mitigation, particularly in high-risk areas like datacenters or digital services, to enhance transparency."
+      ]
+    },
+    {
+      "metric_id": "sasb_18_Percentage_of_employees_that_require_a_work_visa",
+      "metric_name": "Percentage of employees that require a work visa",
+      "metric_code": "TC-SI-330a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All segments retrieved focus on sustainability topics such as employee training, climate collaboration, and energy agreements, with keywords like 'work', 'employees', and 'workforce' but none mention work visas or provide any data on the percentage of employees requiring them. Segments 1-8 discuss initiatives like zero waste engagement, green skills development, and carbon removal, which are unrelated to the specific metric of employee visa status.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 43,
+      "value": "No data found for the metric 'Percentage of employees that require a work visa'. The segments cover other ESG aspects such as waste management training, green workforce development, and climate technology scaling, with no reference to visa ",
+      "context": "No data found for the metric 'Percentage of employees that require a work visa'. The segments cover other ESG aspects such as waste management training, green workforce development, and climate technology scaling, with no reference to visa requirements or percentages.",
+      "evidence_segments": [
+        "P043_S009",
+        "P085_S002",
+        "P006_S009",
+        "P008_S008",
+        "P010_S009",
+        "P019_S010",
+        "P020_S010",
+        "P020_S012"
+      ],
+      "improvement_suggestions": [
+        "Include explicit reporting on the percentage of employees requiring work visas to address SASB metric sasb_18.",
+        "Add workforce demographic data, including visa status, in future ESG disclosures for better transparency."
+      ]
+    },
+    {
+      "metric_id": "sasb_19_Employee_engagement_as_a_percentage",
+      "metric_name": "Employee engagement as a percentage",
+      "metric_code": "TC-SI-330a.2",
+      "disclosure_status": "partially_disclosed",
+      "reasoning": "All segments collectively describe various employee engagement initiatives, such as training, volunteering, and community programs related to ESG topics, but none provide the specific quantitative metric 'Employee engagement as a percentage'. The information is qualitative and lacks numerical data required by the SASB metric.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 43,
+      "value": "Qualitative description of engagement in sustainability initiatives",
+      "context": "local zero waste engagement events that reached hundreds of datacenter employees",
+      "evidence_segments": [
+        "P043_S009",
+        "P085_S002",
+        "P008_S008",
+        "P027_S009",
+        "P034_S007",
+        "P051_S004",
+        "P067_S004",
+        "P072_S001"
+      ],
+      "improvement_suggestions": [
+        "Disclose the percentage of employees engaged in sustainability initiatives, with breakdowns by region or department.",
+        "Provide clear metrics on participation rates in training and volunteer events, including year-over-year data.",
+        "Specify the methodology for calculating employee engagement as a percentage to align with SASB standards."
+      ]
+    },
+    {
+      "metric_id": "sasb_20_Percentage_of_1_gender",
+      "metric_name": "Percentage of (1) gender",
+      "metric_code": "TC-SI-330a.3",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "After analyzing all eight provided segments, none contain information related to the metric 'Percentage of (1) gender'. The segments focus on topics such as climate action, water sustainability, waste management, AI applications, and workforce development, with matched keywords including 'workforce', 'global', and 'diverse'. However, these contexts do not address gender-specific percentages, employee demographics, or any quantitative or qualitative data on gender composition. Therefore, no disclosure is found for this metric.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 8,
+      "value": "No data on gender percentage is present in the segments. The content discusses general workforce engagement, diversity in partnerships or data sets, and global sustainability initiatives without mentioning gender metrics, specific percentag",
+      "context": "No data on gender percentage is present in the segments. The content discusses general workforce engagement, diversity in partnerships or data sets, and global sustainability initiatives without mentioning gender metrics, specific percentages, years, or units related to gender.",
+      "evidence_segments": [
+        "P008_S008",
+        "P027_S009",
+        "P043_S009",
+        "P072_S001",
+        "P076_S007",
+        "P077_S006",
+        "P078_S010",
+        "P085_S002"
+      ],
+      "improvement_suggestions": [
+        "Include gender diversity metrics, such as the percentage of female or male employees, in future ESG disclosures.",
+        "Align reporting with SASB standards by providing quantitative data on workforce gender composition.",
+        "Enhance diversity sections to specify gender-related statistics and targets for better ESG transparency."
+      ]
+    },
+    {
+      "metric_id": "sasb_21_Percentage_of_2_diversity_group_representation_f",
+      "metric_name": "Percentage of (2) diversity group representation for (a) executive management",
+      "metric_code": "TC-SI-330a.3",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All retrieved segments focus on environmental sustainability topics such as climate action, water strategies, waste management, and biodiversity, with keywords 'diverse' and 'diversity' referring to ecological or collaborative aspects. No segment mentions executive management, diversity groups, or any percentage representation relevant to the metric, indicating no disclosure found.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 8,
+      "value": "No data found for the percentage of diversity group representation in executive management. Segments discuss environmental initiatives like net zero efforts, water replenishment, zero waste training, and biodiversity projects, but no inform",
+      "context": "No data found for the percentage of diversity group representation in executive management. Segments discuss environmental initiatives like net zero efforts, water replenishment, zero waste training, and biodiversity projects, but no information on social metrics or management diversity.",
+      "evidence_segments": [
+        "P008_S008",
+        "P027_S009",
+        "P043_S009",
+        "P049_S006",
+        "P049_S014",
+        "P050_S010",
+        "P050_S013",
+        "P050_S015"
+      ],
+      "improvement_suggestions": [
+        "Include explicit metrics on diversity in executive management, such as percentages by group, in sustainability or governance reports.",
+        "Enhance retrieval methods to target social metrics like diversity representation using more specific keywords or codes."
+      ]
+    },
+    {
+      "metric_id": "sasb_22_Percentage_of_2_diversity_group_representation_f",
+      "metric_name": "Percentage of (2) diversity group representation for (b) non-executive management",
+      "metric_code": "TC-SI-330a.3",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All provided segments focus on environmental sustainability topics such as climate action, water strategy, waste management, and biodiversity, or general workforce engagement, with keywords like 'workforce', 'diverse', and 'diversity' used in contexts unrelated to human diversity in management. None address diversity group representation for non-executive management, and no percentage data or specific disclosures are found for this metric.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 8,
+      "value": "No disclosure found for the metric 'Percentage of diversity group representation for non-executive management'; all segments are unrelated to this topic, with no numeric or qualitative data provided.",
+      "context": "No disclosure found for the metric 'Percentage of diversity group representation for non-executive management'; all segments are unrelated to this topic, with no numeric or qualitative data provided.",
+      "evidence_segments": [
+        "P008_S008",
+        "P027_S009",
+        "P043_S009",
+        "P049_S006",
+        "P049_S014",
+        "P050_S010",
+        "P050_S013",
+        "P050_S015"
+      ],
+      "improvement_suggestions": [
+        "Disclose the percentage of diversity groups represented in non-executive management roles, aligned with SASB or other ESG standards.",
+        "Provide qualitative statements or policies on diversity and inclusion in management, including specific groups or categories.",
+        "Include year-specific data and trend analysis for this metric to enhance transparency and comparability."
+      ]
+    },
+    {
+      "metric_id": "sasb_23_Percentage_of_2_diversity_group_representation_f",
+      "metric_name": "Percentage of (2) diversity group representation for (c) technical employees",
+      "metric_code": "TC-SI-330a.3",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All retrieved segments discuss topics such as employee engagement in sustainability initiatives, biodiversity restoration, community environmental projects, and skill development, with matched keywords like 'diverse', 'diversity', 'employees', 'workforce', and 'technical' used in contexts unrelated to workforce diversity metrics. No segment provides any data or information on the percentage of diversity group representation among technical employees.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 43,
+      "value": "No data or context related to the metric found; segments focus on environmental biodiversity, sustainability training, and community projects, with no mention of workforce diversity percentages.",
+      "context": "No data or context related to the metric found; segments focus on environmental biodiversity, sustainability training, and community projects, with no mention of workforce diversity percentages.",
+      "evidence_segments": [
+        "P043_S009",
+        "P050_S015",
+        "P051_S004",
+        "P053_S015",
+        "P055_S012",
+        "P085_S002",
+        "P002_S021",
+        "P004_S002"
+      ],
+      "improvement_suggestions": [
+        "Include specific quantitative data on diversity group representation for technical employees in future ESG reports.",
+        "Clearly delineate workforce diversity metrics from environmental diversity discussions to avoid confusion.",
+        "Align disclosures with SASB standards by reporting percentages for relevant diversity groups in technical roles."
+      ]
+    },
+    {
+      "metric_id": "sasb_24_Percentage_of_2_diversity_group_representation_f",
+      "metric_name": "Percentage of (2) diversity group representation for (d) all other employees",
+      "metric_code": "TC-SI-330a.3",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All segments were analyzed. Segments 1-3 discuss ecological diversity and biodiversity, not workforce diversity. Segment 4 mentions workforce demographics in a general context without specific data on diversity group percentages. Segments 5-8 are unrelated to workforce diversity, covering topics like sustainability goals, AI initiatives, and emissions. No segment provides numeric or qualitative disclosure for the metric 'Percentage of (2) diversity group representation for (d) all other employees'.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 49,
+      "value": "No numeric or qualitative data related to the metric found. Segments focus on ecological diversity, general ESG reporting, and unrelated sustainability topics.",
+      "context": "No numeric or qualitative data related to the metric found. Segments focus on ecological diversity, general ESG reporting, and unrelated sustainability topics.",
+      "evidence_segments": [
+        "P049_S006",
+        "P050_S015",
+        "P053_S015",
+        "P088_S005",
+        "P004_S008",
+        "P006_S002",
+        "P010_S009",
+        "P012_S009"
+      ],
+      "improvement_suggestions": [
+        "Include explicit percentages for diversity group representation in workforce demographics reports.",
+        "Align disclosures with SASB standards by providing targeted data for metrics like sasb_24.",
+        "Improve keyword retrieval accuracy to avoid mismatches with unrelated topics such as ecological diversity."
+      ]
+    },
+    {
+      "metric_id": "sasb_25_Total_amount_of_monetary_losses_as_a_result_of_leg",
+      "metric_name": "Total amount of monetary losses as a result of legal proceedings associated with anti-competitive behaviour regulations",
+      "metric_code": "TC-SI-520a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All retrieved segments focus on environmental sustainability initiatives, such as AI partnerships, carbon reduction goals, energy efficiency, and material usage, with keywords like 'result', 'associated', and 'amount' being incidental matches. None of the segments mention legal proceedings, anti-competitive behavior regulations, or monetary losses, indicating no relevant disclosure for the specified metric.",
+      "unit": "Presentation currency",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 6,
+      "value": "No data on monetary losses from legal proceedings associated with anti-competitive behavior regulations found; segments cover unrelated topics like climate resilience, energy consumption, and carbon emissions.",
+      "context": "No data on monetary losses from legal proceedings associated with anti-competitive behavior regulations found; segments cover unrelated topics like climate resilience, energy consumption, and carbon emissions.",
+      "evidence_segments": [
+        "P006_S002",
+        "P006_S008",
+        "P007_S016",
+        "P011_S009",
+        "P011_S010",
+        "P011_S022",
+        "P014_S003",
+        "P017_S004"
+      ],
+      "improvement_suggestions": [
+        "Add a dedicated section in reports to disclose financial impacts from legal cases, including anti-competitive behavior regulations.",
+        "Provide quantitative data with specific years and contexts for any monetary losses from such legal proceedings.",
+        "Enhance transparency by explicitly addressing legal and regulatory compliance matters in sustainability or ESG disclosures."
+      ]
+    },
+    {
+      "metric_id": "sasb_26_Number_of_1_performance_issues_",
+      "metric_name": "Number of (1) performance issues ",
+      "metric_code": "TC-SI-550a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "After analyzing all eight segments, none provide a direct disclosure of the number of performance issues as specified in the metric. Segments 1, 6, and 8 mention 'performance' in contexts related to improving efficiency, reliability, or project outcomes, but they do not quantify any performance issues. Other segments discuss topics such as innovations, risks, and technology advancements without addressing a count or description of performance incidents. Overall, the retrieved information lacks numeric or qualitative data pertaining to the metric.",
+      "unit": "Number",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 22,
+      "value": null,
+      "context": "by computing workloads, and uses AI models to develop optimized materials which can improve performance and system efficiency. In 2024, the program advanced customized solutions to the prototype stage while exploring additional opportunities to reuse waste heat, airflow, and water from datacenters. Our investments in internal research, partnerships with leading companies, and collaborations with research institutions have been crucial in assessing the feasibility and scalability of this technology.",
+      "evidence_segments": [
+        "P022_S009",
+        "P004_S010",
+        "P006_S004",
+        "P014_S004",
+        "P015_S009",
+        "P015_S013",
+        "P024_S008",
+        "P031_S013"
+      ],
+      "improvement_suggestions": [
+        "Include explicit counts or descriptions of performance incidents in future reports.",
+        "Define 'performance issues' clearly within the ESG framework for standardized reporting.",
+        "Provide annual data on performance management metrics, such as number of issues addressed or resolved."
+      ]
+    },
+    {
+      "metric_id": "sasb_27_2_service_disruptions",
+      "metric_name": "(2) service disruptions",
+      "metric_code": "TC-SI-550a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "The analysis of all provided segments reveals that the content consistently focuses on environmental sustainability, carbon emissions reduction, datacenter operations, AI applications, and supply chain management. Key topics include strategies for reducing Scope 3 emissions, advancements in cooling technologies, and supplier engagement for carbon-free electricity. However, none of the segments mention or discuss 'service disruptions,' which is the specified metric. The retrieved segments matched keywords such as 'service' and 'technology' but in contexts unrelated to disruptions, indicating a lack of disclosure for this metric.",
+      "unit": "Number",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 14,
+      "value": "No data or qualitative information on service disruptions (e.g., frequency, duration, causes, impacts) was found in the segments; all content pertains to environmental and operational sustainability without addressing service reliability or",
+      "context": "No data or qualitative information on service disruptions (e.g., frequency, duration, causes, impacts) was found in the segments; all content pertains to environmental and operational sustainability without addressing service reliability or disruption incidents.",
+      "evidence_segments": [
+        "P014_S004",
+        "P005_S003",
+        "P005_S013",
+        "P006_S004",
+        "P013_S003",
+        "P015_S009",
+        "P016_S010",
+        "P022_S009"
+      ],
+      "improvement_suggestions": [
+        "Report quantitative data on service disruption incidents, such as number and average duration per period.",
+        "Describe causes of disruptions (e.g., technical failures, external factors) and mitigation strategies implemented.",
+        "Include impacts on customers and measures taken to enhance service reliability and resilience."
+      ]
+    },
+    {
+      "metric_id": "sasb_28_3_total_customer_downtime",
+      "metric_name": "(3) total customer downtime",
+      "metric_code": "TC-SI-550a.1",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "The retrieved segments collectively focus on Microsoft's sustainability efforts, customer empowerment through technology, emissions reduction, and operational improvements. However, none of the segments mention or provide information directly related to 'total customer downtime'. Keywords matched are general (e.g., 'customer', 'technology', 'risks'), but no specific data on downtime, service availability, or reliability is found across all segments.",
+      "unit": "Days",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 6,
+      "value": 3.0,
+      "context": "No direct data on total customer downtime found in the segments. Context includes discussions on customer support, technology innovation for sustainability, emissions data (e.g., Scope 3), and datacenter efficiency, but no operational metrics regarding downtime.",
+      "evidence_segments": [
+        "P006_S004",
+        "P008_S009",
+        "P008_S012",
+        "P013_S003",
+        "P014_S004",
+        "P015_S009",
+        "P022_S009",
+        "P024_S008"
+      ],
+      "improvement_suggestions": [
+        "Incorporate quantitative metrics on customer downtime, such as total hours or number of incidents per year, in sustainability or operational reports.",
+        "Provide qualitative disclosures on service reliability measures and strategies to minimize customer downtime, including incident response and prevention practices."
+      ]
+    },
+    {
+      "metric_id": "sasb_29_Description_of_business_continuity_risks_related_t",
+      "metric_name": "Description of business continuity risks related to disruptions of operations",
+      "metric_code": "TC-SI-550a.2",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All eight retrieved segments focus on sustainability initiatives, emissions reductions, and operational improvements related to environmental aspects. They discuss topics such as climate governance, supplier engagement, life cycle assessments, technology optimization, and water management, but none explicitly address business continuity risks or disruptions to operations. Keywords like 'operations' and 'business' are used in contexts of sustainability efforts, not risk management or continuity planning for disruptions.",
+      "unit": "",
+      "category": "Discussion and Analysis",
+      "topic": "",
+      "type": "Disclosure Topics & Metrics",
+      "page": 4,
+      "value": "No specific data or description found for business continuity risks related to disruptions of operations. Segments cover general sustainability topics, including climate council activities, emissions reduction strategies, life cycle assessm",
+      "context": "No specific data or description found for business continuity risks related to disruptions of operations. Segments cover general sustainability topics, including climate council activities, emissions reduction strategies, life cycle assessments, datacenter cooling technologies, sustainable aviation fuel pilots, and water consumption trends.",
+      "evidence_segments": [
+        "P004_S004",
+        "P005_S003",
+        "P008_S007",
+        "P009_S004",
+        "P014_S004",
+        "P015_S009",
+        "P026_S014",
+        "P037_S006"
+      ],
+      "improvement_suggestions": [
+        "Disclose specific business continuity risks, such as those related to supply chain disruptions, natural disasters, or cyber-attacks.",
+        "Describe mitigation strategies or continuity plans in place to address operational disruptions.",
+        "Include examples or metrics on past disruptions and recovery efforts to enhance transparency."
+      ]
+    },
+    {
+      "metric_id": "sasb_30_1_Number_of_licences_or_subscriptions",
+      "metric_name": "(1) Number of licences or subscriptions",
+      "metric_code": "TC-SI-000.A",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "The retrieved segments do not contain any information specific to the metric 'Number of licences or subscriptions'. Segment 1 discusses a number of breakthrough innovations, Segment 2 mentions the number of water replenishment projects funded, Segment 3 indicates 'Number of people reached' without context, and Segment 4 refers to a number of ESG goals. All segments are based on the keyword 'number' but are unrelated to licenses or subscriptions, leading to no disclosure for this metric.",
+      "unit": "Number",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Activity Metrics",
+      "page": 4,
+      "value": 27.0,
+      "context": "Segments reference numbers in other contexts: 27 replenishment projects in FY24 with water benefits, a phrase 'Number of people reached', and qualitative mentions of innovations and ESG goals. No unit, year, or data on licenses or subscriptions is provided.",
+      "evidence_segments": [
+        "P004_S010",
+        "P028_S009",
+        "P034_S009",
+        "P088_S012"
+      ],
+      "improvement_suggestions": [
+        "Report the number of licences or subscriptions if applicable, specifying the reporting period and unit (e.g., total count for FY24).",
+        "Include a dedicated section in ESG reports for metrics related to customer or product engagement, such as licenses or subscriptions."
+      ]
+    },
+    {
+      "metric_id": "sasb_31_2_percentage_cloud-based",
+      "metric_name": "(2) percentage cloud-based",
+      "metric_code": "TC-SI-000.A",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "The metric 'percentage cloud-based' requires disclosure of a numerical percentage. Analysis of all segments reveals no direct numerical or qualitative disclosure: Segments 1-4 discuss percentages in unrelated contexts (HVAC, water, waste, recycled materials), and Segment 5 mentions 'cloud-based' but only in reference to a partner's solutions without quantifying the company's own cloud-based activities. Therefore, no relevant disclosure is found.",
+      "unit": "Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Activity Metrics",
+      "page": 25,
+      "value": 1.0,
+      "context": "No specific data on percentage cloud-based found. Contexts include HVAC embodied carbon (Segment 1), water replenishment percentages (Segment 2), waste diversion percentage (Segment 3), recycled content percentage (Segment 4), and cloud-based IoT partnerships (Segment 5).",
+      "evidence_segments": [
+        "P025_S014",
+        "P030_S008",
+        "P041_S019",
+        "P047_S013",
+        "P059_S005"
+      ],
+      "improvement_suggestions": [
+        "Disclose quantitative data on the percentage of operations, data, or services that are cloud-based to align with SASB metric requirements.",
+        "Provide context and scope for cloud-based sustainability initiatives to enhance transparency."
+      ]
+    },
+    {
+      "metric_id": "sasb_32_1_Data_processing_capacity",
+      "metric_name": "(1) Data processing capacity",
+      "metric_code": "TC-SI-000.B",
+      "disclosure_status": "partially_disclosed",
+      "reasoning": "The retrieved segments provide qualitative information related to data processing, such as efficiency improvements and operational changes, but no specific numeric disclosure for the metric 'Data processing capacity' is found. Segments 3, 4, and 5 discuss enhanced data processing through automation and reduced processing times, while segments 1 and 2 focus on datacenter infrastructure capacity, not data processing. Overall, the disclosure is indirect and lacks quantitative metrics for capacity.",
+      "unit": "Note to TC-SI-000.B – Data processing capacity shall be reported in units of measure typically tracked by the entity or used as the basis for contracting software and information technology (IT) services, such as million service units (MSUs), million instructions per second (MIPS), mega floating-point operations per second (MFLOPS), compute cycles or other. Alternatively, the entity may disclose owned and outsourced data processing needs in other units of measure, such as rack space or data centre floor area. The percentage outsourced shall include on-premise cloud services, those that are hosted on public cloud, and those that are residing in co-location data centres.",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Activity Metrics",
+      "page": 59,
+      "value": "Improved data processing efficiency, e.g., time reduction from a full day to minutes",
+      "context": "reducing data processing from a full day to minutes",
+      "evidence_segments": [
+        "P005_S007",
+        "P015_S009",
+        "P023_S010",
+        "P025_S004",
+        "P059_S007",
+        "P002_S010",
+        "P002_S021",
+        "P002_S040"
+      ],
+      "improvement_suggestions": [
+        "Disclose quantitative data processing capacity metrics, such as throughput (e.g., terabytes processed per second) or annual volumes.",
+        "Provide year-over-year comparisons or benchmarks for data processing capacity aligned with ESG standards.",
+        "Clarify how datacenter infrastructure changes relate to specific data processing capacity figures."
+      ]
+    },
+    {
+      "metric_id": "sasb_33_2_percentage_outsourced",
+      "metric_name": "(2) percentage outsourced",
+      "metric_code": "TC-SI-000.B",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All segments contain the keyword 'percentage' but refer to unrelated metrics: Segment 1 discusses the percentage of embodied carbon in HVAC systems, Segment 2 covers water replenishment portfolio percentages, Segment 3 mentions waste diversion percentage, and Segment 4 addresses the percentage of recycled content. None of these segments mention 'outsourced,' indicating no disclosure for the specific metric 'percentage outsourced.'",
+      "unit": "Note to TC-SI-000.B – Data processing capacity shall be reported in units of measure typically tracked by the entity or used as the basis for contracting software and information technology (IT) services, such as million service units (MSUs), million instructions per second (MIPS), mega floating-point operations per second (MFLOPS), compute cycles or other. Alternatively, the entity may disclose owned and outsourced data processing needs in other units of measure, such as rack space or data centre floor area. The percentage outsourced shall include on-premise cloud services, those that are hosted on public cloud, and those that are residing in co-location data centres.",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Activity Metrics",
+      "page": 25,
+      "value": "No data found for percentage outsourced; segments only provide percentages for other topics such as environmental impact, water management, waste diversion, and recycled materials.",
+      "context": "No data found for percentage outsourced; segments only provide percentages for other topics such as environmental impact, water management, waste diversion, and recycled materials.",
+      "evidence_segments": [
+        "P025_S014",
+        "P030_S008",
+        "P041_S019",
+        "P047_S013"
+      ],
+      "improvement_suggestions": [
+        "Include explicit disclosure of the percentage of outsourced activities in future ESG reports.",
+        "Clarify the definition and scope of 'outsourced' to ensure accurate metric reporting."
+      ]
+    },
+    {
+      "metric_id": "sasb_34_1_Amount_of_data_storage",
+      "metric_name": "(1) Amount of data storage",
+      "metric_code": "TC-SI-000.C",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "The unified analysis of all segments indicates that while various ESG topics are discussed, such as water consumption, waste reduction, biodiversity, emissions, and datacenter transformations, none of the segments provide any information related to the metric 'Amount of data storage'. The keyword matches (e.g., 'amount' and 'data') are in contexts unrelated to data storage capacity, focusing instead on environmental and operational aspects. Therefore, no disclosure is found for this specific metric.",
+      "unit": "Petabytes, Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Activity Metrics",
+      "page": 37,
+      "value": "No specific data on amount of data storage, such as capacity in terabytes or similar units, found in the provided segments.",
+      "context": "No specific data on amount of data storage, such as capacity in terabytes or similar units, found in the provided segments.",
+      "evidence_segments": [
+        "P037_S006",
+        "P002_S010",
+        "P002_S021",
+        "P002_S040",
+        "P004_S009",
+        "P005_S003",
+        "P005_S007",
+        "P005_S009"
+      ],
+      "improvement_suggestions": [
+        "Include explicit disclosure of data storage amounts, such as total capacity or trends, in ESG reports to align with SASB standards.",
+        "Provide detailed metrics on data storage, including units and annual comparisons, to enhance transparency and compliance."
+      ]
+    },
+    {
+      "metric_id": "sasb_35_2_percentage_outsourced",
+      "metric_name": "(2) percentage outsourced",
+      "metric_code": "TC-SI-000.C",
+      "disclosure_status": "not_disclosed",
+      "reasoning": "All retrieved segments mention percentages but in contexts unrelated to the metric 'percentage outsourced'. Segment 1 discusses the percentage of embodied carbon in HVAC systems, Segment 2 shows percentages in a water replenishment portfolio, Segment 3 refers to waste diversion percentage, and Segment 4 involves the percentage of recycled content verified by third-party certification. None address outsourcing of operations or activities.",
+      "unit": "Petabytes, Percentage (%)",
+      "category": "Quantitative",
+      "topic": "",
+      "type": "Activity Metrics",
+      "page": 25,
+      "value": 1.0,
+      "context": "Segments contain percentage data in other ESG areas: embodied carbon (Segment 1), water replenishment activities (Segment 2), waste diversion (Segment 3), and recycled content (Segment 4). No information on outsourcing percentages.",
+      "evidence_segments": [
+        "P025_S014",
+        "P030_S008",
+        "P041_S019",
+        "P047_S013"
+      ],
+      "improvement_suggestions": [
+        "Disclose the specific percentage of operations or activities outsourced as per SASB metric sasb_35_2_percentage_outsourced.",
+        "Include contextual details such as the year of data, units, and scope of outsourcing to enhance transparency."
+      ]
+    }
+  ]
+}

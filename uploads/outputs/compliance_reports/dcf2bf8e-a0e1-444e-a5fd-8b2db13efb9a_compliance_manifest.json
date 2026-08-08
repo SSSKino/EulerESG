@@ -1,0 +1,16 @@
+{
+  "file_id": "dcf2bf8e-a0e1-444e-a5fd-8b2db13efb9a",
+  "framework": "SASB",
+  "default_scope_key": "Software & IT Services",
+  "outputs": [
+    {
+      "scope_key": "Software & IT Services",
+      "json_filename": "Software & IT Services_dcf2bf8e-a0e1-444e-a5fd-8b2db13efb9a_compliance.json",
+      "sasb_metrics_filename": "Software & IT Services_dcf2bf8e-a0e1-444e-a5fd-8b2db13efb9a_sasb_metrics.json",
+      "overall_score": 0.13513513513513514
+    }
+  ],
+  "expected_scope_keys": [
+    "Software & IT Services"
+  ]
+}
