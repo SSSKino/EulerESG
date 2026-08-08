@@ -1,6 +1,7 @@
 """File management service functions."""
 
 from .common import *  # noqa: F401,F403
+from ..visual_assets import invalidate_visual_manifest, load_visual_manifest, safe_asset_path, visual_asset_dir
 
 
 _INTERNAL_OCR_FILE_FIELDS = {
@@ -133,6 +134,60 @@ async def serve_pdf(file_id: str, user_id: int = Depends(get_current_user)):
     )
 
 
+async def list_visual_assets(
+    file_id: str,
+    request: Request,
+    user_id: int = Depends(get_current_user),
+):
+    """Return public visual metadata after checking report ownership."""
+    file_info = file_manager.get_file_info(file_id, user_id=user_id)
+    if not file_info:
+        raise HTTPException(status_code=404, detail="File not found or access denied")
+    manifest = load_visual_manifest(file_info["file_path"])
+    if manifest is None:
+        return JSONResponse({"file_id": file_id, "assets": []})
+    assets = []
+    for item in manifest.get("assets", []):
+        if not isinstance(item, dict) or not item.get("asset_id"):
+            continue
+        public = {k: item.get(k) for k in (
+            "asset_id", "mime_type", "page_number", "bbox", "caption", "summary",
+            "ocr_text", "chart_data", "confidence", "parser_version"
+        )}
+        public["asset_url"] = f"/api/files/{file_id}/visual-assets/{item['asset_id']}"
+        assets.append(public)
+    payload = {"file_id": file_id, "assets": assets}
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    etag = '"' + hashlib.sha256(encoded).hexdigest() + '"'
+    if request.headers.get("if-none-match") == etag:
+        return Response(status_code=304, headers={"ETag": etag, "Cache-Control": "private, max-age=0, must-revalidate"})
+    return JSONResponse(payload, headers={"ETag": etag, "Cache-Control": "private, max-age=0, must-revalidate"})
+
+
+async def serve_visual_asset(
+    file_id: str,
+    asset_id: str,
+    user_id: int = Depends(get_current_user),
+):
+    """Serve one allow-listed crop; never accept a filesystem path from clients."""
+    file_info = file_manager.get_file_info(file_id, user_id=user_id)
+    if not file_info:
+        raise HTTPException(status_code=404, detail="File not found or access denied")
+    resolved = safe_asset_path(file_info["file_path"], asset_id)
+    if not resolved:
+        raise HTTPException(status_code=404, detail="Visual asset not found")
+    path, record = resolved
+    return FileResponse(
+        path=str(path),
+        media_type=str(record.get("mime_type") or "application/octet-stream"),
+        filename=path.name,
+        headers={
+            "Cache-Control": "private, max-age=86400, immutable",
+            "ETag": '"' + str(record.get("sha256") or asset_id) + '"',
+        },
+    )
+
+
 async def delete_file(
     file_id: str,
     scope_key: Optional[str] = None,
@@ -151,6 +206,8 @@ async def delete_file(
         partial = _try_delete_one_scope_only(file_id, file_info, sk)
         if partial is not None:
             return partial
+
+    company_id = str(file_info.get("company_id") or "").strip()
 
     try:
         deleted_items = []
@@ -177,6 +234,12 @@ async def delete_file(
                 deleted_items.append(f"Markdown文件: {md_path.name}")
 
         # 3. 删除嵌入向量文件（以 FileManager 的落盘规则为准）
+        asset_dir = visual_asset_dir(file_path)
+        if asset_dir.exists():
+            invalidate_visual_manifest(file_path)
+            shutil.rmtree(asset_dir)
+            deleted_items.append(f"Visual assets: {asset_dir.name}")
+
         embeddings_paths = [
             Path(file_manager.embeddings_outputs) / f"{file_id}_segments.json",
             Path(file_manager.embeddings_outputs) / f"{file_id}_embeddings.npz",
@@ -251,6 +314,20 @@ async def delete_file(
         # 7. 从元数据中删除
         del file_manager.metadata["files"][file_id]
         file_manager._save_metadata()
+
+        if company_id:
+            try:
+                from ..company_registry import company_registry
+                from .company_report_service import schedule_company_reanalysis
+
+                remaining = company_registry.remove_report(company_id, file_id, user_id)
+                if remaining and remaining.get("report_ids"):
+                    schedule_company_reanalysis(company_id, user_id)
+            except Exception as company_exc:
+                logger.warning(
+                    f"Company result refresh could not be queued after deleting {file_id}: "
+                    f"{company_exc}"
+                )
         deleted_items.append("文件元数据")
         
         logger.info(f"File and related data deleted: {file_id}")

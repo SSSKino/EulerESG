@@ -32,6 +32,12 @@ export interface File {
   pages?: string;
   /** Epoch ms from upload_time (or client clock when queued); newest-first sorting. */
   uploadedAtMs?: number;
+  company_id?: string;
+  company_name?: string;
+  report_year?: number;
+  batch_id?: string;
+  upload_mode?: "single" | "multi" | string;
+  company_analysis_version?: number;
 }
 
 /**
@@ -268,6 +274,16 @@ export const useFileStore = create<FileStore>()(
                 scope_analysis_partial: file.scope_analysis_partial === true,
                 scope_analysis_all_done: file.scope_analysis_all_done === true,
                 scope_analysis_unknown_total: file.scope_analysis_unknown_total === true,
+                company_id: file.company_id || undefined,
+                company_name: file.company_name || undefined,
+                report_year:
+                  typeof file.report_year === "number" ? file.report_year : undefined,
+                batch_id: file.batch_id || undefined,
+                upload_mode: file.upload_mode || undefined,
+                company_analysis_version:
+                  typeof file.company_analysis_version === "number"
+                    ? file.company_analysis_version
+                    : undefined,
               };
               backendFiles.push(...expandMultiScopeBackendRows(file, mapped));
             }

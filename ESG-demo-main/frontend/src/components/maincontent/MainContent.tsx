@@ -7,18 +7,8 @@ import { useFileStore } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
 import UploadArea from "./UploadArea";
 import UploadOptionsModal from "./UploadOptionsModal";
+import type { FileInfoFormValues } from "./FileInfoForm";
 import { useT } from "@/i18n/useT";
-
-interface UploadOptions {
-  category: string;
-  description: string;
-  tags: string[];
-  industry: string;
-  semiIndustry: string | string[];
-  framework: string;
-  griSector?: string;
-  griTopics?: string[];
-}
 
 type ActiveReportJob = {
   jobId: string;
@@ -79,16 +69,29 @@ const MainContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUploadFiles, setSelectedUploadFiles] = useState<UploadFile[]>([]);
   const [selectedIndustry, setSelectedIndustry] = useState<string>("");
+  const [uploadMode, setUploadMode] = useState<"single" | "multi">("single");
+  const [uploadSubmitting, setUploadSubmitting] = useState(false);
   const [activeReportJobs, setActiveReportJobs] = useState<Record<string, ActiveReportJob>>({});
-  const [form] = Form.useForm<UploadOptions>();
+  const [form] = Form.useForm<FileInfoFormValues>();
 
   const handleBeforeUpload = (files: UploadFile[]) => {
     if (!files.length) return;
+    if (uploadMode === "single" && files.length !== 1) {
+      void message.error(t("upload.singleReportLimit"));
+      return;
+    }
+    if (uploadMode === "multi" && (files.length < 2 || files.length > 8)) {
+      void message.error(t("upload.multiReportLimit"));
+      return;
+    }
     setSelectedUploadFiles(files);
     setIsModalOpen(true);
   };
 
   const handleModalOk = async () => {
+    if (uploadSubmitting) return;
+    let batchMessageKey: string | null = null;
+    setUploadSubmitting(true);
     try {
       await form.validateFields();
       const queuedFiles = [...selectedUploadFiles];
@@ -98,6 +101,12 @@ const MainContent = () => {
         setIsModalOpen(false);
         form.resetFields();
         return;
+      }
+      if (uploadMode === "single" && queuedFiles.length !== 1) {
+        throw new Error(t("upload.singleReportLimit"));
+      }
+      if (uploadMode === "multi" && (queuedFiles.length < 2 || queuedFiles.length > 8)) {
+        throw new Error(t("upload.multiReportLimit"));
       }
 
       const isGRI = values.framework === "GRI";
@@ -112,13 +121,7 @@ const MainContent = () => {
             ? JSON.stringify(semiVals)
             : undefined;
       const store = useFileStore.getState();
-
-      setIsModalOpen(false);
-      setSelectedUploadFiles([]);
-      setSelectedIndustry("");
-      form.resetFields();
-
-      const batchMessageKey = `upload-batch-${Date.now()}`;
+      batchMessageKey = `upload-batch-${Date.now()}`;
       void message.open({
         key: batchMessageKey,
         type: "loading",
@@ -126,138 +129,117 @@ const MainContent = () => {
         duration: 0,
       });
 
-      let successCount = 0;
-      let failedCount = 0;
-
-      for (const uploadFile of queuedFiles) {
-        try {
-          const file = uploadFile.originFileObj ?? uploadFile;
-          if (!(file instanceof File)) {
-            throw new Error(t("upload.invalidFile"));
-          }
-
-          const response = await apiService.uploadReport(
-            file,
-            values.framework,
-            isCDP ? "CDP" : isTCFD ? "TCFD" : values.industry,
-            isGRI ? "" : semiVals[0] ?? "",
-            values.griSector,
-            griTopics[0] ?? "",
-            scopeSlugs
-          );
-
-          if (response?.file_id) {
-            void store.loadFilesFromBackend();
-          }
-
-          if (response?.job_id) {
-            const jobMessageKey = `report-job-${response.job_id}`;
-            void message.open({
-              key: jobMessageKey,
-              type: "loading",
-              content: `${file.name}: ${response.message || "Processing started."}`,
-              duration: 0,
-            });
-            setActiveReportJobs((prev) => ({
-              ...prev,
-              [response.job_id!]: {
-                jobId: response.job_id!,
-                fileName: file.name,
-                status: "processing",
-                stage: "queued",
-                message: response.message || "Processing started.",
-                progress: 0,
-              },
-            }));
-            apiService.subscribeReportJob(response.job_id, {
-              onEvent: (event) => {
-                setActiveReportJobs((prev) => ({
-                  ...prev,
-                  [response.job_id!]: {
-                    jobId: response.job_id!,
-                    fileName: file.name,
-                    status: event.status,
-                    stage: event.stage,
-                    message: userFacingJobMessage(event),
-                    progress: event.progress,
-                    error: event.error,
-                  },
-                }));
-                void message.open({
-                  key: jobMessageKey,
-                  type: "loading",
-                  content: formatReportJobMessage(file.name, event),
-                  duration: 0,
-                });
-              },
-              onDone: async (event) => {
-                message.destroy(jobMessageKey);
-                setActiveReportJobs((prev) => ({
-                  ...prev,
-                  [response.job_id!]: {
-                    jobId: response.job_id!,
-                    fileName: file.name,
-                    status: event.status,
-                    stage: event.stage || "completed",
-                    message: userFacingJobMessage(event),
-                    progress: 100,
-                  },
-                }));
-                window.setTimeout(() => {
-                  setActiveReportJobs((prev) => {
-                    const next = { ...prev };
-                    delete next[response.job_id!];
-                    return next;
-                  });
-                }, 8000);
-                void message.success(`${file.name}: ${event.message || "Processing completed."}`);
-                if (response.file_id) {
-                  apiService.invalidateAssessmentByFileCache(response.file_id);
-                  apiService.prefetchAssessmentByFile(response.file_id, undefined, true);
-                }
-                await store.loadFilesFromBackend();
-              },
-              onError: async (event) => {
-                message.destroy(jobMessageKey);
-                const errorText = "Processing failed. Please try again.";
-                setActiveReportJobs((prev) => ({
-                  ...prev,
-                  [response.job_id!]: {
-                    ...(prev[response.job_id!] || { jobId: response.job_id!, fileName: file.name }),
-                    status: "failed",
-                    stage: "failed",
-                    message: errorText,
-                    error: errorText,
-                  },
-                }));
-                void message.error(`${file.name}: ${errorText}`);
-                await store.loadFilesFromBackend();
-              },
-            });
-          }
-
-          successCount += 1;
-        } catch (error: any) {
-          failedCount += 1;
-          console.error("Upload error:", error);
-        }
-      }
+      const nativeFiles = queuedFiles.map((uploadFile) => {
+        const value = uploadFile.originFileObj ?? uploadFile;
+        if (!(value instanceof File)) throw new Error(t("upload.invalidFile"));
+        return value;
+      });
+      const companyId = values.companyId === "__new__" ? undefined : values.companyId;
+      const displayName = companyId
+        ? nativeFiles.length === 1
+          ? nativeFiles[0].name
+          : t("upload.companyBatch")
+        : values.companyName || t("upload.companyBatch");
+      const response = await apiService.uploadReportBatch(nativeFiles, {
+        uploadMode,
+        companyId,
+        companyName: companyId ? undefined : values.companyName,
+        reportYears: values.reportYears,
+        framework: values.framework,
+        industry: isCDP ? "CDP" : isTCFD ? "TCFD" : values.industry,
+        semiIndustry: isGRI ? "" : semiVals[0] ?? "",
+        griSector: values.griSector,
+        griTopic: griTopics[0] ?? "",
+        scopeSlugs,
+      });
 
       message.destroy(batchMessageKey);
-
+      setIsModalOpen(false);
+      setSelectedUploadFiles([]);
+      setSelectedIndustry("");
+      form.resetFields();
       await store.loadFilesFromBackend();
 
-      if (successCount > 0) {
-        void message.success(
-          `Queued ${successCount} file(s) for background processing${failedCount ? `, ${failedCount} failed to upload` : ""}.`
-        );
-      }
-      if (successCount === 0 && failedCount > 0) {
-        void message.error(t("upload.uploadFailed", { error: t("upload.batchUploadFailed") }));
-      }
-    } catch (error) {
+      const jobMessageKey = `report-job-${response.job_id}`;
+      setActiveReportJobs((prev) => ({
+        ...prev,
+        [response.job_id]: {
+          jobId: response.job_id,
+          fileName: displayName,
+          status: "processing",
+          stage: "queued",
+          message: response.message || t("upload.processingStarted"),
+          progress: 0,
+        },
+      }));
+      apiService.subscribeReportJob(response.job_id, {
+        onEvent: (event) => {
+          setActiveReportJobs((prev) => ({
+            ...prev,
+            [response.job_id]: {
+              jobId: response.job_id,
+              fileName: displayName,
+              status: event.status,
+              stage: event.stage,
+              message: userFacingJobMessage(event),
+              progress: event.progress,
+              error: event.error,
+            },
+          }));
+          void message.open({
+            key: jobMessageKey,
+            type: "loading",
+            content: formatReportJobMessage(displayName, event),
+            duration: 0,
+          });
+        },
+        onDone: async (event) => {
+          message.destroy(jobMessageKey);
+          setActiveReportJobs((prev) => ({
+            ...prev,
+            [response.job_id]: {
+              jobId: response.job_id,
+              fileName: displayName,
+              status: event.status,
+              stage: "completed",
+              message: userFacingJobMessage(event),
+              progress: 100,
+            },
+          }));
+          window.setTimeout(() => {
+            setActiveReportJobs((prev) => {
+              const next = { ...prev };
+              delete next[response.job_id];
+              return next;
+            });
+          }, 8000);
+          void message.success(`${displayName}: ${event.message || t("upload.processingCompleted")}`);
+          await store.loadFilesFromBackend();
+        },
+        onError: async () => {
+          message.destroy(jobMessageKey);
+          const errorText = t("upload.processingFailed");
+          setActiveReportJobs((prev) => ({
+            ...prev,
+            [response.job_id]: {
+              ...(prev[response.job_id] || { jobId: response.job_id, fileName: displayName }),
+              status: "failed",
+              stage: "failed",
+              message: errorText,
+              error: errorText,
+            },
+          }));
+          void message.error(`${displayName}: ${errorText}`);
+          await store.loadFilesFromBackend();
+        },
+      });
+      void message.success(t("upload.batchQueued", { count: String(nativeFiles.length) }));
+    } catch (error: any) {
+      if (batchMessageKey) message.destroy(batchMessageKey);
       console.error("Validation failed:", error);
-      void message.error(t("upload.fillRequiredFields"));
+      void message.error(error?.message || t("upload.fillRequiredFields"));
+    } finally {
+      setUploadSubmitting(false);
     }
   };
 
@@ -291,7 +273,11 @@ const MainContent = () => {
           })}
         </div>
       )}
-      <UploadArea onBeforeUpload={handleBeforeUpload} />
+      <UploadArea
+        onBeforeUpload={handleBeforeUpload}
+        uploadMode={uploadMode}
+        onUploadModeChange={setUploadMode}
+      />
       <UploadOptionsModal
         isOpen={isModalOpen}
         selectedUploadFiles={selectedUploadFiles}
@@ -300,6 +286,8 @@ const MainContent = () => {
         onCancel={handleModalCancel}
         onIndustryChange={setSelectedIndustry}
         form={form}
+        uploadMode={uploadMode}
+        confirmLoading={uploadSubmitting}
       />
     </>
   );

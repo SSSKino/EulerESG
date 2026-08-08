@@ -31,12 +31,16 @@ class _FakePipeline:
 class _FakeRedis:
     def __init__(self) -> None:
         self.hashes = {}
+        self.queue_length = 0
 
     def hset(self, key, mapping):
         self.hashes.setdefault(key, {}).update(mapping)
 
     def hgetall(self, key):
         return dict(self.hashes.get(key, {}))
+
+    def hget(self, key, field):
+        return self.hashes.get(key, {}).get(field)
 
     def hincrby(self, key, field, amount):
         current = int(self.hashes.setdefault(key, {}).get(field, 0))
@@ -45,8 +49,51 @@ class _FakeRedis:
     def expire(self, key, ttl):  # noqa: ARG002
         return True
 
+    def llen(self, key):  # noqa: ARG002
+        return self.queue_length
+
 
 class PaddleRuntimeTests(unittest.TestCase):
+    def test_document_release_request_unloads_and_acknowledges_when_queue_is_idle(self) -> None:
+        redis = _FakeRedis()
+        redis.hashes["paddleocr:control:release"] = {
+            "request_id": "release-1",
+            "job_id": "job-1",
+        }
+
+        with patch.object(worker, "release_pipeline") as release:
+            request_id = worker._maybe_release_requested(
+                redis,
+                worker_id="worker-1",
+                queue_name="paddleocr:parse",
+                last_request_id="",
+            )
+
+        self.assertEqual(request_id, "release-1")
+        release.assert_called_once()
+        self.assertEqual(
+            redis.hashes["paddleocr:control:release"]["ack:worker-1"],
+            "release-1",
+        )
+
+    def test_document_release_waits_while_another_batch_is_queued(self) -> None:
+        redis = _FakeRedis()
+        redis.queue_length = 1
+        redis.hashes["paddleocr:control:release"] = {
+            "request_id": "release-2",
+        }
+
+        with patch.object(worker, "release_pipeline") as release:
+            request_id = worker._maybe_release_requested(
+                redis,
+                worker_id="worker-1",
+                queue_name="paddleocr:parse",
+                last_request_id="",
+            )
+
+        self.assertEqual(request_id, "")
+        release.assert_not_called()
+
     def test_remote_vllm_options_enable_bounded_continuous_batching(self) -> None:
         env = {
             "PADDLEOCR_VL_REC_BACKEND": "vllm-server",

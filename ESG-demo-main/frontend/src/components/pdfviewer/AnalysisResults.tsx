@@ -18,6 +18,14 @@ type AnalysisDataItem = {
   page?: string | number | null;
   context?: string | null;
   definition?: string | null;
+  visualEvidence?: {
+    asset_id: string;
+    evidence_type?: string;
+    caption?: string;
+    confidence?: number;
+    chart_data?: Record<string, unknown> | null;
+    bbox?: number[] | null;
+  } | null;
 };
 
 interface AnalysisResultsProps {
@@ -40,6 +48,25 @@ const formatNumber = (v: number) => {
   } catch {
     return String(v);
   }
+};
+
+const VisualEvidencePreview: React.FC<{ fileId: string; assetId: string; alt?: string }> = ({
+  fileId,
+  assetId,
+  alt,
+}) => {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    apiService.getVisualAssetObjectUrl(fileId, assetId).then((objectUrl) => {
+      if (!active) return;
+      setUrl(objectUrl);
+    }).catch(() => setUrl(null));
+    return () => {
+      active = false;
+    };
+  }, [fileId, assetId]);
+  return url ? <img src={url} alt={alt || "Visual evidence"} className="mt-2 max-h-64 max-w-full rounded border object-contain" /> : null;
 };
 
 const normalizePage = (page: string | number | null | undefined): number | null => {
@@ -222,6 +249,9 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
         item?.evidence_text,
         item?.evidenceText
       );
+      const visualEvidence = (item?.evidence_sources || []).find(
+        (source: any) => source && typeof source === "object" && source.asset_id
+      ) || null;
 
       return {
         metric_id,
@@ -241,6 +271,7 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
           typeof (item?.definition ?? item?.Definition) === "string"
             ? String(item?.definition ?? item?.Definition).trim() || null
             : null,
+        visualEvidence,
       };
     });
 
@@ -490,6 +521,21 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
               ) : (
                 <div className="mt-1 text-xs text-gray-500">{t("analysis.noEvidenceExcerpt")}</div>
               )}
+              {fileId && record.visualEvidence?.asset_id && (
+                <>
+                  <VisualEvidencePreview
+                    fileId={fileId}
+                    assetId={record.visualEvidence.asset_id}
+                    alt={record.visualEvidence.caption || record.metric_name}
+                  />
+                  <div className="mt-1 text-xs text-gray-500">
+                    {record.visualEvidence.evidence_type || "visual"}
+                    {typeof record.visualEvidence.confidence === "number"
+                      ? ` · ${Math.round(record.visualEvidence.confidence * 100)}%`
+                      : ""}
+                  </div>
+                </>
+              )}
             </div>
           );
 
@@ -538,7 +584,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       },
     ];
   },
-  [data, onPageNavigate, t]
+  [data, fileId, onPageNavigate, t]
 );
 
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Form, Select, Space, Card } from "antd";
+import { Card, Form, Input, InputNumber, Select, Space } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import type { FormInstance } from "antd/es/form";
 import { industries, SASB_OTHER_INDUSTRY_KEY } from "@/data/industries";
@@ -7,6 +7,7 @@ import { CDP_TOPIC_OPTIONS } from "@/data/cdpTopics";
 import { TCFD_TOPIC_OPTIONS } from "@/data/tcfdTopics";
 import { useT } from "@/i18n/useT";
 import { apiService } from "@/lib/api";
+import type { CompanySummary } from "@/lib/api";
 
 export type FileInfoFormValues = {
   category: string;
@@ -19,6 +20,9 @@ export type FileInfoFormValues = {
   griSector?: string;
   /** GRI topic slugs (multi-select supported). */
   griTopics?: string[];
+  companyId: string;
+  companyName?: string;
+  reportYears?: Array<number | undefined>;
 };
 
 interface FileInfoFormProps {
@@ -26,6 +30,7 @@ interface FileInfoFormProps {
   selectedUploadFiles: UploadFile[];
   selectedIndustry: string;
   onIndustryChange: (value: string) => void;
+  uploadMode: "single" | "multi";
 }
 
 interface GriOption {
@@ -33,15 +38,24 @@ interface GriOption {
   label: string;
 }
 
+function detectReportYear(filename: string): number | undefined {
+  const matches = Array.from(String(filename || "").matchAll(/(?<!\d)((?:19|20)\d{2})(?!\d)/g));
+  const value = matches.at(-1)?.[1];
+  return value ? Number(value) : undefined;
+}
+
 const FileInfoForm: React.FC<FileInfoFormProps> = ({
   form,
   selectedUploadFiles,
   selectedIndustry,
   onIndustryChange,
+  uploadMode,
 }) => {
   const { t } = useT();
   const framework = Form.useWatch("framework", form);
   const griSector = Form.useWatch("griSector", form);
+  const selectedCompanyId = Form.useWatch("companyId", form);
+  const scopeLocked = Boolean(selectedCompanyId && selectedCompanyId !== "__new__");
   const isSASBSelected = framework === "SASB";
   const isGRISelected = framework === "GRI";
   const isCDPSelected = framework === "CDP";
@@ -51,6 +65,21 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
     sectors: GriOption[];
     topicsBySector: Record<string, GriOption[]>;
   }>({ sectors: [], topicsBySector: {} });
+  const [companies, setCompanies] = useState<CompanySummary[]>([]);
+
+  useEffect(() => {
+    apiService
+      .getCompanies()
+      .then((response) => setCompanies(response.companies || []))
+      .catch(() => setCompanies([]));
+  }, [selectedUploadFiles]);
+
+  useEffect(() => {
+    form.setFieldValue(
+      "reportYears",
+      selectedUploadFiles.map((file) => detectReportYear(file.name))
+    );
+  }, [form, selectedUploadFiles]);
 
   useEffect(() => {
     if (!isGRISelected) return;
@@ -118,6 +147,28 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
     }
   };
 
+  const handleCompanyChange = (companyId: string) => {
+    if (companyId === "__new__") {
+      form.setFieldsValue({ companyId, companyName: undefined });
+      return;
+    }
+    const company = companies.find((item) => item.company_id === companyId);
+    if (!company) return;
+    const scope = company.scope_config || {};
+    const scopeSlugs = Array.isArray(scope.scope_slugs) ? scope.scope_slugs : [];
+    const frameworkValue = String(scope.framework || "");
+    onIndustryChange(String(scope.industry || ""));
+    form.setFieldsValue({
+      companyId,
+      companyName: company.company_name,
+      framework: frameworkValue,
+      industry: String(scope.industry || ""),
+      semiIndustry: frameworkValue === "GRI" ? [] : scopeSlugs,
+      griSector: scope.gri_sector || undefined,
+      griTopics: frameworkValue === "GRI" ? scopeSlugs : [],
+    });
+  };
+
   return (
     <Form<FileInfoFormValues>
       form={form}
@@ -130,6 +181,8 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
         framework: "",
         griSector: undefined,
         griTopics: [],
+        companyId: "__new__",
+        reportYears: selectedUploadFiles.map(() => undefined),
       }}
     >
       <Form.Item label={t("upload.fileInformation")}>
@@ -154,6 +207,50 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
       </Form.Item>
 
       <Form.Item
+        name="companyId"
+        label={t("upload.company")}
+        rules={[{ required: true, message: t("upload.selectCompany") }]}
+      >
+        <Select
+          onChange={handleCompanyChange}
+          options={[
+            { label: t("upload.newCompany"), value: "__new__" },
+            ...companies.map((company) => ({
+              label: `${company.company_name} (${company.report_count ?? company.report_ids.length}/8)`,
+              value: company.company_id,
+            })),
+          ]}
+        />
+      </Form.Item>
+
+      {selectedCompanyId === "__new__" && (
+        <Form.Item
+          name="companyName"
+          label={t("upload.companyName")}
+          rules={[{ required: true, whitespace: true, message: t("upload.enterCompanyName") }]}
+        >
+          <Input maxLength={160} placeholder={t("upload.companyNamePlaceholder")} />
+        </Form.Item>
+      )}
+
+      <Form.Item label={t("upload.reportYears")}>
+        <Space direction="vertical" style={{ width: "100%" }}>
+          {selectedUploadFiles.map((file, index) => (
+              <div key={file.uid} className="grid grid-cols-[minmax(0,1fr)_120px] items-center gap-3">
+                <span className="truncate text-sm text-gray-700" title={file.name}>{file.name}</span>
+                <Form.Item name={["reportYears", index]} noStyle>
+                  <InputNumber min={1900} max={2100} placeholder={t("upload.yearAuto")} style={{ width: "100%" }} />
+                </Form.Item>
+              </div>
+          ))}
+        </Space>
+      </Form.Item>
+
+      <div className="mb-4 text-xs text-gray-500">
+        {uploadMode === "multi" ? t("upload.multiReportLimit") : t("upload.singleReportLimit")}
+      </div>
+
+      <Form.Item
         name="framework"
         label={t("upload.framework")}
         rules={[{ required: true, message: t("upload.pleaseSelectFramework") }]}
@@ -167,6 +264,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
             { label: "TCFD", value: "TCFD" },
           ]}
           onChange={handleFrameworkChange}
+          disabled={scopeLocked}
           style={{ width: "100%" }}
         />
       </Form.Item>
@@ -193,6 +291,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
                 onIndustryChange(value);
                 form.setFieldsValue({ semiIndustry: undefined });
               }}
+              disabled={scopeLocked}
               style={{ width: "100%" }}
             >
               {Object.keys(industries).map((industry) => (
@@ -220,7 +319,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
               allowClear
               maxTagCount="responsive"
               placeholder={t("upload.selectSubIndustry")}
-              disabled={!selectedIndustry}
+              disabled={!selectedIndustry || scopeLocked}
               style={{ width: "100%" }}
             >
               {selectedIndustry &&
@@ -264,6 +363,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
               maxTagCount="responsive"
               placeholder={t("upload.selectCdpTopic")}
               style={{ width: "100%" }}
+              disabled={scopeLocked}
               options={CDP_TOPIC_OPTIONS.map((o) => ({ label: o.label, value: o.slug }))}
             />
           </Form.Item>
@@ -299,6 +399,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
               allowClear
               maxTagCount="responsive"
               placeholder={t("upload.selectTcfdTopic")}
+              disabled={scopeLocked}
               style={{ width: "100%" }}
               options={TCFD_TOPIC_OPTIONS.map((o) => ({ label: o.label, value: o.slug }))}
             />
@@ -325,6 +426,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
             <Select
               placeholder={t("upload.selectGriSector")}
               onChange={() => form.setFieldsValue({ griTopics: [] })}
+              disabled={scopeLocked}
               style={{ width: "100%" }}
               options={griOptions.sectors.map((s) => ({ label: s.label, value: s.slug }))}
             />
@@ -347,7 +449,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
               allowClear
               maxTagCount="responsive"
               placeholder={t("upload.selectGriTopics")}
-              disabled={!griSector}
+              disabled={!griSector || scopeLocked}
               style={{ width: "100%" }}
               options={griTopicOptions.map((s) => ({ label: s.label, value: s.slug }))}
             />

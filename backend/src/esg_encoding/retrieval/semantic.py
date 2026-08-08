@@ -269,26 +269,38 @@ class SemanticRetriever:
             # for every metric without moving any passage vectors back onto GPU.
             embedding_cache = getattr(report_content, "_semantic_retrieval_embedding_cache", None)
             if embedding_cache is None:
-                segment_embeddings = []
-                segments = []
                 segment_lookup = {
                     getattr(seg, "segment_id", None): seg
                     for seg in report_content.document_content.segments
                     if getattr(seg, "segment_id", None)
                 }
 
-                for segment_emb in report_content.embeddings:
-                    seg = segment_lookup.get(segment_emb.segment_id)
-                    if seg is None:
-                        continue
-                    segment_embeddings.append(segment_emb.embedding)
-                    segments.append(seg)
+                native_matrix = getattr(report_content, "_embedding_matrix", None)
+                native_ids = getattr(report_content, "_embedding_segment_ids", None)
+                if isinstance(native_matrix, np.ndarray) and native_matrix.ndim == 2 and native_ids is not None and len(native_ids) == native_matrix.shape[0]:
+                    pairs = [(segment_lookup.get(str(segment_id)), index) for index, segment_id in enumerate(native_ids)]
+                    valid_pairs = [(segment, index) for segment, index in pairs if segment is not None]
+                    segments = [segment for segment, _ in valid_pairs]
+                    indices = [index for _, index in valid_pairs]
+                    if indices == list(range(native_matrix.shape[0])) and native_matrix.dtype == np.float32 and native_matrix.flags.c_contiguous:
+                        segment_embeddings = native_matrix
+                    else:
+                        segment_embeddings = np.ascontiguousarray(native_matrix[indices], dtype=np.float32)
+                else:
+                    raw_embeddings = []
+                    segments = []
+                    for segment_emb in report_content.embeddings:
+                        seg = segment_lookup.get(segment_emb.segment_id)
+                        if seg is None:
+                            continue
+                        raw_embeddings.append(segment_emb.embedding)
+                        segments.append(seg)
+                    segment_embeddings = np.asarray(raw_embeddings, dtype=np.float32) if raw_embeddings else np.zeros((0, 0), dtype=np.float32)
 
                 if not segment_embeddings:
                     logger.warning("No embedding vectors found in report")
                     return []
 
-                segment_embeddings = np.asarray(segment_embeddings, dtype=np.float32)
                 embedding_cache = (segments, segment_embeddings)
                 try:
                     setattr(report_content, "_semantic_retrieval_embedding_cache", embedding_cache)
@@ -378,6 +390,7 @@ class SemanticRetriever:
                             retrieval_type="semantic+rerank",
                             matched_keywords=[],
                             metric_id=metric.metric_id
+                            , **visual_result_fields(segment)
                         ))
                 logger.info("Used reranker for semantic retrieval" + (" with cached report embeddings" if can_reuse_embeddings else ""))
             else:
@@ -393,6 +406,7 @@ class SemanticRetriever:
                             retrieval_type="semantic",
                             matched_keywords=[],
                             metric_id=metric.metric_id
+                            , **visual_result_fields(segment)
                         ))
                 
                 logger.info(f"Used cosine similarity fallback for semantic retrieval")

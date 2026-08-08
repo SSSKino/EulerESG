@@ -41,13 +41,24 @@ def get_executor() -> ThreadPoolExecutor:
     return _executor
 
 
-def create_report_job(*, file_id: str, filename: str, user_id: Optional[int] = None) -> Dict[str, Any]:
+def create_report_job(
+    *,
+    file_id: str,
+    filename: str,
+    user_id: Optional[int] = None,
+    file_ids: Optional[List[str]] = None,
+    company_id: Optional[str] = None,
+    batch_id: Optional[str] = None,
+) -> Dict[str, Any]:
     job_id = f"report_{uuid.uuid4().hex}"
     now = _now()
     job = {
         "job_id": job_id,
         "file_id": file_id,
+        "file_ids": list(file_ids or ([file_id] if file_id else [])),
         "filename": filename,
+        "company_id": company_id,
+        "batch_id": batch_id,
         "user_id": user_id,
         "status": "queued",
         "stage": "queued",
@@ -129,7 +140,10 @@ def _public_snapshot(job: Dict[str, Any]) -> Dict[str, Any]:
     payload = {
         "job_id": job.get("job_id"),
         "file_id": job.get("file_id"),
+        "file_ids": list(job.get("file_ids") or []),
         "filename": job.get("filename"),
+        "company_id": job.get("company_id"),
+        "batch_id": job.get("batch_id"),
         "status": job.get("status"),
         "stage": job.get("stage"),
         "progress": job.get("progress"),

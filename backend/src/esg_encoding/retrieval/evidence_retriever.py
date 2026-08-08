@@ -8,6 +8,9 @@ report phrase -> canonical metric mapping.
 
 from __future__ import annotations
 
+import hashlib
+import json
+import os
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
 
@@ -103,7 +106,34 @@ def retrieve_metric_collection(
     enrich_document_with_pdf_links(report_content.document_content)
     config = config or _get_default_config(getattr(ProcessingConfig(), "top_k", 50))
     retriever = DualChannelRetriever(config)
-    return retriever.retrieve_for_collection(report_content, metric_collection)
+    cache = getattr(report_content, "_metric_retrieval_cache", None)
+    if not isinstance(cache, dict):
+        cache = {}
+        object.__setattr__(report_content, "_metric_retrieval_cache", cache)
+    expansions = {item.metric_id: item for item in (getattr(metric_collection, "semantic_expansions", None) or [])}
+    config_payload = config.model_dump(mode="json") if hasattr(config, "model_dump") else vars(config)
+    model_versions = {
+        "embedding": os.getenv("EMBEDDING_MODEL", ""),
+        "reranker": os.getenv("RERANK_MODEL", ""),
+    }
+    results = []
+    for metric in list(getattr(metric_collection, "metrics", None) or []):
+        expansion = expansions.get(getattr(metric, "metric_id", ""))
+        payload = {
+            "document": report_content.document_id,
+            "segments": len(report_content.document_content.segments),
+            "metric": metric.model_dump(mode="json") if hasattr(metric, "model_dump") else vars(metric),
+            "expansion": expansion.model_dump(mode="json") if hasattr(expansion, "model_dump") else (vars(expansion) if expansion else None),
+            "config": config_payload,
+            "models": model_versions,
+        }
+        key = hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=True, default=str, separators=(",", ":")).encode()).hexdigest()
+        result = cache.get(key)
+        if result is None:
+            result = retriever.retrieve_for_metric(report_content, metric, expansion)
+            cache[key] = result
+        results.append(result)
+    return results
 
 
 def _profiles_for_mapping(metric_collection: Optional[Any] = None) -> List[MetricRetrievalProfile]:

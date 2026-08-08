@@ -17,6 +17,24 @@ from .report_jobs import (
 )
 
 
+def _runtime_resource_snapshot() -> dict:
+    snapshot: dict = {}
+    try:
+        import resource
+        rss = float(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+        snapshot["peak_rss_mb"] = round(rss / (1024 if os.name != "darwin" else 1024 * 1024), 2)
+    except Exception:
+        pass
+    try:
+        import torch
+        if torch.cuda.is_available():
+            snapshot["gpu_allocated_mb"] = round(torch.cuda.memory_allocated() / 1048576, 2)
+            snapshot["gpu_peak_allocated_mb"] = round(torch.cuda.max_memory_allocated() / 1048576, 2)
+    except Exception:
+        pass
+    return snapshot
+
+
 
 def _emit_upload_progress(progress_cb, stage: str, message: str, progress: Optional[float] = None, **extra) -> None:
     """Send upload/report processing progress to the active SSE job."""
@@ -88,6 +106,8 @@ def _sync_upload_report_body(
     progress_cb=None,
 ) -> dict:
     """PDF encode + assessment off the event loop (keeps /api/files responsive)."""
+    pipeline_started = time.perf_counter()
+    performance: dict = {"scopes": [], "resources_start": _runtime_resource_snapshot()}
     try:
         if pre_saved_file_info is not None:
             file_info = dict(pre_saved_file_info)
@@ -119,11 +139,13 @@ def _sync_upload_report_body(
         old_progress_cb = getattr(getattr(encoder, "extractor", None), "progress_callback", None)
         if getattr(encoder, "extractor", None) is not None:
             encoder.extractor.progress_callback = progress_cb
+        encode_started = time.perf_counter()
         try:
             report_content = encoder.encode_pdf(file_info["file_path"], save_markdown=True)
         finally:
             if getattr(encoder, "extractor", None) is not None:
                 encoder.extractor.progress_callback = old_progress_cb
+        performance["encode_seconds"] = round(time.perf_counter() - encode_started, 3)
 
         # IMPORTANT: Align document_id with file_id so all downstream (chat/cache/output filenames)
         # use a single stable identifier.
@@ -135,10 +157,12 @@ def _sync_upload_report_body(
 
         # Persist segments + embeddings for fast chat retrieval after restart.
         # (This is crucial for "load previous embeddings" requirement.)
+        persist_started = time.perf_counter()
         try:
             file_manager.save_report_artifacts(file_info["file_id"], report_content)
         except Exception as e:
             logger.warning(f"Failed to persist report artifacts for {file_info['file_id']}: {e}")
+        performance["artifact_persist_seconds"] = round(time.perf_counter() - persist_started, 3)
         logger.info("PDF processing completed")
         _emit_upload_progress(progress_cb, "pdf_processed", "Report text extraction and embeddings completed.", 50, file_id=file_info.get("file_id"))
 
@@ -307,9 +331,10 @@ def _sync_upload_report_body(
                     industry=industry,
                     semi_industry=semi_for_disclosure,
                 )
+                analysis_elapsed = time.perf_counter() - t_start
                 logger.info(
                     f"Disclosure inference scope={scope_key} took "
-                    f"{time.perf_counter() - t_start:.2f}s"
+                    f"{analysis_elapsed:.2f}s"
                 )
                 last_assessment = assessment
 
@@ -402,6 +427,14 @@ def _sync_upload_report_body(
                     f"Compliance scope={scope_key} completed in "
                     f"{time.perf_counter() - scope_started:.2f}s"
                 )
+                performance["scopes"].append({
+                    "scope_key": scope_key,
+                    "total_seconds": round(time.perf_counter() - scope_started, 3),
+                    "metrics_seconds": round(retrieval_started - metrics_started, 3),
+                    "retrieval_seconds": round(t_start - retrieval_started, 3),
+                    "analysis_seconds": round(analysis_elapsed, 3),
+                    "metric_count": len(metrics.metrics),
+                })
                 _emit_upload_progress(progress_cb, "assessment_scope_done", f"Completed scope {scope_index}/{len(scopes_list)}: {scope_key}.", 55 + 35 * (scope_index / max(1, len(scopes_list))), file_id=file_info.get("file_id"), scope_key=scope_key, scope_index=scope_index, total_scopes=len(scopes_list))
 
             system_components["current_assessment"] = last_assessment
@@ -435,6 +468,9 @@ def _sync_upload_report_body(
             _patch_file_metadata(file_info["file_id"], status="processed", processing_stage="completed", processing_progress=100)
             _emit_upload_progress(progress_cb, "completed", "Report processing completed.", 100, file_id=file_info.get("file_id"))
 
+            performance["total_seconds"] = round(time.perf_counter() - pipeline_started, 3)
+            performance["resources_end"] = _runtime_resource_snapshot()
+            logger.info(f"Report performance summary: {json.dumps(performance, ensure_ascii=False)}")
             return {
                 "status": "success",
                 "message": "Report uploaded and fully processed",
@@ -442,6 +478,7 @@ def _sync_upload_report_body(
                 "file_id": file_info["file_id"],
                 "summary": summary,
                 "scopes": manifest_rows,
+                "performance": performance,
                 "assessment": {
                     "total_metrics": last_assessment.total_metrics_analyzed if last_assessment else 0,
                     "overall_score": last_assessment.overall_compliance_score if last_assessment else 0,
@@ -585,6 +622,51 @@ async def get_report_job_status(
     if owner is not None and owner != user_id:
         raise HTTPException(status_code=403, detail="Not allowed to access this report job")
     return {"status": "success", "job": job}
+
+
+async def reprocess_report(
+    file_id: str,
+    user_id: int = Depends(get_current_user),
+):
+    """Explicitly enqueue the current visual parser for an existing report."""
+    file_info = file_manager.get_file_info(file_id, user_id=user_id)
+    if not file_info or file_info.get("file_type") != "report":
+        raise HTTPException(status_code=404, detail="Report not found or access denied")
+    source = Path(str(file_info.get("file_path") or ""))
+    if not source.is_file():
+        raise HTTPException(status_code=404, detail="Report PDF is missing")
+    if str(file_info.get("status") or "").lower() == "processing":
+        raise HTTPException(status_code=409, detail="Report is already being processed")
+
+    job = create_report_job(file_id=file_id, filename=source.name, user_id=user_id)
+    _patch_file_metadata(
+        file_id,
+        status="processing",
+        processing_job_id=job["job_id"],
+        processing_stage="queued",
+        processing_progress=0,
+    )
+    get_report_job_executor().submit(
+        _run_report_processing_job,
+        job["job_id"],
+        dict(file_info),
+        source.name,
+        file_info.get("industry"),
+        file_info.get("semi_industry"),
+        file_info.get("framework"),
+        file_info.get("gri_sector"),
+        file_info.get("gri_topic"),
+        json.dumps(file_info.get("scope_slugs") or []) if file_info.get("scope_slugs") else None,
+        user_id,
+    )
+    return {
+        "status": "accepted",
+        "job_id": job["job_id"],
+        "file_id": file_id,
+        "report_id": file_id,
+        "processing_status_url": f"/api/report-jobs/{job['job_id']}",
+        "events_url": f"/api/report-jobs/{job['job_id']}/events",
+    }
 
 
 async def report_job_events(

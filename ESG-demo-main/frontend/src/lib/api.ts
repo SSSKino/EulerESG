@@ -23,10 +23,61 @@ export interface UploadResponse {
   processing_status_url?: string;
 }
 
+export interface ReportBatchUploadResponse {
+  status: string;
+  message?: string;
+  batch_id: string;
+  company_id: string;
+  file_ids: string[];
+  job_id: string;
+  events_url?: string;
+  processing_status_url?: string;
+}
+
+export interface CompanySummary {
+  company_id: string;
+  company_name: string;
+  scope_config: {
+    framework?: string;
+    industry?: string;
+    semi_industry?: string;
+    gri_sector?: string;
+    gri_topic?: string;
+    scope_slugs?: string[];
+  };
+  report_ids: string[];
+  report_count?: number;
+  status: string;
+  stale?: boolean;
+  analysis_version?: number;
+  assessment_outputs?: Array<{
+    scope_key: string;
+    json_filename: string;
+    overall_score?: number;
+    total_metrics?: number;
+  }>;
+}
+
+export interface ReportBatchOptions {
+  uploadMode: "single" | "multi";
+  companyId?: string;
+  companyName?: string;
+  reportYears?: Array<number | null | undefined>;
+  framework?: string;
+  industry?: string;
+  semiIndustry?: string;
+  griSector?: string;
+  griTopic?: string;
+  scopeSlugs?: string;
+}
+
 export interface ReportJobEvent {
   job_id: string;
   file_id?: string;
   filename?: string;
+  file_ids?: string[];
+  company_id?: string;
+  batch_id?: string;
   status: string;
   stage?: string;
   progress?: number;
@@ -81,6 +132,13 @@ export interface CrossEvidenceSnippet {
   segment_id?: string;
   page_number?: number;
   content: string;
+  evidence_type?: "text" | "table" | "chart" | "figure" | "image_text" | "chart_data";
+  asset_id?: string;
+  asset_url?: string;
+  bbox?: [number, number, number, number] | null;
+  caption?: string | null;
+  confidence?: number | null;
+  chart_data?: Record<string, unknown> | null;
 }
 
 export interface CrossMetricValue {
@@ -146,6 +204,8 @@ type GriOptionsResponse = {
 class APIService {
   private assessmentByFileCache = new Map<string, Promise<any>>();
   private griOptionsCache: Promise<GriOptionsResponse> | null = null;
+  private visualManifestCache = new Map<string, { etag?: string; data: any }>();
+  private visualObjectUrlCache = new Map<string, Promise<string>>();
 
   private getAuthToken(): string | null {
     if (typeof window === "undefined") return null;
@@ -213,6 +273,61 @@ class APIService {
     return this.fetchWithError(url);
   }
 
+  async getVisualAssets(fileId: string) {
+    const cached = this.visualManifestCache.get(fileId);
+    const headers = new Headers();
+    if (cached?.etag) headers.set("If-None-Match", cached.etag);
+    const response = await fetch(
+      `${API_BASE_URL}/api/files/${fileId}/visual-assets`,
+      this.withAuth({ headers })
+    );
+    if (response.status === 304 && cached) return cached.data;
+    if (!response.ok) throw new Error(`Unable to load visual manifest (${response.status})`);
+    const data = await response.json();
+    this.visualManifestCache.set(fileId, { etag: response.headers.get("ETag") || undefined, data });
+    return data;
+  }
+
+  async getVisualAssetBlob(fileId: string, assetId: string): Promise<Blob> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/files/${fileId}/visual-assets/${encodeURIComponent(assetId)}`,
+      this.withAuth()
+    );
+    if (!response.ok) throw new Error(`Unable to load visual evidence (${response.status})`);
+    return response.blob();
+  }
+
+  getVisualAssetObjectUrl(fileId: string, assetId: string): Promise<string> {
+    const key = `${fileId}::${assetId}`;
+    const cached = this.visualObjectUrlCache.get(key);
+    if (cached) return cached;
+    const request = this.getVisualAssetBlob(fileId, assetId)
+      .then((blob) => URL.createObjectURL(blob))
+      .catch((error) => {
+        this.visualObjectUrlCache.delete(key);
+        throw error;
+      });
+    this.visualObjectUrlCache.set(key, request);
+    return request;
+  }
+
+  invalidateVisualAssetCache(fileId?: string) {
+    for (const [key, promise] of this.visualObjectUrlCache.entries()) {
+      if (fileId && !key.startsWith(`${fileId}::`)) continue;
+      promise.then((url) => URL.revokeObjectURL(url)).catch(() => undefined);
+      this.visualObjectUrlCache.delete(key);
+    }
+    if (fileId) this.visualManifestCache.delete(fileId);
+    else this.visualManifestCache.clear();
+  }
+
+  async reprocessReport(fileId: string): Promise<UploadResponse> {
+    const result = await this.fetchWithError(`${API_BASE_URL}/api/reports/${fileId}/reprocess`, { method: "POST" });
+    this.invalidateAssessmentByFileCache(fileId);
+    this.invalidateVisualAssetCache(fileId);
+    return result;
+  }
+
   // Delete file; optional scope_key removes one multi-scope compliance row only (keeps PDF).
   async deleteFile(fileId: string, scopeKey?: string) {
     const q =
@@ -224,6 +339,7 @@ class APIService {
     const result = await this.fetchWithError(url, {
       method: "DELETE",
     });
+    if (!scopeKey) this.invalidateVisualAssetCache(fileId);
     console.log("Delete API response:", result);
     return result;
   }
@@ -253,6 +369,55 @@ class APIService {
     });
   }
 
+  async uploadReportBatch(
+    files: File[],
+    options: ReportBatchOptions
+  ): Promise<ReportBatchUploadResponse> {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file));
+    formData.append("uploadMode", options.uploadMode);
+    if (options.companyId) formData.append("companyId", options.companyId);
+    if (options.companyName) formData.append("companyName", options.companyName);
+    if (options.reportYears) {
+      formData.append(
+        "reportYears",
+        JSON.stringify(options.reportYears.map((year) => year ?? null))
+      );
+    }
+    if (options.framework) formData.append("framework", options.framework);
+    if (options.industry) formData.append("industry", options.industry);
+    if (options.semiIndustry) formData.append("semiIndustry", options.semiIndustry);
+    if (options.griSector) formData.append("griSector", options.griSector);
+    if (options.griTopic) formData.append("griTopic", options.griTopic);
+    if (options.scopeSlugs) formData.append("scopeSlugs", options.scopeSlugs);
+    return this.fetchWithError(`${API_BASE_URL}/api/report-batches`, {
+      method: "POST",
+      body: formData,
+    });
+  }
+
+  async getCompanies(): Promise<{ status: string; companies: CompanySummary[] }> {
+    return this.fetchWithError(`${API_BASE_URL}/api/companies`);
+  }
+
+  async getCompany(companyId: string) {
+    return this.fetchWithError(`${API_BASE_URL}/api/companies/${encodeURIComponent(companyId)}`);
+  }
+
+  async getCompanyAssessment(companyId: string, scope?: string) {
+    const query = scope ? `?scope=${encodeURIComponent(scope)}` : "";
+    return this.fetchWithError(
+      `${API_BASE_URL}/api/companies/${encodeURIComponent(companyId)}/assessment${query}`
+    );
+  }
+
+  async retryReportBatch(batchId: string): Promise<ReportBatchUploadResponse> {
+    return this.fetchWithError(
+      `${API_BASE_URL}/api/report-batches/${encodeURIComponent(batchId)}/retry`,
+      { method: "POST" }
+    );
+  }
+
 
   async getReportJobStatus(jobId: string): Promise<{ status: string; job: ReportJobEvent }> {
     return this.fetchWithError(`${API_BASE_URL}/api/report-jobs/${encodeURIComponent(jobId)}`);
@@ -272,7 +437,7 @@ class APIService {
     let terminal = false;
     let lastSeq = 0;
     let source: EventSource | null = null;
-    let pollTimer: ReturnType<typeof window.setInterval> | null = null;
+    let pollTimer: number | null = null;
 
     const handleData = (data: ReportJobEvent | null) => {
       if (!data || closed || terminal) return;

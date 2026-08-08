@@ -30,6 +30,20 @@ _GENERIC_METRIC_TERMS = {
     "sustainability", "disclosure", "metrics", "all", "other", "core", "required", "eligible",
 }
 
+
+def visual_result_fields(segment) -> Dict[str, object]:
+    data = getattr(segment, "structured_data", None)
+    if not isinstance(data, dict) or not data.get("asset_id"):
+        return {}
+    return {
+        "evidence_type": data.get("evidence_type") or getattr(segment, "segment_type", None),
+        "asset_id": data.get("asset_id"),
+        "bbox": data.get("bbox"),
+        "caption": data.get("caption") or data.get("summary"),
+        "confidence": data.get("confidence"),
+        "chart_data": data.get("chart_data"),
+    }
+
 _ENVIRONMENTAL_NOISE_TERMS = {
     "emissions", "ghg", "scope 1", "scope 2", "scope 3", "water", "waste", "renewable", "electricity",
     "energy", "supplier environmental", "recycled", "recycling", "e-waste", "potable", "mwh", "gj",
@@ -102,6 +116,45 @@ def _compute_target_window(metric: ESGMetric, observed_matches: int = 0, base_to
     return max(11, max(int(base_top_k or 10), base) + complexity_bonus + richness_bonus)
 
 
+def _positive_float_env(name: str, default: float, minimum: float = 0.01) -> float:
+    try:
+        value = float(os.getenv(name, str(default)) or default)
+    except (TypeError, ValueError):
+        value = float(default)
+    return max(float(minimum), value)
+
+
+def compute_dynamic_top_k(qualified_count: int) -> int:
+    """Return the small final evidence window derived from qualified candidates.
+
+    The minimum is a target, not padding: when fewer qualified candidates exist,
+    all real candidates are returned. Above the minimum the window grows only
+    logarithmically and is never larger than the available evidence.
+    """
+    q = max(0, int(qualified_count or 0))
+    if q == 0:
+        return 0
+    minimum = max(
+        1,
+        int(_positive_float_env("REPORT_DYNAMIC_TOPK_MIN", 46, minimum=1)),
+    )
+    if q < minimum:
+        return q
+    factor = _positive_float_env("REPORT_DYNAMIC_TOPK_LOG_FACTOR", 4.0)
+    target = math.ceil(minimum + factor * math.log2(q / minimum))
+    return min(q, max(minimum, target))
+
+
+def compute_rerank_pool_k(qualified_count: int, target_k: Optional[int] = None) -> int:
+    """Return the bounded candidate pool sent to Qwen3 reranking."""
+    q = max(0, int(qualified_count or 0))
+    if q == 0:
+        return 0
+    target = compute_dynamic_top_k(q) if target_k is None else max(0, int(target_k))
+    multiplier = _positive_float_env("REPORT_RERANK_POOL_MULTIPLIER", 1.5, minimum=1.0)
+    return min(q, max(target, math.ceil(target * multiplier)))
+
+
 def _compute_internal_pool(metric: ESGMetric, observed_matches: int = 0, base_top_k: int = 10, channel: str = "keyword") -> int:
     target = _compute_target_window(metric, observed_matches=observed_matches, base_top_k=base_top_k)
     is_quant = _is_quantitative_metric(metric)
@@ -150,6 +203,12 @@ def _segment_structure_bonus(segment, expected_unit: Optional[str] = None, prefe
             bonus += 0.08
         elif seg_type == "table":
             bonus += 0.04
+        elif seg_type == "chart_data":
+            bonus += 0.15
+        elif seg_type == "chart":
+            bonus += 0.09
+        elif seg_type in {"figure", "image_text"}:
+            bonus += 0.025
         elif seg_type == "paragraph_cluster":
             bonus += 0.04
         elif seg_type == "heading":

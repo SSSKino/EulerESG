@@ -85,6 +85,25 @@ class RetrievalResult(BaseModel):
         default=None,
         description="Report segment containing the internal PDF link",
     )
+    source_report_id: Optional[str] = Field(
+        default=None,
+        description="Source report identifier for company-level retrieval",
+    )
+    source_report_name: Optional[str] = Field(
+        default=None,
+        description="User-facing source report name",
+    )
+    source_report_year: Optional[int] = Field(
+        default=None,
+        description="Declared reporting year of the source report",
+    )
+    evidence_type: Optional[str] = Field(default=None, description="text/table/chart/figure evidence kind")
+    asset_id: Optional[str] = Field(default=None, description="Stable visual asset identifier")
+    asset_url: Optional[str] = Field(default=None, description="Authenticated visual asset API URL")
+    bbox: Optional[List[float]] = Field(default=None, description="Normalized [x1,y1,x2,y2] PDF bounds")
+    caption: Optional[str] = None
+    confidence: Optional[float] = None
+    chart_data: Optional[Dict[str, Any]] = None
 
 
 class MetricRetrievalResult(BaseModel):
@@ -97,6 +116,18 @@ class MetricRetrievalResult(BaseModel):
     semantic_results: List[RetrievalResult] = Field(default_factory=list, description="Semantic retrieval results")
     combined_results: List[RetrievalResult] = Field(default_factory=list, description="Combined retrieval results")
     total_matches: int = Field(default=0, description="Total matches")
+    qualified_total: int = Field(
+        default=0,
+        description="Unique candidates remaining after evidence qualification",
+    )
+    rerank_pool_k: int = Field(
+        default=0,
+        description="Number of candidates passed to the local reranker",
+    )
+    target_k: int = Field(
+        default=0,
+        description="Number of reranked candidates retained for final analysis",
+    )
 
 
 class TextSegment(BaseModel):
@@ -106,7 +137,7 @@ class TextSegment(BaseModel):
     content: str = Field(..., description="Segment text content")
     page_number: int = Field(..., description="Page number")
     position_y: float = Field(..., description="Y coordinate position in page")
-    segment_type: str = Field(default="text", description="Segment type (text/table/table_row/table_cell/ocr_text)")
+    segment_type: str = Field(default="text", description="Segment type (text/table/table_row/table_cell/ocr_text/chart/figure/image_text/chart_data)")
     position_x: Optional[float] = Field(default=None, description="X coordinate position in page")
     source_table_id: Optional[str] = Field(default=None, description="Related table ID if the segment comes from a table")
     row_header: Optional[str] = Field(default=None, description="Structured table row header")
@@ -235,6 +266,10 @@ class DisclosureAnalysis(BaseModel):
         default=None,
         description="Year currently projected into value/page/context for backward compatibility",
     )
+    value_status: Optional[str] = Field(
+        default=None,
+        description="Value resolution state such as exact, ambiguous, conflict or none",
+    )
     context: Optional[str] = Field(default=None, description="Evidence context/excerpt for the found value")
     page: Optional[int] = Field(default=None, description="Page number where value/context is found")
     evidence_sources: List[Dict[str, Any]] = Field(
@@ -259,6 +294,12 @@ class ComplianceAssessment(BaseModel):
     framework: Optional[str] = Field(None, description="Framework used (e.g., SASB, GRI)")
     industry: Optional[str] = Field(None, description="Industry sector")
     semi_industry: Optional[str] = Field(None, description="Sub-industry sector")
+    company_id: Optional[str] = Field(None, description="Company identifier for aggregated assessments")
+    company_name: Optional[str] = Field(None, description="Company name for aggregated assessments")
+    source_reports: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Reports contributing evidence to an aggregated assessment",
+    )
 
 
 class ChatMessage(BaseModel):

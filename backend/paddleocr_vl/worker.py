@@ -354,6 +354,64 @@ def _requeue_payload(r, queue_name: str, payload_raw: str) -> None:
         logger.error("重新入队失败: {}", exc)
 
 
+def _release_request_key() -> str:
+    return os.getenv(
+        "PADDLEOCR_RELEASE_REQUEST_KEY",
+        "paddleocr:control:release",
+    ).strip()
+
+
+def _maybe_release_requested(
+    r,
+    *,
+    worker_id: str,
+    queue_name: str,
+    last_request_id: str,
+) -> str:
+    """Release this worker only after the shared OCR queue is idle."""
+    request_key = _release_request_key()
+    try:
+        request_id = str(r.hget(request_key, "request_id") or "").strip()
+    except Exception as exc:
+        logger.warning("Failed to read PaddleOCR release request: {}", exc)
+        return last_request_id
+    if not request_id or request_id == last_request_id:
+        return last_request_id
+
+    try:
+        if int(r.llen(queue_name) or 0) > 0:
+            return last_request_id
+    except Exception as exc:
+        logger.warning("Failed to verify PaddleOCR queue before release: {}", exc)
+        return last_request_id
+
+    release_pipeline(f"document completed request={request_id}")
+    try:
+        r.hset(
+            request_key,
+            mapping={
+                f"ack:{worker_id}": request_id,
+                f"ack_at:{worker_id}": _utc_now(),
+            },
+        )
+        r.expire(
+            request_key,
+            _env_int("PADDLEOCR_TASK_RESULT_TTL", 86400, min_value=60),
+        )
+    except Exception as exc:
+        # GPU memory is already released. Leave the request pending so the next
+        # idle poll can retry the acknowledgement.
+        logger.warning("PaddleOCR release acknowledgement failed: {}", exc)
+        return last_request_id
+
+    logger.info(
+        "PaddleOCR worker pipeline released: worker_id={} request_id={}",
+        worker_id,
+        request_id,
+    )
+    return request_id
+
+
 def main() -> int:
     worker_id = os.getenv("PADDLEOCR_WORKER_ID") or f"{socket.gethostname()}-{uuid.uuid4().hex[:8]}"
     queue_name = os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse")
@@ -378,9 +436,24 @@ def main() -> int:
         release_pipeline("model preflight failed")
         return 2
 
+    try:
+        # Ignore a stale request from a previous container lifecycle. Only a
+        # request created after startup should undo the worker prewarm.
+        last_release_request_id = str(
+            r.hget(_release_request_key(), "request_id") or ""
+        ).strip()
+    except Exception:
+        last_release_request_id = ""
+
     while True:
         item = r.blpop(queue_name, timeout=block_timeout)
         if item is None:
+            last_release_request_id = _maybe_release_requested(
+                r,
+                worker_id=worker_id,
+                queue_name=queue_name,
+                last_request_id=last_release_request_id,
+            )
             if idle_sleep:
                 time.sleep(idle_sleep)
             continue

@@ -585,6 +585,22 @@ def should_restart_worker_after_task() -> bool:
 
 def _save_result_markdown(res: Any, page_dir: Path) -> str:
     ensure_shared_writable_dir(page_dir)
+    # Markdown alone loses the crop and layout metadata produced by PaddleOCR-VL.
+    # Keep both when supported; backend promotes the useful files to the report's
+    # durable visual-asset directory before this worker output is cleaned.
+    for method_name in ("save_to_json", "save_to_img"):
+        method = getattr(res, method_name, None)
+        if not callable(method):
+            continue
+        try:
+            method(save_path=str(page_dir))
+        except TypeError:
+            try:
+                method(str(page_dir))
+            except Exception as exc:
+                logger.warning(f"{method_name} failed for {page_dir.name}: {exc}")
+        except Exception as exc:
+            logger.warning(f"{method_name} failed for {page_dir.name}: {exc}")
     try:
         res.save_to_markdown(save_path=str(page_dir))
     except Exception as exc:

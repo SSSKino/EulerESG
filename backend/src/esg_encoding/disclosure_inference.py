@@ -3,6 +3,7 @@ Disclosure Inference Engine - Use LLM to analyze ESG metric disclosure status
 """
 
 import json
+import math
 from typing import Any, List, Dict, Optional, Sequence, Tuple, Union
 import re
 import os
@@ -1107,6 +1108,10 @@ class DisclosureInferenceEngine:
             f"The currently projected value is {best_hit['raw_value']}{raw_unit_text}; "
             "all annual values are retained for later year selection."
         )
+        direct_year_values = self._attach_year_value_sources(
+            best_hit.get("year_values") or [],
+            segment_metadata,
+        )
 
         return DisclosureAnalysis(
             metric_id=retrieval_result.metric_id,
@@ -1126,8 +1131,9 @@ class DisclosureInferenceEngine:
             type=getattr(metric, 'sasb_type', '') if metric else '',
             definition=(getattr(metric, 'definition', None) or '') if metric else '',
             value=_finalize_compliance_value_field(best_hit.get("value")),
-            year_values=best_hit.get("year_values") or [],
+            year_values=direct_year_values,
             selected_year=best_hit.get("selected_year"),
+            value_status="exact",
             context=best_hit.get("context"),
             page=best_hit.get("page"),
             evidence_sources=self._build_evidence_sources(
@@ -1136,6 +1142,169 @@ class DisclosureInferenceEngine:
                 preferred_page=best_hit.get("page"),
             ),
         )
+
+    @staticmethod
+    def _estimate_evidence_tokens(
+        segments: List[str],
+        metadata: List[Dict[str, Any]],
+    ) -> int:
+        char_count = sum(len(str(item or "")) for item in segments)
+        try:
+            char_count += len(json.dumps(metadata or [], ensure_ascii=False))
+        except Exception:
+            pass
+        # Conservative approximation for mixed English/table/number content.
+        return max(1, math.ceil(char_count / 3.5))
+
+    def _evidence_chunks(
+        self,
+        segments: List[str],
+        metadata: List[Dict[str, Any]],
+        token_budget: int,
+    ) -> List[List[Tuple[str, Dict[str, Any]]]]:
+        """Pack evidence without splitting a table row or link source/target unit."""
+        grouped: Dict[tuple, List[Tuple[str, Dict[str, Any]]]] = {}
+        group_order: List[tuple] = []
+        for index, segment in enumerate(segments):
+            meta = dict(metadata[index] if index < len(metadata) else {})
+            report_id = str(meta.get("source_report_id") or "")
+            if meta.get("source_table_id") is not None and meta.get("row_index") is not None:
+                key = (
+                    "table_row",
+                    report_id,
+                    str(meta.get("source_table_id")),
+                    str(meta.get("row_index")),
+                )
+            elif meta.get("link_target_page") is not None:
+                key = (
+                    "pdf_link",
+                    report_id,
+                    str(meta.get("link_source_page")),
+                    str(meta.get("link_target_page")),
+                )
+            else:
+                key = ("segment", str(meta.get("segment_id") or index))
+            if key not in grouped:
+                grouped[key] = []
+                group_order.append(key)
+            grouped[key].append((str(segment or ""), meta))
+
+        chunks: List[List[Tuple[str, Dict[str, Any]]]] = []
+        current: List[Tuple[str, Dict[str, Any]]] = []
+        current_tokens = 0
+        for key in group_order:
+            unit = grouped[key]
+            unit_tokens = self._estimate_evidence_tokens(
+                [item[0] for item in unit],
+                [item[1] for item in unit],
+            )
+            if current and current_tokens + unit_tokens > token_budget:
+                chunks.append(current)
+                current = []
+                current_tokens = 0
+            current.extend(unit)
+            current_tokens += unit_tokens
+        if current:
+            chunks.append(current)
+        return chunks
+
+    def _summarize_evidence_chunks(
+        self,
+        retrieval_result: MetricRetrievalResult,
+        segments: List[str],
+        metadata: List[Dict[str, Any]],
+        metric: Optional['ESGMetric'],
+        token_budget: int,
+    ) -> Tuple[List[str], List[Dict[str, Any]]]:
+        """Extract compact structured candidates from oversized evidence windows."""
+        chunks = self._evidence_chunks(segments, metadata, token_budget)
+        if len(chunks) <= 1:
+            return segments, metadata
+
+        compact_segments: List[str] = []
+        compact_metadata: List[Dict[str, Any]] = []
+        metric_name = retrieval_result.metric_name
+        metric_code = retrieval_result.metric_code or retrieval_result.metric_id
+        metric_unit = str(getattr(metric, "unit", "") or "") if metric else ""
+        logger.info(
+            f"Chunking final evidence metric={retrieval_result.metric_id}: "
+            f"segments={len(segments)}, chunks={len(chunks)}, token_budget={token_budget}"
+        )
+
+        for chunk_index, chunk in enumerate(chunks, start=1):
+            entries = []
+            for text, meta in chunk:
+                entries.append(
+                    {
+                        "segment_id": meta.get("segment_id"),
+                        "source_report_id": meta.get("source_report_id"),
+                        "source_report_name": meta.get("source_report_name"),
+                        "source_report_year": meta.get("source_report_year"),
+                        "page": meta.get("page_number"),
+                        "retrieval_type": meta.get("retrieval_type"),
+                        "link_source_page": meta.get("link_source_page"),
+                        "link_target_page": meta.get("link_target_page"),
+                        "text": text,
+                    }
+                )
+            user_prompt = (
+                "Extract only evidence relevant to the current ESG metric from this evidence chunk. "
+                "Preserve every explicit year, numeric value, unit, dimension label, report ID, page, "
+                "and segment ID. Keep conflicting values. Do not decide the final disclosure status and "
+                "do not invent values. Return JSON with keys summary and candidates.\n\n"
+                f"Metric: {metric_name}\nCode: {metric_code}\nExpected unit: {metric_unit}\n"
+                f"Chunk {chunk_index}/{len(chunks)}:\n"
+                f"{json.dumps(entries, ensure_ascii=False)}"
+            )
+            try:
+                response = self.llm_client.chat.completions.create(
+                    model=self.config.llm_model,
+                    temperature=0.0,
+                    response_format={"type": "json_object"},
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                "You are a strict ESG evidence extraction stage. Return valid JSON only. "
+                                "A candidate must retain its original source IDs and must not merge "
+                                "different years, dimensions, or reports."
+                            ),
+                        },
+                        {"role": "user", "content": user_prompt},
+                    ],
+                )
+            except Exception as exc:
+                raise DisclosureAnalysisError(
+                    f"LLM evidence chunk failed for metric '{metric_name}'.",
+                    metric_id=retrieval_result.metric_id,
+                    metric_name=metric_name,
+                    error_type="llm_chunk_request_failed",
+                ) from exc
+            raw_content = (response.choices[0].message.content or "").strip()
+            parsed = self._extract_json_from_llm_response(raw_content)
+            if not isinstance(parsed, dict):
+                raise DisclosureAnalysisError(
+                    f"LLM returned invalid chunk JSON for metric '{metric_name}'.",
+                    metric_id=retrieval_result.metric_id,
+                    metric_name=metric_name,
+                    error_type="invalid_llm_chunk_json",
+                )
+            compact_text = json.dumps(
+                {"evidence_chunk": chunk_index, **parsed},
+                ensure_ascii=False,
+            )
+            compact_segments.append(self._truncate_segment_text(compact_text, 16000))
+            first_meta = dict(chunk[0][1] if chunk else {})
+            first_meta.update(
+                {
+                    "retrieval_type": "structured_evidence_chunk",
+                    "score": max(
+                        [float(item[1].get("score") or 0.0) for item in chunk] or [0.0]
+                    ),
+                }
+            )
+            compact_metadata.append(first_meta)
+        return compact_segments, compact_metadata
 
     def _analyze_single_metric(
         self, 
@@ -1159,11 +1328,11 @@ class DisclosureInferenceEngine:
         segment_metadata = []
         metric_profile = self._resolve_metric_profile(metric, retrieval_result)
 
-        # Analyze up to the configured number of best fused evidence segments.
-        final_window = _positive_env_int(
-            "REPORT_ANALYSIS_MAX_EVIDENCE_SEGMENTS",
-            46,
-            maximum=46,
+        # Retrieval has already computed and applied the dynamic target window.
+        # Do not impose a second fixed 46-segment truncation here.
+        final_window = int(
+            getattr(retrieval_result, "target_k", 0)
+            or len(retrieval_result.combined_results or [])
         )
         max_evidence_chars = _positive_env_int(
             "REPORT_ANALYSIS_MAX_CHARS_PER_EVIDENCE",
@@ -1204,6 +1373,8 @@ class DisclosureInferenceEngine:
 
                 table_id, row_index = self._get_table_row_key(segment) if segment is not None else (None, None)
                 col_index = self._get_table_column_index(segment) if segment is not None else None
+                structured = getattr(segment, "structured_data", None) if segment is not None else None
+                structured = structured if isinstance(structured, dict) else {}
                 metadata = {
                     "segment_id": result.segment_id,
                     "page_number": page_number,
@@ -1218,6 +1389,24 @@ class DisclosureInferenceEngine:
                     "link_anchor_text": getattr(result, "link_anchor_text", None),
                     "link_source_segment_id": link_source_segment_id,
                     "link_source_context": link_source_context,
+                    "source_report_id": (
+                        getattr(result, "source_report_id", None)
+                        or structured.get("source_report_id")
+                    ),
+                    "source_report_name": (
+                        getattr(result, "source_report_name", None)
+                        or structured.get("source_report_name")
+                    ),
+                    "source_report_year": (
+                        getattr(result, "source_report_year", None)
+                        or structured.get("source_report_year")
+                    ),
+                    "evidence_type": getattr(result, "evidence_type", None) or structured.get("evidence_type"),
+                    "asset_id": getattr(result, "asset_id", None) or structured.get("asset_id"),
+                    "bbox": getattr(result, "bbox", None) or structured.get("bbox"),
+                    "caption": getattr(result, "caption", None) or structured.get("caption") or structured.get("summary"),
+                    "confidence": getattr(result, "confidence", None) or structured.get("confidence"),
+                    "chart_data": getattr(result, "chart_data", None) or structured.get("chart_data"),
                 }
                 segment_metadata.append(metadata)
 
@@ -1237,12 +1426,28 @@ class DisclosureInferenceEngine:
         if direct_analysis is not None:
             return direct_analysis
 
+        prompt_segments = relevant_segments
+        prompt_metadata = segment_metadata
+        chunk_token_budget = _positive_env_int(
+            "REPORT_ANALYSIS_EVIDENCE_CHUNK_TOKEN_BUDGET",
+            24000,
+            minimum=4000,
+        )
+        if self._estimate_evidence_tokens(relevant_segments, segment_metadata) > chunk_token_budget:
+            prompt_segments, prompt_metadata = self._summarize_evidence_chunks(
+                retrieval_result,
+                relevant_segments,
+                segment_metadata,
+                metric,
+                chunk_token_budget,
+            )
+
 # Build prompt containing tag information
         prompt = self._build_analysis_prompt(
             retrieval_result.metric_name,
             retrieval_result.metric_id,
-            relevant_segments,
-            segment_metadata,
+            prompt_segments,
+            prompt_metadata,
             metric_unit=(getattr(metric, "unit", None) or "") if metric else "",
             metric_description=((getattr(metric, "definition", None) or getattr(metric, "description", None) or "").strip())
             if metric
@@ -1579,6 +1784,7 @@ Assessment principles:
             year_values: List[Dict[str, Any]] = []
             selected_year: Optional[int] = None
             selected_year_context: Optional[str] = None
+            value_conflict = False
             target_year = self._target_year_for_metric(metric)
             if disclosure_status != DisclosureStatus.NOT_DISCLOSED:
                 code_candidates = self._metric_code_candidates(retrieval_result, metric)
@@ -1621,24 +1827,35 @@ Assessment principles:
                             }
                         )
                 year_values = self._merge_metric_year_values(
-                    derived_year_values,
-                    llm_year_values,
-                    deterministic_year_values,
-                    selected_candidate_year_values,
+                    *[
+                        self._attach_year_value_sources(values, segment_metadata)
+                        for values in (
+                            derived_year_values,
+                            llm_year_values,
+                            deterministic_year_values,
+                            selected_candidate_year_values,
+                        )
+                    ]
                 )
                 candidate_selected_year, selected_year_value = self._select_metric_year_value(
                     year_values,
                     target_year,
                     metric_profile,
                 )
-                if selected_year_value is not None and not preserve_ambiguous_value:
+                selected_year = candidate_selected_year
+                value_conflict = self._year_has_conflicting_values(
+                    year_values,
+                    candidate_selected_year,
+                )
+                if value_conflict:
+                    found_numeric = None
+                elif selected_year_value is not None and not preserve_ambiguous_value:
                     selected_source = str(selected_year_value.get("source") or "")
                     authoritative_year_value = selected_source in {
                         "llm_evidence",
                         "derived_calculation",
                     }
                     if not authoritative_scalar_selected or authoritative_year_value:
-                        selected_year = candidate_selected_year
                         found_numeric = selected_year_value.get("value")
                         if selected_year_value.get("page") is not None:
                             found_page = selected_year_value.get("page")
@@ -1706,6 +1923,8 @@ Assessment principles:
 
             if disclosure_status == DisclosureStatus.NOT_DISCLOSED:
                 stored_value: Union[int, float, str] = COMPLIANCE_VALUE_NA
+            elif value_conflict:
+                stored_value = COMPLIANCE_VALUE_NA
             else:
                 stored_value = _finalize_compliance_value_field(found_numeric)
 
@@ -1727,6 +1946,7 @@ Assessment principles:
                 value=stored_value,
                 year_values=year_values,
                 selected_year=selected_year,
+                value_status="conflict" if value_conflict else (llm_value_status or None),
                 context=found_context,
                 page=found_page,
                 evidence_sources=self._build_evidence_sources(
@@ -1897,8 +2117,17 @@ Assessment principles:
             data_page = item.get("page_number")
             link_source_page = item.get("link_source_page")
             link_target_page = item.get("link_target_page")
+            source_report_id = item.get("source_report_id")
+            source_report_name = item.get("source_report_name")
+            source_report_year = item.get("source_report_year")
             source_type = "linked_page" if link_target_page else "report_page"
-            key = (source_type, data_page, link_source_page, link_target_page)
+            key = (
+                source_report_id,
+                source_type,
+                data_page,
+                link_source_page,
+                link_target_page,
+            )
             if key in seen:
                 continue
             seen.add(key)
@@ -1907,6 +2136,15 @@ Assessment principles:
                 "data_page": data_page,
                 "segment_id": item.get("segment_id"),
             }
+            for field in ("evidence_type", "asset_id", "bbox", "caption", "confidence", "chart_data"):
+                if item.get(field) is not None:
+                    source[field] = item[field]
+            if source_report_id:
+                source["source_report_id"] = source_report_id
+            if source_report_name:
+                source["source_report_name"] = source_report_name
+            if source_report_year is not None:
+                source["source_report_year"] = source_report_year
             if link_target_page:
                 source["link_source_page"] = link_source_page
                 source["target_page"] = link_target_page
@@ -2451,7 +2689,29 @@ Assessment principles:
 
     def _merge_metric_year_values(self, *collections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         merged: List[Dict[str, Any]] = []
-        seen = set()
+        index_by_key: Dict[tuple, int] = {}
+
+        def merge_sources(target: Dict[str, Any], incoming: Dict[str, Any]) -> None:
+            sources = [
+                dict(item)
+                for item in (target.get("sources") or [])
+                if isinstance(item, dict)
+            ]
+            seen_sources = {
+                json.dumps(item, ensure_ascii=False, sort_keys=True)
+                for item in sources
+            }
+            for source in incoming.get("sources") or []:
+                if not isinstance(source, dict):
+                    continue
+                source_key = json.dumps(source, ensure_ascii=False, sort_keys=True)
+                if source_key in seen_sources:
+                    continue
+                sources.append(dict(source))
+                seen_sources.add(source_key)
+            if sources:
+                target["sources"] = sources
+
         for collection in collections:
             for raw in collection or []:
                 if not isinstance(raw, dict):
@@ -2466,7 +2726,10 @@ Assessment principles:
                 item = dict(raw)
                 item["year"] = year
                 item["value"] = value
-                unit_key = _normalize_unit_text(item.get("unit") or item.get("raw_unit")).lower()
+                raw_unit = item.get("unit") or item.get("raw_unit")
+                unit_key = _normalize_unit_atom(
+                    _extract_unit_hint(raw_unit) or raw_unit
+                ).lower()
                 value_key = float(value)
                 dimensions_key = json.dumps(
                     item.get("dimensions") or {},
@@ -2474,11 +2737,106 @@ Assessment principles:
                     sort_keys=True,
                 )
                 key = (year, value_key, unit_key, dimensions_key)
-                if key in seen:
+                if key in index_by_key:
+                    merge_sources(merged[index_by_key[key]], item)
                     continue
-                seen.add(key)
+                index_by_key[key] = len(merged)
                 merged.append(item)
         return sorted(merged, key=lambda item: (int(item["year"]), str(item.get("label") or "")))
+
+    @staticmethod
+    def _year_value_source_from_metadata(meta: Dict[str, Any]) -> Dict[str, Any]:
+        source: Dict[str, Any] = {
+            "source_type": (
+                "linked_page" if meta.get("link_target_page") is not None else "report_page"
+            ),
+            "data_page": meta.get("page_number"),
+            "segment_id": meta.get("segment_id"),
+        }
+        for key in ("source_report_id", "source_report_name", "source_report_year"):
+            if meta.get(key) is not None:
+                source[key] = meta.get(key)
+        if meta.get("link_target_page") is not None:
+            source["link_source_page"] = meta.get("link_source_page")
+            source["target_page"] = meta.get("link_target_page")
+        return source
+
+    def _attach_year_value_sources(
+        self,
+        year_values: List[Dict[str, Any]],
+        segment_metadata: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        by_segment = {
+            str(item.get("segment_id")): item
+            for item in segment_metadata or []
+            if item.get("segment_id")
+        }
+        by_page: Dict[int, List[Dict[str, Any]]] = {}
+        for item in segment_metadata or []:
+            try:
+                page = int(item.get("page_number"))
+            except (TypeError, ValueError):
+                continue
+            by_page.setdefault(page, []).append(item)
+
+        enriched: List[Dict[str, Any]] = []
+        for raw in year_values or []:
+            item = dict(raw)
+            existing_sources = [
+                dict(source)
+                for source in (item.get("sources") or [])
+                if isinstance(source, dict)
+            ]
+            segment_id = str(item.get("evidence_segment_id") or "")
+            meta = by_segment.get(segment_id)
+            if meta is None and item.get("page") is not None:
+                try:
+                    page_matches = by_page.get(int(item.get("page")), [])
+                except (TypeError, ValueError):
+                    page_matches = []
+                # Page numbers are only safe as fallback when they identify one
+                # source report in the company corpus.
+                report_ids = {
+                    str(match.get("source_report_id") or "") for match in page_matches
+                }
+                if len(report_ids) <= 1 and page_matches:
+                    meta = page_matches[0]
+            if meta is not None:
+                source = self._year_value_source_from_metadata(meta)
+                source_key = json.dumps(source, ensure_ascii=False, sort_keys=True)
+                existing_keys = {
+                    json.dumps(value, ensure_ascii=False, sort_keys=True)
+                    for value in existing_sources
+                }
+                if source_key not in existing_keys:
+                    existing_sources.append(source)
+            if existing_sources:
+                item["sources"] = existing_sources
+            enriched.append(item)
+        return enriched
+
+    @staticmethod
+    def _year_has_conflicting_values(
+        year_values: List[Dict[str, Any]],
+        year: Optional[int],
+    ) -> bool:
+        if year is None:
+            return False
+        distinct = {
+            (
+                float(value),
+                _normalize_unit_atom(
+                    _extract_unit_hint(item.get("unit") or item.get("raw_unit"))
+                    or item.get("unit")
+                    or item.get("raw_unit")
+                ).lower(),
+            )
+            for item in year_values or []
+            if int(item.get("year") or 0) == int(year)
+            for value in [_parse_llm_numeric_value_only(item.get("value"))]
+            if value is not None
+        }
+        return len(distinct) > 1
 
     def _target_year_for_metric(self, metric: Optional['ESGMetric']) -> Optional[int]:
         candidates = []

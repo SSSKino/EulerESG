@@ -14,11 +14,14 @@ from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 from loguru import logger
 
 from .exceptions import ContentExtractionError
 from .models import DocumentContent, ProcessingConfig, TextSegment
+from .visual_assets import append_visual_markers, parse_visual_marker, promote_visual_assets
 
 
 def _shared_dir_mode() -> int:
@@ -769,7 +772,14 @@ class ContentExtractor:
                 f"pdf_links={link_summary.get('internal', 0)}/{link_summary.get('links', 0)}, "
                 f"timings={stage_timings}, batch_elapsed={batch_elapsed}"
             )
-            self._emit_progress("ocr_done", f"OCR extraction completed with {len(segments)} segments.", 45, segments=len(segments))
+            visual_count = sum(1 for seg in segments if seg.segment_type in {"chart", "figure", "image_text", "chart_data"})
+            self._emit_progress(
+                "ocr_done",
+                f"OCR extraction completed with {len(segments)} segments and {visual_count} visual assets.",
+                45,
+                segments=len(segments),
+                visual_assets=visual_count,
+            )
             return document
 
         except ContentExtractionError:
@@ -825,7 +835,21 @@ class ContentExtractor:
             content = str(getattr(seg, "content", "") or "").strip()
             segment_type = str(getattr(seg, "segment_type", "text") or "text").lower()
 
-            if segment_type == "table":
+            if segment_type in {"chart", "figure", "image_text", "chart_data"}:
+                visual = dict(getattr(seg, "structured_data", None) or {})
+                public = {k: visual.get(k) for k in (
+                    "asset_id", "relative_path", "mime_type", "page_number", "bbox", "caption",
+                    "summary", "ocr_text", "chart_data", "confidence", "parser_version"
+                )}
+                lines.extend([
+                    "",
+                    f"<!-- visual-asset: {json.dumps(public, ensure_ascii=False)} -->",
+                    "",
+                    content,
+                    "",
+                    "---",
+                ])
+            elif segment_type == "table":
                 idx = page_table_counts.get(page, 0)
                 page_table_counts[page] = idx + 1
                 marker = f"P{page:03d}_T{idx:03d}"
@@ -861,6 +885,218 @@ class ContentExtractor:
                 safe[k] = "" if v is None else str(v)
         client.hset(key, mapping=safe)
         client.expire(key, int(os.getenv("PADDLEOCR_TASK_RESULT_TTL", "86400") or "86400"))
+
+    @staticmethod
+    def _paddleocr_vlm_control_base_url() -> str:
+        raw = (
+            os.getenv("PADDLEOCR_VLM_CONTROL_URL")
+            or os.getenv("PADDLEOCR_VL_REC_SERVER_URL")
+            or "http://paddleocr-vlm-server:8118"
+        ).strip()
+        base = raw.rstrip("/")
+        if base.endswith("/v1"):
+            base = base[:-3]
+        return base.rstrip("/")
+
+    def _paddleocr_vlm_request(
+        self,
+        method: str,
+        path: str,
+        *,
+        timeout: float,
+    ) -> Dict[str, Any]:
+        url = f"{self._paddleocr_vlm_control_base_url()}/{path.lstrip('/')}"
+        request = Request(url, method=method.upper())
+        try:
+            with urlopen(request, timeout=max(1.0, timeout)) as response:
+                payload = response.read().decode("utf-8", errors="replace").strip()
+        except HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace").strip()
+            raise RuntimeError(f"Paddle vLLM {method} {path} failed: HTTP {exc.code}, {body[:500]}") from exc
+        if not payload:
+            return {}
+        try:
+            data = json.loads(payload)
+        except Exception:
+            return {"body": payload}
+        return data if isinstance(data, dict) else {"result": data}
+
+    def _paddleocr_vlm_sleep_state(self, *, timeout: float) -> Optional[bool]:
+        try:
+            payload = self._paddleocr_vlm_request("GET", "/is_sleeping", timeout=timeout)
+        except RuntimeError as exc:
+            if "HTTP 404" in str(exc):
+                return None
+            raise
+        value = payload.get("is_sleeping")
+        return value if isinstance(value, bool) else None
+
+    def _wake_paddleocr_vlm(self) -> None:
+        if not _env_bool("PADDLEOCR_VLM_SLEEP_ENABLED", False):
+            return
+        timeout = max(
+            5.0,
+            float(os.getenv("PADDLEOCR_VLM_WAKE_TIMEOUT_SECONDS", "180") or "180"),
+        )
+        state = self._paddleocr_vlm_sleep_state(timeout=min(10.0, timeout))
+        if state is None:
+            # Compatibility path for a server that has not enabled the internal
+            # sleep routes yet. A healthy server is already usable.
+            self._paddleocr_vlm_request("GET", "/health", timeout=min(10.0, timeout))
+            self.logger.warning("Paddle vLLM sleep API is unavailable; continuing with an awake server")
+            return
+        if not state:
+            return
+
+        self.logger.info("Waking Paddle vLLM before OCR batch submission")
+        self._paddleocr_vlm_request("POST", "/wake_up", timeout=timeout)
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            state = self._paddleocr_vlm_sleep_state(timeout=min(10.0, timeout))
+            if state is False:
+                self._paddleocr_vlm_request("GET", "/health", timeout=min(10.0, timeout))
+                self.logger.info("Paddle vLLM wake completed")
+                return
+            time.sleep(0.5)
+        raise ContentExtractionError(
+            f"Paddle vLLM wake timed out after {timeout:.0f}s",
+            file_path="",
+        )
+
+    def _request_paddle_worker_release(self, job_id: str) -> bool:
+        if not _env_bool("PADDLEOCR_RELEASE_AFTER_DOCUMENT", False):
+            return False
+        try:
+            client = self._redis_client()
+            request_key = os.getenv(
+                "PADDLEOCR_RELEASE_REQUEST_KEY",
+                "paddleocr:control:release",
+            ).strip()
+            request_id = f"{job_id}:{uuid.uuid4().hex}"
+            task_key = f"{os.getenv('PADDLEOCR_TASK_KEY_PREFIX', 'paddleocr:task').strip()}:{job_id}"
+            pipe = client.pipeline()
+            pipe.delete(request_key)
+            pipe.hset(
+                request_key,
+                mapping={
+                    "request_id": request_id,
+                    "job_id": job_id,
+                    "requested_at": datetime.now().isoformat(),
+                },
+            )
+            pipe.expire(
+                request_key,
+                int(os.getenv("PADDLEOCR_TASK_RESULT_TTL", "86400") or "86400"),
+            )
+            pipe.execute()
+            self._redis_hash_set(
+                client,
+                task_key,
+                {
+                    "worker_release_request_id": request_id,
+                    "worker_release_requested_at": datetime.now().isoformat(),
+                },
+            )
+
+            worker_ids = [
+                item.strip()
+                for item in os.getenv("PADDLEOCR_WORKER_IDS", "").split(",")
+                if item.strip()
+            ]
+            if not worker_ids:
+                return True
+
+            ack_timeout = max(
+                1.0,
+                float(
+                    os.getenv("PADDLEOCR_WORKER_RELEASE_ACK_TIMEOUT_SECONDS", "30")
+                    or "30"
+                ),
+            )
+            deadline = time.monotonic() + ack_timeout
+            while time.monotonic() < deadline:
+                state = client.hgetall(request_key) or {}
+                acked = [
+                    worker_id
+                    for worker_id in worker_ids
+                    if state.get(f"ack:{worker_id}") == request_id
+                ]
+                if len(acked) == len(worker_ids):
+                    self._redis_hash_set(
+                        client,
+                        task_key,
+                        {
+                            "worker_release_completed_at": datetime.now().isoformat(),
+                            "worker_release_acks": acked,
+                        },
+                    )
+                    self.logger.info(
+                        f"PaddleOCR worker pipelines released after job={job_id}: {acked}"
+                    )
+                    return True
+                time.sleep(0.25)
+
+            self.logger.warning(
+                f"Timed out waiting for PaddleOCR worker release acknowledgements: "
+                f"job={job_id}, workers={worker_ids}"
+            )
+            return False
+        except Exception as exc:
+            self.logger.warning(
+                f"Failed to request PaddleOCR worker release: job={job_id}, error={exc}"
+            )
+            return False
+
+    def _sleep_paddleocr_vlm(self, job_id: str) -> bool:
+        if not _env_bool("PADDLEOCR_VLM_SLEEP_ENABLED", False):
+            return False
+        try:
+            client = self._redis_client()
+            queue_name = os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse").strip()
+            if int(client.llen(queue_name) or 0) > 0:
+                self.logger.info(
+                    f"Keeping Paddle vLLM awake because OCR work remains queued: job={job_id}"
+                )
+                return False
+
+            timeout = max(
+                5.0,
+                float(os.getenv("PADDLEOCR_VLM_SLEEP_TIMEOUT_SECONDS", "120") or "120"),
+            )
+            state = self._paddleocr_vlm_sleep_state(timeout=min(10.0, timeout))
+            if state is None:
+                self.logger.warning("Paddle vLLM sleep API is unavailable; model remains loaded")
+                return False
+            if state:
+                return True
+
+            level = int(os.getenv("PADDLEOCR_VLM_SLEEP_LEVEL", "1") or "1")
+            level = 1 if level not in {1, 2} else level
+            self.logger.info(f"Sleeping Paddle vLLM after OCR job={job_id}, level={level}")
+            self._paddleocr_vlm_request(
+                "POST",
+                f"/sleep?level={level}",
+                timeout=timeout,
+            )
+            deadline = time.monotonic() + timeout
+            while time.monotonic() < deadline:
+                if self._paddleocr_vlm_sleep_state(timeout=min(10.0, timeout)) is True:
+                    self.logger.info(f"Paddle vLLM sleep completed after OCR job={job_id}")
+                    return True
+                time.sleep(0.5)
+            self.logger.warning(
+                f"Paddle vLLM sleep did not complete within {timeout:.0f}s: job={job_id}"
+            )
+        except Exception as exc:
+            self.logger.warning(f"Failed to sleep Paddle vLLM after job={job_id}: {exc}")
+        return False
+
+    def _release_paddle_after_document(self, job_id: str) -> None:
+        workers_released = self._request_paddle_worker_release(job_id)
+        # Do not sleep the shared VLM while a worker may still be inside a VLM
+        # request. A missed acknowledgement keeps it awake as a safe fallback.
+        if workers_released:
+            self._sleep_paddleocr_vlm(job_id)
 
     def _remove_queued_batches_for_job(self, client, queue_name: str, job_id: str) -> int:
         """从 Redis 队列中移除同一 OCR job 的未开始 batch，避免失败后继续消费。"""
@@ -1039,6 +1275,18 @@ class ContentExtractor:
         return units, total_pages, batch_dir
 
     def _run_paddleocr_vl_page_batch_queue(self, source_path: Path) -> Dict[str, Any]:
+        job_id = f"parse_{uuid.uuid4().hex}"
+        self._wake_paddleocr_vlm()
+        try:
+            return self._run_paddleocr_vl_page_batch_queue_active(source_path, job_id)
+        finally:
+            self._release_paddle_after_document(job_id)
+
+    def _run_paddleocr_vl_page_batch_queue_active(
+        self,
+        source_path: Path,
+        job_id: str,
+    ) -> Dict[str, Any]:
         queue_run_started = time.perf_counter()
         client = self._redis_client()
 
@@ -1049,7 +1297,6 @@ class ContentExtractor:
         batch_size = self._get_paddleocr_page_batch_size()
         output_root = Path(os.getenv("PADDLEOCR_OUTPUT_DIR", "/workspace/uploads/paddleocr_vl_output"))
 
-        job_id = f"parse_{uuid.uuid4().hex}"
         task_key = f"{key_prefix}:{job_id}"
         output_dir = output_root / job_id
         _ensure_shared_writable_dir(output_root)
@@ -1543,6 +1790,10 @@ class ContentExtractor:
         if not markdown:
             raise ContentExtractionError("PaddleOCR-VL 页级 batch 没有生成 Markdown", file_path=str(source_path))
 
+        self._emit_progress("visual_assets", "Persisting chart and image evidence.", 43)
+        visual_assets = promote_visual_assets(output_dir, source_path)
+        markdown = append_visual_markers(markdown, visual_assets)
+
         keep_process_output = _env_bool("PADDLEOCR_KEEP_PROCESS_OUTPUT", False)
         combined_md_path = output_dir / "combined.md"
         result_markdown_path = ""
@@ -1562,6 +1813,8 @@ class ContentExtractor:
             "total_pages": total_pages,
             "units_processed": total_units,
             "elapsed_worker_seconds_sum": elapsed_total,
+            "visual_asset_count": len(visual_assets),
+            "visual_assets": visual_assets,
             "output_dir": str(output_dir) if keep_process_output else "",
             "result_markdown_path": result_markdown_path,
             "intermediate_output_removed": not keep_process_output,
@@ -1608,6 +1861,35 @@ class ContentExtractor:
 
             block = block.strip()
             if not block:
+                continue
+
+            visual = parse_visual_marker(block)
+            if visual:
+                page = max(1, int(visual.get("page_number") or current_page))
+                caption = str(visual.get("caption") or "").strip()
+                summary = str(visual.get("summary") or "").strip()
+                ocr_text = str(visual.get("ocr_text") or "").strip()
+                chart_data = visual.get("chart_data")
+                segment_type = "chart" if chart_data else "figure"
+                content_parts = [part for part in (caption, summary, ocr_text) if part]
+                if chart_data:
+                    content_parts.append(json.dumps(chart_data, ensure_ascii=False, sort_keys=True))
+                content = "\n".join(content_parts) or f"Visual evidence {visual['asset_id']}"
+                seq += 1
+                segments.append(TextSegment(
+                    segment_id=f"{document_id}_p{page}_s{seq}",
+                    content=content,
+                    page_number=page,
+                    position_y=float(seq),
+                    position_x=0.0,
+                    segment_type=segment_type,
+                    structured_data={
+                        **visual,
+                        "source": "paddleocr_vl_visual_asset",
+                        "parser": "paddleocr-vl",
+                        "evidence_type": segment_type,
+                    },
+                ))
                 continue
 
             if self._looks_like_markdown_table(block):

@@ -40,6 +40,66 @@ class PageBatchRangeTests(unittest.TestCase):
         self.assertEqual(summary["predict_seconds"]["avg"], 5.0)
 
 
+class PaddleDocumentLifecycleTests(unittest.TestCase):
+    def test_queue_wrapper_wakes_before_ocr_and_releases_in_finally(self):
+        extractor = ContentExtractor()
+        calls: list[str] = []
+
+        def run_active(source_path, job_id):  # noqa: ARG001
+            calls.append("run")
+            self.assertTrue(job_id.startswith("parse_"))
+            return {"status": "success"}
+
+        with patch.object(
+            extractor,
+            "_wake_paddleocr_vlm",
+            side_effect=lambda: calls.append("wake"),
+        ), patch.object(
+            extractor,
+            "_run_paddleocr_vl_page_batch_queue_active",
+            side_effect=run_active,
+        ), patch.object(
+            extractor,
+            "_release_paddle_after_document",
+            side_effect=lambda job_id: calls.append("release"),
+        ):
+            result = extractor._run_paddleocr_vl_page_batch_queue(Path("report.pdf"))
+
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(calls, ["wake", "run", "release"])
+
+    def test_queue_wrapper_releases_after_ocr_failure(self):
+        extractor = ContentExtractor()
+
+        with patch.object(extractor, "_wake_paddleocr_vlm"), patch.object(
+            extractor,
+            "_run_paddleocr_vl_page_batch_queue_active",
+            side_effect=ContentExtractionError("failed", file_path="report.pdf"),
+        ), patch.object(extractor, "_release_paddle_after_document") as release:
+            with self.assertRaises(ContentExtractionError):
+                extractor._run_paddleocr_vl_page_batch_queue(Path("report.pdf"))
+
+        release.assert_called_once()
+
+    def test_vllm_sleep_requires_all_worker_release_acknowledgements(self):
+        extractor = ContentExtractor()
+        with patch.object(
+            extractor,
+            "_request_paddle_worker_release",
+            return_value=False,
+        ), patch.object(extractor, "_sleep_paddleocr_vlm") as sleep:
+            extractor._release_paddle_after_document("job-1")
+        sleep.assert_not_called()
+
+        with patch.object(
+            extractor,
+            "_request_paddle_worker_release",
+            return_value=True,
+        ), patch.object(extractor, "_sleep_paddleocr_vlm") as sleep:
+            extractor._release_paddle_after_document("job-2")
+        sleep.assert_called_once_with("job-2")
+
+
 class PyMuPdfSplitTests(unittest.TestCase):
     def test_15_page_pdf_is_split_losslessly_with_ready_markers(self):
         try:

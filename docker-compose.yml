@@ -4,6 +4,8 @@ x-paddleocr-shared-env: &paddleocr-shared-env
   PADDLEOCR_TASK_QUEUE_NAME: paddleocr:parse
   PADDLEOCR_TASK_KEY_PREFIX: paddleocr:task
   PADDLEOCR_TASK_RESULT_TTL: '86400'
+  PADDLEOCR_RELEASE_REQUEST_KEY: paddleocr:control:release
+  PADDLEOCR_WORKER_IDS: paddleocr-worker-1,paddleocr-worker-2
   PADDLEOCR_OUTPUT_DIR: /workspace/uploads/paddleocr_vl_output
   PADDLEOCR_SHARED_DIR_MODE: '0777'
   PADDLEOCR_SHARED_FILE_MODE: '0666'
@@ -23,10 +25,10 @@ x-paddleocr-worker-env: &paddleocr-worker-env
   PADDLEOCR_USE_DOC_ORIENTATION_CLASSIFY: 'false'
   PADDLEOCR_USE_DOC_UNWARPING: 'false'
   PADDLEOCR_USE_LAYOUT_DETECTION: 'true'
-  PADDLEOCR_USE_CHART_RECOGNITION: 'false'
+  PADDLEOCR_USE_CHART_RECOGNITION: 'true'
   PADDLEOCR_USE_SEAL_RECOGNITION: 'false'
-  PADDLEOCR_USE_OCR_FOR_IMAGE_BLOCK: 'false'
-  PADDLEOCR_LAYOUT_SHAPE_MODE: rect
+  PADDLEOCR_USE_OCR_FOR_IMAGE_BLOCK: 'true'
+  PADDLEOCR_LAYOUT_SHAPE_MODE: poly
   PADDLEOCR_VLM_MIN_PIXELS: '112896'
   PADDLEOCR_VLM_MAX_PIXELS: '1003520'
   PADDLEOCR_VLM_MAX_NEW_TOKENS: '2048'
@@ -103,6 +105,9 @@ services:
       PADDLE_PDX_MODEL_SOURCE: modelscope
       PADDLEOCR_DEFAULT_MODEL_SOURCE: modelscope
       PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: 'True'
+      # The service is internal-only. These routes let the backend release the
+      # vLLM GPU allocation between OCR and report analysis.
+      VLLM_SERVER_DEV_MODE: '1'
     command:
       - paddleocr
       - genai_server
@@ -224,8 +229,10 @@ services:
       REPORT_LINK_FORWARD_PAGE_COUNT: '7'
       REPORT_SKIP_PROFILED_METRIC_EXPANSION: 'true'
       REPORT_DISCLOSURE_LLM_CONCURRENCY: '8'
-      # Match disclosure_inference.py hard limits; larger values are ignored.
-      REPORT_ANALYSIS_MAX_EVIDENCE_SEGMENTS: '46'
+      REPORT_DYNAMIC_TOPK_MIN: '46'
+      REPORT_DYNAMIC_TOPK_LOG_FACTOR: '4'
+      REPORT_RERANK_POOL_MULTIPLIER: '1.5'
+      REPORT_ANALYSIS_EVIDENCE_CHUNK_TOKEN_BUDGET: '24000'
       REPORT_ANALYSIS_MAX_CHARS_PER_EVIDENCE: '8192'
 
       # Backend is the only service that splits PDF pages.
@@ -234,6 +241,14 @@ services:
       PADDLEOCR_KEEP_PROCESS_OUTPUT: 'false'
       PADDLEOCR_JOB_WORK_DIR: /workspace/uploads/paddleocr_vl_jobs
       PADDLEOCR_SPLIT_VISIBILITY_WAIT_SECONDS: '60'
+      # Release Paddle once per complete document, never between page batches.
+      PADDLEOCR_RELEASE_AFTER_DOCUMENT: 'true'
+      PADDLEOCR_WORKER_RELEASE_ACK_TIMEOUT_SECONDS: '30'
+      PADDLEOCR_VLM_SLEEP_ENABLED: 'true'
+      PADDLEOCR_VLM_CONTROL_URL: http://paddleocr-vlm-server:8118
+      PADDLEOCR_VLM_SLEEP_LEVEL: '1'
+      PADDLEOCR_VLM_SLEEP_TIMEOUT_SECONDS: '120'
+      PADDLEOCR_VLM_WAKE_TIMEOUT_SECONDS: '180'
 
       PYTHONPATH: /workspace/backend/src
       PYTHONUNBUFFERED: '1'

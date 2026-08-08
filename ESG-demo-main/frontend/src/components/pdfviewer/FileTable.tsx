@@ -2,15 +2,24 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Table, Button, Space, Tag, Popconfirm, Badge } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { DeleteOutlined, CommentOutlined, SyncOutlined } from "@ant-design/icons";
+import { BarChartOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 import { useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import { useT } from "@/i18n/useT";
+import { apiService } from "@/lib/api";
 
 interface FileTableProps {
   onChatClick: (file: File) => void;
   selectedRows: File[];
   onSelectionChange: (rows: File[]) => void;
 }
+
+type FileTableRow = File & {
+  isCompany?: boolean;
+  children?: FileTableRow[];
+  reportCount?: number;
+};
 
 function uploadSortKey(f: File): number {
   if (typeof f.uploadedAtMs === "number" && f.uploadedAtMs > 0) return f.uploadedAtMs;
@@ -31,6 +40,7 @@ function sortFilesForDisplay(files: File[]): File[] {
 
 const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSelectionChange }) => {
   const { t, lang } = useT();
+  const router = useRouter();
   const locale = lang === "zh" ? "zh-CN" : "en-US";
 
   const files = useFileStore((state) => state.files);
@@ -52,7 +62,43 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     return () => clearInterval(timer);
   }, []);
 
-  const dataSource = useMemo(() => sortFilesForDisplay(files), [files]);
+  const dataSource = useMemo<FileTableRow[]>(() => {
+    const sorted = sortFilesForDisplay(files);
+    const grouped = new Map<string, File[]>();
+    const ungrouped: FileTableRow[] = [];
+    for (const file of sorted) {
+      if (!file.company_id) {
+        ungrouped.push(file);
+        continue;
+      }
+      const values = grouped.get(file.company_id) || [];
+      values.push(file);
+      grouped.set(file.company_id, values);
+    }
+    const companyRows: FileTableRow[] = [];
+    for (const [companyId, reports] of grouped.entries()) {
+      const children = sortFilesForDisplay(reports);
+      const failed = children.some((item) => item.status === "failed");
+      const pending = children.some((item) => item.status === "pending");
+      const partial = children.some((item) => item.status === "partial");
+      const first = children[0];
+      companyRows.push({
+        ...first,
+        key: `company::${companyId}`,
+        file_id: undefined,
+        name: first.company_name || companyId,
+        size: `${children.length} ${children.length === 1 ? "report" : "reports"}`,
+        type: "Company",
+        pages: "-",
+        status: failed ? "failed" : pending ? "pending" : partial ? "partial" : "ready",
+        isCompany: true,
+        reportCount: children.length,
+        children,
+      });
+    }
+    companyRows.sort((a, b) => uploadSortKey(b) - uploadSortKey(a));
+    return [...companyRows, ...ungrouped];
+  }, [files]);
 
   useEffect(() => {
     const totalPages = Math.max(1, Math.ceil(dataSource.length / pageSize));
@@ -94,8 +140,15 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
   const renderUnknown = (v: any) =>
     v && v !== "Unknown" && v !== "未知" ? v : t("common.unknown");
 
-  const columns: ColumnsType<File> = [
-    { title: t("files.columns.name"), dataIndex: "name", key: "name" },
+  const columns: ColumnsType<FileTableRow> = [
+    {
+      title: t("files.columns.name"),
+      dataIndex: "name",
+      key: "name",
+      render: (value: string, record) => (
+        <span className={record.isCompany ? "font-semibold text-slate-900" : ""}>{value}</span>
+      ),
+    },
     { title: t("files.columns.size"), dataIndex: "size", key: "size" },
     {
       title: t("files.columns.dateUploaded"),
@@ -154,17 +207,54 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     {
       title: t("files.columns.actions"),
       key: "actions",
-      render: (_: any, file: File) => (
-        <Space>
+      render: (_: any, file: FileTableRow) => (
+        file.isCompany ? (
+          <Button
+            type="primary"
+            size="small"
+            icon={<BarChartOutlined />}
+            disabled={file.status !== "ready"}
+            onClick={(event) => {
+              event.stopPropagation();
+              router.push(`/dashboard/company/${encodeURIComponent(file.company_id!)}`);
+            }}
+          >
+            {t("files.actions.analysis")}
+          </Button>
+        ) : <Space>
           <Button
             type="primary"
             size="small"
             icon={<CommentOutlined />}
-            onClick={() => onChatClick(file)}
+            onClick={(event) => {
+              event.stopPropagation();
+              onChatClick(file);
+            }}
             disabled={file.status !== "ready"}
           >
             {t("files.actions.chat")}
           </Button>
+          <Popconfirm
+            title={lang === "zh" ? "重新解析此报告？" : "Reprocess this report?"}
+            description={lang === "zh" ? "将重新识别文字、图表和图片。" : "Text, charts and images will be extracted again."}
+            onConfirm={async () => {
+              if (!file.file_id) return;
+              await apiService.reprocessReport(file.file_id);
+              await useFileStore.getState().loadFilesFromBackend();
+            }}
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
+          >
+            <Button
+              type="default"
+              size="small"
+              icon={<SyncOutlined />}
+              disabled={!file.file_id || file.backend_status === "processing"}
+              onClick={(event) => event.stopPropagation()}
+            >
+              {lang === "zh" ? "重新解析" : "Reprocess"}
+            </Button>
+          </Popconfirm>
           <Popconfirm
             title={t("files.deleteTitle")}
             description={t("files.deleteDesc")}
@@ -174,7 +264,13 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
             okText={t("common.yes")}
             cancelText={t("common.no")}
           >
-            <Button type="default" danger size="small" icon={<DeleteOutlined />}>
+            <Button
+              type="default"
+              danger
+              size="small"
+              icon={<DeleteOutlined />}
+              onClick={(event) => event.stopPropagation()}
+            >
               {t("files.actions.delete")}
             </Button>
           </Popconfirm>
@@ -241,8 +337,18 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
             loading={loading}
             rowSelection={{
               selectedRowKeys: selectedRows.map((r) => r.key),
-              onChange: (_keys, rows) => onSelectionChange(rows as File[]),
+              onChange: (_keys, rows) =>
+                onSelectionChange((rows as FileTableRow[]).filter((row) => !row.isCompany)),
+              getCheckboxProps: (record) => ({ disabled: Boolean(record.isCompany) }),
             }}
+            onRow={(record) => ({
+              onClick: () => {
+                if (record.isCompany && record.company_id && record.status === "ready") {
+                  router.push(`/dashboard/company/${encodeURIComponent(record.company_id)}`);
+                }
+              },
+              style: record.isCompany ? { cursor: record.status === "ready" ? "pointer" : "default" } : undefined,
+            })}
           />
         )}
       </div>

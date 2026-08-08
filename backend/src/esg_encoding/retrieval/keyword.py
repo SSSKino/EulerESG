@@ -84,6 +84,7 @@ class KeywordRetriever:
                     retrieval_type="exact_code+table_row_context" if is_row_context else "exact_code",
                     matched_keywords=[profile.metric_code],
                     metric_id=profile.metric_id or getattr(metric, "metric_id", ""),
+                    **visual_result_fields(evidence_segment),
                 )
             )
         deduped: Dict[str, RetrievalResult] = {}
@@ -123,6 +124,7 @@ class KeywordRetriever:
                     retrieval_type="exact_alias",
                     matched_keywords=matched_aliases,
                     metric_id=profile.metric_id or getattr(metric, "metric_id", ""),
+                    **visual_result_fields(segment),
                 )
             )
         results.sort(key=lambda item: item.score, reverse=True)

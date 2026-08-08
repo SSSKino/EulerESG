@@ -14,6 +14,8 @@ interface UploadOptionsModalProps {
   onCancel: () => void;
   onIndustryChange: (value: string) => void;
   form: FormInstance<FileInfoFormValues>;
+  uploadMode: "single" | "multi";
+  confirmLoading: boolean;
 }
 
 const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
@@ -24,6 +26,8 @@ const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
   onCancel,
   onIndustryChange,
   form,
+  uploadMode,
+  confirmLoading,
 }) => {
   const { t } = useT();
   return (
@@ -35,12 +39,15 @@ const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
       width={600}
       okText={t("common.ok")}
       cancelText={t("common.cancel")}
+      confirmLoading={confirmLoading}
+      maskClosable={!confirmLoading}
     >
       <FileInfoForm
         form={form}
         selectedUploadFiles={selectedUploadFiles}
         selectedIndustry={selectedIndustry}
         onIndustryChange={onIndustryChange}
+        uploadMode={uploadMode}
       />
     </Modal>
   );

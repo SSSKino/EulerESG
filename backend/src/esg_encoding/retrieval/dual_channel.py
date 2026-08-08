@@ -35,6 +35,7 @@ class DualChannelRetriever:
         self.config = config
         self.keyword_retriever = KeywordRetriever(config)
         self.semantic_retriever = SemanticRetriever(config)
+        self._dynamic_window_by_metric: Dict[str, Dict[str, int]] = {}
 
     def retrieve_for_metric(
         self,
@@ -132,14 +133,19 @@ class DualChannelRetriever:
                     capacity=max(11, len(combined_results)),
                 )
 
+            metric_id = str(getattr(metric, "metric_id", profile.metric_id) or "")
+            window = self._dynamic_window_by_metric.get(metric_id, {})
             result = MetricRetrievalResult(
-                metric_id=getattr(metric, "metric_id", profile.metric_id),
+                metric_id=metric_id,
                 metric_name=getattr(metric, "metric_name", profile.metric_name),
                 metric_code=getattr(metric, "metric_code", profile.metric_code),
                 keyword_results=effective_keyword_results,
                 semantic_results=semantic_results,
                 combined_results=combined_results,
                 total_matches=len(combined_results),
+                qualified_total=int(window.get("qualified_total", len(combined_results))),
+                rerank_pool_k=int(window.get("rerank_pool_k", len(combined_results))),
+                target_k=int(window.get("target_k", len(combined_results))),
             )
             logger.info(
                 f"Metric-centric retrieval completed for {metric_name}, "
@@ -174,6 +180,29 @@ class DualChannelRetriever:
             return str(table_id), int(row_index)
         except Exception:
             return None
+
+    @staticmethod
+    def _segment_source_report(segment) -> tuple[Optional[str], Optional[str], Optional[int]]:
+        data = getattr(segment, "structured_data", None)
+        data = data if isinstance(data, dict) else {}
+        report_id = str(data.get("source_report_id") or "").strip() or None
+        report_name = str(data.get("source_report_name") or "").strip() or None
+        try:
+            report_year = int(data.get("source_report_year"))
+        except (TypeError, ValueError):
+            report_year = None
+        return report_id, report_name, report_year
+
+    @staticmethod
+    def _report_page_key(source_report_id: Optional[str], page_number: int):
+        report_id = str(source_report_id or "").strip()
+        return (report_id, int(page_number)) if report_id else int(page_number)
+
+    @staticmethod
+    def _report_page_parts(key) -> tuple[str, int]:
+        if isinstance(key, tuple) and len(key) == 2:
+            return str(key[0] or ""), int(key[1])
+        return "", int(key)
 
     @classmethod
     def _linked_code_context_results(
@@ -338,7 +367,7 @@ class DualChannelRetriever:
         self,
         report_content: ReportContent,
         trigger_results: Sequence[RetrievalResult],
-    ) -> Dict[int, Dict[str, object]]:
+    ) -> Dict[object, Dict[str, object]]:
         if not self._env_enabled("REPORT_LINK_RESOLUTION_ENABLED", True):
             return {}
         try:
@@ -359,7 +388,7 @@ class DualChannelRetriever:
         segments = list(report_content.document_content.segments or [])
         by_id = {getattr(segment, "segment_id", ""): segment for segment in segments}
         by_row: Dict[tuple[str, int], List[object]] = {}
-        by_page: Dict[int, List[object]] = {}
+        by_page: Dict[object, List[object]] = {}
         for segment in segments:
             key = self._row_key(segment)
             if key is not None:
@@ -369,14 +398,21 @@ class DualChannelRetriever:
             except Exception:
                 page_number = 0
             if page_number > 0:
-                by_page.setdefault(page_number, []).append(segment)
+                source_report_id, _, _ = self._segment_source_report(segment)
+                by_page.setdefault(
+                    self._report_page_key(source_report_id, page_number), []
+                ).append(segment)
 
-        direct_links_by_page: Dict[int, Dict[str, object]] = {}
-        direct_page_order: List[int] = []
+        direct_links_by_page: Dict[object, Dict[str, object]] = {}
+        direct_page_order: List[object] = []
         for result in list(trigger_results)[:32]:
             segment = by_id.get(getattr(result, "segment_id", ""))
             if segment is None:
                 continue
+            source_report_id, source_report_name, source_report_year = (
+                self._segment_source_report(segment)
+            )
+            source_report_key = source_report_id or ""
             related = [segment]
             row_key = self._row_key(segment)
             if row_key is not None:
@@ -399,8 +435,9 @@ class DualChannelRetriever:
                         continue
                     if target_page < 1:
                         continue
+                    target_key = self._report_page_key(source_report_key, target_page)
                     if (
-                        target_page not in direct_links_by_page
+                        target_key not in direct_links_by_page
                         and len(direct_page_order) >= max_target_pages
                     ):
                         continue
@@ -419,26 +456,33 @@ class DualChannelRetriever:
                         "anchor_text": anchor_text,
                         "source_segment_id": str(getattr(source_segment, "segment_id", "") or ""),
                         "source_rank": self._link_source_rank(source_segment, anchor_text),
+                        "source_report_id": source_report_id,
+                        "source_report_name": source_report_name,
+                        "source_report_year": source_report_year,
                     }
-                    current = direct_links_by_page.get(target_page)
+                    current = direct_links_by_page.get(target_key)
                     if current is None:
-                        direct_page_order.append(target_page)
-                        direct_links_by_page[target_page] = candidate
+                        direct_page_order.append(target_key)
+                        direct_links_by_page[target_key] = candidate
                     elif int(candidate["source_rank"]) > int(current.get("source_rank") or 0):
-                        direct_links_by_page[target_page] = candidate
+                        direct_links_by_page[target_key] = candidate
 
-        direct_links = [direct_links_by_page[page] for page in direct_page_order]
+        direct_links = [direct_links_by_page[key] for key in direct_page_order]
 
-        targets: Dict[int, Dict[str, object]] = {}
+        targets: Dict[object, Dict[str, object]] = {}
         for link in direct_links:
             target_page = int(link["target_page"])
-            targets[target_page] = {
+            source_report_key = str(link.get("source_report_id") or "")
+            targets[self._report_page_key(source_report_key, target_page)] = {
                 "source_page": link["source_page"],
                 "anchor_text": link["anchor_text"],
                 "source_segment_id": link.get("source_segment_id"),
                 "root_target_page": target_page,
                 "context_offset": 0,
                 "continuation": False,
+                "source_report_id": link.get("source_report_id"),
+                "source_report_name": link.get("source_report_name"),
+                "source_report_year": link.get("source_report_year"),
             }
 
         # A PDF link starts a bounded second pass over the Paddle-extracted
@@ -447,28 +491,33 @@ class DualChannelRetriever:
         for link in direct_links:
             root_target_page = int(link["target_page"])
             source_page = int(link.get("source_page") or 0)
+            source_report_key = str(link.get("source_report_id") or "")
             for offset in range(1, forward_page_count + 1):
                 candidate_page = root_target_page + offset
+                candidate_key = self._report_page_key(source_report_key, candidate_page)
                 if (
                     candidate_page < 1
                     or candidate_page == source_page
-                    or candidate_page not in by_page
+                    or candidate_key not in by_page
                 ):
                     continue
 
-                current = targets.get(candidate_page)
+                current = targets.get(candidate_key)
                 current_offset = int((current or {}).get("context_offset") or 0)
                 if current is not None and (
                     current_offset == 0 or current_offset <= offset
                 ):
                     continue
-                targets[candidate_page] = {
+                targets[candidate_key] = {
                     "source_page": link["source_page"],
                     "anchor_text": link["anchor_text"],
                     "source_segment_id": link.get("source_segment_id"),
                     "root_target_page": root_target_page,
                     "context_offset": offset,
                     "continuation": True,
+                    "source_report_id": link.get("source_report_id"),
+                    "source_report_name": link.get("source_report_name"),
+                    "source_report_year": link.get("source_report_year"),
                 }
         return targets
 
@@ -484,19 +533,26 @@ class DualChannelRetriever:
         if not targets:
             return []
 
-        target_segments = [
-            segment
-            for segment in report_content.document_content.segments
-            if int(getattr(segment, "page_number", 0) or 0) in targets
-        ]
+        target_segments = []
+        for segment in report_content.document_content.segments:
+            source_report_id, _, _ = self._segment_source_report(segment)
+            segment_key = self._report_page_key(
+                source_report_id,
+                int(getattr(segment, "page_number", 0) or 0),
+            )
+            if segment_key in targets:
+                target_segments.append(segment)
         if not target_segments:
             return []
 
-        page_table_text: Dict[int, List[str]] = {}
+        page_table_text: Dict[tuple[str, int], List[str]] = {}
         for segment in target_segments:
             if str(getattr(segment, "segment_type", "") or "").lower() != "table":
                 continue
-            page_table_text.setdefault(int(segment.page_number), []).append(
+            source_report_id, _, _ = self._segment_source_report(segment)
+            page_table_text.setdefault(
+                self._report_page_key(source_report_id, int(segment.page_number)), []
+            ).append(
                 str(getattr(segment, "content", "") or "")
             )
         page_category_adjustments = {
@@ -513,7 +569,29 @@ class DualChannelRetriever:
         target_report = report_content.model_copy(
             update={"document_content": target_document, "embeddings": target_embeddings}
         )
-        object.__setattr__(target_report, "_semantic_retrieval_embedding_cache", None)
+        target_embedding_cache = None
+        parent_embedding_cache = getattr(
+            report_content,
+            "_semantic_retrieval_embedding_cache",
+            None,
+        )
+        if isinstance(parent_embedding_cache, tuple) and len(parent_embedding_cache) == 2:
+            parent_segments, parent_matrix = parent_embedding_cache
+            selected_indexes = [
+                index
+                for index, segment in enumerate(parent_segments)
+                if getattr(segment, "segment_id", "") in target_ids
+            ]
+            if selected_indexes:
+                target_embedding_cache = (
+                    [parent_segments[index] for index in selected_indexes],
+                    parent_matrix[selected_indexes],
+                )
+        object.__setattr__(
+            target_report,
+            "_semantic_retrieval_embedding_cache",
+            target_embedding_cache,
+        )
 
         candidates: List[RetrievalResult] = []
         candidates.extend(self.keyword_retriever.search_exact_code(target_report, metric, profile))
@@ -522,7 +600,7 @@ class DualChannelRetriever:
         if (
             getattr(self.config, "use_semantic_retrieval", True)
             and profile.dense_query
-            and target_embeddings
+            and (target_embeddings or target_embedding_cache is not None)
         ):
             candidates.extend(
                 self.semantic_retriever.search_by_semantic(
@@ -586,18 +664,28 @@ class DualChannelRetriever:
         linked_results: List[RetrievalResult] = []
         for candidate in deduped.values():
             target_page = int(candidate.page_number)
-            link_meta = targets.get(target_page)
+            candidate_segment = segment_by_id.get(candidate.segment_id)
+            source_report_id, source_report_name, source_report_year = (
+                self._segment_source_report(candidate_segment)
+                if candidate_segment is not None
+                else (
+                    getattr(candidate, "source_report_id", None),
+                    getattr(candidate, "source_report_name", None),
+                    getattr(candidate, "source_report_year", None),
+                )
+            )
+            target_key = self._report_page_key(source_report_id, target_page)
+            link_meta = targets.get(target_key)
             if link_meta is None:
                 continue
             anchor_text = str(link_meta.get("anchor_text") or "").strip()
             matched = list(candidate.matched_keywords or [])
             if anchor_text and anchor_text not in matched:
                 matched.append(anchor_text)
-            candidate_segment = segment_by_id.get(candidate.segment_id)
             candidate_content = str(getattr(candidate_segment, "content", "") or candidate.content or "").lower()
             metric_hits = self._linked_metric_hit_count(candidate_content, metric, metric_terms)
             category_adjustment = page_category_adjustments.get(
-                target_page,
+                target_key,
                 self._linked_category_adjustment(candidate_content, metric),
             )
             segment_type = str(getattr(candidate_segment, "segment_type", "") or "").lower()
@@ -632,6 +720,9 @@ class DualChannelRetriever:
                     link_target_page=int(link_meta.get("root_target_page") or target_page),
                     link_anchor_text=anchor_text or None,
                     link_source_segment_id=str(link_meta.get("source_segment_id") or "") or None,
+                    source_report_id=source_report_id,
+                    source_report_name=source_report_name,
+                    source_report_year=source_report_year,
                 )
             )
         linked_results.sort(key=lambda item: item.score, reverse=True)
@@ -643,23 +734,21 @@ class DualChannelRetriever:
         remaining: List[RetrievalResult] = []
         represented_pages = set()
         for result in linked_results:
-            if result.page_number not in represented_pages:
-                represented_pages.add(result.page_number)
+            page_key = (result.source_report_id or "", result.page_number)
+            if page_key not in represented_pages:
+                represented_pages.add(page_key)
                 page_first.append(result)
             else:
                 remaining.append(result)
         linked_results = page_first + remaining
         logger.info(
             f"Linked-page retrieval for {getattr(metric, 'metric_id', 'unknown')}: "
-            f"roots={sorted({int(meta.get('root_target_page') or page) for page, meta in targets.items()})}, "
+            f"roots={sorted({(self._report_page_parts(key)[0], int(meta.get('root_target_page') or self._report_page_parts(key)[1])) for key, meta in targets.items()})}, "
             f"pages={sorted(targets)}, matches={len(linked_results)}"
         )
-        result_limit = max(
-            1,
-            len(targets),
-            int(getattr(self.config, "top_k", 10) or 10),
-        )
-        return linked_results[:result_limit]
+        # Qualification and dynamic pool sizing happen once in _combine_results.
+        # Do not impose a second fixed window on linked-page evidence here.
+        return linked_results
 
     @staticmethod
     def _is_index_context(content: str) -> bool:
@@ -750,7 +839,7 @@ class DualChannelRetriever:
         results: Sequence[RetrievalResult],
         report_content: Optional[ReportContent],
         profile,
-        limit: int,
+        limit: Optional[int] = None,
     ) -> List[RetrievalResult]:
         segments = list(
             getattr(getattr(report_content, "document_content", None), "segments", [])
@@ -797,7 +886,26 @@ class DualChannelRetriever:
             for label in labels:
                 if label not in retrieval_type:
                     retrieval_type += f"+{label}"
-            prepared.append(result.model_copy(update={"retrieval_type": retrieval_type}))
+            source_report_id = getattr(result, "source_report_id", None)
+            source_report_name = getattr(result, "source_report_name", None)
+            source_report_year = getattr(result, "source_report_year", None)
+            if segment is not None:
+                segment_report_id, segment_report_name, segment_report_year = (
+                    self._segment_source_report(segment)
+                )
+                source_report_id = source_report_id or segment_report_id
+                source_report_name = source_report_name or segment_report_name
+                source_report_year = source_report_year or segment_report_year
+            prepared.append(
+                result.model_copy(
+                    update={
+                        "retrieval_type": retrieval_type,
+                        "source_report_id": source_report_id,
+                        "source_report_name": source_report_name,
+                        "source_report_year": source_report_year,
+                    }
+                )
+            )
 
         def attention_rank(item: RetrievalResult) -> tuple[int, float]:
             result_type = str(item.retrieval_type or "")
@@ -807,7 +915,11 @@ class DualChannelRetriever:
             return rank, float(item.score or 0.0)
 
         prepared.sort(key=attention_rank, reverse=True)
-        bounded = prepared[:max(1, int(limit or 1))]
+        bounded = (
+            prepared[: max(0, int(limit))]
+            if limit is not None
+            else prepared
+        )
         logger.info(
             f"Unified rerank pool: candidates={len(bounded)}, "
             f"real_data={sum('real_data_evidence' in item.retrieval_type for item in bounded)}, "
@@ -815,6 +927,57 @@ class DualChannelRetriever:
             f"code_index={sum('code_index_evidence' in item.retrieval_type for item in bounded)}"
         )
         return bounded
+
+    @staticmethod
+    def _select_balanced_rerank_pool(
+        candidates: Sequence[RetrievalResult],
+        pool_k: int,
+    ) -> List[RetrievalResult]:
+        """Reserve relevant candidates per report, then fill by global rank."""
+        pool_k = min(len(candidates), max(0, int(pool_k or 0)))
+        if pool_k <= 0:
+            return []
+        ranked = list(candidates)
+        best_score = max([float(item.score or 0.0) for item in ranked] or [0.0])
+        reservation_floor = max(0.12, best_score * 0.45)
+        report_groups: Dict[str, List[RetrievalResult]] = {}
+        for item in ranked:
+            retrieval_type = str(item.retrieval_type or "")
+            reservation_qualified = (
+                float(item.score or 0.0) >= reservation_floor
+                or "real_data_evidence" in retrieval_type
+                or "linked_page" in retrieval_type
+                or "exact_alias" in retrieval_type
+                or "exact_code" in retrieval_type
+            )
+            if not reservation_qualified:
+                continue
+            report_id = str(getattr(item, "source_report_id", None) or "__single_report__")
+            report_groups.setdefault(report_id, []).append(item)
+
+        if len(report_groups) <= 1:
+            return ranked[:pool_k]
+
+        quota = max(1, pool_k // len(report_groups))
+        selected: List[RetrievalResult] = []
+        selected_ids = set()
+        for report_id in sorted(report_groups):
+            for item in report_groups[report_id][:quota]:
+                if len(selected) >= pool_k:
+                    break
+                if item.segment_id in selected_ids:
+                    continue
+                selected.append(item)
+                selected_ids.add(item.segment_id)
+
+        for item in ranked:
+            if len(selected) >= pool_k:
+                break
+            if item.segment_id in selected_ids:
+                continue
+            selected.append(item)
+            selected_ids.add(item.segment_id)
+        return selected
 
     @staticmethod
     def _apply_evidence_priority(results: Sequence[RetrievalResult]) -> List[RetrievalResult]:
@@ -890,8 +1053,6 @@ class DualChannelRetriever:
         if metric is None:
             return fused[: max(1, int(getattr(self.config, "top_k", 10) or 10))]
 
-        final_k = _target_window_size(self.config, metric, observed_matches=len(fused))
-        final_k = max(11, final_k)
         if profile is None:
             profile = build_metric_retrieval_profile(metric)
         deterministic = exact_metric_rerank(
@@ -906,19 +1067,34 @@ class DualChannelRetriever:
             deterministic,
             report_content=report_content,
         )
-        rerank_limit = max(
-            final_k,
-            int(getattr(self.semantic_retriever, "reranker_top_k", final_k) or final_k),
-        )
-        candidate_pool = self._prepare_unified_rerank_candidates(
+        qualified = self._prepare_unified_rerank_candidates(
             deterministic,
             report_content,
             profile,
-            rerank_limit,
+            limit=None,
         )
+        qualified_total = len(qualified)
+        target_k = compute_dynamic_top_k(qualified_total)
+        rerank_pool_k = compute_rerank_pool_k(qualified_total, target_k)
+        candidate_pool = self._select_balanced_rerank_pool(qualified, rerank_pool_k)
         reranked = self.semantic_retriever.rerank_candidates(candidate_pool, metric)
         reranked = self._apply_evidence_priority(reranked)
-        return reranked[:final_k]
+        metric_id = str(getattr(metric, "metric_id", "") or "")
+        self._dynamic_window_by_metric[metric_id] = {
+            "qualified_total": qualified_total,
+            "rerank_pool_k": len(candidate_pool),
+            "target_k": target_k,
+        }
+        per_report: Dict[str, int] = {}
+        for item in qualified:
+            report_id = str(getattr(item, "source_report_id", None) or "single")
+            per_report[report_id] = per_report.get(report_id, 0) + 1
+        logger.info(
+            f"Dynamic retrieval window metric={metric_id or getattr(metric, 'metric_name', 'unknown')}: "
+            f"qualified_total={qualified_total}, rerank_pool_k={len(candidate_pool)}, "
+            f"target_k={target_k}, per_report={per_report}"
+        )
+        return reranked[:target_k]
 
     def retrieve_for_collection(
         self,

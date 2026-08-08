@@ -18,6 +18,7 @@ from esg_encoding.models import (
 from esg_encoding.retrieval.keyword import KeywordRetriever
 from esg_encoding.retrieval.reranker import _QwenReranker
 from esg_encoding.retrieval.semantic import SemanticRetriever
+from esg_encoding.retrieval.evidence_retriever import retrieve_metric_collection
 from esg_encoding.services.common import (
     _apply_assessment_year_selection,
     _prepare_metrics_for_retrieval,
@@ -175,6 +176,27 @@ class RetrievalCacheTests(unittest.TestCase):
 
         self.assertEqual(calls, 3)
         self.assertIs(first[1], second[1])
+
+    def test_metric_results_are_reused_across_scopes_with_same_identity(self):
+        report = _report([TextSegment(segment_id="s1", content="Energy", page_number=1, position_y=0)])
+        collection = SimpleNamespace(metrics=[_metric(1)], semantic_expansions=[])
+        expected = SimpleNamespace(metric_id="metric-1")
+        calls = 0
+
+        def fake_retrieve(_self, _report, _metric, _expansion=None):
+            nonlocal calls
+            calls += 1
+            return expected
+
+        with patch("esg_encoding.retrieval.evidence_retriever.enrich_document_with_pdf_links"), patch.object(
+            __import__("esg_encoding.retrieval.dual_channel", fromlist=["DualChannelRetriever"]).DualChannelRetriever,
+            "retrieve_for_metric",
+            fake_retrieve,
+        ):
+            first = retrieve_metric_collection(report, collection, ProcessingConfig())
+            second = retrieve_metric_collection(report, collection, ProcessingConfig())
+        self.assertEqual(calls, 1)
+        self.assertIs(first[0], second[0])
 
 
 class MetricPreparationTests(unittest.TestCase):

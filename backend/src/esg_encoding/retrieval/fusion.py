@@ -143,6 +143,13 @@ def rrf_fuse(
                 link_target_page=bucket["link_target_page"],
                 link_anchor_text=bucket["link_anchor_text"],
                 link_source_segment_id=bucket["link_source_segment_id"],
+                evidence_type=base.evidence_type,
+                asset_id=base.asset_id,
+                asset_url=base.asset_url,
+                bbox=base.bbox,
+                caption=base.caption,
+                confidence=base.confidence,
+                chart_data=base.chart_data,
             )
         )
     fused.sort(key=lambda item: item.score, reverse=True)

@@ -4,7 +4,7 @@ ESG System API Endpoints
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from typing import Any, Dict, List, Optional, Set
 import os
@@ -481,6 +481,7 @@ def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
         if isinstance(item, dict)
     ]
     selected_year = getattr(analysis, "selected_year", None)
+    value_status = getattr(analysis, "value_status", None)
 
     return {
         "metric_id": analysis.metric_id,
@@ -497,6 +498,7 @@ def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
         "value": value,
         "year_values": year_values,
         "selected_year": selected_year,
+        "value_status": value_status,
         "context": context,
         "Metric": metric_name,
         "Category": category,
@@ -508,6 +510,7 @@ def _metric_row_from_disclosure_analysis(analysis: DisclosureAnalysis) -> dict:
         "Value": value,
         "Year Values": year_values,
         "Selected Year": selected_year,
+        "Value Status": value_status,
         "Page": page,
         "Context": context,
         "Disclosure Status": disclosure_status,
@@ -673,6 +676,7 @@ def _metric_result_overlay_from_analysis(analysis: DisclosureAnalysis) -> Dict[s
         "Value": getattr(analysis, "value", None),
         "Year Values": list(getattr(analysis, "year_values", None) or []),
         "Selected Year": getattr(analysis, "selected_year", None),
+        "Value Status": getattr(analysis, "value_status", None),
         "Page": getattr(analysis, "page", None),
         "Context": getattr(analysis, "context", None),
         "Disclosure Status": _analysis_status_value(analysis),
@@ -689,6 +693,7 @@ def _metric_result_overlay_from_analysis(analysis: DisclosureAnalysis) -> Dict[s
         "value": getattr(analysis, "value", None),
         "year_values": list(getattr(analysis, "year_values", None) or []),
         "selected_year": getattr(analysis, "selected_year", None),
+        "value_status": getattr(analysis, "value_status", None),
         "page": getattr(analysis, "page", None),
         "context": getattr(analysis, "context", None),
         "unit": getattr(analysis, "unit", "") or "",
@@ -713,6 +718,7 @@ def _default_not_disclosed_overlay(row: dict, index: int) -> Dict[str, Any]:
         "Value": COMPLIANCE_VALUE_NA,
         "Year Values": [],
         "Selected Year": None,
+        "Value Status": "none",
         "Page": None,
         "Context": "",
         "Disclosure Status": "not_disclosed",
@@ -729,6 +735,7 @@ def _default_not_disclosed_overlay(row: dict, index: int) -> Dict[str, Any]:
         "value": COMPLIANCE_VALUE_NA,
         "year_values": [],
         "selected_year": None,
+        "value_status": "none",
         "page": None,
         "context": "",
         "unit": unit,

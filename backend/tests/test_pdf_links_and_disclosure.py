@@ -428,6 +428,80 @@ class PdfLinkTests(unittest.TestCase):
             self.assertEqual(metric_linked[0].page_number, expected_page, name)
             self.assertEqual(combined_linked[0].page_number, expected_page, name)
 
+    def test_linked_page_pool_is_not_truncated_before_dynamic_rerank(self):
+        code = "TC-SI-330a.3"
+        source = _table_segment(
+            "index-row",
+            "table_row",
+            f"Employees | Reference indices: SASB {code}",
+            page=108,
+            links=[
+                {
+                    "link_type": "internal",
+                    "anchor_text": "Global female representation",
+                    "source_page": 108,
+                    "target_page": 86,
+                }
+            ],
+        )
+        target_segments = [
+            _table_segment(
+                "technical-row",
+                "table_row",
+                "Global female representation - Technical roles | FY24 25.0%",
+                page=86,
+                table_id="gender-table",
+                row_index=1,
+                row_header="Technical roles",
+            )
+        ]
+        for page in range(86, 94):
+            for index in range(8):
+                target_segments.append(
+                    TextSegment(
+                        segment_id=f"p{page}-candidate-{index}",
+                        content=(
+                            "Gender representation for technical employees "
+                            f"supporting value {index + 1}%"
+                        ),
+                        page_number=page,
+                        position_y=float(index + 2),
+                        segment_type="text",
+                    )
+                )
+
+        report = _report([source, *target_segments])
+        config = ProcessingConfig(top_k=10)
+        object.__setattr__(config, "use_keyword_retrieval", True)
+        object.__setattr__(config, "use_semantic_retrieval", False)
+        retriever = DualChannelRetriever(config)
+        metric = _metric(
+            "TC-SI-330a.3.03",
+            code,
+            "Percentage of (1) gender representation for (c) technical employees",
+            "Percentage (%)",
+        )
+        profile = build_metric_retrieval_profile(metric)
+        trigger = RetrievalResult(
+            segment_id="index-row",
+            content=source.content,
+            page_number=108,
+            score=0.97,
+            retrieval_type="exact_code",
+            metric_id=metric.metric_id,
+        )
+
+        linked = retriever._search_linked_pages(
+            report,
+            metric,
+            profile,
+            [trigger],
+        )
+
+        self.assertEqual(len(linked), 65)
+        self.assertIn("technical-row", {item.segment_id for item in linked})
+        self.assertEqual({item.page_number for item in linked}, set(range(86, 94)))
+
     def test_linked_page_context_includes_target_and_next_seven_pages_only(self):
         code = "TC-X-200a.1"
         source = _table_segment(
@@ -1523,6 +1597,68 @@ class DirectDisclosureTests(unittest.TestCase):
             self.engine._extract_years_from_text("FY22 | FY 2023 | CY'24"),
             [2022, 2023, 2024],
         )
+
+    def test_same_year_value_merges_sources_before_conflict_detection(self):
+        metadata = [
+            {
+                "segment_id": "report-a::value",
+                "page_number": 4,
+                "source_report_id": "report-a",
+                "source_report_name": "Acme 2024.pdf",
+                "source_report_year": 2024,
+            },
+            {
+                "segment_id": "report-b::value",
+                "page_number": 9,
+                "source_report_id": "report-b",
+                "source_report_name": "Acme ESG 2024.pdf",
+                "source_report_year": 2024,
+            },
+        ]
+        first = self.engine._attach_year_value_sources(
+            [{
+                "year": 2024,
+                "value": 87,
+                "unit": "%",
+                "evidence_segment_id": "report-a::value",
+            }],
+            metadata,
+        )
+        second = self.engine._attach_year_value_sources(
+            [{
+                "year": 2024,
+                "value": 87,
+                "unit": "Percentage (%)",
+                "evidence_segment_id": "report-b::value",
+            }],
+            metadata,
+        )
+
+        merged = self.engine._merge_metric_year_values(first, second)
+
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(len(merged[0]["sources"]), 2)
+        self.assertFalse(self.engine._year_has_conflicting_values(merged, 2024))
+        conflicting = self.engine._merge_metric_year_values(
+            merged,
+            [{"year": 2024, "value": 84, "unit": "%"}],
+        )
+        self.assertTrue(
+            self.engine._year_has_conflicting_values(conflicting, 2024)
+        )
+
+    def test_evidence_chunking_keeps_table_rows_together(self):
+        segments = ["A" * 80, "B" * 80, "C" * 80]
+        metadata = [
+            {"segment_id": "a", "source_table_id": "table-1", "row_index": 2},
+            {"segment_id": "b", "source_table_id": "table-1", "row_index": 2},
+            {"segment_id": "c"},
+        ]
+
+        chunks = self.engine._evidence_chunks(segments, metadata, token_budget=30)
+
+        self.assertEqual(len(chunks), 2)
+        self.assertEqual([item[1]["segment_id"] for item in chunks[0]], ["a", "b"])
 
     def test_ocr_separator_variation_matches_full_code_only(self):
         canonical_code = "TC-HW-410a.3"

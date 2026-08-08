@@ -276,16 +276,29 @@ class FileManager:
             # Move extracted markdown (created during PDF extraction) together with the PDF
             extracted_src = current_path.parent / f"{current_path.stem}_extracted.md"
             extracted_dst = target_dir / extracted_src.name
+            visual_src = current_path.parent / f"{current_path.stem}_visual_assets"
+            visual_dst = target_dir / visual_src.name
 
-            shutil.move(str(current_path), str(target_path))
+            already_in_target = current_path.resolve() == target_path.resolve()
+            if not already_in_target:
+                shutil.move(str(current_path), str(target_path))
 
-            if extracted_src.exists():
+            if extracted_src.exists() and extracted_src.resolve() != extracted_dst.resolve():
                 try:
                     shutil.move(str(extracted_src), str(extracted_dst))
                     file_info["extracted_md_path"] = str(extracted_dst)
                     logger.info(f"Moved extracted markdown to: {extracted_dst}")
                 except Exception as e:
                     logger.warning(f"Failed to move extracted markdown {extracted_src} -> {extracted_dst}: {e}")
+
+            if visual_src.exists() and visual_src.resolve() != visual_dst.resolve():
+                try:
+                    shutil.copytree(visual_src, visual_dst, dirs_exist_ok=True)
+                    shutil.rmtree(visual_src)
+                    file_info["visual_assets_path"] = str(visual_dst)
+                    logger.info(f"Moved visual assets to: {visual_dst}")
+                except Exception as e:
+                    logger.warning(f"Failed to move visual assets {visual_src} -> {visual_dst}: {e}")
             
             # Also support legacy markdown saved as <stem>.md (older runs)
             legacy_src = current_path.parent / f"{current_path.stem}.md"
@@ -486,8 +499,14 @@ class FileManager:
 
         # 2) embeddings
         emb_objs = report_content.embeddings or []
-        seg_ids = [e.segment_id for e in emb_objs]
-        emb_matrix = np.array([e.embedding for e in emb_objs], dtype=np.float32) if emb_objs else np.zeros((0, 0), dtype=np.float32)
+        cached_matrix = getattr(report_content, "_embedding_matrix", None)
+        cached_ids = getattr(report_content, "_embedding_segment_ids", None)
+        if isinstance(cached_matrix, np.ndarray) and cached_matrix.ndim == 2 and cached_ids is not None and len(cached_ids) == cached_matrix.shape[0]:
+            emb_matrix = np.ascontiguousarray(cached_matrix, dtype=np.float32)
+            seg_ids = [str(value) for value in cached_ids]
+        else:
+            seg_ids = [e.segment_id for e in emb_objs]
+            emb_matrix = np.asarray([e.embedding for e in emb_objs], dtype=np.float32) if emb_objs else np.zeros((0, 0), dtype=np.float32)
         np.savez_compressed(emb_path, embeddings=emb_matrix, segment_ids=np.array(seg_ids, dtype=object))
 
         # 3) meta

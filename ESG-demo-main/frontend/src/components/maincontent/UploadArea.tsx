@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Layout, Upload } from "antd";
+import { Layout, Segmented, Upload } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useT } from "@/i18n/useT";
@@ -9,15 +9,22 @@ const { Dragger } = Upload;
 
 interface UploadAreaProps {
   onBeforeUpload: (files: UploadFile[]) => void;
+  uploadMode: "single" | "multi";
+  onUploadModeChange: (mode: "single" | "multi") => void;
 }
 
-const UploadArea: React.FC<UploadAreaProps> = ({ onBeforeUpload }) => {
+const UploadArea: React.FC<UploadAreaProps> = ({
+  onBeforeUpload,
+  uploadMode,
+  onUploadModeChange,
+}) => {
   const { t } = useT();
   const batchKeyRef = useRef<string>("");
 
   const props = {
     name: "file",
-    multiple: true,
+    multiple: uploadMode === "multi",
+    accept: ".pdf,application/pdf",
     showUploadList: false,
     beforeUpload: (file: any, fileList: any[]) => {
       const list = (fileList || []) as UploadFile[];
@@ -52,6 +59,16 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onBeforeUpload }) => {
           borderRadius: 8,
         }}
       >
+        <div className="mb-4 flex justify-center">
+          <Segmented
+            value={uploadMode}
+            onChange={(value) => onUploadModeChange(value as "single" | "multi")}
+            options={[
+              { label: t("upload.singleReport"), value: "single" },
+              { label: t("upload.multiReport"), value: "multi" },
+            ]}
+          />
+        </div>
         <Dragger
           {...props}
           style={{

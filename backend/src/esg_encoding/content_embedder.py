@@ -6,6 +6,7 @@
 
 from typing import List
 import os
+import numpy as np
 import torch
 from loguru import logger
 
@@ -95,6 +96,12 @@ class ContentEmbedder:
                 document_content=document_content,
                 embeddings=segment_embeddings
             )
+            # Keep the contiguous matrix produced by the model. Persistence and
+            # semantic retrieval can consume it directly instead of rebuilding it
+            # from thousands of Python float objects.
+            contiguous = np.ascontiguousarray(embeddings, dtype=np.float32)
+            object.__setattr__(report_content, "_embedding_matrix", contiguous)
+            object.__setattr__(report_content, "_embedding_segment_ids", [s.segment_id for s in document_content.segments])
             
             self.logger.info(f"嵌入生成完成: {len(segment_embeddings)} 个向量")
             return report_content
@@ -164,4 +171,4 @@ class ContentEmbedder:
             return similarities[:top_k]
             
         except Exception as e:
-            raise ContentEmbeddingError(f"相似度计算失败: {e}") 
+            raise ContentEmbeddingError(f"相似度计算失败: {e}")
