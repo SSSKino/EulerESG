@@ -104,6 +104,14 @@ class RetrievalResult(BaseModel):
     caption: Optional[str] = None
     confidence: Optional[float] = None
     chart_data: Optional[Dict[str, Any]] = None
+    structure_confidence: Optional[float] = None
+    ocr_confidence: Optional[float] = None
+    header_path: List[str] = Field(default_factory=list)
+    rowspan: int = 1
+    colspan: int = 1
+    parse_pass: int = 1
+    review_status: Optional[str] = None
+    conflicts: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class MetricRetrievalResult(BaseModel):
@@ -144,6 +152,14 @@ class TextSegment(BaseModel):
     col_header: Optional[str] = Field(default=None, description="Structured table column header")
     value_text: Optional[str] = Field(default=None, description="Structured table cell value text")
     unit: Optional[str] = Field(default=None, description="Structured table unit")
+    structure_confidence: Optional[float] = None
+    ocr_confidence: Optional[float] = None
+    header_path: List[str] = Field(default_factory=list)
+    rowspan: int = 1
+    colspan: int = 1
+    parse_pass: int = 1
+    review_status: Optional[str] = None
+    conflicts: List[Dict[str, Any]] = Field(default_factory=list)
     structured_data: Optional[Dict[str, Any]] = Field(default=None, description="Structured evidence payload")
     
 

@@ -1407,6 +1407,14 @@ class DisclosureInferenceEngine:
                     "caption": getattr(result, "caption", None) or structured.get("caption") or structured.get("summary"),
                     "confidence": getattr(result, "confidence", None) or structured.get("confidence"),
                     "chart_data": getattr(result, "chart_data", None) or structured.get("chart_data"),
+                    "structure_confidence": getattr(result, "structure_confidence", None) or structured.get("structure_confidence"),
+                    "ocr_confidence": getattr(result, "ocr_confidence", None) or structured.get("ocr_confidence"),
+                    "header_path": getattr(result, "header_path", None) or structured.get("header_path") or [],
+                    "rowspan": getattr(result, "rowspan", 1),
+                    "colspan": getattr(result, "colspan", 1),
+                    "parse_pass": getattr(result, "parse_pass", 1),
+                    "review_status": getattr(result, "review_status", None) or structured.get("review_status"),
+                    "conflicts": getattr(result, "conflicts", None) or structured.get("conflicts") or [],
                 }
                 segment_metadata.append(metadata)
 
@@ -2138,6 +2146,9 @@ Assessment principles:
             }
             for field in ("evidence_type", "asset_id", "bbox", "caption", "confidence", "chart_data"):
                 if item.get(field) is not None:
+                    source[field] = item[field]
+            for field in ("structure_confidence", "ocr_confidence", "header_path", "rowspan", "colspan", "parse_pass", "review_status", "conflicts"):
+                if item.get(field) not in (None, [], ""):
                     source[field] = item[field]
             if source_report_id:
                 source["source_report_id"] = source_report_id
@@ -2905,6 +2916,15 @@ Assessment principles:
             except Exception:
                 segment = None
             if segment is None:
+                continue
+            segment_data = getattr(segment, "structured_data", None)
+            segment_data = segment_data if isinstance(segment_data, dict) else {}
+            if (
+                str(getattr(segment, "review_status", None) or segment_data.get("review_status") or "").lower()
+                == "needs_review"
+            ):
+                # Conflicted table structure may be cited, but it must never take
+                # the deterministic fully-disclosed shortcut as a confirmed value.
                 continue
 
             row_key = self._get_table_row_key(segment)

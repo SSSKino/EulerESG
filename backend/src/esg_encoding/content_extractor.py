@@ -21,7 +21,7 @@ from loguru import logger
 
 from .exceptions import ContentExtractionError
 from .models import DocumentContent, ProcessingConfig, TextSegment
-from .visual_assets import append_visual_markers, parse_visual_marker, promote_visual_assets
+from .visual_assets import append_visual_markers, load_visual_manifest, parse_visual_marker, promote_visual_assets
 
 
 def _shared_dir_mode() -> int:
@@ -578,12 +578,15 @@ class _SimpleHTMLTableParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.rows: List[List[str]] = []
-        self._row: Optional[List[tuple[str, int, int]]] = None
+        self._row: Optional[List[tuple[str, int, int, bool]]] = None
         self._cell: Optional[List[str]] = None
         self._cell_rowspan = 1
         self._cell_colspan = 1
         self._in_cell = False
         self._active_rowspans: Dict[int, tuple[str, int]] = {}
+        self.cells: List[Dict[str, Any]] = []
+        self._row_index = 0
+        self._cell_is_header = False
 
     def handle_starttag(self, tag: str, attrs) -> None:  # type: ignore[override]
         tag = tag.lower()
@@ -594,6 +597,7 @@ class _SimpleHTMLTableParser(HTMLParser):
             self._cell_rowspan = self._parse_span(attrs, "rowspan")
             self._cell_colspan = self._parse_span(attrs, "colspan")
             self._in_cell = True
+            self._cell_is_header = tag == "th"
         elif tag == "br" and self._in_cell and self._cell is not None:
             self._cell.append(" ")
 
@@ -606,7 +610,7 @@ class _SimpleHTMLTableParser(HTMLParser):
         if tag in {"td", "th"} and self._in_cell:
             text = re.sub(r"\s+", " ", unescape("".join(self._cell or []))).strip()
             if self._row is not None:
-                self._row.append((text, self._cell_rowspan, self._cell_colspan))
+                self._row.append((text, self._cell_rowspan, self._cell_colspan, self._cell_is_header))
             self._cell = None
             self._cell_rowspan = 1
             self._cell_colspan = 1
@@ -616,6 +620,7 @@ class _SimpleHTMLTableParser(HTMLParser):
                 expanded_row = self._expand_row(self._row)
                 if any(str(cell).strip() for cell in expanded_row):
                     self.rows.append(expanded_row)
+                    self._row_index += 1
             self._row = None
 
     @staticmethod
@@ -630,7 +635,7 @@ class _SimpleHTMLTableParser(HTMLParser):
             return min(value, 1000) if value > 0 else 1
         return 1
 
-    def _expand_row(self, cells: Sequence[tuple[str, int, int]]) -> List[str]:
+    def _expand_row(self, cells: Sequence[tuple[str, int, int, bool]]) -> List[str]:
         occupied = {
             column: text
             for column, (text, _remaining_rows) in self._active_rowspans.items()
@@ -642,10 +647,18 @@ class _SimpleHTMLTableParser(HTMLParser):
         }
 
         column = 0
-        for text, rowspan, colspan in cells:
+        for text, rowspan, colspan, is_header in cells:
             while any((column + offset) in occupied for offset in range(colspan)):
                 column += 1
 
+            self.cells.append({
+                "row_index": self._row_index,
+                "col_index": column,
+                "text": text,
+                "rowspan": rowspan,
+                "colspan": colspan,
+                "is_header": is_header,
+            })
             for offset in range(colspan):
                 target_column = column + offset
                 occupied[target_column] = text
@@ -703,6 +716,10 @@ class ContentExtractor:
             segment_started = time.perf_counter()
             document_id = self._document_id(source_path)
             segments = self._segments_from_markdown(markdown, document_id)
+            table_records = list(result.get("table_records") or [])
+            if table_records:
+                self._enrich_table_segments_from_records(segments, table_records)
+            self._stitch_continued_tables(segments)
             if not segments:
                 segments = [
                     TextSegment(
@@ -1792,6 +1809,8 @@ class ContentExtractor:
 
         self._emit_progress("visual_assets", "Persisting chart and image evidence.", 43)
         visual_assets = promote_visual_assets(output_dir, source_path)
+        visual_manifest = load_visual_manifest(source_path) or {}
+        table_records = list(visual_manifest.get("tables") or [])
         markdown = append_visual_markers(markdown, visual_assets)
 
         keep_process_output = _env_bool("PADDLEOCR_KEEP_PROCESS_OUTPUT", False)
@@ -1815,6 +1834,7 @@ class ContentExtractor:
             "elapsed_worker_seconds_sum": elapsed_total,
             "visual_asset_count": len(visual_assets),
             "visual_assets": visual_assets,
+            "table_records": table_records,
             "output_dir": str(output_dir) if keep_process_output else "",
             "result_markdown_path": result_markdown_path,
             "intermediate_output_removed": not keep_process_output,
@@ -2045,7 +2065,7 @@ class ContentExtractor:
         start_seq: int = 0,
         table_title: str = "",
     ) -> List[TextSegment]:
-        rows = self._parse_table_rows(table_md)
+        rows, physical_cells, quality = self._parse_table_details(table_md)
         if not rows:
             return []
 
@@ -2057,6 +2077,14 @@ class ContentExtractor:
 
         segments: List[TextSegment] = []
         seq = start_seq
+        common_quality = {
+            "structure_confidence": quality["structure_confidence"],
+            "ocr_confidence": quality["ocr_confidence"],
+            "parse_pass": 1,
+            "review_status": quality["review_status"],
+            "quality_reasons": quality["reasons"],
+            "conflicts": [],
+        }
 
         for r_idx, row in enumerate(data_rows, start=1):
             row = self._normalise_table_row(row, width=max(len(headers), len(row)))
@@ -2074,6 +2102,10 @@ class ContentExtractor:
                     segment_type="table_row",
                     source_table_id=table_id,
                     row_header=row_header,
+                    structure_confidence=quality["structure_confidence"],
+                    ocr_confidence=quality["ocr_confidence"],
+                    parse_pass=1,
+                    review_status=quality["review_status"],
                     structured_data={
                         "source": "paddleocr_vl_table_parser",
                         "parser": "paddleocr-vl",
@@ -2083,6 +2115,7 @@ class ContentExtractor:
                         "row_header": row_header,
                         "row_text": row_text,
                         "column_headers": headers,
+                        **common_quality,
                     },
                 )
             )
@@ -2091,6 +2124,8 @@ class ContentExtractor:
                     continue
                 seq += 1
                 col_header = headers[c_idx] if c_idx < len(headers) else f"col_{c_idx + 1}"
+                physical = next((cell for cell in physical_cells if cell.get("row_index") == r_idx and cell.get("col_index") == c_idx), None) or {}
+                header_path = [str(headers[c_idx]).strip()] if c_idx < len(headers) and str(headers[c_idx]).strip() else []
                 cell_content_parts = []
                 if table_title:
                     cell_content_parts.append(f"[Table Title] {table_title}")
@@ -2110,6 +2145,13 @@ class ContentExtractor:
                         row_header=row_header,
                         col_header=col_header,
                         value_text=value,
+                        structure_confidence=quality["structure_confidence"],
+                        ocr_confidence=quality["ocr_confidence"],
+                        header_path=header_path,
+                        rowspan=int(physical.get("rowspan") or 1),
+                        colspan=int(physical.get("colspan") or 1),
+                        parse_pass=1,
+                        review_status=quality["review_status"],
                         structured_data={
                             "source": "paddleocr_vl_table_parser",
                             "parser": "paddleocr-vl",
@@ -2123,10 +2165,178 @@ class ContentExtractor:
                             "column_headers": headers,
                             "row_text": row_text,
                             "row_segment_id": row_segment_id,
+                            "header_path": header_path,
+                            "rowspan": int(physical.get("rowspan") or 1),
+                            "colspan": int(physical.get("colspan") or 1),
+                            "bbox": physical.get("bbox"),
+                            **common_quality,
                         },
                     )
                 )
         return segments
+
+    def _enrich_table_segments_from_records(self, segments: List[TextSegment], records: List[Dict[str, Any]]) -> None:
+        table_segments = [segment for segment in segments if segment.segment_type == "table" and segment.source_table_id]
+        by_page: Dict[int, List[TextSegment]] = {}
+        for segment in table_segments:
+            by_page.setdefault(int(segment.page_number), []).append(segment)
+        record_by_page: Dict[int, List[Dict[str, Any]]] = {}
+        for record in records:
+            try:
+                record_by_page.setdefault(max(1, int(record.get("page_number") or 1)), []).append(record)
+            except Exception:
+                continue
+
+        structure_threshold = float(os.getenv("REPORT_TABLE_STRUCTURE_CONFIDENCE_THRESHOLD", "0.80") or "0.80")
+        ocr_threshold = float(os.getenv("REPORT_TABLE_OCR_CONFIDENCE_THRESHOLD", "0.75") or "0.75")
+        for page, page_tables in by_page.items():
+            page_records = record_by_page.get(page, [])
+            for index, table_segment in enumerate(page_tables):
+                if index >= len(page_records):
+                    continue
+                record = page_records[index]
+                raw_html = str(record.get("pred_html") or "")
+                raw_rows, raw_cells, raw_quality = self._parse_table_details(raw_html)
+                markdown_rows = self._parse_table_rows(table_segment.content)
+                structure_confidence = record.get("structure_confidence")
+                ocr_confidence = record.get("ocr_confidence")
+                structure_confidence = float(structure_confidence) if structure_confidence is not None else raw_quality["structure_confidence"]
+                ocr_confidence = float(ocr_confidence) if ocr_confidence is not None else raw_quality["ocr_confidence"]
+                reasons = list(raw_quality["reasons"])
+                if structure_confidence < structure_threshold:
+                    reasons.append("low_structure_confidence")
+                if ocr_confidence < ocr_threshold:
+                    reasons.append("low_ocr_confidence")
+                conflicts: List[Dict[str, Any]] = []
+                normalized_raw = [self._normalise_table_row(row) for row in raw_rows]
+                normalized_markdown = [self._normalise_table_row(row) for row in markdown_rows]
+                if normalized_raw and normalized_markdown and normalized_raw != normalized_markdown:
+                    conflicts.append({
+                        "type": "table_structure_mismatch",
+                        "first_pass_markdown": normalized_markdown,
+                        "paddle_structured_html": normalized_raw,
+                    })
+                    reasons.append("structure_source_conflict")
+                reasons = list(dict.fromkeys(reasons))
+                review_status = "needs_review" if reasons or conflicts else "verified"
+                related = [segment for segment in segments if segment.source_table_id == table_segment.source_table_id]
+                for related_segment in related:
+                    related_segment.structure_confidence = structure_confidence
+                    related_segment.ocr_confidence = ocr_confidence
+                    related_segment.review_status = review_status
+                    related_segment.conflicts = conflicts
+                    data = dict(related_segment.structured_data or {})
+                    data.update({
+                        "bbox": record.get("bbox"),
+                        "structure_confidence": structure_confidence,
+                        "ocr_confidence": ocr_confidence,
+                        "parse_pass": 1,
+                        "review_status": review_status,
+                        "quality_reasons": reasons,
+                        "conflicts": conflicts,
+                        "structured_html": raw_html,
+                    })
+                    if related_segment.segment_type == "table_cell":
+                        cell = next((item for item in raw_cells if item.get("row_index") == data.get("row_index") and item.get("col_index") == data.get("col_index")), None)
+                        if cell:
+                            related_segment.rowspan = int(cell.get("rowspan") or 1)
+                            related_segment.colspan = int(cell.get("colspan") or 1)
+                            data["rowspan"] = related_segment.rowspan
+                            data["colspan"] = related_segment.colspan
+                    related_segment.structured_data = data
+
+    def _stitch_continued_tables(self, segments: List[TextSegment]) -> None:
+        tables = sorted(
+            [segment for segment in segments if segment.segment_type == "table" and segment.source_table_id],
+            key=lambda item: (item.page_number, item.position_y),
+        )
+        previous: Optional[TextSegment] = None
+        for current in tables:
+            if previous is None or current.page_number != previous.page_number + 1:
+                previous = current
+                continue
+            previous_rows = self._parse_table_rows(previous.content)
+            current_rows = self._parse_table_rows(current.content)
+            if not previous_rows or not current_rows:
+                previous = current
+                continue
+            previous_header = self._normalise_table_row(previous_rows[0])
+            current_header = self._normalise_table_row(current_rows[0])
+            if len(previous_header) < 2 or previous_header != current_header:
+                previous = current
+                continue
+            old_id = current.source_table_id
+            continued_id = previous.source_table_id
+            for segment in segments:
+                if segment.source_table_id != old_id:
+                    continue
+                segment.source_table_id = continued_id
+                data = dict(segment.structured_data or {})
+                data.update({
+                    "table_id": continued_id,
+                    "continued_from_page": previous.page_number,
+                    "continued_on_page": current.page_number,
+                    "repeated_header_suppressed": True,
+                })
+                segment.structured_data = data
+            previous_data = dict(previous.structured_data or {})
+            continuation_pages = list(previous_data.get("continuation_pages") or [previous.page_number])
+            if current.page_number not in continuation_pages:
+                continuation_pages.append(current.page_number)
+            previous_data["continuation_pages"] = continuation_pages
+            previous.structured_data = previous_data
+            # Keep the last physical page as the next adjacency anchor while the
+            # logical table id remains the first page's stable id.
+            previous = current
+
+    def _parse_table_details(self, table_text: str) -> tuple[List[List[str]], List[Dict[str, Any]], Dict[str, Any]]:
+        is_html = bool(re.search(r"<\s*(table|tr|td|th)\b", table_text or "", flags=re.IGNORECASE))
+        cells: List[Dict[str, Any]] = []
+        if is_html:
+            parser = _SimpleHTMLTableParser()
+            try:
+                parser.feed(table_text)
+                parser.close()
+                rows = [self._normalise_table_row(row) for row in parser.rows if any(str(c).strip() for c in row)]
+                cells = list(parser.cells)
+            except Exception:
+                rows = []
+        else:
+            rows = self._parse_markdown_table_rows(table_text)
+            for r_idx, row in enumerate(rows):
+                for c_idx, value in enumerate(row):
+                    cells.append({"row_index": r_idx, "col_index": c_idx, "text": value, "rowspan": 1, "colspan": 1, "is_header": r_idx == 0})
+
+        reasons: List[str] = []
+        widths = [len(row) for row in rows if row]
+        if widths and len(set(widths)) > 1:
+            reasons.append("inconsistent_column_count")
+        if not rows or not any(str(value).strip() for value in rows[0]):
+            reasons.append("missing_header")
+        if is_html and table_text.lower().count("<table") != table_text.lower().count("</table"):
+            reasons.append("malformed_html")
+        year_pattern = re.compile(r"\b(?:19|20)\d{2}\b")
+        if rows:
+            year_columns = sum(1 for value in rows[0] if year_pattern.search(str(value)))
+            numeric_columns = max((sum(1 for value in row if re.search(r"\d", str(value))) for row in rows[1:]), default=0)
+            if year_columns and numeric_columns and numeric_columns < year_columns:
+                reasons.append("year_value_count_mismatch")
+
+        structure_confidence = 0.9 if is_html and not reasons else (0.72 if is_html else 0.80)
+        ocr_confidence = 1.0  # Markdown/HTML has no per-cell scores; raw Paddle JSON may override this later.
+        structure_threshold = float(os.getenv("REPORT_TABLE_STRUCTURE_CONFIDENCE_THRESHOLD", "0.80") or "0.80")
+        ocr_threshold = float(os.getenv("REPORT_TABLE_OCR_CONFIDENCE_THRESHOLD", "0.75") or "0.75")
+        if structure_confidence < structure_threshold:
+            reasons.append("low_structure_confidence")
+        if ocr_confidence < ocr_threshold:
+            reasons.append("low_ocr_confidence")
+        reasons = list(dict.fromkeys(reasons))
+        return rows, cells, {
+            "structure_confidence": structure_confidence,
+            "ocr_confidence": ocr_confidence,
+            "review_status": "needs_review" if reasons else ("verified" if is_html else "unverified"),
+            "reasons": reasons,
+        }
 
     def _parse_table_rows(self, table_text: str) -> List[List[str]]:
         html_rows = self._parse_html_table_rows(table_text)

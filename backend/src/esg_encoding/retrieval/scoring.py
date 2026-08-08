@@ -33,16 +33,28 @@ _GENERIC_METRIC_TERMS = {
 
 def visual_result_fields(segment) -> Dict[str, object]:
     data = getattr(segment, "structured_data", None)
-    if not isinstance(data, dict) or not data.get("asset_id"):
-        return {}
-    return {
+    data = data if isinstance(data, dict) else {}
+    fields = {
+        "structure_confidence": getattr(segment, "structure_confidence", None) or data.get("structure_confidence"),
+        "ocr_confidence": getattr(segment, "ocr_confidence", None) or data.get("ocr_confidence"),
+        "header_path": getattr(segment, "header_path", None) or data.get("header_path") or [],
+        "rowspan": getattr(segment, "rowspan", 1),
+        "colspan": getattr(segment, "colspan", 1),
+        "parse_pass": getattr(segment, "parse_pass", 1),
+        "review_status": getattr(segment, "review_status", None) or data.get("review_status"),
+        "conflicts": getattr(segment, "conflicts", None) or data.get("conflicts") or [],
+    }
+    if not data.get("asset_id"):
+        return fields
+    fields.update({
         "evidence_type": data.get("evidence_type") or getattr(segment, "segment_type", None),
         "asset_id": data.get("asset_id"),
         "bbox": data.get("bbox"),
         "caption": data.get("caption") or data.get("summary"),
         "confidence": data.get("confidence"),
         "chart_data": data.get("chart_data"),
-    }
+    })
+    return fields
 
 _ENVIRONMENTAL_NOISE_TERMS = {
     "emissions", "ghg", "scope 1", "scope 2", "scope 3", "water", "waste", "renewable", "electricity",
@@ -324,6 +336,13 @@ def _qualitative_relevance_adjustment(metric: ESGMetric, content: str, anchors: 
         return min(0.10, anchor_hits * 0.02)
 
     adjustment = 0.0
+    structured = getattr(segment, "structured_data", None)
+    structured = structured if isinstance(structured, dict) else {}
+    review_status = str(getattr(segment, "review_status", None) or structured.get("review_status") or "").lower()
+    if review_status == "verified":
+        adjustment += 0.04
+    elif review_status == "needs_review":
+        adjustment -= 0.12
     if anchor_hits > 0:
         adjustment += min(0.34, 0.07 * anchor_hits)
     else:

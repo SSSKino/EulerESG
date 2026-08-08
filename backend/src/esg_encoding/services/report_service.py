@@ -146,6 +146,15 @@ def _sync_upload_report_body(
             if getattr(encoder, "extractor", None) is not None:
                 encoder.extractor.progress_callback = old_progress_cb
         performance["encode_seconds"] = round(time.perf_counter() - encode_started, 3)
+        table_segments = [segment for segment in report_content.document_content.segments if segment.segment_type == "table"]
+        performance["table_quality"] = {
+            "first_pass_tables": len(table_segments),
+            "review_candidates": sum(1 for segment in table_segments if segment.review_status == "needs_review"),
+            "second_pass_tables": sum(1 for segment in table_segments if int(segment.parse_pass or 1) > 1),
+            "replaced_tables": sum(1 for segment in table_segments if (segment.structured_data or {}).get("second_pass_replaced")),
+            "conflicted_tables": sum(1 for segment in table_segments if segment.conflicts),
+            "second_pass_budget_ratio": float(os.getenv("REPORT_TABLE_SECOND_PASS_MAX_RATIO", "0.30") or "0.30"),
+        }
 
         # IMPORTANT: Align document_id with file_id so all downstream (chat/cache/output filenames)
         # use a single stable identifier.

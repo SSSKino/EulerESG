@@ -491,6 +491,14 @@ class FileManager:
                 "col_header": getattr(s, "col_header", None),
                 "value_text": getattr(s, "value_text", None),
                 "unit": getattr(s, "unit", None),
+                "structure_confidence": getattr(s, "structure_confidence", None),
+                "ocr_confidence": getattr(s, "ocr_confidence", None),
+                "header_path": getattr(s, "header_path", []),
+                "rowspan": getattr(s, "rowspan", 1),
+                "colspan": getattr(s, "colspan", 1),
+                "parse_pass": getattr(s, "parse_pass", 1),
+                "review_status": getattr(s, "review_status", None),
+                "conflicts": getattr(s, "conflicts", []),
                 "structured_data": getattr(s, "structured_data", None),
             }
             for s in segments
@@ -570,6 +578,14 @@ class FileManager:
                             col_header=(str(s.get("col_header")) if s.get("col_header") is not None else None),
                             value_text=(str(s.get("value_text")) if s.get("value_text") is not None else None),
                             unit=(str(s.get("unit")) if s.get("unit") is not None else None),
+                            structure_confidence=(float(s.get("structure_confidence")) if s.get("structure_confidence") is not None else None),
+                            ocr_confidence=(float(s.get("ocr_confidence")) if s.get("ocr_confidence") is not None else None),
+                            header_path=list(s.get("header_path") or []),
+                            rowspan=int(s.get("rowspan") or 1),
+                            colspan=int(s.get("colspan") or 1),
+                            parse_pass=int(s.get("parse_pass") or 1),
+                            review_status=(str(s.get("review_status")) if s.get("review_status") is not None else None),
+                            conflicts=list(s.get("conflicts") or []),
                             structured_data=(s.get("structured_data") if isinstance(s.get("structured_data"), dict) else None),
                         )
                     )

@@ -90,6 +90,58 @@ def _build_layout_index(layout: list[dict[str, Any]]) -> dict[str, dict[str, Any
     return index
 
 
+def _percentile10(values: list[float]) -> float | None:
+    if not values:
+        return None
+    ordered = sorted(values)
+    return ordered[max(0, int((len(ordered) - 1) * 0.10))]
+
+
+def _extract_table_records(layout: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for parent in layout:
+        candidates = parent.get("table_res_list")
+        if not isinstance(candidates, list):
+            candidates = [parent] if parent.get("pred_html") else []
+        for table in candidates:
+            if not isinstance(table, dict):
+                continue
+            html = str(table.get("pred_html") or "").strip()
+            if not html:
+                continue
+            page_index = table.get("page_index", parent.get("page_index", 0))
+            ocr = table.get("table_ocr_pred") if isinstance(table.get("table_ocr_pred"), dict) else {}
+            raw_scores = table.get("rec_scores") or ocr.get("rec_scores") or []
+            scores = []
+            for value in raw_scores if isinstance(raw_scores, list) else []:
+                try:
+                    scores.append(float(value))
+                except (TypeError, ValueError):
+                    pass
+            structure_score = table.get("structure_score", table.get("score"))
+            try:
+                structure_score = float(structure_score) if structure_score is not None else None
+            except (TypeError, ValueError):
+                structure_score = None
+            identity = hashlib.sha256(f"{page_index}:{html}".encode("utf-8")).hexdigest()
+            if identity in seen:
+                continue
+            seen.add(identity)
+            records.append({
+                "page_number": max(1, int(page_index or 0) + 1),
+                "pred_html": html,
+                "bbox": table.get("block_bbox") or table.get("bbox"),
+                "cell_box_list": table.get("cell_box_list") or table.get("rec_boxes") or ocr.get("rec_boxes") or [],
+                "rec_texts": table.get("rec_texts") or ocr.get("rec_texts") or [],
+                "rec_scores": scores,
+                "structure_confidence": structure_score,
+                "ocr_confidence": _percentile10(scores),
+                "parse_pass": 1,
+            })
+    return records
+
+
 def _metadata_for_image(source: Path, layout_index: dict[str, dict[str, Any]]) -> dict[str, Any]:
     item = layout_index.get(source.name.lower()) or layout_index.get(source.stem.lower()) or {}
     width = item.get("width") or item.get("image_width") or item.get("page_width")
@@ -174,6 +226,7 @@ def promote_visual_assets(output_dir: str | Path, pdf_path: str | Path) -> list[
     seen: set[str] = set()
     layout = list(_json_layout_records(root))
     layout_index = _build_layout_index(layout)
+    table_records = _extract_table_records(layout)
 
     for source in sorted(p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in IMAGE_SUFFIXES):
         staging = destination / f".asset.{os.getpid()}.{threading.get_ident()}.tmp"
@@ -204,7 +257,7 @@ def promote_visual_assets(output_dir: str | Path, pdf_path: str | Path) -> list[
     audit_tmp = destination / f"layout_audit.{os.getpid()}.tmp"
     audit_tmp.write_text(json.dumps(layout, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     os.replace(audit_tmp, audit_path)
-    manifest = {"version": 2, "assets": records, "layout_audit": audit_path.name}
+    manifest = {"version": 3, "assets": records, "tables": table_records, "layout_audit": audit_path.name}
     manifest_path = destination / "manifest.json"
     temporary_manifest = destination / f"manifest.{os.getpid()}.tmp"
     temporary_manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")

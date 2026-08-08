@@ -26,6 +26,16 @@ type AnalysisDataItem = {
     chart_data?: Record<string, unknown> | null;
     bbox?: number[] | null;
   } | null;
+  tableEvidence?: {
+    review_status?: string;
+    structure_confidence?: number;
+    ocr_confidence?: number;
+    header_path?: string[];
+    rowspan?: number;
+    colspan?: number;
+    parse_pass?: number;
+    conflicts?: Array<Record<string, unknown>>;
+  } | null;
 };
 
 interface AnalysisResultsProps {
@@ -252,6 +262,9 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
       const visualEvidence = (item?.evidence_sources || []).find(
         (source: any) => source && typeof source === "object" && source.asset_id
       ) || null;
+      const tableEvidence = (item?.evidence_sources || []).find(
+        (source: any) => source && typeof source === "object" && source.review_status
+      ) || null;
 
       return {
         metric_id,
@@ -272,6 +285,7 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
             ? String(item?.definition ?? item?.Definition).trim() || null
             : null,
         visualEvidence,
+        tableEvidence,
       };
     });
 
@@ -535,6 +549,28 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
                       : ""}
                   </div>
                 </>
+              )}
+              {record.tableEvidence && (
+                <div className="mt-2 rounded border border-gray-200 bg-gray-50 p-2 text-xs">
+                  <Tag color={record.tableEvidence.review_status === "needs_review" ? "warning" : "success"}>
+                    {record.tableEvidence.review_status === "needs_review"
+                      ? ("表格结构待复核")
+                      : ("表格结构已校验")}
+                  </Tag>
+                  <div className="mt-1 text-gray-600">
+                    {typeof record.tableEvidence.structure_confidence === "number"
+                      ? `Structure ${Math.round(record.tableEvidence.structure_confidence * 100)}% `
+                      : ""}
+                    {typeof record.tableEvidence.ocr_confidence === "number"
+                      ? `OCR ${Math.round(record.tableEvidence.ocr_confidence * 100)}%`
+                      : ""}
+                  </div>
+                  {!!record.tableEvidence.conflicts?.length && (
+                    <div className="mt-1 text-amber-700">
+                      {record.tableEvidence.conflicts.length} conflict(s); value not treated as confirmed.
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           );

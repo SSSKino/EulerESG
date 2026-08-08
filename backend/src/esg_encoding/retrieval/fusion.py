@@ -150,6 +150,14 @@ def rrf_fuse(
                 caption=base.caption,
                 confidence=base.confidence,
                 chart_data=base.chart_data,
+                structure_confidence=base.structure_confidence,
+                ocr_confidence=base.ocr_confidence,
+                header_path=base.header_path,
+                rowspan=base.rowspan,
+                colspan=base.colspan,
+                parse_pass=base.parse_pass,
+                review_status=base.review_status,
+                conflicts=base.conflicts,
             )
         )
     fused.sort(key=lambda item: item.score, reverse=True)

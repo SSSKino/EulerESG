@@ -26,6 +26,12 @@ def test_assets_are_deduplicated_and_path_is_allow_listed(tmp_path: Path):
         "type": "chart", "image": "chart.png", "bbox": [10, 20, 110, 220],
         "page_width": 200, "page_height": 400, "title": "Emissions",
         "data": {"2024": 12}, "confidence": 0.91,
+        "page_index": 1,
+        "table_res_list": [{
+            "pred_html": "<table><tr><th>Metric</th><th>FY24</th></tr><tr><td>Energy</td><td>12</td></tr></table>",
+            "structure_score": 0.93,
+            "table_ocr_pred": {"rec_scores": [0.98, 0.96, 0.95, 0.94]},
+        }],
     }), encoding="utf-8")
     pdf = tmp_path / "report.pdf"
     pdf.write_bytes(b"pdf")
@@ -39,9 +45,12 @@ def test_assets_are_deduplicated_and_path_is_allow_listed(tmp_path: Path):
     assert resolved and resolved[0].read_bytes() == b"not-a-real-png-but-stable"
     assert safe_asset_path(pdf, "../../report.pdf") is None
     manifest = json.loads((tmp_path / "report_visual_assets" / "manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == 2
+    assert manifest["version"] == 3
     assert "layout_records" not in manifest
     assert (tmp_path / "report_visual_assets" / manifest["layout_audit"]).is_file()
+    assert manifest["tables"][0]["page_number"] == 2
+    assert manifest["tables"][0]["structure_confidence"] == 0.93
+    assert manifest["tables"][0]["ocr_confidence"] == 0.94
 
 
 def test_manifest_cache_reuses_and_invalidates_by_mtime(tmp_path: Path):

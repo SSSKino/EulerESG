@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from esg_encoding.content_extractor import ContentExtractor
+from esg_encoding.models import TextSegment
 
 
 class HtmlTableSpanTests(unittest.TestCase):
@@ -83,6 +84,44 @@ class HtmlTableSpanTests(unittest.TestCase):
             ["U.S. race and ethnicity representation"] * 5,
         )
         self.assertEqual(rows[3], ["Black", "%", "8%", "9%", "10%"])
+
+        segments = self.extractor._table_segments_from_markdown(
+            table, document_id="doc", page=1, table_id="table-1"
+        )
+        section = next(
+            segment for segment in segments
+            if segment.segment_type == "table_cell"
+            and segment.value_text == "U.S. race and ethnicity representation"
+        )
+        self.assertEqual(section.colspan, 5)
+        self.assertEqual(section.rowspan, 1)
+        self.assertEqual(section.review_status, "verified")
+
+    def test_malformed_table_is_marked_for_review(self):
+        table = "<table><tr><th>Metric</th><th>FY24</th></tr><tr><td>Energy</td><td>10</td></tr>"
+        segments = self.extractor._table_segments_from_markdown(
+            table, document_id="doc", page=1, table_id="table-1"
+        )
+        self.assertTrue(segments)
+        self.assertTrue(all(segment.review_status == "needs_review" for segment in segments))
+
+    def test_adjacent_identical_headers_are_stitched(self):
+        first = TextSegment(
+            segment_id="t1", content="| Metric | FY24 |\n|---|---|\n| A | 1 |",
+            page_number=1, position_y=1, segment_type="table", source_table_id="table-1",
+        )
+        second = TextSegment(
+            segment_id="t2", content="| Metric | FY24 |\n|---|---|\n| B | 2 |",
+            page_number=2, position_y=1, segment_type="table", source_table_id="table-2",
+        )
+        cell = TextSegment(
+            segment_id="c2", content="B", page_number=2, position_y=2,
+            segment_type="table_cell", source_table_id="table-2",
+        )
+        self.extractor._stitch_continued_tables([first, second, cell])
+        self.assertEqual(second.source_table_id, "table-1")
+        self.assertEqual(cell.source_table_id, "table-1")
+        self.assertEqual(cell.structured_data["continued_from_page"], 1)
 
 
 if __name__ == "__main__":
