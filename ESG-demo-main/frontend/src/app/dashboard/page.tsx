@@ -6,7 +6,7 @@ export default function DashboardPage() {
   return (
     <>
       <PDFViewer />
-      <FloatingStatusButton />
+      {process.env.NODE_ENV === "development" && <FloatingStatusButton />}
     </>
   );
 }

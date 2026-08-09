@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { apiService } from "@/lib/api";
+import { errorSummary } from "@/lib/logger";
 
 export interface File {
   key: string;
@@ -74,6 +75,15 @@ function slugToLabel(slug: string | undefined | null): string {
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase())
     .trim();
+}
+
+function formatFileSize(bytes: unknown): string {
+  if (typeof bytes !== "number" || !Number.isFinite(bytes) || bytes < 0) return "-";
+
+  const megabytes = bytes / (1024 * 1024);
+  if (megabytes < 1024) return `${megabytes.toFixed(2)} MB`;
+
+  return `${(megabytes / 1024).toFixed(2)} GB`;
 }
 
 function normalizeTotalPages(file: any): string {
@@ -160,7 +170,7 @@ interface FileStore {
   ) => void;
   updateFilePages: (fileIdOrKey: string, pages: number) => void;
   setSelectedFileId: (fileId: string | null) => void;
-  loadFilesFromBackend: () => Promise<void>;
+  loadFilesFromBackend: (options?: { showLoading?: boolean }) => Promise<void>;
   setLoading: (loading: boolean) => void;
   clearFiles: () => void;
 }
@@ -203,9 +213,7 @@ export const useFileStore = create<FileStore>()(
         })),
       deleteFile: async (fileId, scopeKey) => {
         try {
-          console.log("Deleting file from backend:", fileId, scopeKey);
           const result = await apiService.deleteFile(fileId, scopeKey);
-          console.log("Delete result:", result);
 
           const sk = scopeKey && String(scopeKey).trim() ? String(scopeKey).trim() : "";
           set((state) => ({
@@ -219,7 +227,7 @@ export const useFileStore = create<FileStore>()(
           // Refresh file list from backend
           await get().loadFilesFromBackend();
         } catch (error) {
-          console.error('Failed to delete file from backend:', error);
+          console.error(`Failed to delete file from backend: ${errorSummary(error)}`);
           throw error;
         }
       },
@@ -227,20 +235,18 @@ export const useFileStore = create<FileStore>()(
         set(() => ({
           selectedFileId: fileId,
         })),
-      loadFilesFromBackend: async () => {
+      loadFilesFromBackend: async (options) => {
+        const showLoading = options?.showLoading === true;
         try {
-          set({ loading: true });
-          console.log('Loading files from backend...');
+          if (showLoading) set({ loading: true });
           const response = await apiService.getFiles();
-          console.log('Backend response:', response);
           if (response.status === 'success') {
             const backendFiles: File[] = [];
             for (const file of response.files as any[]) {
-              console.log('Mapping file:', file);
               const mapped: File = {
                 key: file.file_id,
                 name: file.original_name,
-                size: (typeof file.file_size === "number" && Number.isFinite(file.file_size)) ? `${(file.file_size / 1024).toFixed(2)} KB` : "-",
+                size: formatFileSize(file.file_size),
                 dateUploaded: file.upload_time?.split("T")?.[0] || "",
                 uploadedAtMs: parseUploadTimeMs(file.upload_time),
                 type: file.original_name?.split('.')?.pop()?.toUpperCase() || '',
@@ -287,7 +293,6 @@ export const useFileStore = create<FileStore>()(
               };
               backendFiles.push(...expandMultiScopeBackendRows(file, mapped));
             }
-            console.log('Mapped files:', backendFiles);
             
             set((state) => {
               const hasChanges =
@@ -305,7 +310,6 @@ export const useFileStore = create<FileStore>()(
                 });
 
               if (hasChanges) {
-                console.log('🔄 File list updated - changes detected');
               }
 
               return {
@@ -315,9 +319,9 @@ export const useFileStore = create<FileStore>()(
             });
           }
         } catch (error) {
-          console.error('Failed to load files from backend:', error);
+          console.error(`Failed to load files from backend: ${errorSummary(error)}`);
         } finally {
-          set({ loading: false });
+          if (showLoading) set({ loading: false });
         }
       }
     }),

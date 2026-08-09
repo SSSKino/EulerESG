@@ -85,18 +85,18 @@ async def chat(request: ChatRequest):
         latest_assessment = system_components.get("current_assessment")
         report_content = system_components.get("current_report")
         
-        logger.info(f"Chat request received. Memory state: assessment={latest_assessment is not None}, report={report_content is not None}")
+        logger.debug(f"Chat memory state: assessment={latest_assessment is not None}, report={report_content is not None}")
         
         # 如果内存中没有数据，尝试从文件系统加载
         if not latest_assessment:
-            logger.info("No assessment in memory, trying to load from files...")
+            logger.debug("No assessment in memory; loading from files")
             latest_assessment = _load_latest_assessment_for_chat()
-            logger.info(f"Loaded assessment from files: {latest_assessment is not None}")
+            logger.debug(f"Assessment loaded from files: {latest_assessment is not None}")
 
         if not report_content:
-            logger.info("No report content in memory, trying to load from files...")
+            logger.debug("No report content in memory; loading from files")
             report_content = _load_report_content_for_chat()
-            logger.info(f"Loaded report content from files: {report_content is not None}")
+            logger.debug(f"Report content loaded from files: {report_content is not None}")
 
         with _chatbot_ops_lock:
             # 如果没有数据，仍然允许聊天，但只能回答一般性问题

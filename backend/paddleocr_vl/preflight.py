@@ -17,6 +17,9 @@ import os
 import sys
 
 from loguru import logger
+from logging_config import configure_logging
+
+configure_logging("paddleocr-preflight")
 
 # 预检服务是唯一默认允许在线下载模型的进程。
 # 普通 worker 默认只使用已经通过预检的本地缓存，避免解析任务期间写坏 .paddlex 缓存。

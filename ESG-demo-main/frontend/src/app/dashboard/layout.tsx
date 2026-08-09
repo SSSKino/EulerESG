@@ -3,7 +3,7 @@
 
 import React, { useEffect } from "react";
 import { Layout } from "antd";
-import Nav from "@/components/navbar/Nav";
+import DashboardSidebar from "@/components/navbar/DashboardSidebar";
 import { useRouter } from "next/navigation";
 import { AUTH_TOKEN_KEY } from "@/lib/auth";
 
@@ -37,9 +37,9 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Nav />
-      <Content style={{ display: "flex" }}>{children}</Content>
+    <Layout style={{ minHeight: "100vh", flexDirection: "row" }}>
+      <DashboardSidebar />
+      <Content style={{ display: "flex", minWidth: 0 }}>{children}</Content>
     </Layout>
   );
 }

@@ -44,6 +44,11 @@
 }
 
 :root {
+  --motion-fast: 140ms;
+  --motion-normal: 220ms;
+  --motion-slow: 320ms;
+  --motion-fluid: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -124,6 +129,10 @@
     overflow-x: hidden;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   /* Evidence reader (Cross Analysis) can temporarily allow horizontal scroll when the user zooms in.
      This avoids clipping while keeping the rest of the app strictly no-horizontal-scroll. */
   html.evidence-x-scroll,
@@ -138,6 +147,68 @@
     padding: 0;
     background: #f0f2f5;
     font-family: Inter, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
+  }
+
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Fluid, GPU-friendly interaction primitives shared by native, Ant and Radix controls. */
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled),
+  a,
+  [role="button"]:not([aria-disabled="true"]),
+  .ant-btn:not(:disabled),
+  .ant-dropdown-menu-item,
+  .ant-select-selector,
+  .ant-pagination-item,
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--motion-fluid);
+  }
+}
+
+button:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active,
+.ant-btn:not(:disabled):active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+
+.ant-modal,
+.ant-drawer-content,
+.ant-dropdown,
+.ant-popover,
+.ant-tooltip {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.ant-table-tbody > tr > td,
+.ant-table-thead > tr > th {
+  transition: background-color var(--motion-fast) var(--motion-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

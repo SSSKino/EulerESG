@@ -5,6 +5,6 @@ WORKDIR /workspace/paddleocr_vl_service
 
 RUN python -m pip install --no-cache-dir loguru redis
 
-COPY parse_core.py worker.py preflight.py /workspace/paddleocr_vl_service/
+COPY logging_config.py parse_core.py worker.py preflight.py /workspace/paddleocr_vl_service/
 
 CMD ["python", "/workspace/paddleocr_vl_service/worker.py"]

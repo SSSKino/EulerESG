@@ -14,6 +14,9 @@ from datetime import datetime, timezone
 from typing import Any, Dict
 
 from loguru import logger
+from logging_config import configure_logging
+
+configure_logging(os.getenv("PADDLEOCR_WORKER_ID", "paddleocr-worker"))
 
 from parse_core import (
     PaddleOCRModelLoadError,
@@ -169,18 +172,17 @@ def _handle_page_batch(r, worker_id: str, payload: Dict[str, Any]) -> None:
     ready_path = str(payload.get("ready_path") or "")
     filename = str(payload.get("filename") or "")
 
-    logger.info(
-        "开始 page-batch: job={} unit={}/{} pages={}-{} input={}",
+    logger.debug(
+        "Starting page batch job={} unit={}/{} pages={}-{}",
         job_id,
         unit_index,
         total_units,
         start_page,
         end_page,
-        input_path,
     )
 
     if _job_cancelled(r, job_id):
-        logger.warning("父 job 已取消，跳过 page-batch: job={} unit={}/{}", job_id, unit_index, total_units)
+        logger.warning("Parent job cancelled; skipping page batch job={} unit={}/{}", job_id, unit_index, total_units)
         _set_batch_status(
             r,
             job_id,
@@ -252,7 +254,7 @@ def _handle_page_batch(r, worker_id: str, payload: Dict[str, Any]) -> None:
             },
         )
         _increment_parent_done(r, job_id, status="success", unit_index=unit_index)
-        logger.info("完成 page-batch: job={} unit={}/{}", job_id, unit_index, total_units)
+        logger.debug("Completed page batch job={} unit={}/{}", job_id, unit_index, total_units)
     except PageBatchTimeoutError as exc:
         tb = traceback.format_exc()
         elapsed_seconds = time.monotonic() - task_started
@@ -462,12 +464,12 @@ def main() -> int:
         try:
             payload = json.loads(payload_raw)
         except Exception:
-            logger.error("丢弃无效解析任务 payload: {}", payload_raw[:1000])
+            logger.error("Discarding invalid task payload payload_bytes={}", len(payload_raw.encode("utf-8", errors="replace")))
             continue
 
         task_type = str(payload.get("task_type") or "").strip().lower()
         if task_type not in {"page_batch", "page-batch", "batch"}:
-            logger.error("丢弃不支持的任务类型: task_type={} payload={}", task_type or "missing", payload)
+            logger.error("Discarding unsupported task type task_type={}", task_type or "missing")
             continue
         try:
             _handle_page_batch(r, worker_id, payload)
@@ -483,7 +485,12 @@ def main() -> int:
             release_pipeline("model load failed")
             return 2
         except Exception:
-            logger.exception("PaddleOCR 任务失败: task_type={} payload={}", task_type, payload)
+            logger.exception(
+                "PaddleOCR task failed task_type={} job_id={} unit_index={}",
+                task_type,
+                payload.get("job_id", ""),
+                payload.get("unit_index", ""),
+            )
             release_pipeline("task failed")
             if _env_bool("PADDLEOCR_EXIT_ON_TASK_FAILURE", True):
                 logger.warning("任务失败后退出 worker，由 Docker 重启以清理 PaddleOCR/VLM 内部线程状态")

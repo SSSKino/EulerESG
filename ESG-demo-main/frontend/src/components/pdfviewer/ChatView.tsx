@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
+import { Drawer } from "antd";
 import AnalysisResults from "./AnalysisResults";
 import ChatInterface from "./ChatInterface";
-import { PanelLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageCircle } from "lucide-react";
 import { useT } from "@/i18n/useT";
 import type { File as FileData } from "@/store/useFileStore";
 
@@ -25,7 +26,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 ${className}`}
+      className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-[box-shadow,border-color,opacity,transform] duration-300 ease-[var(--motion-fluid)] ${className}`}
     >
       <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-100">
         <div
@@ -47,6 +48,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 };
 
 const PDFChatViewer = dynamic(() => import("./PDFChatViewer"), { ssr: false });
+const MemoizedPDFChatViewer = React.memo(PDFChatViewer);
 // Use same-origin proxy via Next.js rewrites by default.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -62,11 +64,6 @@ interface ChatViewProps {
   onClearChat: () => void;
 }
 
-// balanced: PDF 1/2, AI 1/2
-// pdfShrunk: PDF 1/4, AI 3/4 (AI expanded to the left)
-// aiShrunk: AI 1/4, PDF 3/4 (PDF expanded to the right)
-type WidthMode = "balanced" | "pdfShrunk" | "aiShrunk";
-
 const ChatView: React.FC<ChatViewProps> = ({
   activeFile,
   messages,
@@ -74,7 +71,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   onClearChat,
 }) => {
   const { t } = useT();
-  const [widthMode, setWidthMode] = useState<WidthMode>("balanced");
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const [showAnalysisTable, setShowAnalysisTable] = useState<boolean>(true);
 
   const [targetPage, setTargetPage] = useState<number | undefined>(undefined);
@@ -82,36 +79,15 @@ const ChatView: React.FC<ChatViewProps> = ({
   // page number repeatedly.
   const [targetPageNonce, setTargetPageNonce] = useState<number>(0);
 
-  const pdfWidthClass =
-    widthMode === "pdfShrunk"
-      ? "w-full md:w-1/4"
-      : widthMode === "aiShrunk"
-        ? "w-full md:w-3/4"
-        : "w-full md:w-1/2";
-
-  const aiWidthClass =
-    widthMode === "aiShrunk"
-      ? "w-full md:w-1/4"
-      : widthMode === "pdfShrunk"
-        ? "w-full md:w-3/4"
-        : "w-full md:w-1/2";
-
-  const ensurePdfReadable = () => {
-    // If AI is currently focused (PDF is shrunk), restore to a readable layout
-    // when the user navigates to a page reference.
-    if (widthMode === "pdfShrunk") setWidthMode("balanced");
-  };
-
   const navigateToPage = (page: number) => {
     setTargetPage(page);
     setTargetPageNonce((n) => n + 1);
-    ensurePdfReadable();
   };
 
   return (
     <div className="flex flex-col gap-6">
       {/* Analysis: Summary always visible; Results table can be collapsed upward */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 w-full hover:shadow-lg">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-[box-shadow,border-color] duration-300 ease-[var(--motion-fluid)] w-full hover:shadow-lg">
         <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-100">
           <div className="flex items-center gap-2 select-none flex-grow">
             <h3 className="text-md font-semibold text-gray-800 truncate">{t("chat.analysis")}</h3>
@@ -140,29 +116,15 @@ const ChatView: React.FC<ChatViewProps> = ({
         </div>
       </div>
 
-      {/* PDF + AI split view with width focus controls */}
-      <div className="flex flex-col md:flex-row gap-6 min-h-[600px]">
+      <div className="min-h-[600px]">
         <CollapsibleSection
           title={activeFile?.name || t("chat.documentViewer")}
           defaultOpen={true}
-          className={`${pdfWidthClass} hover:shadow-lg`}
-          headerActions={
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                // Expand PDF to the right (AI shrinks)
-                setWidthMode((m) => (m === "aiShrunk" ? "balanced" : "aiShrunk"));
-              }}
-              className="p-1 hover:bg-gray-200 rounded-md transition-colors"
-              title={widthMode === "aiShrunk" ? t("chat.restoreSplitView") : t("chat.expandPdfWidth")}
-            >
-              <PanelLeft className="w-5 h-5 text-gray-600" />
-            </button>
-          }
+          className="w-full hover:shadow-lg"
         >
           {activeFile?.type?.toUpperCase() === "PDF" && activeFile?.file_id ? (
             <div className="overflow-hidden rounded-lg h-[70vh] min-h-[600px]">
-              <PDFChatViewer
+              <MemoizedPDFChatViewer
                 fileUrl={`${API_BASE_URL}/api/files/${activeFile.file_id}/pdf`}
                 targetPage={targetPage}
                 targetPageNonce={targetPageNonce}
@@ -176,35 +138,39 @@ const ChatView: React.FC<ChatViewProps> = ({
             </div>
           )}
         </CollapsibleSection>
-
-        <CollapsibleSection
-          title={t("chat.aiAssistant")}
-          defaultOpen={true}
-          className={`${aiWidthClass} hover:shadow-lg`}
-          headerActions={
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                // Expand AI to the left (PDF shrinks)
-                setWidthMode((m) => (m === "pdfShrunk" ? "balanced" : "pdfShrunk"));
-              }}
-              className="p-1 hover:bg-gray-200 rounded-md transition-colors"
-              title={widthMode === "pdfShrunk" ? t("chat.restoreSplitView") : t("chat.expandAiWidth")}
-            >
-              <PanelLeft className="w-5 h-5 text-gray-600" />
-            </button>
-          }
-        >
-          <div className="h-[70vh] min-h-[600px] flex flex-col">
-            <ChatInterface
-              messages={messages}
-              onSendMessage={onSendMessage}
-              onClearChat={onClearChat}
-              onReferenceClick={(page) => navigateToPage(page)}
-            />
-          </div>
-        </CollapsibleSection>
       </div>
+
+      <button
+        type="button"
+        onClick={() => setAssistantOpen(true)}
+        className="fixed bottom-6 right-6 z-40 flex h-12 items-center gap-2 rounded-full bg-[#2274BC] px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:bg-[#1b63a3] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2"
+        aria-label={t("chat.aiAssistant")}
+      >
+        <MessageCircle className="h-5 w-5" />
+        <span className="text-sm font-medium">{t("chat.aiAssistant")}</span>
+      </button>
+
+      <Drawer
+        title={t("chat.aiAssistant")}
+        placement="right"
+        width={440}
+        open={assistantOpen}
+        onClose={() => setAssistantOpen(false)}
+        destroyOnClose={false}
+        styles={{ body: { padding: 0, display: "flex", flexDirection: "column", height: "calc(100% - 55px)" } }}
+      >
+        <div className="flex h-full min-h-0 flex-col">
+          <ChatInterface
+            messages={messages}
+            onSendMessage={onSendMessage}
+            onClearChat={onClearChat}
+            onReferenceClick={(page) => {
+              navigateToPage(page);
+              setAssistantOpen(false);
+            }}
+          />
+        </div>
+      </Drawer>
     </div>
   );
 };

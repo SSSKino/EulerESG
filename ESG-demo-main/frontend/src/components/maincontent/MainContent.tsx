@@ -135,23 +135,35 @@ const MainContent = () => {
         return value;
       });
       const companyId = values.companyId === "__new__" ? undefined : values.companyId;
-      const displayName = companyId
-        ? nativeFiles.length === 1
-          ? nativeFiles[0].name
-          : t("upload.companyBatch")
-        : values.companyName || t("upload.companyBatch");
-      const response = await apiService.uploadReportBatch(nativeFiles, {
-        uploadMode,
-        companyId,
-        companyName: companyId ? undefined : values.companyName,
-        reportYears: values.reportYears,
-        framework: values.framework,
-        industry: isCDP ? "CDP" : isTCFD ? "TCFD" : values.industry,
-        semiIndustry: isGRI ? "" : semiVals[0] ?? "",
-        griSector: values.griSector,
-        griTopic: griTopics[0] ?? "",
-        scopeSlugs,
-      });
+      const displayName = uploadMode === "single"
+        ? nativeFiles[0].name
+        : companyId
+          ? t("upload.companyBatch")
+          : values.companyName || t("upload.companyBatch");
+      const response = uploadMode === "single"
+        ? await apiService.uploadReport(
+            nativeFiles[0],
+            values.framework,
+            isCDP ? "CDP" : isTCFD ? "TCFD" : values.industry,
+            isGRI ? "" : semiVals[0] ?? "",
+            values.griSector,
+            griTopics[0] ?? "",
+            scopeSlugs,
+          )
+        : await apiService.uploadReportBatch(nativeFiles, {
+            uploadMode,
+            companyId,
+            companyName: companyId ? undefined : values.companyName,
+            reportYears: values.reportYears,
+            framework: values.framework,
+            industry: isCDP ? "CDP" : isTCFD ? "TCFD" : values.industry,
+            semiIndustry: isGRI ? "" : semiVals[0] ?? "",
+            griSector: values.griSector,
+            griTopic: griTopics[0] ?? "",
+            scopeSlugs,
+          });
+      const jobId = response.job_id;
+      if (!jobId) throw new Error(t("upload.processingFailed"));
 
       message.destroy(batchMessageKey);
       setIsModalOpen(false);
@@ -160,11 +172,11 @@ const MainContent = () => {
       form.resetFields();
       await store.loadFilesFromBackend();
 
-      const jobMessageKey = `report-job-${response.job_id}`;
+      const jobMessageKey = `report-job-${jobId}`;
       setActiveReportJobs((prev) => ({
         ...prev,
-        [response.job_id]: {
-          jobId: response.job_id,
+        [jobId]: {
+          jobId,
           fileName: displayName,
           status: "processing",
           stage: "queued",
@@ -172,12 +184,12 @@ const MainContent = () => {
           progress: 0,
         },
       }));
-      apiService.subscribeReportJob(response.job_id, {
+      apiService.subscribeReportJob(jobId, {
         onEvent: (event) => {
           setActiveReportJobs((prev) => ({
             ...prev,
-            [response.job_id]: {
-              jobId: response.job_id,
+            [jobId]: {
+              jobId,
               fileName: displayName,
               status: event.status,
               stage: event.stage,
@@ -197,8 +209,8 @@ const MainContent = () => {
           message.destroy(jobMessageKey);
           setActiveReportJobs((prev) => ({
             ...prev,
-            [response.job_id]: {
-              jobId: response.job_id,
+            [jobId]: {
+              jobId,
               fileName: displayName,
               status: event.status,
               stage: "completed",
@@ -209,7 +221,7 @@ const MainContent = () => {
           window.setTimeout(() => {
             setActiveReportJobs((prev) => {
               const next = { ...prev };
-              delete next[response.job_id];
+              delete next[jobId];
               return next;
             });
           }, 8000);
@@ -221,8 +233,8 @@ const MainContent = () => {
           const errorText = t("upload.processingFailed");
           setActiveReportJobs((prev) => ({
             ...prev,
-            [response.job_id]: {
-              ...(prev[response.job_id] || { jobId: response.job_id, fileName: displayName }),
+            [jobId]: {
+              ...(prev[jobId] || { jobId, fileName: displayName }),
               status: "failed",
               stage: "failed",
               message: errorText,

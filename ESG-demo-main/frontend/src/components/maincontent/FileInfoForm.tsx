@@ -55,7 +55,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
   const framework = Form.useWatch("framework", form);
   const griSector = Form.useWatch("griSector", form);
   const selectedCompanyId = Form.useWatch("companyId", form);
-  const scopeLocked = Boolean(selectedCompanyId && selectedCompanyId !== "__new__");
+  const scopeLocked = uploadMode === "multi" && Boolean(selectedCompanyId && selectedCompanyId !== "__new__");
   const isSASBSelected = framework === "SASB";
   const isGRISelected = framework === "GRI";
   const isCDPSelected = framework === "CDP";
@@ -68,18 +68,23 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
 
   useEffect(() => {
+    if (uploadMode !== "multi") {
+      setCompanies([]);
+      return;
+    }
     apiService
       .getCompanies()
       .then((response) => setCompanies(response.companies || []))
       .catch(() => setCompanies([]));
-  }, [selectedUploadFiles]);
+  }, [selectedUploadFiles, uploadMode]);
 
   useEffect(() => {
+    if (uploadMode !== "multi") return;
     form.setFieldValue(
       "reportYears",
       selectedUploadFiles.map((file) => detectReportYear(file.name))
     );
-  }, [form, selectedUploadFiles]);
+  }, [form, selectedUploadFiles, uploadMode]);
 
   useEffect(() => {
     if (!isGRISelected) return;
@@ -206,49 +211,51 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
         </Space>
       </Form.Item>
 
-      <Form.Item
-        name="companyId"
-        label={t("upload.company")}
-        rules={[{ required: true, message: t("upload.selectCompany") }]}
-      >
-        <Select
-          onChange={handleCompanyChange}
-          options={[
-            { label: t("upload.newCompany"), value: "__new__" },
-            ...companies.map((company) => ({
-              label: `${company.company_name} (${company.report_count ?? company.report_ids.length}/8)`,
-              value: company.company_id,
-            })),
-          ]}
-        />
-      </Form.Item>
+      {uploadMode === "multi" && (
+        <>
+          <Form.Item
+            name="companyId"
+            label={t("upload.company")}
+            rules={[{ required: true, message: t("upload.selectCompany") }]}
+          >
+            <Select
+              onChange={handleCompanyChange}
+              options={[
+                { label: t("upload.newCompany"), value: "__new__" },
+                ...companies.map((company) => ({
+                  label: `${company.company_name} (${company.report_count ?? company.report_ids.length}/8)`,
+                  value: company.company_id,
+                })),
+              ]}
+            />
+          </Form.Item>
 
-      {selectedCompanyId === "__new__" && (
-        <Form.Item
-          name="companyName"
-          label={t("upload.companyName")}
-          rules={[{ required: true, whitespace: true, message: t("upload.enterCompanyName") }]}
-        >
-          <Input maxLength={160} placeholder={t("upload.companyNamePlaceholder")} />
-        </Form.Item>
+          {selectedCompanyId === "__new__" && (
+            <Form.Item
+              name="companyName"
+              label={t("upload.companyName")}
+              rules={[{ required: true, whitespace: true, message: t("upload.enterCompanyName") }]}
+            >
+              <Input maxLength={160} placeholder={t("upload.companyNamePlaceholder")} />
+            </Form.Item>
+          )}
+
+          <Form.Item label={t("upload.reportYears") }>
+            <Space direction="vertical" style={{ width: "100%" }}>
+              {selectedUploadFiles.map((file, index) => (
+                <div key={file.uid} className="grid grid-cols-[minmax(0,1fr)_120px] items-center gap-3">
+                  <span className="truncate text-sm text-gray-700" title={file.name}>{file.name}</span>
+                  <Form.Item name={["reportYears", index]} noStyle>
+                    <InputNumber min={1900} max={2100} placeholder={t("upload.yearAuto")} style={{ width: "100%" }} />
+                  </Form.Item>
+                </div>
+              ))}
+            </Space>
+          </Form.Item>
+
+          <div className="mb-4 text-xs text-gray-500">{t("upload.multiReportLimit")}</div>
+        </>
       )}
-
-      <Form.Item label={t("upload.reportYears")}>
-        <Space direction="vertical" style={{ width: "100%" }}>
-          {selectedUploadFiles.map((file, index) => (
-              <div key={file.uid} className="grid grid-cols-[minmax(0,1fr)_120px] items-center gap-3">
-                <span className="truncate text-sm text-gray-700" title={file.name}>{file.name}</span>
-                <Form.Item name={["reportYears", index]} noStyle>
-                  <InputNumber min={1900} max={2100} placeholder={t("upload.yearAuto")} style={{ width: "100%" }} />
-                </Form.Item>
-              </div>
-          ))}
-        </Space>
-      </Form.Item>
-
-      <div className="mb-4 text-xs text-gray-500">
-        {uploadMode === "multi" ? t("upload.multiReportLimit") : t("upload.singleReportLimit")}
-      </div>
 
       <Form.Item
         name="framework"

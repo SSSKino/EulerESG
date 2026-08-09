@@ -1432,6 +1432,9 @@ class ContentExtractor:
         # 否则单个 PaddleOCR batch 处理较久时，前端会看起来像卡住。
         progress_emit_interval = float(os.getenv("PADDLEOCR_PROGRESS_EMIT_INTERVAL", "5.0") or "5.0")
         last_progress_emit_ts = 0.0
+        progress_log_interval = float(os.getenv("APP_PROGRESS_LOG_INTERVAL_SECONDS", "30") or "30")
+        last_progress_log_ts = 0.0
+        last_progress_log_bucket = -1
         batch_states: list[dict] = []
         while time.time() < deadline:
             batch_states = [client.hgetall(f"{task_key}:batch:{i:04d}") for i in range(1, total_units + 1)]
@@ -1486,12 +1489,21 @@ class ContentExtractor:
                     f"p{b['start_page']}-{b['end_page']}" if b["start_page"] != b["end_page"] else f"p{b['start_page']}"
                     for b in running_batches[:3]
                 ) or "-"
-                self.logger.info(
-                    f"PaddleOCR-VL page-batch job={job_id} done={done_count}/{total_units} "
-                    f"batch={done_count + failed_count}/{total_units} failed={failed_count} "
-                    f"running={running_count} queued={queued_count} pages={pages_done}/{total_pages} "
-                    f"running_pages={running_pages_text}"
+                completed_count = done_count + failed_count
+                progress_bucket = min(10, int((completed_count * 10) / max(1, total_units)))
+                should_log_progress = (
+                    progress_bucket > last_progress_log_bucket
+                    or progress_log_interval <= 0
+                    or now_ts - last_progress_log_ts >= progress_log_interval
                 )
+                if should_log_progress:
+                    self.logger.info(
+                        f"PaddleOCR-VL progress job_id={job_id} completed={completed_count}/{total_units} "
+                        f"failed={failed_count} running={running_count} queued={queued_count} "
+                        f"pages={pages_done}/{total_pages} running_pages={running_pages_text}"
+                    )
+                    last_progress_log_bucket = progress_bucket
+                    last_progress_log_ts = now_ts
                 last_progress_signature = progress_signature
                 last_progress_emit_ts = now_ts
                 self._redis_hash_set(

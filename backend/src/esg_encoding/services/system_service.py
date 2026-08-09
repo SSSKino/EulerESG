@@ -7,6 +7,12 @@ async def startup_event():
     """Initialize system components on startup"""
     # Load environment variables from .env file
     load_dotenv()
+
+    # Recover disk space left by interrupted/OOM OCR jobs. This only touches
+    # expired children of the dedicated work roots, never report-owned assets.
+    from ..paddleocr_cleanup import cleanup_stale_paddleocr_artifacts
+    cleanup_stale_paddleocr_artifacts()
+    file_manager.recover_interrupted_reports()
     
     # Create default configuration
     config = ProcessingConfig()

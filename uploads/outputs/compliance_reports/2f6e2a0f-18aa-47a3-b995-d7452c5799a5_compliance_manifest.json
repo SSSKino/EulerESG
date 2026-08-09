@@ -1,0 +1,9 @@
+{
+  "file_id": "2f6e2a0f-18aa-47a3-b995-d7452c5799a5",
+  "framework": "SASB",
+  "default_scope_key": "Software & IT Services",
+  "outputs": [],
+  "expected_scope_keys": [
+    "Software & IT Services"
+  ]
+}

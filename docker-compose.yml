@@ -1,4 +1,7 @@
 x-paddleocr-shared-env: &paddleocr-shared-env
+  APP_LOG_LEVEL: ${APP_LOG_LEVEL:-INFO}
+  APP_LOG_FORMAT: ${APP_LOG_FORMAT:-text}
+  APP_PROGRESS_LOG_INTERVAL_SECONDS: ${APP_PROGRESS_LOG_INTERVAL_SECONDS:-30}
   # Backend and workers must use the same Redis keys and shared paths.
   PADDLEOCR_TASK_QUEUE_URL: redis://redis:6379/0
   PADDLEOCR_TASK_QUEUE_NAME: paddleocr:parse
@@ -220,6 +223,8 @@ services:
     environment:
       <<: *paddleocr-shared-env
       PADDLEOCR_TASK_POLL_INTERVAL: '2.0'
+      APP_ACCESS_LOG: ${APP_ACCESS_LOG:-false}
+      APP_SLOW_REQUEST_MS: ${APP_SLOW_REQUEST_MS:-2000}
       PADDLEOCR_VL_TIMEOUT: '28800'
       REPORT_JOB_EXPOSE_INTERNAL_DETAILS: 'false'
       REPORT_LINK_RESOLUTION_ENABLED: 'true'
@@ -244,6 +249,8 @@ services:
       # One Redis task processes up to 7 PDF pages; a 116-page report creates 17 tasks.
       PADDLEOCR_PAGE_BATCH_SIZE: '7'
       PADDLEOCR_KEEP_PROCESS_OUTPUT: 'false'
+      PADDLEOCR_KEEP_LAYOUT_AUDIT: ${PADDLEOCR_KEEP_LAYOUT_AUDIT:-false}
+      PADDLEOCR_STALE_ARTIFACT_TTL_HOURS: ${PADDLEOCR_STALE_ARTIFACT_TTL_HOURS:-24}
       PADDLEOCR_JOB_WORK_DIR: /workspace/uploads/paddleocr_vl_jobs
       PADDLEOCR_SPLIT_VISIBILITY_WAIT_SECONDS: '60'
       # Release Paddle once per complete document, never between page batches.
@@ -293,6 +300,7 @@ services:
       python3 -m uvicorn esg_encoding.api:app
       --host 0.0.0.0
       --port 8000
+      --no-access-log
       --reload
       --reload-dir src
       --reload-exclude outputs/*

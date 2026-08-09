@@ -40,6 +40,37 @@
       "created_at": "2026-07-17T06:47:57.489386+00:00",
       "updated_at": "2026-07-17T10:49:00.201388+00:00",
       "last_error": null
+    },
+    "company_bc3c62c47b574889bf3dea76f921efaa": {
+      "company_id": "company_bc3c62c47b574889bf3dea76f921efaa",
+      "user_id": 526078,
+      "company_name": "dell 2024",
+      "normalized_name": "dell 2024",
+      "scope_config": {
+        "framework": "SASB",
+        "industry": "Technology & Communications",
+        "semi_industry": "Software & IT Services",
+        "gri_sector": "",
+        "gri_topic": "",
+        "scope_slugs": [
+          "Software & IT Services"
+        ]
+      },
+      "scope_signature": "{\"framework\":\"SASB\",\"gri_sector\":\"\",\"gri_topic\":\"\",\"industry\":\"Technology & Communications\",\"scope_slugs\":[\"Software & IT Services\"],\"semi_industry\":\"Software & IT Services\"}",
+      "report_ids": [
+        "58d1da5d-62b1-4f4c-b180-4284b34c267b"
+      ],
+      "batch_ids": [
+        "batch_e3d705318c7b450e880a56f0bf0c16e1"
+      ],
+      "status": "failed",
+      "analysis_version": 0,
+      "active_analysis_id": null,
+      "assessment_outputs": [],
+      "stale": false,
+      "created_at": "2026-08-08T15:36:37.985396+00:00",
+      "updated_at": "2026-08-08T16:10:44.994564+00:00",
+      "last_error": "[DISCLOSURE_ANALYSIS_ERROR] LLM returned invalid JSON for metric 'Percentage of (2) diversity group representation for (b) non-executive management'."
     }
   },
   "batches": {
@@ -63,6 +94,27 @@
       "error": "",
       "created_at": "2026-07-17T06:47:58.931253+00:00",
       "updated_at": "2026-07-17T10:49:00.207127+00:00"
+    },
+    "batch_e3d705318c7b450e880a56f0bf0c16e1": {
+      "batch_id": "batch_e3d705318c7b450e880a56f0bf0c16e1",
+      "company_id": "company_bc3c62c47b574889bf3dea76f921efaa",
+      "user_id": 526078,
+      "upload_mode": "single",
+      "file_ids": [
+        "58d1da5d-62b1-4f4c-b180-4284b34c267b"
+      ],
+      "report_years": {
+        "58d1da5d-62b1-4f4c-b180-4284b34c267b": 2024
+      },
+      "processed_file_ids": [
+        "58d1da5d-62b1-4f4c-b180-4284b34c267b"
+      ],
+      "failed_file_ids": [],
+      "job_id": "report_acd5348457744c80b2a5a8fe3d127118",
+      "status": "failed",
+      "error": "[DISCLOSURE_ANALYSIS_ERROR] LLM returned invalid JSON for metric 'Percentage of (2) diversity group representation for (b) non-executive management'.",
+      "created_at": "2026-08-08T15:36:39.617885+00:00",
+      "updated_at": "2026-08-08T16:10:44.987234+00:00"
     }
   }
 }

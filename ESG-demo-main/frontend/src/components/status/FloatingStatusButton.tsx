@@ -7,6 +7,7 @@ import { useT } from "@/i18n/useT";
 const FloatingStatusButton: React.FC = () => {
   const { t } = useT();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isDevelopment = process.env.NODE_ENV === "development";
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -16,6 +17,8 @@ const FloatingStatusButton: React.FC = () => {
     setIsModalOpen(false);
   };
 
+  if (!isDevelopment) return null;
+
   return (
     <>
       <FloatButton
@@ -24,7 +27,7 @@ const FloatingStatusButton: React.FC = () => {
         onClick={showModal}
         style={{
           right: 24,
-          bottom: 80,
+          bottom: 72,
         }}
         type="primary"
       />

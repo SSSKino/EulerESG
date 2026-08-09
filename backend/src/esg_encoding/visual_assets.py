@@ -252,12 +252,20 @@ def promote_visual_assets(output_dir: str | Path, pdf_path: str | Path) -> list[
             "sha256": digest,
         })
 
-    # Keep audit data separate so normal manifest reads stay small.
+    # The full flattened layout is useful for parser diagnostics but large and
+    # unnecessary for normal evidence retrieval. Keep it only when requested.
     audit_path = destination / "layout_audit.json"
-    audit_tmp = destination / f"layout_audit.{os.getpid()}.tmp"
-    audit_tmp.write_text(json.dumps(layout, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    os.replace(audit_tmp, audit_path)
-    manifest = {"version": 3, "assets": records, "tables": table_records, "layout_audit": audit_path.name}
+    keep_layout_audit = str(os.getenv("PADDLEOCR_KEEP_LAYOUT_AUDIT", "false")).strip().lower() in {
+        "1", "true", "yes", "y", "on"
+    }
+    manifest = {"version": 3, "assets": records, "tables": table_records}
+    if keep_layout_audit:
+        audit_tmp = destination / f"layout_audit.{os.getpid()}.tmp"
+        audit_tmp.write_text(json.dumps(layout, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+        os.replace(audit_tmp, audit_path)
+        manifest["layout_audit"] = audit_path.name
+    else:
+        audit_path.unlink(missing_ok=True)
     manifest_path = destination / "manifest.json"
     temporary_manifest = destination / f"manifest.{os.getpid()}.tmp"
     temporary_manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")

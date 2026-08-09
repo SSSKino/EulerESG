@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Button, Space, Tag, Popconfirm, Badge } from "antd";
+import { Table, Button, Dropdown, Modal, Space, Tag, Tooltip, message } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
-import { DeleteOutlined, CommentOutlined, SyncOutlined } from "@ant-design/icons";
+import { DeleteOutlined, StarFilled, StarOutlined } from "@ant-design/icons";
 import { BarChartOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useFileStore } from "@/store/useFileStore";
+import { canCrossAnalyzeFiles } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import { useT } from "@/i18n/useT";
-import { apiService } from "@/lib/api";
 
 interface FileTableProps {
   onChatClick: (file: File) => void;
@@ -20,6 +20,8 @@ type FileTableRow = File & {
   children?: FileTableRow[];
   reportCount?: number;
 };
+
+const FAVOURITE_REPORTS_STORAGE_KEY = "euleresg-favourite-reports";
 
 function uploadSortKey(f: File): number {
   if (typeof f.uploadedAtMs === "number" && f.uploadedAtMs > 0) return f.uploadedAtMs;
@@ -41,26 +43,72 @@ function sortFilesForDisplay(files: File[]): File[] {
 const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSelectionChange }) => {
   const { t, lang } = useT();
   const router = useRouter();
-  const locale = lang === "zh" ? "zh-CN" : "en-US";
 
   const files = useFileStore((state) => state.files);
   const loading = useFileStore((state) => state.loading);
-  const lastRefresh = useFileStore((state) => state.lastRefresh);
-  const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [favouriteReportKeys, setFavouriteReportKeys] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(FAVOURITE_REPORTS_STORAGE_KEY) || "[]");
+      if (Array.isArray(stored)) setFavouriteReportKeys(new Set(stored.map(String)));
+    } catch {
+      setFavouriteReportKeys(new Set());
+    }
+  }, []);
+
+  const toggleFavourite = (file: File) => {
+    const favouriteKey = `${file.file_id || file.key}::${file.analysis_scope_key || ""}`;
+    setFavouriteReportKeys((current) => {
+      const next = new Set(current);
+      if (next.has(favouriteKey)) next.delete(favouriteKey);
+      else next.add(favouriteKey);
+      window.localStorage.setItem(FAVOURITE_REPORTS_STORAGE_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  const isFavourite = (file: File) =>
+    favouriteReportKeys.has(`${file.file_id || file.key}::${file.analysis_scope_key || ""}`);
 
   useEffect(() => {
     const timer = setInterval(() => {
       const state = useFileStore.getState();
       const hasUnfinished = state.files.some((f) => f.status === "pending" || f.status === "partial");
       if (hasUnfinished && !state.loading) {
-        void state.loadFilesFromBackend();
+        void state.loadFilesFromBackend({ showLoading: false });
       }
     }, 4000);
     return () => clearInterval(timer);
   }, []);
+
+  const crossAnalysisAllowed = canCrossAnalyzeFiles(selectedRows);
+  const selectedFrameworks = [...new Set(selectedRows.map((f) => (f.framework || "").trim()).filter(Boolean))];
+  const crossAnalysisDisabledReason =
+    selectedRows.length >= 2 && !crossAnalysisAllowed
+      ? selectedFrameworks.length > 1
+        ? t("files.crossAnalysisDifferentFrameworkDisabled")
+        : t("files.crossAnalysisSameFramework")
+      : undefined;
+
+  const handleCrossAnalyze = () => {
+    if (selectedRows.length < 2) {
+      void message.info(t("files.selectAtLeastTwoReports"));
+      return;
+    }
+    if (!crossAnalysisAllowed) {
+      void message.warning(t("files.crossAnalysisSameFramework"));
+      return;
+    }
+    const ids = [...new Set(selectedRows.map((file) => file.file_id).filter(Boolean) as string[])];
+    if (ids.length < 2) {
+      void message.info(t("files.selectAtLeastTwoReports"));
+      return;
+    }
+    router.push(`/cross-analysis?ids=${encodeURIComponent(ids.join(","))}`);
+  };
 
   const dataSource = useMemo<FileTableRow[]>(() => {
     const sorted = sortFilesForDisplay(files);
@@ -140,11 +188,42 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
   const renderUnknown = (v: any) =>
     v && v !== "Unknown" && v !== "未知" ? v : t("common.unknown");
 
+  const optionFilterValue = (file: File) => {
+    const framework = (file.framework || "").trim();
+    const value = framework === "CDP" || framework === "TCFD" ? file.semiIndustry : file.industry;
+    return String(value || t("common.unknown"));
+  };
+
+  const subOptionFilterValue = (file: File) => {
+    const framework = (file.framework || "").trim();
+    return framework === "CDP" || framework === "TCFD"
+      ? t("common.na")
+      : String(file.semiIndustry || t("common.unknown"));
+  };
+
+  const filterRows = dataSource.flatMap((row) => [row, ...(row.children || [])]);
+  const makeFilterOptions = (values: string[]) =>
+    [...new Set(values.map((value) => value.trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b))
+      .map((value) => ({ text: value, value }));
+
+  const tableFilters = {
+    name: makeFilterOptions(filterRows.map((file) => String(file.name || t("common.unknown")))),
+    date: makeFilterOptions(filterRows.map((file) => String(file.dateUploaded || t("common.unknown")))),
+    framework: makeFilterOptions(filterRows.map((file) => String(file.framework || t("common.unknown")))),
+    option: makeFilterOptions(filterRows.map(optionFilterValue)),
+    subOption: makeFilterOptions(filterRows.map(subOptionFilterValue)),
+    status: [...new Map(filterRows.map((file) => [file.status, { text: statusText(file), value: file.status }])).values()],
+  };
+
   const columns: ColumnsType<FileTableRow> = [
     {
       title: t("files.columns.name"),
       dataIndex: "name",
       key: "name",
+      filters: tableFilters.name,
+      filterSearch: true,
+      onFilter: (value, record) => String(record.name || t("common.unknown")) === String(value),
       render: (value: string, record) => (
         <span className={record.isCompany ? "font-semibold text-slate-900" : ""}>{value}</span>
       ),
@@ -154,6 +233,9 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       title: t("files.columns.dateUploaded"),
       dataIndex: "dateUploaded",
       key: "dateUploaded",
+      filters: tableFilters.date,
+      filterSearch: true,
+      onFilter: (value, record) => String(record.dateUploaded || t("common.unknown")) === String(value),
       render: (v: any) => (v && v !== "Unknown" && v !== "未知" ? v : t("common.unknown")),
     },
     {
@@ -163,16 +245,12 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       render: (v: any) => (v && v !== "Unknown" && v !== "未知" ? v : t("common.unknown")),
     },
     {
-      title: t("files.columns.pages"),
-      dataIndex: "pages",
-      key: "pages",
-      render: (_: any, record: File) =>
-        record.pages && record.pages !== "-" ? record.pages : t("common.na"),
-    },
-    {
       title: t("files.columns.framework"),
       dataIndex: "framework",
       key: "framework",
+      filters: tableFilters.framework,
+      filterSearch: true,
+      onFilter: (value, record) => String(record.framework || t("common.unknown")) === String(value),
       render: (v: string | undefined) => {
         const fw = (v || "").trim() || t("common.unknown");
         return <Tag color={frameworkTagColor(v)}>{fw}</Tag>;
@@ -182,6 +260,9 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       title: t("files.columns.industry"),
       dataIndex: "industry",
       key: "industry",
+      filters: tableFilters.option,
+      filterSearch: true,
+      onFilter: (value, record) => optionFilterValue(record) === String(value),
       render: (v: any, record: File) => {
         const fw = (record.framework || "").trim();
         if (fw === "CDP" || fw === "TCFD") {
@@ -194,6 +275,9 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       title: t("files.columns.subOption"),
       dataIndex: "semiIndustry",
       key: "semiIndustry",
+      filters: tableFilters.subOption,
+      filterSearch: true,
+      onFilter: (value, record) => subOptionFilterValue(record) === String(value),
       render: (v: any, record: File) => {
         const fw = (record.framework || "").trim();
         return fw === "CDP" || fw === "TCFD" ? t("common.na") : renderUnknown(v);
@@ -202,6 +286,9 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     {
       title: t("files.columns.status"),
       key: "status",
+      filters: tableFilters.status,
+      filterSearch: true,
+      onFilter: (value, record) => record.status === String(value),
       render: (_: any, file: File) => <Tag color={statusColor(file.status)}>{statusText(file)}</Tag>,
     },
     {
@@ -225,64 +312,65 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
           <Button
             type="primary"
             size="small"
-            icon={<CommentOutlined />}
+            icon={<BarChartOutlined />}
             onClick={(event) => {
               event.stopPropagation();
               onChatClick(file);
             }}
             disabled={file.status !== "ready"}
           >
-            {t("files.actions.chat")}
+            {t("files.actions.analysis")}
           </Button>
-          <Popconfirm
-            title={lang === "zh" ? "重新解析此报告？" : "Reprocess this report?"}
-            description={lang === "zh" ? "将重新识别文字、图表和图片。" : "Text, charts and images will be extracted again."}
-            onConfirm={async () => {
-              if (!file.file_id) return;
-              await apiService.reprocessReport(file.file_id);
-              await useFileStore.getState().loadFilesFromBackend();
+          <Dropdown
+            trigger={["click"]}
+            menu={{
+              items: [
+                {
+                  key: "favourite",
+                  icon: isFavourite(file) ? <StarFilled className="text-amber-400" /> : <StarOutlined />,
+                  label: isFavourite(file)
+                    ? (lang === "zh" ? "取消收藏" : "Remove from favourites")
+                    : (lang === "zh" ? "收藏" : "Add to favourites"),
+                },
+                {
+                  key: "delete",
+                  danger: true,
+                  icon: <DeleteOutlined />,
+                  label: t("files.actions.delete"),
+                },
+              ],
+              onClick: ({ key, domEvent }) => {
+                domEvent.stopPropagation();
+                if (key === "favourite") {
+                  toggleFavourite(file);
+                  return;
+                }
+                if (key !== "delete") return;
+                Modal.confirm({
+                  title: t("files.deleteTitle"),
+                  content: t("files.deleteDesc"),
+                  okText: t("common.yes"),
+                  cancelText: t("common.no"),
+                  okButtonProps: { danger: true },
+                  onOk: async () => {
+                    await useFileStore.getState().deleteFile(file.file_id!, file.analysis_scope_key);
+                  },
+                });
+              },
             }}
-            okText={t("common.yes")}
-            cancelText={t("common.no")}
           >
             <Button
               type="default"
               size="small"
-              icon={<SyncOutlined />}
-              disabled={!file.file_id || file.backend_status === "processing"}
+              icon={<span className="relative -top-[2px] text-base font-semibold leading-none tracking-[2px]">•••</span>}
+              aria-label="More actions"
               onClick={(event) => event.stopPropagation()}
-            >
-              {lang === "zh" ? "重新解析" : "Reprocess"}
-            </Button>
-          </Popconfirm>
-          <Popconfirm
-            title={t("files.deleteTitle")}
-            description={t("files.deleteDesc")}
-            onConfirm={async () => {
-              await useFileStore.getState().deleteFile(file.file_id!, file.analysis_scope_key);
-            }}
-            okText={t("common.yes")}
-            cancelText={t("common.no")}
-          >
-            <Button
-              type="default"
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-              onClick={(event) => event.stopPropagation()}
-            >
-              {t("files.actions.delete")}
-            </Button>
-          </Popconfirm>
+            />
+          </Dropdown>
         </Space>
       ),
     },
   ];
-
-  const lastUpdatedText =
-    lastRefresh > 0
-      ? t("files.lastUpdated", { time: new Date(lastRefresh).toLocaleTimeString(locale) })
-      : null;
 
   const pagination: TablePaginationConfig = {
     current: currentPage,
@@ -290,7 +378,8 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     defaultPageSize: 10,
     showSizeChanger: true,
     pageSizeOptions: ["10", "20", "50", "100"],
-    showLessItems: false,
+    showLessItems: true,
+    responsive: false,
     showTotal: (total) => `${total}`,
     onChange: (page, nextPageSize) => {
       const resolvedPageSize = nextPageSize || pageSize;
@@ -310,16 +399,19 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       <div className="p-3 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-700">{t("files.title")}</h3>
         <div className="flex items-center space-x-2">
-          {loading && <Badge status="processing" text={t("common.loading")} />}
-          <Button
-            size="small"
-            icon={<SyncOutlined spin={loading} />}
-            onClick={() => loadFilesFromBackend()}
-            disabled={loading}
-          >
-            {t("common.refresh")}
-          </Button>
-          {lastUpdatedText && <span className="text-xs text-gray-500">{lastUpdatedText}</span>}
+          <Tooltip title={crossAnalysisDisabledReason} placement="top">
+            <span>
+              <Button
+                type="primary"
+                size="small"
+                icon={<BarChartOutlined />}
+                disabled={selectedRows.length < 2 || !crossAnalysisAllowed}
+                onClick={handleCrossAnalyze}
+              >
+                {t("files.crossAnalysisBeta")}
+              </Button>
+            </span>
+          </Tooltip>
         </div>
       </div>
       <div className="overflow-x-auto px-1 pb-2">

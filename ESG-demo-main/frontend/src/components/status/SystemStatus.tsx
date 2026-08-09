@@ -12,6 +12,7 @@ import {
 import { apiService } from "@/lib/api";
 import { useT } from "@/i18n/useT";
 import type { SystemStatus } from "@/lib/api";
+import { errorSummary } from "@/lib/logger";
 
 interface SystemStatusMonitorProps {
   open: boolean;
@@ -27,18 +28,13 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
 
   const fetchStatus = async () => {
     try {
-      console.log('Fetching system status...');
-      console.log('API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL || '(same-origin via Next rewrites)');
       setLoading(true);
       
       const response = await apiService.getSystemStatus();
-      console.log('System status response:', response);
       setStatus(response);
       setLastUpdate(new Date());
     } catch (error: any) {
-      console.error('Failed to fetch system status:', error);
-      console.error('Error message:', error?.message);
-      console.error('Error details:', error);
+      console.error(`Failed to fetch system status: ${errorSummary(error)}`);
       
       // Show a user-friendly error message
       setStatus({

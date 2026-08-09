@@ -38,6 +38,7 @@ const nextConfig = {
 
   devIndicators: {
     autoPrerender: false,
+    position: "bottom-right",
   },
 };
 

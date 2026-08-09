@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import { Layout } from "antd";
-import Nav from "@/components/navbar/Nav";
+import DashboardSidebar from "@/components/navbar/DashboardSidebar";
 import { usePathname } from "next/navigation";
 
 const { Content } = Layout;
@@ -35,9 +35,9 @@ export default function CrossAnalysisLayout({ children }: { children: React.Reac
   // no extra framework selection gate is required.
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Nav />
-      <Content style={{ display: "flex" }}>
+    <Layout style={{ minHeight: "100vh", flexDirection: "row" }}>
+      <DashboardSidebar />
+      <Content style={{ display: "flex", minWidth: 0 }}>
         {children}
       </Content>
     </Layout>

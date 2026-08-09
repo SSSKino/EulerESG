@@ -1,12 +1,13 @@
 // app/dashboard/chat/page.tsx
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import { Breadcrumb, message } from "antd";
-import { useRouter, useSearchParams } from "next/navigation";
+import { message } from "antd";
+import { useSearchParams } from "next/navigation";
 import ChatView from "@/components/pdfviewer/ChatView";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService, type ChatResponse } from "@/lib/api";
 import { useT } from "@/i18n/useT";
+import { errorSummary } from "@/lib/logger";
 
 interface Message {
   text: string;
@@ -15,7 +16,6 @@ interface Message {
 
 export default function ChatPage() {
   const { t } = useT();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Message[]>(() => [
     { text: t("chat.welcomeMessage"), isUser: false },
@@ -64,10 +64,6 @@ export default function ChatPage() {
     return cands[0];
   }, [files, queryFileId, selectedFileId, queryScope]);
 
-  const handleBackToList = () => {
-    router.push("/dashboard");
-  };
-
   const handleSendMessage = async (userMessage: string) => {
     const effectiveFileId = queryFileId || selectedFileId;
     // 添加用户消息
@@ -98,11 +94,10 @@ export default function ChatPage() {
 
       // 如果有相关段落，可以在这里处理
       if (response.relevant_segments && response.relevant_segments.length > 0) {
-        console.log('Relevant segments:', response.relevant_segments);
       }
 
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error(`Chat request failed: ${errorSummary(error)}`);
       message.error(t("chat.failedToSend", { error: String(error) }));
       
       // 移除加载消息，添加错误消息
@@ -128,25 +123,6 @@ export default function ChatPage() {
   return (
     <div className="w-full flex flex-col justify-start items-center mx-auto pt-1 min-h-screen">
       <div className="w-[95%]">
-        <Breadcrumb
-          style={{ margin: 20 }}
-          items={[
-            {
-              title: (
-                <a
-                  onClick={handleBackToList}
-                  className="text-blue-600 hover:text-blue-800 cursor-pointer">
-                  {t("files.breadcrumbDashboard")}
-                </a>
-              ),
-            },
-            {
-              title: currentFile?.name || t("chat.breadcrumbChat"),
-            },
-          ]}
-          className="mb-2 !text-lg"
-        />
-
         <ChatView
           activeFile={currentFile}
           messages={messages}

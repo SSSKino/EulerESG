@@ -88,7 +88,7 @@ export function NewSidebar({
             <div key={primary}>
               <button
                 onClick={() => onTogglePrimary(primary)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-[color,background-color,border-color,box-shadow] duration-150 ease-[var(--motion-fluid)] ${
                   isActivePrimary
                     ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A]"
                     : "bg-transparent border border-transparent text-[#0F172A] hover:bg-slate-50"
@@ -122,7 +122,7 @@ export function NewSidebar({
                                 }
                                 onSelectSecondary(primary, secondary);
                               }}
-                              className={`flex-1 min-w-0 flex items-center text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                              className={`flex-1 min-w-0 flex items-center text-left px-3 py-2 rounded-lg text-sm transition-[color,background-color,border-color,box-shadow] duration-150 ease-[var(--motion-fluid)] ${
                                 isSelectedSecondary
                                   ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
                                   : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
@@ -160,7 +160,7 @@ export function NewSidebar({
                                       e.stopPropagation();
                                       onSelectTertiary(primary, secondary, metricName);
                                     }}
-                                    className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-all ${
+                                    className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-[color,background-color,border-color,box-shadow] duration-150 ease-[var(--motion-fluid)] ${
                                       isSelectedMetric
                                         ? "bg-[#DBEAFE] border border-[#93C5FD] text-[#1E40AF] font-medium"
                                         : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
@@ -189,7 +189,7 @@ export function NewSidebar({
       <div className="mt-6 pt-4 border-t border-slate-200">
         <button
           onClick={() => onSelectDisclosure?.()}
-          className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all ${
+          className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-[color,background-color,border-color,box-shadow] duration-150 ease-[var(--motion-fluid)] ${
             viewMode === "disclosure"
               ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
               : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"

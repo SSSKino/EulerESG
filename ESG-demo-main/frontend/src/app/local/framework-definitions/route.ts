@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs/promises";
+import type { Dirent } from "node:fs";
 import path from "node:path";
 
 export const runtime = "nodejs";
@@ -87,7 +88,7 @@ async function walkJsonFiles(dir: string, depth = 0): Promise<string[]> {
     return [];
   }
 
-  let entries: Awaited<ReturnType<typeof fs.readdir>> = [];
+  let entries: Dirent<string>[] = [];
   try {
     entries = await fs.readdir(dir, { withFileTypes: true });
   } catch {

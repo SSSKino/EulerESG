@@ -1110,7 +1110,7 @@ useEffect(() => {
           </button>
         ) : null}
 
-        <div className={`${sidebarCollapsed ? "w-0 overflow-visible" : "w-[320px]"} flex-shrink-0 transition-all duration-200`}>
+        <div className={`${sidebarCollapsed ? "w-0 overflow-visible" : "w-[320px]"} flex-shrink-0 transition-[width] duration-200 ease-[var(--motion-fluid)]`}>
           <div className="sticky top-6">
             {!sidebarCollapsed && (recordsLoading ? (
               <div className="relative w-[320px]">

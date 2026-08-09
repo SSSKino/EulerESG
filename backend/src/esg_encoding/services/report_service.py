@@ -645,7 +645,16 @@ async def reprocess_report(
     if not source.is_file():
         raise HTTPException(status_code=404, detail="Report PDF is missing")
     if str(file_info.get("status") or "").lower() == "processing":
-        raise HTTPException(status_code=409, detail="Report is already being processed")
+        existing_job_id = str(file_info.get("processing_job_id") or "").strip()
+        if existing_job_id and snapshot_report_job(existing_job_id):
+            raise HTTPException(status_code=409, detail="Report is already being processed")
+        _patch_file_metadata(
+            file_id,
+            status="failed",
+            processing_stage="interrupted",
+            processing_progress=100,
+            processing_error="Processing was interrupted. A replacement job is being created.",
+        )
 
     job = create_report_job(file_id=file_id, filename=source.name, user_id=user_id)
     _patch_file_metadata(
@@ -774,23 +783,11 @@ async def upload_report(
         the shared ``ESGChatbot`` instance. Concurrent uploads still share global ``system_components``
         (last write wins); use one analysis at a time for stable chat context.
     """
-    # ===== DEBUG: Function called =====
-    logger.info(f"=== UPLOAD_REPORT ENDPOINT CALLED ===")
-    logger.info(f"File: {file.filename}")
-    logger.info(f"Framework: {framework}")
-    logger.info(f"Industry: {industry}")
-    logger.info(f"SemiIndustry: {semiIndustry}")
-    logger.info(f"GRI Sector: {griSector}, GRI Topic: {griTopic}")
-    logger.info(f"scopeSlugs: {scopeSlugs}")
-    logger.info(f"=== END DEBUG ===")
-    
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
     
     try:
-        logger.info("=== STARTING FILE PROCESSING ===")
         content = await file.read()
-        logger.info(f"File content read successfully, size: {len(content)} bytes")
 
         # 保存上传文件后立即返回，真正的 OCR / embedding / compliance 分析在后台线程中执行。
         file_info = file_manager.save_uploaded_file(
@@ -805,6 +802,15 @@ async def upload_report(
             user_id=user_id,
         )
         job = create_report_job(file_id=file_info["file_id"], filename=file.filename or "", user_id=user_id)
+        try:
+            scope_count = max(1, len(_parse_scope_slugs_json(scopeSlugs, semiIndustry or griTopic)))
+        except Exception:
+            # Logging metadata must never make an otherwise valid upload fail.
+            scope_count = 1
+        logger.info(
+            "Report upload accepted file_id={} job_id={} framework={} file_size={} scope_count={}",
+            file_info["file_id"], job["job_id"], framework or "", len(content), scope_count,
+        )
         _patch_file_metadata(
             file_info["file_id"],
             status="processing",

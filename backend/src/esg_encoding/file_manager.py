@@ -113,7 +113,7 @@ class FileManager:
         
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
-            logger.info(f"确保目录存在: {directory}")
+            logger.debug(f"Ensured storage directory: {directory}")
     
     def _load_metadata(self) -> Dict:
         """加载文件元数据"""
@@ -134,6 +134,48 @@ class FileManager:
         except Exception as e:
             logger.error(f"保存元数据失败: {e}")
     
+    def recover_interrupted_reports(self) -> Dict[str, int]:
+        """Normalize in-memory report jobs lost when the backend stopped."""
+        recovered = {"completed": 0, "interrupted": 0}
+        changed = False
+        now = datetime.now().isoformat()
+        for info in self.metadata.get("files", {}).values():
+            if not isinstance(info, dict) or info.get("file_type") != "report":
+                continue
+            if str(info.get("status") or "").strip().lower() != "processing":
+                continue
+            stage = str(info.get("processing_stage") or "").strip().lower()
+            previous_job_id = info.pop("processing_job_id", None)
+            if previous_job_id:
+                info["interrupted_job_id"] = previous_job_id
+            if stage == "completed":
+                info.update({
+                    "status": "processed",
+                    "processing_stage": "completed",
+                    "processing_progress": 100,
+                    "processing_error": None,
+                })
+                recovered["completed"] += 1
+            else:
+                info.update({
+                    "status": "failed",
+                    "processing_stage": "interrupted",
+                    "processing_progress": 100,
+                    "processing_error": "Processing was interrupted by a backend restart. Please reprocess the report.",
+                })
+                recovered["interrupted"] += 1
+            history = info.setdefault("processing_history", [])
+            if isinstance(history, list):
+                history.append({"time": now, "stage": "interrupted_recovery", "previous_stage": stage})
+            changed = True
+        if changed:
+            self._save_metadata()
+            logger.warning(
+                "Recovered report metadata completed={} interrupted={}",
+                recovered["completed"], recovered["interrupted"],
+            )
+        return recovered
+
     def _generate_file_hash(self, file_path: Path) -> str:
         """生成文件哈希值"""
         hash_md5 = hashlib.md5()

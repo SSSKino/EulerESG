@@ -2,9 +2,23 @@
  * ESG Backend API Service
  */
 
+import { errorSummary } from "@/lib/logger";
+
 // Prefer same-origin proxy via Next.js rewrites. If you need to bypass Next,
 // set NEXT_PUBLIC_API_BASE_URL to a full backend URL.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
+// Keep large multipart uploads out of the Next.js rewrite proxy. Resolve the
+// exposed FastAPI port on the browser's current host so localhost and LAN
+// access use the same code path without hard-coding a machine address.
+const uploadApiBaseUrl = () => {
+  const configured = process.env.NEXT_PUBLIC_UPLOAD_API_BASE_URL;
+  if (configured) return configured.replace(/\/$/, "");
+  if (typeof window !== "undefined") {
+    return `${window.location.protocol}//${window.location.hostname}:8000`;
+  }
+  return API_BASE_URL;
+};
 
 export interface AuthResponse {
   token: string;
@@ -225,7 +239,21 @@ class APIService {
     const response = await fetch(url, this.withAuth(options));
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
-      throw new Error(errorData.detail || errorData.error || `HTTP ${response.status}`);
+      const rawDetail = errorData.detail ?? errorData.error;
+      const detail = Array.isArray(rawDetail)
+        ? rawDetail
+            .map((item) => {
+              if (typeof item === "string") return item;
+              const location = Array.isArray(item?.loc) ? item.loc.join(".") : "request";
+              return `${location}: ${item?.msg || JSON.stringify(item)}`;
+            })
+            .join("; ")
+        : typeof rawDetail === "string"
+          ? rawDetail
+          : rawDetail
+            ? JSON.stringify(rawDetail)
+            : `HTTP ${response.status}`;
+      throw new Error(detail);
     }
     return response.json();
   }
@@ -335,12 +363,10 @@ class APIService {
         ? `?scope_key=${encodeURIComponent(String(scopeKey).trim())}`
         : "";
     const url = `${API_BASE_URL}/api/files/${fileId}${q}`;
-    console.log(`Calling DELETE ${url}`);
     const result = await this.fetchWithError(url, {
       method: "DELETE",
     });
     if (!scopeKey) this.invalidateVisualAssetCache(fileId);
-    console.log("Delete API response:", result);
     return result;
   }
 
@@ -363,7 +389,7 @@ class APIService {
     if (griSector) formData.append("griSector", griSector);
     if (griTopic) formData.append("griTopic", griTopic);
     if (scopeSlugs) formData.append("scopeSlugs", scopeSlugs);
-    return this.fetchWithError(`${API_BASE_URL}/api/upload-report`, {
+    return this.fetchWithError(`${uploadApiBaseUrl()}/api/upload-report`, {
       method: "POST",
       body: formData,
     });
@@ -390,7 +416,7 @@ class APIService {
     if (options.griSector) formData.append("griSector", options.griSector);
     if (options.griTopic) formData.append("griTopic", options.griTopic);
     if (options.scopeSlugs) formData.append("scopeSlugs", options.scopeSlugs);
-    return this.fetchWithError(`${API_BASE_URL}/api/report-batches`, {
+    return this.fetchWithError(`${uploadApiBaseUrl()}/api/report-batches`, {
       method: "POST",
       body: formData,
     });
@@ -459,7 +485,7 @@ class APIService {
       try {
         return JSON.parse(event.data) as ReportJobEvent;
       } catch (error) {
-        console.warn("Failed to parse report job SSE event", error, event.data);
+        console.warn(`Failed to parse report job SSE event: ${errorSummary(error)}`);
         return null;
       }
     };
@@ -475,7 +501,7 @@ class APIService {
           handleData(result.job);
         } catch (error) {
           // Keep polling. A transient network failure should not hide progress forever.
-          console.warn("Report job polling failed", error);
+          console.warn(`Report job polling failed: ${errorSummary(error)}`);
         }
       }, 2000);
     };
@@ -499,7 +525,7 @@ class APIService {
         startPollingFallback();
       });
     } catch (error) {
-      console.warn("Report job SSE failed to start; using polling fallback", error);
+      console.warn(`Report job SSE failed to start; using polling fallback: ${errorSummary(error)}`);
       startPollingFallback();
     }
 

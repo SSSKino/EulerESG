@@ -17,7 +17,8 @@ def test_normalize_bbox_supports_polygon_and_clamps():
     assert normalize_bbox([-1, 0, 4, 2]) == [0.0, 0.0, 1.0, 1.0]
 
 
-def test_assets_are_deduplicated_and_path_is_allow_listed(tmp_path: Path):
+def test_assets_are_deduplicated_and_path_is_allow_listed(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("PADDLEOCR_KEEP_LAYOUT_AUDIT", "true")
     output = tmp_path / "worker" / "page_0002_part_01"
     output.mkdir(parents=True)
     (output / "chart.png").write_bytes(b"not-a-real-png-but-stable")
@@ -51,6 +52,22 @@ def test_assets_are_deduplicated_and_path_is_allow_listed(tmp_path: Path):
     assert manifest["tables"][0]["page_number"] == 2
     assert manifest["tables"][0]["structure_confidence"] == 0.93
     assert manifest["tables"][0]["ocr_confidence"] == 0.94
+
+
+def test_layout_audit_is_omitted_by_default(tmp_path: Path, monkeypatch):
+    monkeypatch.delenv("PADDLEOCR_KEEP_LAYOUT_AUDIT", raising=False)
+    output = tmp_path / "worker" / "page_0001"
+    output.mkdir(parents=True)
+    (output / "layout.json").write_text('{"type":"text","text":"hello"}', encoding="utf-8")
+    pdf = tmp_path / "report.pdf"
+    pdf.write_bytes(b"pdf")
+
+    promote_visual_assets(tmp_path / "worker", pdf)
+
+    destination = tmp_path / "report_visual_assets"
+    manifest = json.loads((destination / "manifest.json").read_text(encoding="utf-8"))
+    assert "layout_audit" not in manifest
+    assert not (destination / "layout_audit.json").exists()
 
 
 def test_manifest_cache_reuses_and_invalidates_by_mtime(tmp_path: Path):
