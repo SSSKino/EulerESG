@@ -8,6 +8,19 @@ import { errorSummary } from "@/lib/logger";
 // set NEXT_PUBLIC_API_BASE_URL to a full backend URL.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
+class ApiRequestError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiRequestError";
+    this.status = status;
+  }
+}
+
+const wait = (milliseconds: number) =>
+  new Promise<void>((resolve) => globalThis.setTimeout(resolve, milliseconds));
+
 // Keep large multipart uploads out of the Next.js rewrite proxy. Resolve the
 // exposed FastAPI port on the browser's current host so localhost and LAN
 // access use the same code path without hard-coding a machine address.
@@ -238,7 +251,14 @@ class APIService {
   private async fetchWithError(url: string, options?: RequestInit) {
     const response = await fetch(url, this.withAuth(options));
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+      const responseText = await response.text();
+      let errorData: any = {};
+      try {
+        errorData = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        // Next's proxy can return a plain-text/HTML 5xx response while the
+        // backend is restarting. Do not expose that response body to the UI.
+      }
       const rawDetail = errorData.detail ?? errorData.error;
       const detail = Array.isArray(rawDetail)
         ? rawDetail
@@ -252,8 +272,10 @@ class APIService {
           ? rawDetail
           : rawDetail
             ? JSON.stringify(rawDetail)
-            : `HTTP ${response.status}`;
-      throw new Error(detail);
+            : response.status >= 500
+              ? `Backend temporarily unavailable (HTTP ${response.status})`
+              : `HTTP ${response.status}`;
+      throw new ApiRequestError(detail, response.status);
     }
     return response.json();
   }
@@ -363,11 +385,35 @@ class APIService {
         ? `?scope_key=${encodeURIComponent(String(scopeKey).trim())}`
         : "";
     const url = `${API_BASE_URL}/api/files/${fileId}${q}`;
-    const result = await this.fetchWithError(url, {
-      method: "DELETE",
-    });
-    if (!scopeKey) this.invalidateVisualAssetCache(fileId);
-    return result;
+    // DELETE is idempotent, so retry brief backend/proxy outages. This also
+    // covers the case where the backend deleted the file but the response was
+    // lost while the container or proxy was restarting.
+    const maxAttempts = 3;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        const result = await this.fetchWithError(url, { method: "DELETE" });
+        if (!scopeKey) this.invalidateVisualAssetCache(fileId);
+        return result;
+      } catch (error) {
+        const status = error instanceof ApiRequestError ? error.status : undefined;
+
+        // DELETE's requested end state is already satisfied when the record is
+        // gone. Treat 404 as idempotent success so stale dashboard rows can be
+        // removed instead of reappearing forever after a refresh race.
+        if (status === 404) {
+          if (!scopeKey) this.invalidateVisualAssetCache(fileId);
+          return { status: "success", already_deleted: true };
+        }
+
+        const transient = status === undefined || status >= 500;
+        if (!transient || attempt === maxAttempts) throw error;
+
+        await wait(300 * 2 ** (attempt - 1));
+      }
+    }
+
+    throw new Error("Unable to delete file");
   }
 
   // Upload PDF report (SASB: industry + semiIndustry; GRI: griSector + griTopic)

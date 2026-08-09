@@ -213,7 +213,7 @@ export const useFileStore = create<FileStore>()(
         })),
       deleteFile: async (fileId, scopeKey) => {
         try {
-          const result = await apiService.deleteFile(fileId, scopeKey);
+          await apiService.deleteFile(fileId, scopeKey);
 
           const sk = scopeKey && String(scopeKey).trim() ? String(scopeKey).trim() : "";
           set((state) => ({
@@ -222,14 +222,16 @@ export const useFileStore = create<FileStore>()(
               if (sk) return file.analysis_scope_key !== sk;
               return false;
             }),
+            selectedFileId: !sk && state.selectedFileId === fileId ? null : state.selectedFileId,
           }));
-
-          // Refresh file list from backend
-          await get().loadFilesFromBackend();
         } catch (error) {
           console.error(`Failed to delete file from backend: ${errorSummary(error)}`);
           throw error;
         }
+
+        // Deletion already succeeded. Keep a temporary list-refresh failure
+        // from being reported to the user as a failed deletion.
+        await get().loadFilesFromBackend({ showLoading: false });
       },
       setSelectedFileId: (fileId) =>
         set(() => ({

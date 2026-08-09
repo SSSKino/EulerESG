@@ -8,6 +8,7 @@ import { useFileStore } from "@/store/useFileStore";
 import { canCrossAnalyzeFiles } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import { useT } from "@/i18n/useT";
+import { errorSummary } from "@/lib/logger";
 
 interface FileTableProps {
   onChatClick: (file: File) => void;
@@ -49,6 +50,8 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [favouriteReportKeys, setFavouriteReportKeys] = useState<Set<string>>(new Set());
+  const [deleteTarget, setDeleteTarget] = useState<File | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     try {
@@ -108,6 +111,31 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
       return;
     }
     router.push(`/cross-analysis?ids=${encodeURIComponent(ids.join(","))}`);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const target = deleteTarget;
+    if (!target) return;
+    if (!target.file_id) {
+      void message.error(lang === "zh" ? "删除失败：报告 ID 缺失" : "Delete failed: missing report ID");
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      // This action means deleting the report itself. Never pass a scope key
+      // here, otherwise a multi-scope row would only remove one assessment and
+      // the PDF would reappear after the list refresh.
+      await useFileStore.getState().deleteFile(target.file_id);
+      onSelectionChange(selectedRows.filter((row) => row.file_id !== target.file_id));
+      setDeleteTarget(null);
+      void message.success(lang === "zh" ? "文件已删除" : "File deleted");
+    } catch (error) {
+      const detail = errorSummary(error);
+      void message.error(lang === "zh" ? `删除失败：${detail}` : `Delete failed: ${detail}`);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const dataSource = useMemo<FileTableRow[]>(() => {
@@ -346,16 +374,7 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
                   return;
                 }
                 if (key !== "delete") return;
-                Modal.confirm({
-                  title: t("files.deleteTitle"),
-                  content: t("files.deleteDesc"),
-                  okText: t("common.yes"),
-                  cancelText: t("common.no"),
-                  okButtonProps: { danger: true },
-                  onOk: async () => {
-                    await useFileStore.getState().deleteFile(file.file_id!, file.analysis_scope_key);
-                  },
-                });
+                setDeleteTarget(file);
               },
             }}
           >
@@ -395,7 +414,8 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
   };
 
   return (
-    <div className="mt-4 bg-white rounded-lg shadow-sm">
+    <>
+      <div className="mt-4 bg-white rounded-lg shadow-sm">
       <div className="p-3 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-700">{t("files.title")}</h3>
         <div className="flex items-center space-x-2">
@@ -444,7 +464,28 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
           />
         )}
       </div>
-    </div>
+      </div>
+      <Modal
+        open={Boolean(deleteTarget)}
+        title={t("files.deleteTitle")}
+        okText={t("common.yes")}
+        cancelText={t("common.no")}
+        okButtonProps={{ danger: true }}
+        confirmLoading={deleting}
+        closable={!deleting}
+        maskClosable={!deleting}
+        keyboard={!deleting}
+        onOk={() => void handleDeleteConfirm()}
+        onCancel={() => {
+          if (!deleting) setDeleteTarget(null);
+        }}
+      >
+        <p>{t("files.deleteDesc")}</p>
+        {deleteTarget?.name ? (
+          <p className="mt-2 break-all text-sm font-medium text-slate-700">{deleteTarget.name}</p>
+        ) : null}
+      </Modal>
+    </>
   );
 };
 

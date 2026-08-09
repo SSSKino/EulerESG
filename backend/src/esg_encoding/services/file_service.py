@@ -1,5 +1,7 @@
 """File management service functions."""
 
+import shutil
+
 from .common import *  # noqa: F401,F403
 from ..visual_assets import invalidate_visual_manifest, load_visual_manifest, safe_asset_path, visual_asset_dir
 
@@ -201,9 +203,18 @@ async def delete_file(
     if not file_info:
         raise HTTPException(status_code=404, detail="File not found or access denied")
 
+    # get_file_info also supports legacy filename aliases. All destructive
+    # operations must use the canonical metadata key, otherwise the artifacts
+    # can be removed before ``del metadata[alias]`` raises a KeyError.
+    canonical_file_id = str(
+        file_manager.resolve_file_id(file_id, user_id=user_id)
+        or file_info.get("file_id")
+        or file_id
+    )
+
     sk = (scope_key or "").strip()
     if sk and file_info.get("file_type") == "report":
-        partial = _try_delete_one_scope_only(file_id, file_info, sk)
+        partial = _try_delete_one_scope_only(canonical_file_id, file_info, sk)
         if partial is not None:
             return partial
 
@@ -241,9 +252,9 @@ async def delete_file(
             deleted_items.append(f"Visual assets: {asset_dir.name}")
 
         embeddings_paths = [
-            Path(file_manager.embeddings_outputs) / f"{file_id}_segments.json",
-            Path(file_manager.embeddings_outputs) / f"{file_id}_embeddings.npz",
-            Path(file_manager.embeddings_outputs) / f"{file_id}_embeddings_meta.json",
+            Path(file_manager.embeddings_outputs) / f"{canonical_file_id}_segments.json",
+            Path(file_manager.embeddings_outputs) / f"{canonical_file_id}_embeddings.npz",
+            Path(file_manager.embeddings_outputs) / f"{canonical_file_id}_embeddings_meta.json",
             # Legacy variants (best-effort)
             Path(file_manager.embeddings_outputs) / f"{stem}_embeddings.json",
             Path(file_manager.embeddings_outputs) / f"{stem}_embeddings.npy",
@@ -255,16 +266,16 @@ async def delete_file(
                 deleted_items.append(f"嵌入文件: {emb_path.name}")
 
         # 4. 删除合规输出：uploads/outputs/compliance_reports（JSON / XLSX / manifest 及一切含 file_id 的合规文件）
-        _unlink_compliance_reports_dir_for_file_id(file_id, stem, deleted_items)
-        _unlink_compliance_markdown_for_file_id(file_id, deleted_items)
+        _unlink_compliance_reports_dir_for_file_id(canonical_file_id, stem, deleted_items)
+        _unlink_compliance_markdown_for_file_id(canonical_file_id, deleted_items)
 
         # Legacy location (older builds): backend/outputs
         legacy_outputs_dir = Path(__file__).resolve().parents[2] / "outputs"
         if legacy_outputs_dir.exists():
             legacy_paths: List[Path] = []
-            legacy_paths.extend(legacy_outputs_dir.glob(f"*{file_id}*.md"))
-            legacy_paths.extend(legacy_outputs_dir.glob(f"*{file_id}*compliance*.json"))
-            legacy_paths.extend(legacy_outputs_dir.glob(f"*{file_id}*compliance*.xlsx"))
+            legacy_paths.extend(legacy_outputs_dir.glob(f"*{canonical_file_id}*.md"))
+            legacy_paths.extend(legacy_outputs_dir.glob(f"*{canonical_file_id}*compliance*.json"))
+            legacy_paths.extend(legacy_outputs_dir.glob(f"*{canonical_file_id}*compliance*.xlsx"))
             for comp_path in legacy_paths:
                 if comp_path.is_file():
                     try:
@@ -283,7 +294,7 @@ async def delete_file(
             deleted_items.append("内存中的报告内容")
         
         current_assessment = system_components.get("current_assessment")
-        if current_assessment and hasattr(current_assessment, "report_id") and str(getattr(current_assessment, "report_id", "")) == str(file_id):
+        if current_assessment and hasattr(current_assessment, "report_id") and str(getattr(current_assessment, "report_id", "")) == canonical_file_id:
             system_components["current_assessment"] = None
             cleared_current = True
             deleted_items.append("内存中的评估结果")
@@ -312,25 +323,26 @@ async def delete_file(
                         deleted_items.append("聊天机器人上下文")
         
         # 7. 从元数据中删除
-        del file_manager.metadata["files"][file_id]
-        file_manager._save_metadata()
+        # pop + locked atomic persistence makes duplicate/concurrent DELETE
+        # requests safe and prevents a false success when disk persistence fails.
+        file_manager.remove_file_metadata(canonical_file_id)
 
         if company_id:
             try:
                 from ..company_registry import company_registry
                 from .company_report_service import schedule_company_reanalysis
 
-                remaining = company_registry.remove_report(company_id, file_id, user_id)
+                remaining = company_registry.remove_report(company_id, canonical_file_id, user_id)
                 if remaining and remaining.get("report_ids"):
                     schedule_company_reanalysis(company_id, user_id)
             except Exception as company_exc:
                 logger.warning(
-                    f"Company result refresh could not be queued after deleting {file_id}: "
+                    f"Company result refresh could not be queued after deleting {canonical_file_id}: "
                     f"{company_exc}"
                 )
         deleted_items.append("文件元数据")
         
-        logger.info(f"File and related data deleted: {file_id}")
+        logger.info(f"File and related data deleted: {canonical_file_id}")
         logger.info(f"Deleted items: {', '.join(deleted_items)}")
         
         return {

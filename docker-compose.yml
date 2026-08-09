@@ -215,6 +215,10 @@ services:
       dockerfile: Dockerfile
     image: euleresg-backend:dev
     container_name: euleresg-backend-dev
+    restart: unless-stopped
+    # Report analysis can run for tens of minutes. Allow graceful completion
+    # instead of Docker's default 10-second SIGKILL window during replacement.
+    stop_grace_period: 1h
     working_dir: /workspace/backend
     ports:
       - 8000:8000

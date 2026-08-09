@@ -13,6 +13,7 @@ from typing import Optional, Dict, List, Any
 from loguru import logger
 import hashlib
 import json
+import threading
 
 import numpy as np
 
@@ -69,6 +70,7 @@ class FileManager:
     """ESG系统文件管理器"""
 
     def __init__(self, base_upload_dir: str = "../../uploads"):
+        self._metadata_lock = threading.RLock()
         # Use absolute path from file location to ensure correct uploads directory
         # Path: backend/src/esg_encoding/ -> backend/ -> ESG DEMO/ -> uploads/
         if base_upload_dir == "../../uploads":
@@ -126,13 +128,42 @@ class FileManager:
         return {"files": {}, "sessions": {}}
     
     def _save_metadata(self):
-        """保存文件元数据"""
+        """Atomically persist metadata; never report success after a failed write."""
+        temp_path: Optional[Path] = None
         try:
-            self.metadata_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.metadata_file, 'w', encoding='utf-8') as f:
-                json.dump(self.metadata, f, ensure_ascii=False, indent=2)
+            with self._metadata_lock:
+                self.metadata_file.parent.mkdir(parents=True, exist_ok=True)
+                temp_path = self.metadata_file.with_name(
+                    f".{self.metadata_file.name}.{uuid.uuid4().hex}.tmp"
+                )
+                with open(temp_path, "w", encoding="utf-8") as f:
+                    json.dump(self.metadata, f, ensure_ascii=False, indent=2)
+                    f.flush()
+                    os.fsync(f.fileno())
+                os.replace(temp_path, self.metadata_file)
         except Exception as e:
             logger.error(f"保存元数据失败: {e}")
+            if temp_path is not None:
+                try:
+                    temp_path.unlink(missing_ok=True)
+                except Exception:
+                    pass
+            raise
+
+    def remove_file_metadata(self, file_id: str) -> bool:
+        """Remove one metadata record and persist it as one locked operation."""
+        with self._metadata_lock:
+            files = self.metadata.setdefault("files", {})
+            removed = files.pop(file_id, None)
+            if removed is None:
+                return False
+            try:
+                self._save_metadata()
+            except Exception:
+                # Keep memory and disk consistent when persistence fails.
+                files[file_id] = removed
+                raise
+            return True
     
     def recover_interrupted_reports(self) -> Dict[str, int]:
         """Normalize in-memory report jobs lost when the backend stopped."""
