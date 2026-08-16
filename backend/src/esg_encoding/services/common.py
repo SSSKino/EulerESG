@@ -1671,6 +1671,105 @@ def _normalize_assessment_payload(payload: dict) -> dict:
     return payload
 
 
+def _compact_assessment_payload(payload: dict) -> dict:
+    """Project an assessment to the fields used by the single-report UI.
+
+    Persisted SASB assessments intentionally contain legacy/canonical duplicate
+    fields and a second ``sasb_metric_rows`` copy for exports.  Returning all of
+    that data makes the interactive report endpoint several times larger than
+    the page needs.  This projection leaves the default API response untouched
+    and is only used when the client explicitly requests ``compact=true``.
+    """
+    if not isinstance(payload, dict):
+        return {"metric_analyses": []}
+
+    top_level_fields = (
+        "report_id",
+        "assessment_date",
+        "filename",
+        "total_metrics",
+        "overall_score",
+        "total_metrics_analyzed",
+        "overall_compliance_score",
+        "framework",
+        "disclosure_summary",
+        "status",
+        "message",
+        "scope_key",
+        "requested_year",
+    )
+    metric_fields = (
+        "metric_id",
+        "metric_name",
+        "metric_code",
+        "disclosure_status",
+        "reasoning",
+        "unit",
+        "category",
+        "topic",
+        "type",
+        "value",
+        "page",
+        "context",
+        "definition",
+        "selected_year",
+        "value_status",
+        "year_selection_status",
+    )
+    evidence_fields = (
+        "asset_id",
+        "evidence_type",
+        "caption",
+        "confidence",
+        "chart_data",
+        "bbox",
+        "review_status",
+        "structure_confidence",
+        "ocr_confidence",
+        "header_path",
+        "rowspan",
+        "colspan",
+        "parse_pass",
+    )
+
+    compact = {
+        key: payload.get(key)
+        for key in top_level_fields
+        if key in payload
+    }
+    compact_metrics: List[Dict[str, Any]] = []
+    for raw_metric in payload.get("metric_analyses") or []:
+        if not isinstance(raw_metric, dict):
+            continue
+        metric = {
+            key: raw_metric.get(key)
+            for key in metric_fields
+            if key in raw_metric
+        }
+        evidence_sources: List[Dict[str, Any]] = []
+        for raw_source in raw_metric.get("evidence_sources") or []:
+            if not isinstance(raw_source, dict):
+                continue
+            source = {
+                key: raw_source.get(key)
+                for key in evidence_fields
+                if key in raw_source
+            }
+            conflicts = raw_source.get("conflicts")
+            if isinstance(conflicts, list) and conflicts:
+                # The report table only needs the count, not the potentially
+                # large conflict payloads.
+                source["conflicts"] = [{} for _ in conflicts]
+            if source:
+                evidence_sources.append(source)
+        metric["evidence_sources"] = evidence_sources
+        compact_metrics.append(metric)
+
+    compact["metric_analyses"] = compact_metrics
+    compact["response_view"] = "compact"
+    return compact
+
+
 def _apply_assessment_year_selection(payload: dict, target_year: Optional[int]) -> dict:
     """Project one requested year into legacy scalar fields without losing year_values."""
     if target_year is None:

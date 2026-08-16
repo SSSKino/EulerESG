@@ -22,6 +22,7 @@ from .models import (
     ReportContent,
     MetricCollection,
     RetrievalResult,
+    table_row_scope_key,
 )
 from .exceptions import DisclosureAnalysisError
 from .retrieval.metric_profile import (
@@ -1143,6 +1144,106 @@ class DisclosureInferenceEngine:
             ),
         )
 
+    def _direct_code_label_disclosure_analysis(
+        self,
+        retrieval_result: MetricRetrievalResult,
+        report_content: ReportContent,
+        metric: Optional['ESGMetric'],
+        segment_metadata: List[Dict],
+        evidence_segment_ids: List[str],
+        metric_profile: Optional[MetricRetrievalProfile] = None,
+    ) -> Optional[DisclosureAnalysis]:
+        """Accept an explicit current-code/current-label report statement as disclosure.
+
+        This fallback deliberately requires both identities.  A bare SASB code in a
+        navigation/index cell is still insufficient, while a report row that names
+        the exact code and exact metric cannot be reclassified by the LLM as
+        unrelated merely because table extraction failed to recover its value.
+        """
+        code_candidates = self._metric_code_candidates(retrieval_result, metric)
+        metric_name = str(
+            getattr(metric, "metric_name", None)
+            or retrieval_result.metric_name
+            or ""
+        ).strip()
+        if not code_candidates or not metric_name or not segment_metadata:
+            return None
+
+        metric_profile = metric_profile or self._resolve_metric_profile(metric, retrieval_result)
+        # One framework code can represent several separately assessed
+        # sub-metrics (for example, the TC-SI-330a.3 representation splits).
+        # Code + label alone is not a safe shortcut for those rows because the
+        # LLM may still need to select the current component and its value.
+        if self._metric_code_is_shared(metric_profile, code_candidates):
+            return None
+
+        best_hit: Optional[Dict[str, Any]] = None
+        for meta in segment_metadata:
+            segment_id = meta.get("segment_id")
+            if not segment_id:
+                continue
+            try:
+                segment = self._get_segment_by_id(report_content, segment_id)
+            except Exception:
+                segment = None
+            if segment is None:
+                continue
+            evidence_text, _ = self._direct_evidence_bundle_for_segment(
+                report_content, segment, code_candidates, metric_profile
+            )
+            if not self._contains_metric_code(evidence_text, code_candidates):
+                continue
+            label_matches = (
+                self._profile_component_matches(evidence_text, metric_profile)
+                if metric_profile is not None
+                else content_contains_alias(evidence_text, metric_name)
+            )
+            if not label_matches:
+                continue
+            hit = {
+                "segment_id": segment_id,
+                "page": getattr(segment, "page_number", None) or meta.get("page_number"),
+                "context": self._format_short_metadata_value(evidence_text, 1400),
+                "score": float(meta.get("score", 0) or 0),
+            }
+            if best_hit is None or hit["score"] > best_hit["score"]:
+                best_hit = hit
+
+        if best_hit is None:
+            return None
+
+        code_text = "/".join(code_candidates[:2])
+        return DisclosureAnalysis(
+            metric_id=retrieval_result.metric_id,
+            metric_name=retrieval_result.metric_name,
+            metric_code=retrieval_result.metric_code,
+            disclosure_status=DisclosureStatus.FULLY_DISCLOSED,
+            reasoning=(
+                f"The report explicitly identifies the current metric by both its exact "
+                f"code ({code_text}) and metric label ({metric_name}). This direct "
+                "same-code statement is treated as disclosure even though no reliable "
+                "scalar value was recovered from the parsed segment."
+            ),
+            evidence_segments=list(dict.fromkeys([
+                best_hit["segment_id"], *(evidence_segment_ids or [])
+            ])),
+            improvement_suggestions=[],
+            category=getattr(metric, 'sasb_category', '') if metric else '',
+            topic=(getattr(metric, 'sasb_topic', None) or '') if metric else '',
+            unit=getattr(metric, 'unit', '') or '' if metric else '',
+            type=getattr(metric, 'sasb_type', '') if metric else '',
+            definition=(getattr(metric, 'definition', None) or '') if metric else '',
+            value=None,
+            value_status="unavailable",
+            context=best_hit["context"],
+            page=best_hit["page"],
+            evidence_sources=self._build_evidence_sources(
+                segment_metadata,
+                preferred_segment_id=best_hit["segment_id"],
+                preferred_page=best_hit["page"],
+            ),
+        )
+
     @staticmethod
     def _estimate_evidence_tokens(
         segments: List[str],
@@ -1173,6 +1274,7 @@ class DisclosureInferenceEngine:
                     "table_row",
                     report_id,
                     str(meta.get("source_table_id")),
+                    str(meta.get("page_number") or ""),
                     str(meta.get("row_index")),
                 )
             elif meta.get("link_target_page") is not None:
@@ -1433,6 +1535,21 @@ class DisclosureInferenceEngine:
         )
         if direct_analysis is not None:
             return direct_analysis
+
+        # If parsing did not recover a scalar, an explicit report statement that
+        # contains both the exact current code and current metric label is still a
+        # deterministic disclosure.  This also prevents unrelated retrieved
+        # diversity/workforce passages from overruling the direct code evidence.
+        direct_label_analysis = self._direct_code_label_disclosure_analysis(
+            retrieval_result=retrieval_result,
+            report_content=report_content,
+            metric=metric,
+            segment_metadata=segment_metadata,
+            evidence_segment_ids=evidence_segment_ids,
+            metric_profile=metric_profile,
+        )
+        if direct_label_analysis is not None:
+            return direct_label_analysis
 
         prompt_segments = relevant_segments
         prompt_metadata = segment_metadata
@@ -2214,7 +2331,7 @@ Assessment principles:
         }
         table_rows: Dict[Tuple[str, int], List[Any]] = {}
         for segment in segments:
-            row_key = self._get_table_row_key(segment)
+            row_key = self._get_table_row_scope_key(segment)
             if row_key != (None, None):
                 table_rows.setdefault(row_key, []).append(segment)
 
@@ -2289,7 +2406,7 @@ Assessment principles:
         return None
 
     def _get_table_row_key(self, segment) -> Tuple[Optional[str], Optional[int]]:
-        """Return (source_table_id, row_index) for table/cell segments, with segment_id fallback."""
+        """Return the public table ID and row index, with segment ID fallback."""
         table_id = self._get_segment_field(
             segment,
             "source_table_id", "table_id", "source_table", "table_uid", "table_index", "source_table_index",
@@ -2308,6 +2425,17 @@ Assessment principles:
         if table_id is None or row_index is None:
             return None, None
         return str(table_id), row_index
+
+    def _get_table_row_scope_key(self, segment) -> Tuple[Optional[str], Optional[int]]:
+        """Return an internal report/page-scoped row key for joins and caches."""
+        table_id, row_index = self._get_table_row_key(segment)
+        if table_id is None or row_index is None:
+            return None, None
+        return table_row_scope_key(
+            segment,
+            table_id=table_id,
+            row_index=row_index,
+        ) or (None, None)
 
     def _get_table_column_index(self, segment) -> Optional[int]:
         col_index = self._get_segment_field(segment, "column_index", "col_index", "column_idx", "col_number", "source_column_index")
@@ -2447,7 +2575,7 @@ Assessment principles:
         code_candidates: Optional[List[str]] = None,
         metric_profile: Optional[MetricRetrievalProfile] = None,
     ) -> List[Dict[str, Any]]:
-        row_key = self._get_table_row_key(target_segment)
+        row_key = self._get_table_row_scope_key(target_segment)
         if row_key == (None, None):
             return []
         candidates: List[Dict[str, Any]] = []
@@ -2927,7 +3055,7 @@ Assessment principles:
                 # the deterministic fully-disclosed shortcut as a confirmed value.
                 continue
 
-            row_key = self._get_table_row_key(segment)
+            row_key = self._get_table_row_scope_key(segment)
             if row_key == (None, None) or row_key in seen_rows:
                 continue
             seen_rows.add(row_key)
@@ -2989,7 +3117,7 @@ Assessment principles:
             segment = self._get_segment_by_id(report_content, segment_id)
             if segment is None:
                 continue
-            row_key = self._get_table_row_key(segment)
+            row_key = self._get_table_row_scope_key(segment)
             if row_key == (None, None) or row_key in seen_rows:
                 continue
             seen_rows.add(row_key)
@@ -3106,17 +3234,19 @@ Assessment principles:
     ) -> Tuple[str, Optional[Union[int, float]], Optional[str], Optional[str]]:
         """Aggregate all cells from the same table row.
 
-        The row key is source_table_id + row_index, with segment_id fallback.
+        The row key is source report + table + page + row index, with a
+        segment-ID fallback for legacy segments.
         The returned context is for the LLM/UI only; it does not directly classify status.
         The numeric candidate is the latest-year cell in that row when a year can be identified.
         """
-        table_id, row_index = self._get_table_row_key(target_segment)
-        if table_id is None or row_index is None:
+        row_key = self._get_table_row_scope_key(target_segment)
+        if row_key == (None, None):
             return "", None, None, None
+        table_id, row_index = self._get_table_row_key(target_segment)
 
         row_segments = list(
             self._get_report_segment_cache(report_content)["table_rows"].get(
-                (table_id, row_index),
+                row_key,
                 [],
             )
         )

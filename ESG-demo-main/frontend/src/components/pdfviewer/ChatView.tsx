@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { Drawer } from "antd";
 import AnalysisResults from "./AnalysisResults";
@@ -47,8 +47,8 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   );
 };
 
-const PDFChatViewer = dynamic(() => import("./PDFChatViewer"), { ssr: false });
-const MemoizedPDFChatViewer = React.memo(PDFChatViewer);
+const PDFReportViewer = dynamic(() => import("./PDFEvidenceViewer"), { ssr: false });
+const MemoizedPDFReportViewer = React.memo(PDFReportViewer);
 // Use same-origin proxy via Next.js rewrites by default.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -59,6 +59,8 @@ interface Message {
 
 interface ChatViewProps {
   activeFile: FileData | null;
+  fileId?: string;
+  scopeKey?: string;
   messages: Message[];
   onSendMessage: (message: string) => void;
   onClearChat: () => void;
@@ -66,6 +68,8 @@ interface ChatViewProps {
 
 const ChatView: React.FC<ChatViewProps> = ({
   activeFile,
+  fileId,
+  scopeKey,
   messages,
   onSendMessage,
   onClearChat,
@@ -78,11 +82,13 @@ const ChatView: React.FC<ChatViewProps> = ({
   // Used to force a new navigation request even if the user clicks the same
   // page number repeatedly.
   const [targetPageNonce, setTargetPageNonce] = useState<number>(0);
+  const effectiveFileId = fileId || activeFile?.file_id;
+  const effectiveScopeKey = scopeKey || activeFile?.analysis_scope_key;
 
-  const navigateToPage = (page: number) => {
+  const navigateToPage = useCallback((page: number) => {
     setTargetPage(page);
     setTargetPageNonce((n) => n + 1);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col gap-6">
@@ -108,9 +114,9 @@ const ChatView: React.FC<ChatViewProps> = ({
 
         <div className="p-4">
           <AnalysisResults
-            fileId={activeFile?.file_id}
-            scopeKey={activeFile?.analysis_scope_key}
-            onPageNavigate={(page) => navigateToPage(page)}
+            fileId={effectiveFileId}
+            scopeKey={effectiveScopeKey}
+            onPageNavigate={navigateToPage}
             showTable={showAnalysisTable}
           />
         </div>
@@ -122,12 +128,15 @@ const ChatView: React.FC<ChatViewProps> = ({
           defaultOpen={true}
           className="w-full hover:shadow-lg"
         >
-          {activeFile?.type?.toUpperCase() === "PDF" && activeFile?.file_id ? (
+          {effectiveFileId && (!activeFile?.type || activeFile.type.toUpperCase() === "PDF") ? (
             <div className="overflow-hidden rounded-lg h-[70vh] min-h-[600px]">
-              <MemoizedPDFChatViewer
-                fileUrl={`${API_BASE_URL}/api/files/${activeFile.file_id}/pdf`}
-                targetPage={targetPage}
-                targetPageNonce={targetPageNonce}
+              <MemoizedPDFReportViewer
+                fileUrl={`${API_BASE_URL}/api/files/${effectiveFileId}/pdf`}
+                initialPage={targetPage || 1}
+                navigationNonce={targetPageNonce}
+                height="100%"
+                defaultZoom={1}
+                fitTo="width"
               />
             </div>
           ) : (

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Form, message, Progress } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useFileStore } from "@/store/useFileStore";
+import type { ReportCatalogMode } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
 import UploadArea from "./UploadArea";
 import UploadOptionsModal from "./UploadOptionsModal";
@@ -63,13 +64,20 @@ function formatReportJobMessage(fileName: string, event: any): string {
   return `${fileName}: ${userFacingJobMessage(event)}${progress}`;
 }
 
-const MainContent = () => {
+interface MainContentProps {
+  uploadMode: ReportCatalogMode;
+  onUploadModeChange: (mode: ReportCatalogMode) => void;
+}
+
+const MainContent: React.FC<MainContentProps> = ({
+  uploadMode,
+  onUploadModeChange,
+}) => {
   const { t } = useT();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUploadFiles, setSelectedUploadFiles] = useState<UploadFile[]>([]);
   const [selectedIndustry, setSelectedIndustry] = useState<string>("");
-  const [uploadMode, setUploadMode] = useState<"single" | "multi">("single");
   const [uploadSubmitting, setUploadSubmitting] = useState(false);
   const [activeReportJobs, setActiveReportJobs] = useState<Record<string, ActiveReportJob>>({});
   const [form] = Form.useForm<FileInfoFormValues>();
@@ -288,7 +296,7 @@ const MainContent = () => {
       <UploadArea
         onBeforeUpload={handleBeforeUpload}
         uploadMode={uploadMode}
-        onUploadModeChange={setUploadMode}
+        onUploadModeChange={onUploadModeChange}
       />
       <UploadOptionsModal
         isOpen={isModalOpen}

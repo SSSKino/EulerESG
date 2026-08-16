@@ -28,6 +28,7 @@ export default function ChatPage() {
 
   const queryFileId = searchParams.get("file_id");
   const queryScope = searchParams.get("scope");
+  const requestedFileId = queryFileId || selectedFileId || undefined;
 
   useEffect(() => {
     // Update the default greeting when switching language (only if the chat is still fresh)
@@ -53,7 +54,7 @@ export default function ChatPage() {
   }, [files, loadFilesFromBackend]);
 
   const currentFile = useMemo(() => {
-    const id = queryFileId || selectedFileId;
+    const id = requestedFileId;
     if (!id) return null;
     const cands = files.filter((f) => f.file_id === id);
     if (cands.length === 0) return null;
@@ -62,7 +63,7 @@ export default function ChatPage() {
       if (hit) return hit;
     }
     return cands[0];
-  }, [files, queryFileId, selectedFileId, queryScope]);
+  }, [files, requestedFileId, queryScope]);
 
   const handleSendMessage = async (userMessage: string) => {
     const effectiveFileId = queryFileId || selectedFileId;
@@ -125,6 +126,8 @@ export default function ChatPage() {
       <div className="w-[95%]">
         <ChatView
           activeFile={currentFile}
+          fileId={requestedFileId}
+          scopeKey={queryScope || undefined}
           messages={messages}
           onSendMessage={handleSendMessage}
           onClearChat={handleClearChat}

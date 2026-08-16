@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { clearAuth, getStoredAuth } from "@/lib/auth";
+import { apiService } from "@/lib/api";
 import { useAppLang } from "@/i18n/useAppLang";
 import { useT } from "@/i18n/useT";
 import { canCrossAnalyzeFiles, useFileStore } from "@/store/useFileStore";
@@ -97,6 +98,10 @@ export default function DashboardSidebar() {
     if (auth?.name || auth?.email) setDisplayName(auth.name || auth.email || "User");
   }, []);
 
+  useEffect(() => {
+    router.prefetch("/dashboard/chat");
+  }, [router]);
+
   const initials = useMemo(() => {
     const firstCharacter = displayName.trim().slice(0, 1);
     return (firstCharacter || "U").toUpperCase();
@@ -146,6 +151,12 @@ export default function DashboardSidebar() {
       }
       let target = `/dashboard/chat?file_id=${encodeURIComponent(report.file_id)}`;
       if (report.analysis_scope_key) target += `&scope=${encodeURIComponent(report.analysis_scope_key)}`;
+      apiService.prefetchAssessmentByFile(
+        report.file_id,
+        report.analysis_scope_key,
+        false,
+        true,
+      );
       setSelectorMode(null);
       router.push(target);
       return;
@@ -363,6 +374,12 @@ export default function DashboardSidebar() {
             onClick: () => {
               const key = reportKey(file);
               if (selectorMode !== "cross") {
+                apiService.prefetchAssessmentByFile(
+                  file.file_id,
+                  file.analysis_scope_key,
+                  false,
+                  true,
+                );
                 setSelectedReportKeys([key]);
                 return;
               }

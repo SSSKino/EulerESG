@@ -17,6 +17,7 @@ import re
 import time
 from typing import Dict, List, Optional, Sequence
 
+from ..models import table_row_scope_key
 from .scoring import *  # noqa: F401,F403
 from .fusion import exact_metric_rerank, rrf_fuse
 from .keyword import KeywordRetriever
@@ -63,13 +64,23 @@ class DualChannelRetriever:
                 report_content,
                 exact_code_results,
             )
+            link_trigger_results = self._select_link_trigger_results(
+                report_content,
+                exact_code_results,
+                exact_alias_results,
+            )
+            protected_exact_code_results = self._protected_exact_code_data_results(
+                report_content,
+                exact_code_results,
+                profile,
+            )
 
             linked_started = time.perf_counter()
             linked_page_results = self._search_linked_pages(
                 report_content,
                 metric,
                 profile,
-                exact_code_results + exact_alias_results + bm25_results,
+                link_trigger_results,
                 semantic_expansion,
             )
             linked_category_results = [
@@ -84,7 +95,9 @@ class DualChannelRetriever:
 
             # Internal links form a second, page-bounded retrieval pass. Once
             # that pass finds evidence, do not run or rerank whole-report dense
-            # candidates for the same metric.
+            # candidates for the same metric. A verified exact-Code table row
+            # that already contains real data remains protected: linked pages
+            # supplement that direct evidence instead of replacing it.
             linked_second_pass = bool(linked_page_results)
             semantic_started = time.perf_counter()
             semantic_results: List[RetrievalResult] = []
@@ -102,8 +115,13 @@ class DualChannelRetriever:
             semantic_elapsed = time.perf_counter() - semantic_started
 
             if linked_second_pass:
-                effective_keyword_results = linked_page_results
+                effective_keyword_results = self._retain_protected_exact_code_data(
+                    linked_page_results,
+                    protected_exact_code_results,
+                    capacity=len(linked_page_results) + len(protected_exact_code_results),
+                )
                 channel_results = {
+                    "exact_code": protected_exact_code_results,
                     "linked_page_category": linked_category_results,
                     "linked_page": linked_other_results,
                 }
@@ -126,6 +144,12 @@ class DualChannelRetriever:
                 channel_results=channel_results,
                 profile=profile,
             )
+            if protected_exact_code_results:
+                combined_results = self._retain_protected_exact_code_data(
+                    combined_results,
+                    protected_exact_code_results,
+                    capacity=len(combined_results) + len(protected_exact_code_results),
+                )
             if not linked_second_pass and link_code_context_results:
                 combined_results = self._retain_link_fallback_code_context(
                     combined_results,
@@ -153,6 +177,8 @@ class DualChannelRetriever:
                 f"keyword={keyword_elapsed:.2f}s, semantic={semantic_elapsed:.2f}s, "
                 f"linked={linked_elapsed:.2f}s, "
                 f"mode={'linked_second_pass' if linked_second_pass else 'whole_report'}, "
+                f"link_triggers={len(link_trigger_results)}, "
+                f"protected_exact_data={len(protected_exact_code_results)}, "
                 f"link_fallback_code_rows={len(link_code_context_results) if not linked_second_pass else 0}, "
                 f"discovery_candidates={len(exact_code_results) + len(exact_alias_results) + len(bm25_results)}"
             )
@@ -174,12 +200,7 @@ class DualChannelRetriever:
         data = data if isinstance(data, dict) else {}
         table_id = getattr(segment, "source_table_id", None) or data.get("table_id") or data.get("source_table_id")
         row_index = data.get("row_index", data.get("row_idx"))
-        if table_id is None or row_index is None:
-            return None
-        try:
-            return str(table_id), int(row_index)
-        except Exception:
-            return None
+        return table_row_scope_key(segment, table_id=table_id, row_index=row_index)
 
     @staticmethod
     def _segment_source_report(segment) -> tuple[Optional[str], Optional[str], Optional[int]]:
@@ -203,6 +224,150 @@ class DualChannelRetriever:
         if isinstance(key, tuple) and len(key) == 2:
             return str(key[0] or ""), int(key[1])
         return "", int(key)
+
+    @classmethod
+    def _select_link_trigger_results(
+        cls,
+        report_content: ReportContent,
+        exact_code_results: Sequence[RetrievalResult],
+        exact_alias_results: Sequence[RetrievalResult],
+    ) -> List[RetrievalResult]:
+        """Choose metric-identity evidence that is safe to follow as a PDF link.
+
+        Broad BM25 hits are deliberately excluded: an adjacent index row can
+        share words such as ``employees`` while pointing at a different SASB
+        metric. When exact-Code hits exist, prefer their logical table rows over
+        whole-table chunks so links from neighbouring rows cannot become roots.
+        Exact aliases are retained only as a fallback for reports that omit the
+        framework code entirely.
+        """
+        segments = list(report_content.document_content.segments or [])
+        by_id = {
+            str(getattr(segment, "segment_id", "") or ""): segment
+            for segment in segments
+        }
+
+        def dedupe(results: Sequence[RetrievalResult]) -> List[RetrievalResult]:
+            values: List[RetrievalResult] = []
+            seen = set()
+            for result in results:
+                segment_id = str(getattr(result, "segment_id", "") or "")
+                if not segment_id or segment_id in seen:
+                    continue
+                seen.add(segment_id)
+                values.append(result)
+            return values
+
+        exact_values = dedupe(exact_code_results)
+        if exact_values:
+            row_scoped = []
+            for result in exact_values:
+                segment = by_id.get(str(result.segment_id))
+                segment_type = str(getattr(segment, "segment_type", "") or "").lower()
+                retrieval_type = str(getattr(result, "retrieval_type", "") or "")
+                if "table_row_context" in retrieval_type or segment_type == "table_row":
+                    row_scoped.append(result)
+            return row_scoped or exact_values
+
+        alias_values = dedupe(exact_alias_results)
+        if not alias_values:
+            return []
+        scoped_aliases = []
+        for result in alias_values:
+            segment = by_id.get(str(result.segment_id))
+            segment_type = str(getattr(segment, "segment_type", "") or "").lower()
+            if segment_type and segment_type != "table":
+                scoped_aliases.append(result)
+        return scoped_aliases or alias_values
+
+    @classmethod
+    def _protected_exact_code_data_results(
+        cls,
+        report_content: ReportContent,
+        exact_code_results: Sequence[RetrievalResult],
+        profile,
+    ) -> List[RetrievalResult]:
+        """Return conflict-free exact-Code rows that contain real row data."""
+        segments = list(report_content.document_content.segments or [])
+        by_id = {
+            str(getattr(segment, "segment_id", "") or ""): segment
+            for segment in segments
+        }
+        by_row: Dict[tuple[str, int], List[object]] = {}
+        for segment in segments:
+            row_key = cls._row_key(segment)
+            if row_key is not None:
+                by_row.setdefault(row_key, []).append(segment)
+
+        protected: List[RetrievalResult] = []
+        seen = set()
+        scoped_results = cls._select_link_trigger_results(
+            report_content,
+            exact_code_results,
+            [],
+        )
+        for result in scoped_results:
+            if result.segment_id in seen:
+                continue
+            segment = by_id.get(str(result.segment_id))
+            if segment is None:
+                continue
+            row_key = cls._row_key(segment)
+            if row_key is None:
+                continue
+            row_segments = by_row.get(row_key, [])
+            if not cls._segment_has_real_data(segment, profile, row_segments):
+                continue
+
+            unresolved = False
+            for related in row_segments or [segment]:
+                data = getattr(related, "structured_data", None)
+                data = data if isinstance(data, dict) else {}
+                review_status = str(
+                    getattr(related, "review_status", None)
+                    or data.get("review_status")
+                    or ""
+                ).strip().lower()
+                conflicts = getattr(related, "conflicts", None) or data.get("conflicts") or []
+                if review_status == "needs_review" or bool(conflicts):
+                    unresolved = True
+                    break
+            if unresolved:
+                continue
+
+            retrieval_type = str(result.retrieval_type or "")
+            for label in ("real_data_evidence", "protected_exact_code_data"):
+                if label not in retrieval_type:
+                    retrieval_type += f"+{label}"
+            protected.append(result.model_copy(update={"retrieval_type": retrieval_type}))
+            seen.add(result.segment_id)
+        return protected
+
+    @staticmethod
+    def _retain_protected_exact_code_data(
+        results: Sequence[RetrievalResult],
+        required_results: Sequence[RetrievalResult],
+        capacity: int,
+    ) -> List[RetrievalResult]:
+        """Keep direct exact-Code data ahead of linked/reranked candidates."""
+        values = list(results)
+        by_id = {item.segment_id: item for item in values}
+        protected: List[RetrievalResult] = []
+        protected_ids = set()
+        for required in required_results:
+            if required.segment_id in protected_ids:
+                continue
+            protected_ids.add(required.segment_id)
+            selected = by_id.get(required.segment_id, required)
+            retrieval_type = str(selected.retrieval_type or "")
+            for label in ("real_data_evidence", "protected_exact_code_data"):
+                if label not in retrieval_type:
+                    retrieval_type += f"+{label}"
+            protected.append(selected.model_copy(update={"retrieval_type": retrieval_type}))
+
+        remaining = [item for item in values if item.segment_id not in protected_ids]
+        limit = max(len(protected), max(1, int(capacity or 1)))
+        return (protected + remaining)[:limit]
 
     @classmethod
     def _linked_code_context_results(

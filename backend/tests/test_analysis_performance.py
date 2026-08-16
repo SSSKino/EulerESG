@@ -7,12 +7,15 @@ from types import MethodType, SimpleNamespace
 import unittest
 from unittest.mock import patch
 
+import numpy as np
+
 from esg_encoding.disclosure_inference import DisclosureInferenceEngine
 from esg_encoding.models import (
     DocumentContent,
     ProcessingConfig,
     ReportContent,
     RetrievalResult,
+    SegmentEmbedding,
     TextSegment,
 )
 from esg_encoding.retrieval.keyword import KeywordRetriever
@@ -21,6 +24,7 @@ from esg_encoding.retrieval.semantic import SemanticRetriever
 from esg_encoding.retrieval.evidence_retriever import retrieve_metric_collection
 from esg_encoding.services.common import (
     _apply_assessment_year_selection,
+    _compact_assessment_payload,
     _prepare_metrics_for_retrieval,
 )
 
@@ -150,6 +154,85 @@ class QwenRerankerBatchTests(unittest.TestCase):
 
 
 class RetrievalCacheTests(unittest.TestCase):
+    @staticmethod
+    def _semantic_retriever() -> SemanticRetriever:
+        retriever = object.__new__(SemanticRetriever)
+        retriever.config = ProcessingConfig(similarity_threshold=0.0)
+        retriever.embedding_model = object()
+        retriever.reranker = None
+        retriever._reranker_initialized = True
+        retriever.reranker_top_k = 10
+        retriever._reranker_lock = threading.Lock()
+        return retriever
+
+    @staticmethod
+    def _semantic_segment() -> TextSegment:
+        return TextSegment(
+            segment_id="semantic-segment",
+            content="Total energy consumed was 10 GJ.",
+            page_number=1,
+            position_y=0,
+        )
+
+    def test_semantic_retrieval_accepts_legacy_embedding_lists(self):
+        segment = self._semantic_segment()
+        report = _report([segment])
+        report.embeddings = [
+            SegmentEmbedding(segment_id=segment.segment_id, embedding=[1.0, 0.0])
+        ]
+
+        with patch(
+            "esg_encoding.retrieval.semantic.encode_query_texts",
+            return_value=np.asarray([[1.0, 0.0]], dtype=np.float32),
+        ):
+            results = self._semantic_retriever().search_by_semantic(
+                report,
+                _metric(1),
+                apply_reranker=False,
+            )
+
+        self.assertEqual(results[0].segment_id, segment.segment_id)
+        cached_matrix = getattr(report, "_semantic_retrieval_embedding_cache")[1]
+        self.assertEqual(cached_matrix.shape, (1, 2))
+        self.assertEqual(cached_matrix.dtype, np.float32)
+
+    def test_semantic_retrieval_reuses_native_numpy_matrix(self):
+        segment = self._semantic_segment()
+        report = _report([segment])
+        native_matrix = np.asarray([[1.0, 0.0]], dtype=np.float32)
+        object.__setattr__(report, "_embedding_matrix", native_matrix)
+        object.__setattr__(report, "_embedding_segment_ids", [segment.segment_id])
+
+        with patch(
+            "esg_encoding.retrieval.semantic.encode_query_texts",
+            return_value=np.asarray([[1.0, 0.0]], dtype=np.float32),
+        ):
+            results = self._semantic_retriever().search_by_semantic(
+                report,
+                _metric(1),
+                apply_reranker=False,
+            )
+
+        self.assertEqual(results[0].segment_id, segment.segment_id)
+        self.assertIs(getattr(report, "_semantic_retrieval_embedding_cache")[1], native_matrix)
+
+    def test_semantic_retrieval_returns_empty_for_empty_numpy_matrix(self):
+        report = _report([])
+        object.__setattr__(report, "_embedding_matrix", np.empty((0, 2), dtype=np.float32))
+        object.__setattr__(report, "_embedding_segment_ids", [])
+
+        with patch(
+            "esg_encoding.retrieval.semantic.encode_query_texts",
+            return_value=np.asarray([[1.0, 0.0]], dtype=np.float32),
+        ):
+            results = self._semantic_retriever().search_by_semantic(
+                report,
+                _metric(1),
+                apply_reranker=False,
+            )
+
+        self.assertEqual(results, [])
+
     def test_bm25_corpus_is_tokenized_once_per_report(self):
         segments = [
             TextSegment(
@@ -292,6 +375,59 @@ class AssessmentYearSelectionTests(unittest.TestCase):
         self.assertIsNone(metric["page"])
         self.assertEqual(metric["selected_year"], 2021)
         self.assertEqual(metric["year_selection_status"], "not_available")
+
+
+class CompactAssessmentPayloadTests(unittest.TestCase):
+    def test_compact_view_keeps_ui_fields_and_drops_export_duplicates(self):
+        payload = {
+            "report_id": "report-1",
+            "framework": "SASB",
+            "sasb_metric_rows": [{"large": "duplicate export row" * 100}],
+            "metric_analyses": [
+                {
+                    "metric_id": "employee-engagement",
+                    "metric_name": "Employee engagement",
+                    "metric_code": "TC-SI-330a.2",
+                    "disclosure_status": "fully_disclosed",
+                    "reasoning": "Disclosed",
+                    "value": 87,
+                    "page": 108,
+                    "context": "Employee engagement: 87%",
+                    "definition": "Percentage of employees who are engaged.",
+                    "evidence_segments": ["large-segment" * 100],
+                    "year_values": [{"year": 2024, "value": 87}],
+                    "evidence_sources": [
+                        {
+                            "asset_id": "asset-1",
+                            "caption": "Engagement chart",
+                            "confidence": 0.9,
+                            "private_debug_payload": "drop-me",
+                        },
+                        {
+                            "review_status": "needs_review",
+                            "structure_confidence": 0.8,
+                            "conflicts": [{"large": "secret"}, {"large": "secret-2"}],
+                        },
+                    ],
+                    "Value": 87,
+                    "Context": "Employee engagement: 87%",
+                }
+            ],
+        }
+
+        compact = _compact_assessment_payload(payload)
+
+        self.assertEqual(compact["response_view"], "compact")
+        self.assertNotIn("sasb_metric_rows", compact)
+        metric = compact["metric_analyses"][0]
+        self.assertEqual(metric["value"], 87)
+        self.assertEqual(metric["page"], 108)
+        self.assertEqual(metric["context"], "Employee engagement: 87%")
+        self.assertNotIn("evidence_segments", metric)
+        self.assertNotIn("year_values", metric)
+        self.assertNotIn("Value", metric)
+        self.assertNotIn("private_debug_payload", metric["evidence_sources"][0])
+        self.assertEqual(len(metric["evidence_sources"][1]["conflicts"]), 2)
 
 
 if __name__ == "__main__":

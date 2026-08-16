@@ -3,6 +3,10 @@
 from .common import *  # noqa: F401,F403
 from fastapi import Header, Query
 from fastapi.responses import StreamingResponse
+import shutil
+import tempfile
+
+import numpy as np
 
 from ..auth.service import get_user_id_from_authorization
 from ..gpu_model_lifecycle import with_backend_model_task
@@ -15,6 +19,9 @@ from .report_jobs import (
     snapshot_report_job,
     update_report_job,
 )
+
+
+_report_reanalysis_lock = threading.RLock()
 
 
 def _runtime_resource_snapshot() -> dict:
@@ -51,7 +58,9 @@ def _patch_file_metadata(file_id: str, **updates) -> None:
     try:
         finfo = file_manager.metadata.get("files", {}).get(file_id)
         if isinstance(finfo, dict):
-            finfo.update({k: v for k, v in updates.items() if v is not None})
+            # ``None`` is meaningful for terminal transitions: it clears a
+            # stale job id or error left by an earlier/retried run.
+            finfo.update(updates)
             file_manager._save_metadata()
     except Exception as exc:
         logger.debug(f"File metadata patch skipped for {file_id}: {exc}")
@@ -87,8 +96,559 @@ def _ocr_progress_metadata_updates(extra: Optional[dict]) -> dict:
     }
 
 
+def _report_progress_metadata_updates(
+    *,
+    stage: str,
+    message: str,
+    progress: Optional[float],
+    job_id: str,
+    extra: Optional[dict],
+) -> dict:
+    """Map a progress event to durable dashboard state.
+
+    The in-memory job remains ``processing`` until the final event containing
+    the result is emitted.  File metadata, however, must not be changed back to
+    ``processing`` after the processing body has reached a terminal stage.
+    """
+    normalized_stage = str(stage or "").strip().lower()
+    terminal_status = {
+        "completed": "processed",
+        "partial_success": "processed",
+        "failed": "failed",
+    }.get(normalized_stage)
+    is_terminal = terminal_status is not None
+    updates = {
+        "status": terminal_status or "processing",
+        "processing_job_id": None if is_terminal else job_id,
+        "processing_stage": normalized_stage or stage,
+    }
+    if progress is not None or is_terminal:
+        updates["processing_progress"] = 100 if progress is None else progress
+    if is_terminal:
+        raw_error = extra.get("error") if isinstance(extra, dict) else None
+        updates["processing_error"] = (
+            None
+            if normalized_stage == "completed"
+            else str(raw_error or message or "Processing completed with warnings.")[:1000]
+        )
+    updates.update(_ocr_progress_metadata_updates(extra))
+    return updates
+
+
 def _format_sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+def _report_artifact_conflict(detail: str) -> HTTPException:
+    return HTTPException(status_code=409, detail=detail)
+
+
+def _load_validated_report_artifacts(file_id: str) -> dict:
+    """Load the immutable report retrieval corpus and validate its row mapping.
+
+    Assessment-only reanalysis must never reconstruct missing embeddings.  A
+    missing/corrupt artifact, or any ambiguity between segment rows and the
+    persisted NumPy matrix, is therefore a conflict that requires a full
+    reprocess instead of an implicit OCR/embedding fallback.
+    """
+    artifacts = file_manager.load_report_artifacts(file_id)
+    if not artifacts:
+        raise _report_artifact_conflict(
+            "Persisted report segments and embeddings are unavailable; reprocess the report first."
+        )
+
+    segments = list(artifacts.get("segments") or [])
+    matrix = artifacts.get("embedding_matrix")
+    embedding_segment_ids = [
+        str(value) for value in (artifacts.get("embedding_segment_ids") or [])
+    ]
+    segment_ids = [str(getattr(segment, "segment_id", "") or "") for segment in segments]
+
+    valid_matrix = (
+        isinstance(matrix, np.ndarray)
+        and matrix.ndim == 2
+        and matrix.shape[0] > 0
+        and matrix.shape[1] > 0
+    )
+    row_mapping_matches = (
+        bool(segments)
+        and valid_matrix
+        and matrix.shape[0] == len(segments)
+        and len(embedding_segment_ids) == len(segments)
+        and embedding_segment_ids == segment_ids
+        and all(segment_ids)
+        and len(set(segment_ids)) == len(segment_ids)
+    )
+    if not row_mapping_matches:
+        raise _report_artifact_conflict(
+            "Persisted report artifacts are inconsistent; segment and embedding rows must match exactly."
+        )
+    if not np.issubdtype(matrix.dtype, np.number):
+        raise _report_artifact_conflict(
+            "Persisted report embeddings have an invalid numeric format."
+        )
+    return artifacts
+
+
+def _report_content_from_artifacts(file_info: dict, artifacts: dict) -> ReportContent:
+    file_id = str(file_info.get("file_id") or "")
+    segments = list(artifacts["segments"])
+    document_content = DocumentContent(
+        document_id=file_id,
+        file_path=str(file_info.get("file_path") or ""),
+        segments=segments,
+        markdown_content="\n\n".join(
+            str(getattr(segment, "content", "") or "") for segment in segments
+        ),
+    )
+    report_content = ReportContent(
+        document_id=file_id,
+        document_content=document_content,
+        # Keep the legacy Python-list representation empty.  Retrieval reads
+        # the validated native matrix attached below and must not regenerate it.
+        embeddings=[],
+    )
+    object.__setattr__(report_content, "_embedding_matrix", artifacts["embedding_matrix"])
+    object.__setattr__(
+        report_content,
+        "_embedding_segment_ids",
+        list(artifacts["embedding_segment_ids"]),
+    )
+    return report_content
+
+
+def _reanalysis_scopes(file_info: dict) -> tuple[str, List[tuple[str, dict]]]:
+    fw = str(file_info.get("framework") or "").strip().upper()
+    raw_scopes = file_info.get("scope_slugs_json")
+    if isinstance(raw_scopes, list):
+        raw_scopes = json.dumps(raw_scopes, ensure_ascii=False)
+
+    scopes: List[tuple[str, dict]] = []
+    if fw == "GRI":
+        sector = str(file_info.get("gri_sector") or "").strip()
+        topics = _parse_scope_slugs_json(raw_scopes, file_info.get("gri_topic"))
+        if not sector or not topics:
+            raise _report_artifact_conflict(
+                "The report metadata does not contain the GRI sector and topic required for reanalysis."
+            )
+        scopes = [(topic, {"griSector": sector, "griTopic": topic}) for topic in topics]
+    elif fw == "SASB":
+        semis = _parse_scope_slugs_json(raw_scopes, file_info.get("semi_industry"))
+        if not semis:
+            raise _report_artifact_conflict(
+                "The report metadata does not contain a SASB sub-industry required for reanalysis."
+            )
+        scopes = [(semi, {"semiIndustry": semi}) for semi in semis]
+    elif fw in {"CDP", "TCFD"}:
+        topics = _parse_scope_slugs_json(raw_scopes, file_info.get("semi_industry"))
+        if not topics:
+            raise _report_artifact_conflict(
+                f"The report metadata does not contain a {fw} topic required for reanalysis."
+            )
+        scopes = [(topic, {"semiIndustry": topic}) for topic in topics]
+    else:
+        raise _report_artifact_conflict(
+            "The report metadata does not contain a supported assessment framework."
+        )
+    return fw, scopes
+
+
+def _load_reanalysis_scope_metrics(
+    processor,
+    fw: str,
+    scope_key: str,
+    params: dict,
+):
+    if fw == "GRI":
+        metrics = processor.load_gri_metrics_by_sector_topic(
+            params["griSector"], params["griTopic"]
+        )
+        semi_for_disclosure = (
+            f"GRI {params['griSector']} {params['griTopic']}".strip()
+        )
+        filename_part = _sanitize_compliance_filename_part(
+            f"GRI_{params['griSector']}_{params['griTopic']}"
+        )
+    elif fw == "SASB":
+        metrics = processor.load_sasb_metrics_by_industry(params["semiIndustry"])
+        semi_for_disclosure = params["semiIndustry"]
+        filename_part = _sanitize_compliance_filename_part(params["semiIndustry"])
+    elif fw == "CDP":
+        metrics = processor.load_cdp_metrics_by_topic(params["semiIndustry"])
+        semi_for_disclosure = params["semiIndustry"] or "CDP"
+        filename_part = _sanitize_compliance_filename_part(
+            f"CDP_{params['semiIndustry']}"
+        )
+    else:
+        metrics = processor.load_tcfd_metrics_by_topic(params["semiIndustry"])
+        semi_for_disclosure = params["semiIndustry"] or "TCFD"
+        filename_part = _sanitize_compliance_filename_part(
+            f"TCFD_{params['semiIndustry']}"
+        )
+    return metrics, semi_for_disclosure, filename_part
+
+
+def _assessment_excel_frame(assessment_json: dict) -> pd.DataFrame:
+    df_flat = pd.json_normalize(
+        assessment_json,
+        record_path="metric_analyses",
+        meta=[
+            "report_id",
+            "assessment_date",
+            "filename",
+            "total_metrics",
+            "overall_score",
+            ["disclosure_summary", "fully_disclosed"],
+            ["disclosure_summary", "partially_disclosed"],
+            ["disclosure_summary", "not_disclosed"],
+        ],
+    )
+
+    def pick_series(*names, default=""):
+        for name in names:
+            if name in df_flat.columns:
+                return df_flat[name]
+        return pd.Series([default] * len(df_flat))
+
+    return pd.DataFrame(
+        {
+            "Metric": pick_series("Metric", "metric_name"),
+            "Category": pick_series("Category", "category"),
+            "Unit": pick_series("Unit", "unit"),
+            "Code": pick_series("Code", "metric_code", "metric_id"),
+            "Topic": pick_series("Topic", "topic"),
+            "Type": pick_series("Type", "type"),
+            "Definition": pick_series("Definition", "definition"),
+            "Value": pick_series("Value", "value"),
+            "Page": pick_series("Page", "page"),
+            "Context": pick_series("Context", "context"),
+            "Disclosure Status": pick_series(
+                "Disclosure Status", "disclosure_status", "Model Disclosure Status"
+            ),
+            "LLM Analysis": pick_series("LLM Analysis", "reasoning"),
+            "ChatGPT": pick_series("ChatGPT"),
+            "InputWrong": pick_series("InputWrong"),
+            "comment": pick_series("comment"),
+        }
+    )
+
+
+def _stage_reanalysis_scope_outputs(
+    *,
+    assessment,
+    disclosure_engine,
+    file_info: dict,
+    fw: str,
+    scope_key: str,
+    filename_part: str,
+    llm_model_name: Optional[str],
+    compliance_stage_dir: Path,
+    markdown_stage_dir: Path,
+) -> tuple[dict, List[tuple[Path, Path]], str]:
+    file_id = str(file_info["file_id"])
+    compliance_dir = Path(file_manager.compliance_outputs)
+    markdown_dir = Path(file_manager.markdown_outputs)
+
+    md_stem = _sanitize_compliance_filename_part(filename_part)
+    markdown_filename = f"compliance_report_{file_id}_{md_stem}.md"
+    final_markdown_path = markdown_dir / markdown_filename
+    staged_markdown_path = markdown_stage_dir / markdown_filename
+    staged_markdown_path.write_text(
+        disclosure_engine.generate_compliance_report(assessment), encoding="utf-8"
+    )
+
+    json_filename = f"{filename_part}_{file_id}_compliance.json"
+    xlsx_filename = f"{filename_part}_{file_id}_compliance.xlsx"
+    sasb_filename = f"{filename_part}_{file_id}_sasb_metrics.json"
+    staged_json_path = compliance_stage_dir / json_filename
+    staged_xlsx_path = compliance_stage_dir / xlsx_filename
+    staged_sasb_path = compliance_stage_dir / sasb_filename
+
+    assessment_json = _build_compliance_assessment_json(
+        assessment,
+        str(final_markdown_path),
+        _compliance_result_filename(file_info.get("original_name") or "", llm_model_name),
+    )
+    staged_json_path.write_text(
+        json.dumps(assessment_json, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    _assessment_excel_frame(assessment_json).to_excel(
+        staged_xlsx_path, index=False, sheet_name="Benchmark"
+    )
+
+    staged_files = [
+        (staged_markdown_path, final_markdown_path),
+        (staged_json_path, compliance_dir / json_filename),
+        (staged_xlsx_path, compliance_dir / xlsx_filename),
+    ]
+    sasb_metrics_filename = None
+    if fw == "SASB" and assessment_json.get("sasb_metric_rows"):
+        staged_sasb_path.write_text(
+            json.dumps(
+                assessment_json["sasb_metric_rows"], indent=2, ensure_ascii=False
+            ),
+            encoding="utf-8",
+        )
+        staged_files.append((staged_sasb_path, compliance_dir / sasb_filename))
+        sasb_metrics_filename = sasb_filename
+
+    manifest_row = {
+        "scope_key": scope_key,
+        "json_filename": json_filename,
+        "sasb_metrics_filename": sasb_metrics_filename,
+        "overall_score": float(assessment.overall_compliance_score or 0.0),
+    }
+    return manifest_row, staged_files, str(final_markdown_path)
+
+
+def _commit_staged_assessment_files(
+    staged_files: List[tuple[Path, Path]],
+) -> None:
+    """Atomically replace each file and roll back the whole bundle on error.
+
+    The manifest must be the final item supplied by the caller; readers thus
+    never discover a new manifest before all files referenced by it exist.
+    """
+    seen_targets = set()
+    for staged_path, target_path in staged_files:
+        target_key = str(target_path.resolve())
+        if target_key in seen_targets or not staged_path.is_file():
+            raise RuntimeError("Invalid staged assessment bundle")
+        seen_targets.add(target_key)
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+
+    backups: List[tuple[Path, Optional[Path]]] = []
+    committed: List[tuple[Path, Optional[Path]]] = []
+    try:
+        for staged_path, target_path in staged_files:
+            backup_path = None
+            if target_path.exists():
+                fd, backup_name = tempfile.mkstemp(
+                    prefix=f".{target_path.name}.",
+                    suffix=".reanalyze-backup",
+                    dir=str(target_path.parent),
+                )
+                os.close(fd)
+                backup_path = Path(backup_name)
+                shutil.copy2(target_path, backup_path)
+            backups.append((target_path, backup_path))
+            os.replace(staged_path, target_path)
+            committed.append((target_path, backup_path))
+    except Exception:
+        for target_path, backup_path in reversed(committed):
+            try:
+                if backup_path is not None and backup_path.exists():
+                    os.replace(backup_path, target_path)
+                elif target_path.exists():
+                    target_path.unlink()
+            except Exception as rollback_error:
+                logger.error(
+                    f"Assessment output rollback failed for {target_path}: {rollback_error}"
+                )
+        raise
+    finally:
+        for _, backup_path in backups:
+            if backup_path is not None and backup_path.exists():
+                try:
+                    backup_path.unlink()
+                except Exception:
+                    pass
+
+
+@with_backend_model_task("reanalyze_report")
+def _sync_reanalyze_report_body(file_info: dict, progress_cb=None) -> dict:
+    """Run retrieval + disclosure using persisted segments/embeddings only."""
+    started = time.perf_counter()
+    file_id = str(file_info.get("file_id") or "")
+    artifacts = _load_validated_report_artifacts(file_id)
+    report_content = _report_content_from_artifacts(file_info, artifacts)
+    fw, scopes = _reanalysis_scopes(file_info)
+    _emit_upload_progress(
+        progress_cb,
+        "artifacts_loaded",
+        "Persisted report evidence loaded.",
+        5,
+        file_id=file_id,
+        segment_count=len(report_content.document_content.segments),
+    )
+
+    processor = system_components["metric_processor"]
+    disclosure_engine = system_components["disclosure_engine"]
+    config = system_components.get("config")
+    llm_model_name = getattr(config, "llm_model", None) if config else None
+    compliance_dir = Path(file_manager.compliance_outputs)
+    markdown_dir = Path(file_manager.markdown_outputs)
+    compliance_dir.mkdir(parents=True, exist_ok=True)
+    markdown_dir.mkdir(parents=True, exist_ok=True)
+
+    manifest_rows: List[dict] = []
+    staged_files: List[tuple[Path, Path]] = []
+    scope_performance: List[dict] = []
+    last_assessment = None
+    last_metrics = None
+    last_report_path = ""
+    expected_scope_keys = [scope_key for scope_key, _ in scopes]
+
+    with tempfile.TemporaryDirectory(
+        prefix=f".{file_id}.reanalyze-", dir=str(compliance_dir)
+    ) as compliance_stage_name, tempfile.TemporaryDirectory(
+        prefix=f".{file_id}.reanalyze-", dir=str(markdown_dir)
+    ) as markdown_stage_name:
+        compliance_stage_dir = Path(compliance_stage_name)
+        markdown_stage_dir = Path(markdown_stage_name)
+        _emit_upload_progress(
+            progress_cb,
+            "assessment_start",
+            f"Starting assessment-only analysis for {len(scopes)} scope(s).",
+            10,
+            file_id=file_id,
+            total_scopes=len(scopes),
+        )
+
+        for scope_index, (scope_key, params) in enumerate(scopes, 1):
+            scope_started = time.perf_counter()
+            progress_start = 10 + 75 * ((scope_index - 1) / max(1, len(scopes)))
+            _emit_upload_progress(
+                progress_cb,
+                "assessment_scope",
+                f"Analyzing scope {scope_index}/{len(scopes)}: {scope_key}.",
+                progress_start,
+                file_id=file_id,
+                scope_key=scope_key,
+                scope_index=scope_index,
+                total_scopes=len(scopes),
+            )
+            metrics_started = time.perf_counter()
+            metrics, semi_for_disclosure, filename_part = _load_reanalysis_scope_metrics(
+                processor, fw, scope_key, params
+            )
+            metrics = _prepare_metrics_for_retrieval(processor, metrics)
+            retrieval_started = time.perf_counter()
+            retrieval_results = retrieve_metric_collection(
+                report_content, metrics, config=config
+            )
+            analysis_started = time.perf_counter()
+            assessment = disclosure_engine.analyze_compliance(
+                retrieval_results,
+                report_content,
+                str(file_info.get("file_path") or ""),
+                metrics,
+                framework=fw,
+                industry=file_info.get("industry"),
+                semi_industry=semi_for_disclosure,
+            )
+            analysis_finished = time.perf_counter()
+            manifest_row, scope_staged_files, report_path = (
+                _stage_reanalysis_scope_outputs(
+                    assessment=assessment,
+                    disclosure_engine=disclosure_engine,
+                    file_info=file_info,
+                    fw=fw,
+                    scope_key=scope_key,
+                    filename_part=filename_part,
+                    llm_model_name=llm_model_name,
+                    compliance_stage_dir=compliance_stage_dir,
+                    markdown_stage_dir=markdown_stage_dir,
+                )
+            )
+            manifest_rows.append(manifest_row)
+            staged_files.extend(scope_staged_files)
+            last_assessment = assessment
+            last_metrics = metrics
+            last_report_path = report_path
+            scope_performance.append(
+                {
+                    "scope_key": scope_key,
+                    "total_seconds": round(time.perf_counter() - scope_started, 3),
+                    "metrics_seconds": round(retrieval_started - metrics_started, 3),
+                    "retrieval_seconds": round(analysis_started - retrieval_started, 3),
+                    "analysis_seconds": round(analysis_finished - analysis_started, 3),
+                    "metric_count": len(metrics.metrics),
+                }
+            )
+            _emit_upload_progress(
+                progress_cb,
+                "assessment_scope_done",
+                f"Completed scope {scope_index}/{len(scopes)}: {scope_key}.",
+                10 + 75 * (scope_index / max(1, len(scopes))),
+                file_id=file_id,
+                scope_key=scope_key,
+                scope_index=scope_index,
+                total_scopes=len(scopes),
+            )
+
+        _write_compliance_manifest(
+            compliance_stage_dir,
+            file_id,
+            fw,
+            manifest_rows,
+            expected_scope_keys=expected_scope_keys,
+        )
+        staged_manifest = _compliance_manifest_path(compliance_stage_dir, file_id)
+        final_manifest = _compliance_manifest_path(compliance_dir, file_id)
+        # Commit the manifest last so readers only discover a complete bundle.
+        staged_files.append((staged_manifest, final_manifest))
+        _emit_upload_progress(
+            progress_cb,
+            "assessment_committing",
+            "Saving the completed assessment.",
+            90,
+            file_id=file_id,
+        )
+        _commit_staged_assessment_files(staged_files)
+
+    # Global state is updated only after the durable bundle is committed.
+    system_components["current_report"] = report_content
+    system_components["current_assessment"] = last_assessment
+    system_components["current_metrics"] = last_metrics
+    system_components["current_framework"] = fw
+    system_components["current_industry"] = file_info.get("industry")
+    system_components["current_semi_industry"] = file_info.get("semi_industry")
+    system_components["current_gri_sector"] = file_info.get("gri_sector")
+    system_components["current_gri_topic"] = file_info.get("gri_topic")
+    system_components["current_company"] = Path(
+        str(file_info.get("original_name") or "report")
+    ).stem
+    if last_assessment is not None and system_components.get("chatbot") is not None:
+        try:
+            with _chatbot_ops_lock:
+                system_components["chatbot"].load_context(report_content, last_assessment)
+        except Exception as exc:
+            # The durable assessment has already committed.  Chat context is a
+            # rebuildable in-memory convenience and must not turn that success
+            # into a failed job (which would falsely claim the old files remain).
+            logger.warning(
+                f"Assessment committed but chatbot context refresh failed for {file_id}: {exc}"
+            )
+
+    performance = {
+        "total_seconds": round(time.perf_counter() - started, 3),
+        "segment_count": len(report_content.document_content.segments),
+        "embedding_count": int(artifacts["embedding_matrix"].shape[0]),
+        "embedding_dim": int(artifacts["embedding_matrix"].shape[1]),
+        "scopes": scope_performance,
+        "assessment_only": True,
+    }
+    return {
+        "status": "success",
+        "message": "Report assessment completed using persisted evidence.",
+        "report_id": file_id,
+        "file_id": file_id,
+        "scopes": manifest_rows,
+        "performance": performance,
+        "assessment": {
+            "total_metrics": (
+                last_assessment.total_metrics_analyzed if last_assessment else 0
+            ),
+            "overall_score": (
+                last_assessment.overall_compliance_score if last_assessment else 0
+            ),
+            "disclosure_summary": (
+                last_assessment.disclosure_summary if last_assessment else {}
+            ),
+            "report_path": last_report_path,
+        },
+    }
 
 
 @with_backend_model_task("upload_report")
@@ -474,7 +1034,14 @@ def _sync_upload_report_body(
                     f"Complete processing chain finished ({len(scopes_list)} scope(s)). "
                     f"Last score: {last_assessment.overall_compliance_score:.2%}"
                 )
-            _patch_file_metadata(file_info["file_id"], status="processed", processing_stage="completed", processing_progress=100)
+            _patch_file_metadata(
+                file_info["file_id"],
+                status="processed",
+                processing_job_id=None,
+                processing_stage="completed",
+                processing_progress=100,
+                processing_error=None,
+            )
             _emit_upload_progress(progress_cb, "completed", "Report processing completed.", 100, file_id=file_info.get("file_id"))
 
             performance["total_seconds"] = round(time.perf_counter() - pipeline_started, 3)
@@ -522,7 +1089,14 @@ def _sync_upload_report_body(
                     "确保使用可访问的模型（如 'qwen-plus' 或 'qwen-turbo'）。"
                 )
 
-            _patch_file_metadata(file_info["file_id"], status="processed", processing_stage="partial_success", processing_progress=100)
+            _patch_file_metadata(
+                file_info["file_id"],
+                status="processed",
+                processing_job_id=None,
+                processing_stage="partial_success",
+                processing_progress=100,
+                processing_error=str(assessment_error)[:1000],
+            )
             _emit_upload_progress(progress_cb, "partial_success", error_message, 100, file_id=file_info.get("file_id"), error=str(assessment_error))
 
             return {
@@ -540,7 +1114,14 @@ def _sync_upload_report_body(
         # If processing fails, move to failed directory
         if 'file_info' in locals():
             file_manager.move_report_file(file_info["file_id"], "failed")
-            _patch_file_metadata(file_info["file_id"], status="failed", processing_stage="failed", processing_progress=100)
+            _patch_file_metadata(
+                file_info["file_id"],
+                status="failed",
+                processing_job_id=None,
+                processing_stage="failed",
+                processing_progress=100,
+                processing_error=str(e)[:1000],
+            )
             _emit_upload_progress(progress_cb, "failed", f"Report processing failed: {e}", 100, file_id=file_info.get("file_id"), error=str(e))
         raise
 
@@ -570,13 +1151,13 @@ def _run_report_processing_job(
             extra=extra,
         )
         if file_info.get("file_id"):
-            metadata_updates = {
-                "status": "processing",
-                "processing_job_id": job_id,
-                "processing_stage": stage,
-                "processing_progress": progress,
-            }
-            metadata_updates.update(_ocr_progress_metadata_updates(extra))
+            metadata_updates = _report_progress_metadata_updates(
+                stage=stage,
+                message=message,
+                progress=progress,
+                job_id=job_id,
+                extra=extra,
+            )
             _patch_file_metadata(
                 file_info["file_id"],
                 **metadata_updates,
@@ -615,6 +1196,96 @@ def _run_report_processing_job(
             stage="failed",
             progress=100,
             message="Processing failed. Please try again.",
+            error=str(exc),
+            event_type="error",
+        )
+
+
+def _run_report_reanalysis_job(job_id: str, file_info: dict) -> None:
+    """Background assessment-only entry point."""
+    file_id = str(file_info.get("file_id") or "")
+
+    def progress_cb(
+        *,
+        stage: str,
+        message: str,
+        progress: Optional[float] = None,
+        extra: Optional[dict] = None,
+    ):
+        update_report_job(
+            job_id,
+            status="processing",
+            stage=stage,
+            progress=progress,
+            message=message,
+            extra=extra,
+        )
+        _patch_file_metadata(
+            file_id,
+            reanalysis_job_id=job_id,
+            reanalysis_stage=stage,
+            reanalysis_progress=progress,
+            reanalysis_error=None,
+        )
+
+    try:
+        update_report_job(
+            job_id,
+            status="processing",
+            stage="artifacts_loading",
+            progress=1,
+            message="Loading persisted report evidence.",
+        )
+        _patch_file_metadata(
+            file_id,
+            reanalysis_job_id=job_id,
+            reanalysis_stage="artifacts_loading",
+            reanalysis_progress=1,
+            reanalysis_error=None,
+        )
+        result = _sync_reanalyze_report_body(file_info, progress_cb=progress_cb)
+        finfo = file_manager.metadata.get("files", {}).get(file_id)
+        try:
+            previous_version = (
+                int(finfo.get("assessment_version") or 0)
+                if isinstance(finfo, dict)
+                else 0
+            )
+        except (TypeError, ValueError):
+            previous_version = 0
+        _patch_file_metadata(
+            file_id,
+            reanalysis_job_id=None,
+            reanalysis_stage="completed",
+            reanalysis_progress=100,
+            reanalysis_error=None,
+            assessment_version=previous_version + 1,
+            assessment_updated_at=datetime.now().isoformat(),
+        )
+        update_report_job(
+            job_id,
+            status="success",
+            stage="completed",
+            progress=100,
+            message=result.get("message") or "Report assessment completed.",
+            result=result,
+            event_type="done",
+        )
+    except Exception as exc:
+        logger.exception(f"Background report reanalysis failed: job_id={job_id}")
+        _patch_file_metadata(
+            file_id,
+            reanalysis_job_id=None,
+            reanalysis_stage="failed",
+            reanalysis_progress=100,
+            reanalysis_error=str(exc)[:1000],
+        )
+        update_report_job(
+            job_id,
+            status="failed",
+            stage="failed",
+            progress=100,
+            message="Assessment-only analysis failed. The previous assessment was preserved.",
             error=str(exc),
             event_type="error",
         )
@@ -663,6 +1334,7 @@ async def reprocess_report(
         processing_job_id=job["job_id"],
         processing_stage="queued",
         processing_progress=0,
+        processing_error=None,
     )
     get_report_job_executor().submit(
         _run_report_processing_job,
@@ -682,6 +1354,60 @@ async def reprocess_report(
         "job_id": job["job_id"],
         "file_id": file_id,
         "report_id": file_id,
+        "processing_status_url": f"/api/report-jobs/{job['job_id']}",
+        "events_url": f"/api/report-jobs/{job['job_id']}/events",
+    }
+
+
+async def reanalyze_report(
+    file_id: str,
+    user_id: int = Depends(get_current_user),
+):
+    """Queue assessment-only analysis using persisted segments and embeddings."""
+    with _report_reanalysis_lock:
+        file_info = file_manager.get_file_info(file_id, user_id=user_id)
+        if not file_info or file_info.get("file_type") != "report":
+            raise HTTPException(status_code=404, detail="Report not found or access denied")
+
+        if str(file_info.get("status") or "").strip().lower() == "processing":
+            raise HTTPException(status_code=409, detail="Report is currently being processed")
+        for job_field in ("processing_job_id", "reanalysis_job_id"):
+            active_job_id = str(file_info.get(job_field) or "").strip()
+            active_job = snapshot_report_job(active_job_id) if active_job_id else None
+            if active_job and str(active_job.get("status") or "") not in TERMINAL_STATUSES:
+                raise HTTPException(status_code=409, detail="Report is currently being processed")
+
+        # Validate synchronously so the API returns 409 instead of accepting a
+        # job that would silently regenerate or immediately fail on artifacts.
+        _load_validated_report_artifacts(str(file_info.get("file_id") or file_id))
+        _reanalysis_scopes(file_info)
+
+        job_file_info = dict(file_info)
+        canonical_file_id = str(job_file_info.get("file_id") or file_id)
+        job = create_report_job(
+            file_id=canonical_file_id,
+            filename=str(job_file_info.get("safe_filename") or job_file_info.get("original_name") or canonical_file_id),
+            user_id=user_id,
+        )
+        _patch_file_metadata(
+            canonical_file_id,
+            reanalysis_job_id=job["job_id"],
+            reanalysis_stage="queued",
+            reanalysis_progress=0,
+            reanalysis_error=None,
+        )
+        get_report_job_executor().submit(
+            _run_report_reanalysis_job,
+            job["job_id"],
+            job_file_info,
+        )
+
+    return {
+        "status": "accepted",
+        "job_id": job["job_id"],
+        "file_id": canonical_file_id,
+        "report_id": canonical_file_id,
+        "assessment_only": True,
         "processing_status_url": f"/api/report-jobs/{job['job_id']}",
         "events_url": f"/api/report-jobs/{job['job_id']}/events",
     }
@@ -817,6 +1543,7 @@ async def upload_report(
             processing_job_id=job["job_id"],
             processing_stage="queued",
             processing_progress=0,
+            processing_error=None,
         )
         get_report_job_executor().submit(
             _run_report_processing_job,

@@ -173,21 +173,40 @@ class FileManager:
         for info in self.metadata.get("files", {}).values():
             if not isinstance(info, dict) or info.get("file_type") != "report":
                 continue
-            if str(info.get("status") or "").strip().lower() != "processing":
-                continue
+            status = str(info.get("status") or "").strip().lower()
             stage = str(info.get("processing_stage") or "").strip().lower()
+            history = info.get("processing_history")
+            last_history = history[-1] if isinstance(history, list) and history else {}
+            legacy_partial_recovery = (
+                status == "failed"
+                and stage == "interrupted"
+                and isinstance(last_history, dict)
+                and last_history.get("stage") == "interrupted_recovery"
+                and last_history.get("previous_stage") == "partial_success"
+            )
+            if status != "processing" and not legacy_partial_recovery:
+                continue
+            if legacy_partial_recovery:
+                stage = "partial_success"
             previous_job_id = info.pop("processing_job_id", None)
-            if previous_job_id:
-                info["interrupted_job_id"] = previous_job_id
-            if stage == "completed":
+            if stage in {"completed", "partial_success"}:
+                info.pop("interrupted_job_id", None)
+                recovered_error = info.get("processing_error")
+                if stage == "partial_success" and (
+                    not recovered_error
+                    or legacy_partial_recovery
+                ):
+                    recovered_error = "Report content was processed, but assessment completed with warnings."
                 info.update({
                     "status": "processed",
-                    "processing_stage": "completed",
+                    "processing_stage": stage,
                     "processing_progress": 100,
-                    "processing_error": None,
+                    "processing_error": recovered_error if stage == "partial_success" else None,
                 })
                 recovered["completed"] += 1
             else:
+                if previous_job_id:
+                    info["interrupted_job_id"] = previous_job_id
                 info.update({
                     "status": "failed",
                     "processing_stage": "interrupted",
@@ -197,7 +216,8 @@ class FileManager:
                 recovered["interrupted"] += 1
             history = info.setdefault("processing_history", [])
             if isinstance(history, list):
-                history.append({"time": now, "stage": "interrupted_recovery", "previous_stage": stage})
+                recovery_stage = "terminal_recovery" if stage in {"completed", "partial_success"} else "interrupted_recovery"
+                history.append({"time": now, "stage": recovery_stage, "previous_stage": stage})
             changed = True
         if changed:
             self._save_metadata()

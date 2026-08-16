@@ -7,7 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from esg_encoding.content_extractor import enrich_document_with_pdf_links
 from esg_encoding.disclosure_inference import DisclosureInferenceEngine
@@ -756,6 +756,235 @@ class RetrievalNoiseControlTests(unittest.TestCase):
         self.assertIn("real_data_evidence", prepared[0].retrieval_type)
         self.assertIn("data-row", {item.segment_id for item in prepared})
 
+    def test_exact_code_row_is_the_only_link_trigger_when_bm25_hits_adjacent_metric(self):
+        code = "TC-SI-330a.2"
+        metric = _metric(
+            "employee-engagement",
+            code,
+            "Employee engagement as a percentage",
+            "Percentage (%)",
+        )
+        engagement_row = _table_segment(
+            "engagement-row",
+            "table_row",
+            f"Employee engagement | FY2024: 87% | SASB {code}",
+            page=108,
+            row_index=6,
+        )
+        engagement_value = _table_segment(
+            "engagement-value",
+            "table_cell",
+            "Employee engagement as a percentage: 87%",
+            page=108,
+            row_index=6,
+            col_index=1,
+            col_header="FY2024",
+            value_text="Employee engagement as a percentage: 87%",
+        )
+        adjacent_row = _table_segment(
+            "employees-row",
+            "table_row",
+            "Employees | Global female representation | SASB TC-SI-330a.3",
+            page=108,
+            row_index=9,
+            links=[
+                {
+                    "link_type": "internal",
+                    "anchor_text": "Global female representation",
+                    "source_page": 108,
+                    "target_page": 86,
+                }
+            ],
+        )
+        report = _report([engagement_row, engagement_value, adjacent_row])
+        exact_result = RetrievalResult(
+            segment_id=engagement_row.segment_id,
+            content=engagement_row.content,
+            page_number=engagement_row.page_number,
+            score=1.0,
+            retrieval_type="exact_code+table_row_context",
+            metric_id=metric.metric_id,
+        )
+        adjacent_bm25 = RetrievalResult(
+            segment_id=adjacent_row.segment_id,
+            content=adjacent_row.content,
+            page_number=adjacent_row.page_number,
+            score=0.9,
+            retrieval_type="bm25",
+            metric_id=metric.metric_id,
+        )
+        config = ProcessingConfig(top_k=10)
+        object.__setattr__(config, "use_semantic_retrieval", False)
+        object.__setattr__(config, "use_reranker", False)
+        retriever = DualChannelRetriever(config)
+        retriever.keyword_retriever.search_exact_code = lambda *args, **kwargs: [exact_result]
+        retriever.keyword_retriever.search_exact_alias = lambda *args, **kwargs: []
+        retriever.keyword_retriever.search_bm25 = lambda *args, **kwargs: [adjacent_bm25]
+        captured_triggers = []
+
+        def fake_linked_search(
+            target_report,
+            target_metric,
+            profile,
+            trigger_results,
+            semantic_expansion=None,
+        ):
+            captured_triggers.extend(item.segment_id for item in trigger_results)
+            return []
+
+        retriever._search_linked_pages = fake_linked_search
+        result = retriever.retrieve_for_metric(report, metric)
+
+        self.assertEqual(captured_triggers, [engagement_row.segment_id])
+        self.assertNotIn(adjacent_row.segment_id, captured_triggers)
+        self.assertEqual(result.combined_results[0].segment_id, engagement_row.segment_id)
+
+    def test_exact_code_cell_does_not_join_same_row_number_on_next_page(self):
+        code = "TC-SI-330a.2"
+        metric = _metric(
+            "employee-engagement",
+            code,
+            "Employee engagement as a percentage",
+            "Percentage (%)",
+        )
+        engagement_row = _table_segment(
+            "p108-engagement-row",
+            "table_row",
+            f"Employee engagement | FY2024: 87% | SASB {code}",
+            page=108,
+            table_id="continued-index",
+            row_index=6,
+        )
+        next_page_row = _table_segment(
+            "p109-ewaste-row",
+            "table_row",
+            "E-waste recycled | FY2024: 91,000 metric tons | SASB TC-HW-410a.4",
+            page=109,
+            table_id="continued-index",
+            row_index=6,
+        )
+        code_cell = _table_segment(
+            "p108-engagement-code",
+            "table_cell",
+            f"Reference indices: SASB {code}",
+            page=108,
+            table_id="continued-index",
+            row_index=6,
+            col_index=2,
+            col_header="Reference indices",
+            value_text=f"SASB {code}",
+        )
+        report = _report([engagement_row, next_page_row, code_cell])
+
+        results = KeywordRetriever(ProcessingConfig()).search_exact_code(
+            report,
+            metric,
+        )
+
+        self.assertEqual(
+            {item.segment_id for item in results},
+            {engagement_row.segment_id},
+        )
+        self.assertNotIn(
+            next_page_row.segment_id,
+            {item.segment_id for item in results},
+        )
+
+    def test_exact_code_data_survives_linked_second_pass_and_reranker(self):
+        code = "TC-SI-330a.2"
+        metric_name = "Employee engagement as a percentage"
+        metric = _metric("employee-engagement", code, metric_name, "Percentage (%)")
+        row = _table_segment(
+            "engagement-row",
+            "table_row",
+            (
+                "Employee engagement | FY2024: Inclusive workforce - Accountability | "
+                f"Employee engagement as a percentage: 87% | SASB {code}"
+            ),
+            page=108,
+            row_index=6,
+        )
+        value_cell = _table_segment(
+            "engagement-value",
+            "table_cell",
+            "FY2024: Employee engagement as a percentage: 87%",
+            page=108,
+            row_index=6,
+            col_index=1,
+            col_header="FY2024",
+            value_text="Employee engagement as a percentage: 87%",
+        )
+        code_cell = _table_segment(
+            "engagement-code",
+            "table_cell",
+            f"Reference indices: SASB {code}",
+            page=108,
+            row_index=6,
+            col_index=2,
+            col_header="Reference indices",
+            value_text=f"SASB {code}",
+        )
+        linked_noise = TextSegment(
+            segment_id="linked-diversity-noise",
+            content="Global female representation and workforce diversity: 35%",
+            page_number=86,
+            position_y=1,
+            segment_type="text",
+        )
+        report = _report([row, value_cell, code_cell, linked_noise])
+        config = ProcessingConfig(top_k=10)
+        object.__setattr__(config, "use_semantic_retrieval", False)
+        object.__setattr__(config, "use_reranker", True)
+        retriever = DualChannelRetriever(config)
+        retriever.keyword_retriever.search_exact_alias = lambda *args, **kwargs: []
+        retriever.keyword_retriever.search_bm25 = lambda *args, **kwargs: []
+        linked_result = RetrievalResult(
+            segment_id=linked_noise.segment_id,
+            content=linked_noise.content,
+            page_number=linked_noise.page_number,
+            score=0.95,
+            retrieval_type="linked_page+bm25",
+            metric_id=metric.metric_id,
+            link_source_page=108,
+            link_target_page=86,
+        )
+        retriever._search_linked_pages = lambda *args, **kwargs: [linked_result]
+        retriever.semantic_retriever.rerank_candidates = (
+            lambda candidates, *args, **kwargs: [
+                item for item in candidates if item.segment_id != row.segment_id
+            ]
+        )
+
+        result = retriever.retrieve_for_metric(report, metric)
+
+        self.assertEqual(result.combined_results[0].segment_id, row.segment_id)
+        self.assertIn(
+            "protected_exact_code_data",
+            result.combined_results[0].retrieval_type,
+        )
+        self.assertIn(linked_noise.segment_id, {
+            item.segment_id for item in result.combined_results
+        })
+
+        llm_create = Mock(
+            side_effect=AssertionError("protected exact-code data must bypass the LLM")
+        )
+        engine = object.__new__(DisclosureInferenceEngine)
+        engine.config = config
+        engine.llm_client = SimpleNamespace(
+            chat=SimpleNamespace(completions=SimpleNamespace(create=llm_create))
+        )
+
+        analysis = engine._analyze_single_metric(result, report, metric)
+
+        self.assertEqual(analysis.disclosure_status.value, "fully_disclosed")
+        self.assertEqual(analysis.value, 87)
+        self.assertEqual(analysis.selected_year, 2024)
+        self.assertEqual(analysis.page, 108)
+        self.assertIn(row.segment_id, analysis.evidence_segments)
+        self.assertIn(value_cell.segment_id, analysis.evidence_segments)
+        llm_create.assert_not_called()
+
     def test_linked_pages_run_normal_semantic_retrieval_before_link_attention(self):
         metric = self._metric_with_topic()
         profile = build_metric_retrieval_profile(metric)
@@ -1090,6 +1319,58 @@ class DirectDisclosureTests(unittest.TestCase):
         analysis, _, _, _ = self._direct("TC-HW-410a.3", None)
         self.assertIsNone(analysis)
 
+    def test_exact_code_and_metric_label_count_as_disclosure_without_parsed_value(self):
+        code = "TC-SI-330a.2"
+        metric_name = "Employee engagement as a percentage"
+        row = _table_segment(
+            "row",
+            "table_row",
+            f"{metric_name} | SASB {code}",
+        )
+        report = _report([row])
+        metric = _metric(code, code, metric_name, "Percentage (%)")
+        retrieval = MetricRetrievalResult(
+            metric_id=code,
+            metric_name=metric_name,
+            metric_code=code,
+            combined_results=[],
+        )
+
+        analysis = self.engine._direct_code_label_disclosure_analysis(
+            retrieval,
+            report,
+            metric,
+            [{"segment_id": "row", "page_number": 1, "score": 1.0}],
+            ["row"],
+        )
+
+        self.assertIsNotNone(analysis)
+        self.assertEqual(analysis.disclosure_status.value, "fully_disclosed")
+        self.assertIsNone(analysis.value)
+
+    def test_bare_exact_code_still_does_not_count_as_labelled_disclosure(self):
+        code = "TC-SI-330a.2"
+        metric_name = "Employee engagement as a percentage"
+        row = _table_segment("row", "table_row", f"SASB {code} | See page 82")
+        report = _report([row])
+        metric = _metric(code, code, metric_name, "Percentage (%)")
+        retrieval = MetricRetrievalResult(
+            metric_id=code,
+            metric_name=metric_name,
+            metric_code=code,
+            combined_results=[],
+        )
+
+        analysis = self.engine._direct_code_label_disclosure_analysis(
+            retrieval,
+            report,
+            metric,
+            [{"segment_id": "row", "page_number": 1, "score": 1.0}],
+            ["row"],
+        )
+
+        self.assertIsNone(analysis)
+
     def test_plain_text_number_does_not_trigger_direct_disclosure(self):
         code = "TC-HW-410a.3"
         segment = TextSegment(
@@ -1235,6 +1516,178 @@ class DirectDisclosureTests(unittest.TestCase):
         self.assertEqual(analysis.value, 87)
         self.assertEqual(analysis.page, 108)
         self.assertIn("Employee engagement as a percentage: 87%", analysis.context)
+
+    def test_employee_engagement_exact_code_row_bypasses_false_llm_rejection(self):
+        code = "TC-SI-330a.2"
+        metric_name = "Employee engagement as a percentage"
+        row = _table_segment(
+            "engagement-row",
+            "table_row",
+            (
+                "[Table Title] Reporting frameworks index\n"
+                "[Column Headers] Key performance indicator | FY2024 | Reference indices\n"
+                "Key performance indicator: Employee engagement | "
+                "FY2024: Inclusive workforce - Accountability\\n"
+                f"Employee engagement as a percentage: 87% | SASB {code}"
+            ),
+            page=108,
+            row_index=6,
+            row_header="Employee engagement",
+        )
+        value_cell = _table_segment(
+            "engagement-value",
+            "table_cell",
+            "FY2024: Employee engagement as a percentage: 87%",
+            page=108,
+            row_index=6,
+            col_index=1,
+            row_header="Employee engagement",
+            col_header="FY2024",
+            value_text=(
+                "Inclusive workforce - Accountability\\n"
+                "Employee engagement as a percentage: 87%"
+            ),
+        )
+        code_cell = _table_segment(
+            "engagement-code",
+            "table_cell",
+            f"Reference indices: SASB {code}",
+            page=108,
+            row_index=6,
+            col_index=2,
+            row_header="Employee engagement",
+            col_header="Reference indices",
+            value_text=f"SASB {code}",
+        )
+        report = _report([row, value_cell, code_cell])
+        metric = _metric("employee-engagement", code, metric_name, "Percentage (%)")
+        retrieval = MetricRetrievalResult(
+            metric_id=metric.metric_id,
+            metric_name=metric_name,
+            metric_code=code,
+            combined_results=[
+                RetrievalResult(
+                    segment_id=row.segment_id,
+                    content=row.content,
+                    page_number=108,
+                    score=1.0,
+                    retrieval_type=(
+                        "exact_code+table_row_context+"
+                        "real_data_evidence+protected_exact_code_data"
+                    ),
+                    metric_id=metric.metric_id,
+                )
+            ],
+            total_matches=1,
+            target_k=1,
+        )
+        llm_create = Mock(
+            side_effect=AssertionError("clear same-code data must bypass the LLM")
+        )
+        self.engine.config = ProcessingConfig()
+        self.engine.llm_client = SimpleNamespace(
+            chat=SimpleNamespace(completions=SimpleNamespace(create=llm_create))
+        )
+
+        analysis = self.engine._analyze_single_metric(retrieval, report, metric)
+
+        self.assertEqual(analysis.disclosure_status.value, "fully_disclosed")
+        self.assertEqual(analysis.value, 87)
+        self.assertEqual(analysis.selected_year, 2024)
+        self.assertEqual(analysis.page, 108)
+        self.assertIn("Employee engagement as a percentage: 87%", analysis.context)
+        self.assertIn(value_cell.segment_id, analysis.evidence_segments)
+        llm_create.assert_not_called()
+
+    def test_direct_disclosure_does_not_mix_same_row_number_from_next_page(self):
+        code = "TC-SI-330a.2"
+        metric_name = "Employee engagement as a percentage"
+        engagement_row = _table_segment(
+            "p108-engagement-row",
+            "table_row",
+            f"Employee engagement | FY2024: 87% | SASB {code}",
+            page=108,
+            table_id="continued-index",
+            row_index=6,
+        )
+        engagement_value = _table_segment(
+            "p108-engagement-value",
+            "table_cell",
+            "Employee engagement as a percentage: 87%",
+            page=108,
+            table_id="continued-index",
+            row_index=6,
+            col_index=1,
+            col_header="FY2024",
+            value_text="Employee engagement as a percentage: 87%",
+        )
+        engagement_code = _table_segment(
+            "p108-engagement-code",
+            "table_cell",
+            f"Reference indices: SASB {code}",
+            page=108,
+            table_id="continued-index",
+            row_index=6,
+            col_index=2,
+            col_header="Reference indices",
+            value_text=f"SASB {code}",
+        )
+        next_page_row = _table_segment(
+            "p109-ewaste-row",
+            "table_row",
+            "E-waste recycled | FY2024: 91,000 metric tons | SASB TC-HW-410a.4",
+            page=109,
+            table_id="continued-index",
+            row_index=6,
+        )
+        next_page_value = _table_segment(
+            "p109-ewaste-value",
+            "table_cell",
+            "E-waste recycled: 91,000 metric tons",
+            page=109,
+            table_id="continued-index",
+            row_index=6,
+            col_index=1,
+            col_header="FY2024",
+            value_text="91,000 metric tons",
+        )
+        report = _report([
+            engagement_row,
+            engagement_value,
+            engagement_code,
+            next_page_row,
+            next_page_value,
+        ])
+        metric = _metric(
+            "employee-engagement",
+            code,
+            metric_name,
+            "Percentage (%)",
+        )
+        retrieval = MetricRetrievalResult(
+            metric_id=metric.metric_id,
+            metric_name=metric_name,
+            metric_code=code,
+            combined_results=[],
+        )
+
+        analysis = self.engine._direct_code_data_disclosure_analysis(
+            retrieval,
+            report,
+            metric,
+            [{
+                "segment_id": engagement_row.segment_id,
+                "page_number": 108,
+                "score": 1.0,
+                "retrieval_type": "exact_code+table_row_context",
+            }],
+            [engagement_row.segment_id],
+        )
+
+        self.assertIsNotNone(analysis)
+        self.assertEqual(analysis.value, 87)
+        self.assertEqual(analysis.page, 108)
+        self.assertNotIn("91,000", analysis.context)
 
     def test_direct_code_row_retains_all_years_and_projects_latest(self):
         code = "TC-SI-330a.2"
@@ -1650,15 +2103,31 @@ class DirectDisclosureTests(unittest.TestCase):
     def test_evidence_chunking_keeps_table_rows_together(self):
         segments = ["A" * 80, "B" * 80, "C" * 80]
         metadata = [
-            {"segment_id": "a", "source_table_id": "table-1", "row_index": 2},
-            {"segment_id": "b", "source_table_id": "table-1", "row_index": 2},
-            {"segment_id": "c"},
+            {
+                "segment_id": "a",
+                "source_table_id": "table-1",
+                "page_number": 1,
+                "row_index": 2,
+            },
+            {
+                "segment_id": "b",
+                "source_table_id": "table-1",
+                "page_number": 1,
+                "row_index": 2,
+            },
+            {
+                "segment_id": "c",
+                "source_table_id": "table-1",
+                "page_number": 2,
+                "row_index": 2,
+            },
         ]
 
         chunks = self.engine._evidence_chunks(segments, metadata, token_budget=30)
 
         self.assertEqual(len(chunks), 2)
         self.assertEqual([item[1]["segment_id"] for item in chunks[0]], ["a", "b"])
+        self.assertEqual([item[1]["segment_id"] for item in chunks[1]], ["c"])
 
     def test_ocr_separator_variation_matches_full_code_only(self):
         canonical_code = "TC-HW-410a.3"

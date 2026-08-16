@@ -11,6 +11,7 @@ import math
 from collections import Counter
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+from ..models import table_row_scope_key
 from .metric_profile import MetricRetrievalProfile, best_alias_matches, build_metric_retrieval_profile, tokenize_metric_text
 from .scoring import *  # noqa: F401,F403
 
@@ -295,12 +296,7 @@ class KeywordRetriever:
         if isinstance(structured, dict):
             table_id = table_id or structured.get("table_id") or structured.get("source_table_id")
             row_index = structured.get("row_index", structured.get("row_idx"))
-        if table_id is None or row_index is None:
-            return None
-        try:
-            return str(table_id), int(row_index)
-        except Exception:
-            return None
+        return table_row_scope_key(segment, table_id=table_id, row_index=row_index)
 
     def _upgrade_code_cell_to_table_row(self, segment: Any, row_lookup: Dict[Tuple[str, int], Any]) -> Tuple[Any, str, bool]:
         """Return full table-row evidence when exact Code matched a cell.

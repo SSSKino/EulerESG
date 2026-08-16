@@ -297,17 +297,40 @@ class SemanticRetriever:
                         segments.append(seg)
                     segment_embeddings = np.asarray(raw_embeddings, dtype=np.float32) if raw_embeddings else np.zeros((0, 0), dtype=np.float32)
 
-                if not segment_embeddings:
-                    logger.warning("No embedding vectors found in report")
-                    return []
-
-                embedding_cache = (segments, segment_embeddings)
-                try:
-                    setattr(report_content, "_semantic_retrieval_embedding_cache", embedding_cache)
-                except Exception:
-                    pass
             else:
                 segments, segment_embeddings = embedding_cache
+
+            # Both the persisted representation and the native fast path are
+            # NumPy matrices.  Never use their truth value: bool(ndarray) raises
+            # for multi-element reports.  Normalizing here also makes a legacy
+            # list-based cache safe without copying an already-contiguous
+            # float32 matrix.
+            if not isinstance(segments, list):
+                segments = list(segments)
+            segment_embeddings = np.asarray(segment_embeddings, dtype=np.float32)
+            if segment_embeddings.size == 0:
+                logger.warning("No embedding vectors found in report")
+                return []
+            if segment_embeddings.ndim != 2 or segment_embeddings.shape[0] != len(segments):
+                logger.warning(
+                    "Invalid report embedding matrix: rows={} segments={} dimensions={}",
+                    segment_embeddings.shape[0] if segment_embeddings.ndim else 0,
+                    len(segments),
+                    segment_embeddings.ndim,
+                )
+                return []
+            segment_embeddings = np.ascontiguousarray(segment_embeddings, dtype=np.float32)
+
+            normalized_cache = (segments, segment_embeddings)
+            if (
+                embedding_cache is None
+                or embedding_cache[0] is not segments
+                or embedding_cache[1] is not segment_embeddings
+            ):
+                try:
+                    setattr(report_content, "_semantic_retrieval_embedding_cache", normalized_cache)
+                except Exception:
+                    pass
 
             similarities = cosine_similarity(query_embedding, segment_embeddings)[0]
             relaxed_threshold = max(0.08, float(getattr(self.config, "similarity_threshold", 0.2) or 0.2) * (0.65 if _is_quantitative_metric(metric) else 0.8))

@@ -394,6 +394,7 @@ async def get_assessment_by_file(
     user_id: int = Depends(get_current_user),
     scope: Optional[str] = None,
     year: Optional[int] = None,
+    compact: bool = False,
 ):
     """
     根据文件ID获取合规评估结果（从JSON文件）(只能访问自己的文件)
@@ -481,11 +482,16 @@ async def get_assessment_by_file(
         with open(json_file, 'r', encoding='utf-8') as f:
             assessment_data = json.load(f)
 
-        return _apply_assessment_year_selection(
+        assessment_payload = _apply_assessment_year_selection(
             _normalize_assessment_payload(assessment_data),
             year,
         )
+        if compact:
+            return _compact_assessment_payload(assessment_payload)
+        return assessment_payload
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Failed to load assessment for {file_id}: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to load assessment: {str(e)}")

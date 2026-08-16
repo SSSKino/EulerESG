@@ -2,12 +2,65 @@
 Simplified data models for ESG report encoding
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from .embedding_settings import get_configured_embedding_model_name
 from datetime import datetime
 from pydantic import BaseModel, Field
 from enum import Enum
+
+
+def table_row_scope_key(
+    segment: Any,
+    table_id: Any = None,
+    row_index: Any = None,
+) -> Optional[Tuple[str, int]]:
+    """Return a page-scoped logical row key for table evidence.
+
+    Paddle can keep one logical ``table_id`` across continuation pages while
+    restarting ``row_index`` on every page. The page and source report must be
+    part of the lookup scope, otherwise a cell on page N can be joined to the
+    same row number on page N+1.
+    """
+    data = getattr(segment, "structured_data", None)
+    data = data if isinstance(data, dict) else {}
+    resolved_table_id = (
+        table_id
+        or getattr(segment, "source_table_id", None)
+        or data.get("table_id")
+        or data.get("source_table_id")
+    )
+    resolved_row_index = (
+        row_index
+        if row_index is not None
+        else data.get("row_index", data.get("row_idx"))
+    )
+    if resolved_table_id is None or resolved_row_index is None:
+        return None
+    try:
+        normalized_row_index = int(resolved_row_index)
+    except (TypeError, ValueError):
+        return None
+
+    source_report_id = str(
+        getattr(segment, "source_report_id", None)
+        or data.get("source_report_id")
+        or ""
+    ).strip()
+    raw_page_number = (
+        getattr(segment, "page_number", None)
+        or data.get("page_number")
+        or data.get("page")
+        or 0
+    )
+    try:
+        page_number = int(raw_page_number)
+    except (TypeError, ValueError):
+        page_number = 0
+    scoped_table_id = "\x1f".join(
+        (source_report_id, str(resolved_table_id), f"p{page_number}")
+    )
+    return scoped_table_id, normalized_row_index
 
 
 class MetricCategory(str, Enum):

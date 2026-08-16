@@ -258,7 +258,12 @@ def _link_attachment_group(segment: TextSegment) -> tuple:
     table_id = segment.source_table_id or data.get("table_id")
     row_index = data.get("row_index")
     if table_id and row_index is not None:
-        return ("table_row", str(table_id), str(row_index))
+        return (
+            "table_row",
+            str(table_id),
+            str(getattr(segment, "page_number", None) or data.get("page_number") or ""),
+            str(row_index),
+        )
     return ("segment", str(segment.segment_id))
 
 

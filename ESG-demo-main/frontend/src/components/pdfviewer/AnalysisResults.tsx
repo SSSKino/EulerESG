@@ -38,6 +38,8 @@ type AnalysisDataItem = {
   } | null;
 };
 
+type AnalysisErrorCode = "no_file" | "no_analysis" | "load_failed";
+
 interface AnalysisResultsProps {
   fileId?: string;
   scopeKey?: string;
@@ -184,8 +186,6 @@ const extractContextText = (raw: any): string => {
   return String(raw).trim();
 };
 
-const analysisDataCache = new Map<string, AnalysisDataItem[]>();
-
 const pickValue = (...vals: any[]) => {
   for (const v of vals) {
     if (v === null || v === undefined) continue;
@@ -306,44 +306,41 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     ) || files.find((file) => file.file_id === fileId);
   const industry = currentFile?.industry;
   const semiIndustry = currentFile?.semiIndustry;
+  const requestedFileId = fileId || currentFile?.file_id;
 
-  const cacheKey = `${fileId || ""}::${scopeKey || ""}`;
-  const [analysisData, setAnalysisData] = useState<AnalysisDataItem[]>(() =>
-    analysisDataCache.get(cacheKey) || []
-  );
-  const [loading, setLoading] = useState(() => !!fileId && !analysisDataCache.has(cacheKey));
-  const [error, setError] = useState<string | null>(null);
+  const [analysisData, setAnalysisData] = useState<AnalysisDataItem[]>([]);
+  const [loading, setLoading] = useState(() => !!requestedFileId);
+  const [error, setError] = useState<AnalysisErrorCode | null>(null);
 
   useEffect(() => {
-    const cached = analysisDataCache.get(cacheKey);
-    if (cached) {
-      setAnalysisData(cached);
-      setLoading(false);
-      setError(null);
-    }
+    let active = true;
 
     const fetchAnalysisData = async () => {
-      if (!currentFile?.file_id) {
+      if (!requestedFileId) {
         setAnalysisData([]);
         setLoading(false);
-        setError(t("analysis.noFileSelected"));
+        setError("no_file");
         return;
       }
 
-      if (!cached) {
-        setLoading(true);
-      }
+      setLoading(true);
       setError(null);
       try {
-        const assessment = await apiService.getAssessmentByFile(currentFile.file_id, scopeKey, false);
+        const assessment = await apiService.getAssessmentByFile(
+          requestedFileId,
+          scopeKey,
+          false,
+          true,
+        );
+        if (!active) return;
         const convertedData = convertAssessmentData(assessment);
-        analysisDataCache.set(cacheKey, convertedData);
         setAnalysisData(convertedData);
 
         if (assessment?.status === "not_analyzed") {
-          setError(t("analysis.noAnalysisAvailable"));
+          setError("no_analysis");
         }
       } catch (err) {
+        if (!active) return;
         console.error("Failed to fetch assessment data:", err);
         const isNotAnalyzed =
           err &&
@@ -354,18 +351,21 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
             ((err as any).message as string).toLowerCase().includes("no analysis"));
 
         if (isNotAnalyzed) {
-          setError(t("analysis.noAnalysisAvailable"));
+          setError("no_analysis");
         } else {
-          setError(t("analysis.failedToLoad"));
+          setError("load_failed");
         }
         setAnalysisData([]);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
     void fetchAnalysisData();
-  }, [cacheKey, currentFile?.file_id, scopeKey, t]);
+    return () => {
+      active = false;
+    };
+  }, [requestedFileId, scopeKey]);
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "Quantitative":
@@ -377,10 +377,13 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     }
   };
 
-  const data = analysisData.map((item, index) => ({
-    ...item,
-    key: `${item.metric_id}-${index}`,
-  }));
+  const data = useMemo(
+    () => analysisData.map((item, index) => ({
+      ...item,
+      key: `${item.metric_id}-${index}`,
+    })),
+    [analysisData],
+  );
 
   const columns: ColumnsType<AnalysisDataItem> = useMemo(
   () => {
@@ -624,31 +627,18 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 );
 
 
-  const getAnalysisSummary = (data: AnalysisDataItem[]) => {
-    // Since backend doesn't distinguish between disclosure and activity metrics,
-    // we'll only show disclosure metrics to avoid empty activity section
-    const disclosureData = data;
-    
-    const getStats = (group: AnalysisDataItem[]) => {
-      const red = group.filter(
-        (item) => item.disclosure_status === "not_disclosed"
-      ).length;
-      const yellow = group.filter(
-        (item) => item.disclosure_status === "partially_disclosed"
-      ).length;
-      const green = group.filter(
-        (item) => item.disclosure_status === "fully_disclosed"
-      ).length;
-      return { red, yellow, green };
-    };
-
-    return {
-      disclosure: getStats(disclosureData),
-      // Remove activity section since backend doesn't provide this distinction
-    };
-  };
-
-  const summary = getAnalysisSummary(data);
+  const summary = useMemo(() => {
+    const disclosure = data.reduce(
+      (stats, item) => {
+        if (item.disclosure_status === "not_disclosed") stats.red += 1;
+        else if (item.disclosure_status === "partially_disclosed") stats.yellow += 1;
+        else if (item.disclosure_status === "fully_disclosed") stats.green += 1;
+        return stats;
+      },
+      { red: 0, yellow: 0, green: 0 },
+    );
+    return { disclosure };
+  }, [data]);
   // console.log("data.length", summary.disclosure);
 
   if (loading) {
@@ -671,6 +661,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   }
 
   if (error) {
+    const errorMessage = error === "no_file"
+      ? t("analysis.noFileSelected")
+      : error === "no_analysis"
+        ? t("analysis.noAnalysisAvailable")
+        : t("analysis.failedToLoad");
     return (
       <div className="flex flex-col gap-6">
         <h1 className="text-2xl font-bold text-gray-800 !my-0">
@@ -683,7 +678,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         </h2>
         <Alert
           message={t("common.error")}
-          description={error}
+          description={errorMessage}
           type="error"
           showIcon
           action={
@@ -780,7 +775,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
             className="w-full analysis-results-table"
             scroll={{ y: 300 }}
             tableLayout="fixed"
-            pagination={false}
+            pagination={{ pageSize: 20, showSizeChanger: false, hideOnSinglePage: true }}
             rowKey="key"
           />
         </div>
@@ -789,4 +784,4 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   );
 };
 
-export default AnalysisResults;
+export default React.memo(AnalysisResults);

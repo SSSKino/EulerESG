@@ -18,6 +18,8 @@ const { Text } = Typography;
 export type PDFEvidenceViewerProps = {
   fileUrl: string;
   initialPage?: number;
+  /** Re-run external page navigation when the same page is requested twice. */
+  navigationNonce?: number;
   height?: string | number;
   /**
    * Default zoom multiplier (relative to the chosen fit mode).
@@ -43,6 +45,7 @@ type PageSize = { w: number; h: number } | null;
 export default function PDFEvidenceViewer({
   fileUrl,
   initialPage = 1,
+  navigationNonce,
   height = "72vh",
   defaultZoom = 1.15,
   fitTo = "width",
@@ -62,7 +65,7 @@ export default function PDFEvidenceViewer({
 
   useEffect(() => {
     setPage(Math.max(1, initialPage));
-  }, [initialPage]);
+  }, [initialPage, navigationNonce]);
 
   // Pass auth header for protected PDF endpoint
   const pdfOptions = useMemo(() => {

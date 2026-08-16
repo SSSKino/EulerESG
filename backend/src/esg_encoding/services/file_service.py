@@ -132,7 +132,8 @@ async def serve_pdf(file_id: str, user_id: int = Depends(get_current_user)):
     return FileResponse(
         path=str(file_path),
         media_type="application/pdf",
-        filename=file_info.get("safe_filename", "report.pdf")
+        filename=file_info.get("safe_filename", "report.pdf"),
+        headers={"Cache-Control": "private, max-age=86400, immutable"},
     )
 
 

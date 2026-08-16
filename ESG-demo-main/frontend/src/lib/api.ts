@@ -280,13 +280,21 @@ class APIService {
     return response.json();
   }
 
-  private assessmentCacheKey(fileId: string, scope?: string) {
-    return `${fileId}::${(scope || "").trim()}`;
+  private assessmentCacheKey(fileId: string, scope?: string, compact = false) {
+    return `${fileId}::${(scope || "").trim()}::${compact ? "compact" : "full"}`;
   }
 
   invalidateAssessmentByFileCache(fileId?: string, scope?: string) {
     if (fileId) {
-      this.assessmentByFileCache.delete(this.assessmentCacheKey(fileId, scope));
+      if (scope !== undefined) {
+        this.assessmentByFileCache.delete(this.assessmentCacheKey(fileId, scope, false));
+        this.assessmentByFileCache.delete(this.assessmentCacheKey(fileId, scope, true));
+        return;
+      }
+      const prefix = `${fileId}::`;
+      for (const key of this.assessmentByFileCache.keys()) {
+        if (key.startsWith(prefix)) this.assessmentByFileCache.delete(key);
+      }
       return;
     }
     this.assessmentByFileCache.clear();
@@ -376,6 +384,13 @@ class APIService {
     this.invalidateAssessmentByFileCache(fileId);
     this.invalidateVisualAssetCache(fileId);
     return result;
+  }
+
+  async reanalyzeReport(fileId: string): Promise<UploadResponse> {
+    return this.fetchWithError(
+      `${API_BASE_URL}/api/reports/${encodeURIComponent(fileId)}/reanalyze`,
+      { method: "POST" }
+    );
   }
 
   // Delete file; optional scope_key removes one multi-scope compliance row only (keeps PDF).
@@ -663,9 +678,18 @@ class APIService {
     return this.fetchWithError(`${API_BASE_URL}/api/assessment`);
   }
 
-  async getAssessmentByFile(fileId: string, scope?: string, forceRefresh = false) {
-    const qs = scope ? `?scope=${encodeURIComponent(scope)}` : "";
-    const cacheKey = this.assessmentCacheKey(fileId, scope);
+  async getAssessmentByFile(
+    fileId: string,
+    scope?: string,
+    forceRefresh = false,
+    compact = false,
+  ) {
+    const params = new URLSearchParams();
+    if (scope) params.set("scope", scope);
+    if (compact) params.set("compact", "true");
+    const query = params.toString();
+    const qs = query ? `?${query}` : "";
+    const cacheKey = this.assessmentCacheKey(fileId, scope, compact);
     if (forceRefresh) {
       this.assessmentByFileCache.delete(cacheKey);
     } else {
@@ -680,13 +704,15 @@ class APIService {
           : [];
         const status = String((payload as any)?.status ?? "").trim().toLowerCase();
         const shouldCache = !(status === "not_analyzed" || (analyses.length === 0 && status !== "success"));
-        if (!shouldCache) {
+        if (!shouldCache && this.assessmentByFileCache.get(cacheKey) === request) {
           this.assessmentByFileCache.delete(cacheKey);
         }
         return payload;
       })
       .catch((error) => {
-        this.assessmentByFileCache.delete(cacheKey);
+        if (this.assessmentByFileCache.get(cacheKey) === request) {
+          this.assessmentByFileCache.delete(cacheKey);
+        }
         throw error;
       });
 
@@ -694,9 +720,14 @@ class APIService {
     return request;
   }
 
-  prefetchAssessmentByFile(fileId?: string, scope?: string, forceRefresh = false) {
+  prefetchAssessmentByFile(
+    fileId?: string,
+    scope?: string,
+    forceRefresh = false,
+    compact = false,
+  ) {
     if (!fileId) return;
-    void this.getAssessmentByFile(fileId, scope, forceRefresh).catch(() => undefined);
+    void this.getAssessmentByFile(fileId, scope, forceRefresh, compact).catch(() => undefined);
   }
 
   // 获取最新的评估结果

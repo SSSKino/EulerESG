@@ -65,6 +65,8 @@ export const DICT = {
       selectAtLeastTwoReports: "请至少选择两份报告进行对比",
       crossAnalysisSameFramework: "交叉分析仅支持相同框架（如 SASB 与 SASB、GRI 与 GRI）；GRI 需相同 Sector 与 Topic",
       title: "我的文件",
+      singleReportDirectory: "单份报告解读目录",
+      multiReportDirectory: "多份报告解读目录",
       columns: {
         name: "名称",
         size: "大小",
@@ -450,6 +452,8 @@ export const DICT = {
       selectAtLeastTwoReports: "Please select at least two reports to compare",
       crossAnalysisSameFramework: "Cross analysis requires the same framework (e.g. SASB with SASB, GRI with GRI) and for GRI the same Sector and Topic.",
       title: "Your Files",
+      singleReportDirectory: "Single-report interpretation directory",
+      multiReportDirectory: "Multi-report interpretation directory",
       columns: {
         name: "Name",
         size: "Size",

@@ -10,6 +10,8 @@ export interface File {
   size: string;
   dateUploaded: string;
   type: string;
+  /** Backend storage category; homepage interpretation catalogues only show reports. */
+  file_type?: string;
   status: "pending" | "ready" | "failed" | "partial";
   url?: string;
   industry?: string;
@@ -39,6 +41,23 @@ export interface File {
   batch_id?: string;
   upload_mode?: "single" | "multi" | string;
   company_analysis_version?: number;
+}
+
+export type ReportCatalogMode = "single" | "multi";
+
+/**
+ * Select the homepage catalogue for a report.
+ *
+ * The original single-report endpoint did not persist `upload_mode`, so an
+ * absent or unknown value must remain visible in the single-report catalogue.
+ * Only an explicit `multi` value belongs to the company/multi-report catalogue.
+ */
+export function getReportCatalogMode(
+  file: Pick<File, "upload_mode">,
+): ReportCatalogMode {
+  return String(file.upload_mode || "").trim().toLowerCase() === "multi"
+    ? "multi"
+    : "single";
 }
 
 /**
@@ -183,12 +202,15 @@ export const useFileStore = create<FileStore>()(
       loading: false,
       lastRefresh: 0,
       setLoading: (loading) => set({ loading }),
-      clearFiles: () =>
+      clearFiles: () => {
+        apiService.invalidateAssessmentByFileCache();
+        apiService.invalidateVisualAssetCache();
         set(() => ({
           files: [],
           selectedFileId: null,
           lastRefresh: 0,
-        })),
+        }));
+      },
       addFile: (file) =>
         set((state) => ({
           files: [...state.files, { ...file, status: file.status ?? "pending" }],
@@ -252,6 +274,7 @@ export const useFileStore = create<FileStore>()(
                 dateUploaded: file.upload_time?.split("T")?.[0] || "",
                 uploadedAtMs: parseUploadTimeMs(file.upload_time),
                 type: file.original_name?.split('.')?.pop()?.toUpperCase() || '',
+                file_type: file.file_type || undefined,
                 status: mapBackendReportStatus(file),
                 file_id: file.file_id,
                 backend_status: file.status,

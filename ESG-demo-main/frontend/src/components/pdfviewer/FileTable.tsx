@@ -1,19 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Table, Button, Dropdown, Modal, Space, Tag, Tooltip, message } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
-import { DeleteOutlined, StarFilled, StarOutlined } from "@ant-design/icons";
+import { DeleteOutlined, StarFilled, StarOutlined, SyncOutlined } from "@ant-design/icons";
 import { BarChartOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { useFileStore } from "@/store/useFileStore";
-import { canCrossAnalyzeFiles } from "@/store/useFileStore";
-import type { File } from "@/store/useFileStore";
+import {
+  canCrossAnalyzeFiles,
+  getReportCatalogMode,
+  useFileStore,
+} from "@/store/useFileStore";
+import type { File, ReportCatalogMode } from "@/store/useFileStore";
 import { useT } from "@/i18n/useT";
 import { errorSummary } from "@/lib/logger";
+import { apiService } from "@/lib/api";
 
 interface FileTableProps {
   onChatClick: (file: File) => void;
   selectedRows: File[];
   onSelectionChange: (rows: File[]) => void;
+  reportCatalogMode: ReportCatalogMode;
 }
 
 type FileTableRow = File & {
@@ -41,7 +46,12 @@ function sortFilesForDisplay(files: File[]): File[] {
   });
 }
 
-const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSelectionChange }) => {
+const FileTable: React.FC<FileTableProps> = ({
+  onChatClick,
+  selectedRows,
+  onSelectionChange,
+  reportCatalogMode,
+}) => {
   const { t, lang } = useT();
   const router = useRouter();
 
@@ -52,6 +62,7 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
   const [favouriteReportKeys, setFavouriteReportKeys] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<File | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [reanalyzingIds, setReanalyzingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     try {
@@ -138,12 +149,115 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     }
   };
 
+  const setReanalyzing = (fileId: string, active: boolean) => {
+    setReanalyzingIds((current) => {
+      const next = new Set(current);
+      if (active) next.add(fileId);
+      else next.delete(fileId);
+      return next;
+    });
+  };
+
+  const handleReanalyze = (file: File) => {
+    const fileId = file.file_id;
+    if (!fileId || reanalyzingIds.has(fileId)) return;
+
+    Modal.confirm({
+      title: lang === "zh" ? "重新分析报告" : "Re-analyze report",
+      content:
+        lang === "zh"
+          ? "仅复用已有 OCR、分段和 embedding，不会重新解析 PDF。非确定性指标仍可能调用当前配置的 LLM 并产生费用。"
+          : "This reuses the existing OCR, segments, and embeddings without parsing the PDF again. Non-deterministic metrics may still call the configured LLM and incur usage charges.",
+      okText: lang === "zh" ? "开始重新分析" : "Start re-analysis",
+      cancelText: lang === "zh" ? "取消" : "Cancel",
+      onOk: async () => {
+        const messageKey = `reanalyze-${fileId}`;
+        setReanalyzing(fileId, true);
+        try {
+          const accepted = await apiService.reanalyzeReport(fileId);
+          const jobId = accepted.job_id;
+          if (!jobId) throw new Error("Backend did not return a re-analysis job ID");
+          void message.loading({
+            key: messageKey,
+            content: lang === "zh" ? "正在重新分析报告…" : "Re-analyzing report…",
+            duration: 0,
+          });
+          apiService.subscribeReportJob(jobId, {
+            onDone: () => {
+              apiService.invalidateAssessmentByFileCache(fileId);
+              void useFileStore.getState().loadFilesFromBackend({ showLoading: false });
+              setReanalyzing(fileId, false);
+              void message.success({
+                key: messageKey,
+                content: lang === "zh" ? "报告分析已更新" : "Report analysis updated",
+              });
+            },
+            onError: (error) => {
+              setReanalyzing(fileId, false);
+              void message.error({
+                key: messageKey,
+                content:
+                  lang === "zh"
+                    ? `重新分析失败：${errorSummary(error)}`
+                    : `Re-analysis failed: ${errorSummary(error)}`,
+              });
+            },
+          });
+        } catch (error) {
+          setReanalyzing(fileId, false);
+          void message.error({
+            key: messageKey,
+            content:
+              lang === "zh"
+                ? `无法开始重新分析：${errorSummary(error)}`
+                : `Unable to start re-analysis: ${errorSummary(error)}`,
+          });
+          throw error;
+        }
+      },
+    });
+  };
+
   const dataSource = useMemo<FileTableRow[]>(() => {
-    const sorted = sortFilesForDisplay(files);
+    const reportFiles = files.filter(
+      (file) => !file.file_type || file.file_type === "report",
+    );
+    const companyReportIds = new Map<string, Set<string>>();
+    const explicitlyMultiCompanyIds = new Set<string>();
+    for (const file of reportFiles) {
+      if (!file.company_id) continue;
+      const reportIds = companyReportIds.get(file.company_id) || new Set<string>();
+      reportIds.add(file.file_id || file.key);
+      companyReportIds.set(file.company_id, reportIds);
+      if (getReportCatalogMode(file) === "multi") {
+        explicitlyMultiCompanyIds.add(file.company_id);
+      }
+    }
+    const multiReportCompanyIds = new Set(
+      [...companyReportIds.entries()]
+        .filter(
+          ([companyId, reportIds]) =>
+            explicitlyMultiCompanyIds.has(companyId) || reportIds.size >= 2,
+        )
+        .map(([companyId]) => companyId),
+    );
+    const visibleFiles = reportFiles.filter((file) => {
+      if (reportCatalogMode === "single") {
+        return getReportCatalogMode(file) === "single";
+      }
+      return (
+        getReportCatalogMode(file) === "multi" ||
+        Boolean(file.company_id && multiReportCompanyIds.has(file.company_id))
+      );
+    });
+    const sorted = sortFilesForDisplay(visibleFiles);
     const grouped = new Map<string, File[]>();
     const ungrouped: FileTableRow[] = [];
     for (const file of sorted) {
-      if (!file.company_id) {
+      // Single-report interpretations are always flat, including historical
+      // records that happen to carry a company_id. Multi-report interpretations
+      // are grouped into their company directory.
+      if (reportCatalogMode === "single" || !file.company_id) {
         ungrouped.push(file);
         continue;
       }
@@ -154,6 +268,9 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     const companyRows: FileTableRow[] = [];
     for (const [companyId, reports] of grouped.entries()) {
       const children = sortFilesForDisplay(reports);
+      const reportCount = new Set(
+        children.map((item) => item.file_id || item.key),
+      ).size;
       const failed = children.some((item) => item.status === "failed");
       const pending = children.some((item) => item.status === "pending");
       const partial = children.some((item) => item.status === "partial");
@@ -163,23 +280,27 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
         key: `company::${companyId}`,
         file_id: undefined,
         name: first.company_name || companyId,
-        size: `${children.length} ${children.length === 1 ? "report" : "reports"}`,
+        size: `${reportCount} ${reportCount === 1 ? "report" : "reports"}`,
         type: "Company",
         pages: "-",
         status: failed ? "failed" : pending ? "pending" : partial ? "partial" : "ready",
         isCompany: true,
-        reportCount: children.length,
+        reportCount,
         children,
       });
     }
     companyRows.sort((a, b) => uploadSortKey(b) - uploadSortKey(a));
     return [...companyRows, ...ungrouped];
-  }, [files]);
+  }, [files, reportCatalogMode]);
 
   useEffect(() => {
     const totalPages = Math.max(1, Math.ceil(dataSource.length / pageSize));
     setCurrentPage((prev) => Math.min(prev, totalPages));
   }, [dataSource.length, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [reportCatalogMode]);
 
   const statusText = (file: File) => {
     const s = file.status;
@@ -361,6 +482,22 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
                     : (lang === "zh" ? "收藏" : "Add to favourites"),
                 },
                 {
+                  key: "reanalyze",
+                  icon: (
+                    <SyncOutlined
+                      spin={Boolean(file.file_id && reanalyzingIds.has(file.file_id))}
+                    />
+                  ),
+                  disabled:
+                    file.status !== "ready" ||
+                    !file.file_id ||
+                    reanalyzingIds.has(file.file_id),
+                  label:
+                    lang === "zh"
+                      ? "重新分析（不重新解析）"
+                      : "Re-analyze (reuse parsing)",
+                },
+                {
                   key: "delete",
                   danger: true,
                   icon: <DeleteOutlined />,
@@ -371,6 +508,10 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
                 domEvent.stopPropagation();
                 if (key === "favourite") {
                   toggleFavourite(file);
+                  return;
+                }
+                if (key === "reanalyze") {
+                  handleReanalyze(file);
                   return;
                 }
                 if (key !== "delete") return;
@@ -417,7 +558,11 @@ const FileTable: React.FC<FileTableProps> = ({ onChatClick, selectedRows, onSele
     <>
       <div className="mt-4 bg-white rounded-lg shadow-sm">
       <div className="p-3 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-700">{t("files.title")}</h3>
+        <h3 className="text-lg font-semibold text-gray-700">
+          {reportCatalogMode === "multi"
+            ? t("files.multiReportDirectory")
+            : t("files.singleReportDirectory")}
+        </h3>
         <div className="flex items-center space-x-2">
           <Tooltip title={crossAnalysisDisabledReason} placement="top">
             <span>
