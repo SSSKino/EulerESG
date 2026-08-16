@@ -117,6 +117,12 @@ _excel_metrics_jobs_lock = threading.Lock()
 # Single global ESGChatbot: serialize context/session ops vs background upload (HippoRAG + load_context).
 _chatbot_ops_lock = threading.RLock()
 
+# Per-cache-key locks prevent concurrent cross-analysis requests from rebuilding
+# and replacing the same JSON cache file at the same time.  The guard protects
+# creation of entries in the lock registry itself.
+_cross_disclosed_locks: Dict[str, threading.Lock] = {}
+_cross_disclosed_locks_guard = threading.Lock()
+
 
 # Deleted deprecated function _parse_compliance_report() (179 lines)
 # This function parsed Markdown reports with heuristic guessing and preset defaults.

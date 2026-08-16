@@ -47,7 +47,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   );
 };
 
-const PDFReportViewer = dynamic(() => import("./PDFEvidenceViewer"), { ssr: false });
+const PDFReportViewer = dynamic(() => import("./PDFChatViewer"), { ssr: false });
 const MemoizedPDFReportViewer = React.memo(PDFReportViewer);
 // Use same-origin proxy via Next.js rewrites by default.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
@@ -132,11 +132,10 @@ const ChatView: React.FC<ChatViewProps> = ({
             <div className="overflow-hidden rounded-lg h-[70vh] min-h-[600px]">
               <MemoizedPDFReportViewer
                 fileUrl={`${API_BASE_URL}/api/files/${effectiveFileId}/pdf`}
-                initialPage={targetPage || 1}
-                navigationNonce={targetPageNonce}
+                targetPage={targetPage || 1}
+                targetPageNonce={targetPageNonce}
                 height="100%"
                 defaultZoom={1}
-                fitTo="width"
               />
             </div>
           ) : (

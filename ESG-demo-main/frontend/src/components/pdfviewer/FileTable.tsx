@@ -1,8 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Table, Button, Dropdown, Modal, Space, Tag, Tooltip, message } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
-import { DeleteOutlined, StarFilled, StarOutlined, SyncOutlined } from "@ant-design/icons";
-import { BarChartOutlined } from "@ant-design/icons";
+import {
+  BarChartOutlined,
+  DeleteOutlined,
+  EllipsisOutlined,
+  StarFilled,
+  StarOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import {
   canCrossAnalyzeFiles,
@@ -457,7 +463,7 @@ const FileTable: React.FC<FileTableProps> = ({
           >
             {t("files.actions.analysis")}
           </Button>
-        ) : <Space>
+        ) : <Space size={4}>
           <Button
             type="primary"
             size="small"
@@ -522,8 +528,9 @@ const FileTable: React.FC<FileTableProps> = ({
             <Button
               type="default"
               size="small"
-              icon={<span className="relative -top-[2px] text-base font-semibold leading-none tracking-[2px]">•••</span>}
-              aria-label="More actions"
+              icon={<EllipsisOutlined style={{ fontSize: 13 }} />}
+              aria-label={lang === "zh" ? "更多操作" : "More actions"}
+              title={lang === "zh" ? "更多操作" : "More actions"}
               onClick={(event) => event.stopPropagation()}
             />
           </Dropdown>

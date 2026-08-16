@@ -249,58 +249,6 @@
       "interrupted_job_id": "report_12b89b28b3984571867d6595478f4ae5",
       "processing_error": null
     },
-    "2ac73cc2-03d3-4fc0-8aad-c8270524950d": {
-      "file_id": "2ac73cc2-03d3-4fc0-8aad-c8270524950d",
-      "original_name": "Dell2024.pdf",
-      "safe_filename": "20260714_010100_2ac73cc2-03d3-4fc0-8aad-c8270524950d.pdf",
-      "file_path": "/workspace/uploads/reports/processed/20260714_010100_2ac73cc2-03d3-4fc0-8aad-c8270524950d.pdf",
-      "file_type": "report",
-      "file_size": 12049968,
-      "page_count": 116,
-      "file_hash": "c0461379c802d3c6e43cde5e730ffbcd",
-      "upload_time": "2026-07-14T01:01:02.322771",
-      "status": "processed",
-      "processing_history": [
-        {
-          "timestamp": "2026-07-14T01:14:35.214763",
-          "action": "moved_to_processed",
-          "previous_path": "/workspace/uploads/reports/pending/20260714_010100_2ac73cc2-03d3-4fc0-8aad-c8270524950d.pdf",
-          "new_path": "/workspace/uploads/reports/processed/20260714_010100_2ac73cc2-03d3-4fc0-8aad-c8270524950d.pdf"
-        },
-        {
-          "time": "2026-08-09T02:12:09.263673",
-          "stage": "interrupted_recovery",
-          "previous_stage": "completed"
-        }
-      ],
-      "industry": "Technology & Communications",
-      "framework": "SASB",
-      "semi_industry": "Software & IT Services",
-      "gri_sector": null,
-      "gri_topic": null,
-      "user_id": 526078,
-      "processing_stage": "completed",
-      "processing_progress": 100,
-      "processing_total_pages": 116,
-      "processing_pages_done": 116,
-      "processing_pages_success": 116,
-      "processing_pages_failed": 0,
-      "processing_total_units": 17,
-      "processing_units_done": 17,
-      "processing_units_success": 17,
-      "processing_units_failed": 0,
-      "processing_units_running": 0,
-      "processing_units_queued": 0,
-      "processing_page_batch_size": 7,
-      "processing_running_batches": [],
-      "segments_path": "/workspace/uploads/outputs/embeddings/2ac73cc2-03d3-4fc0-8aad-c8270524950d_segments.json",
-      "embeddings_path": "/workspace/uploads/outputs/embeddings/2ac73cc2-03d3-4fc0-8aad-c8270524950d_embeddings.npz",
-      "embeddings_meta_path": "/workspace/uploads/outputs/embeddings/2ac73cc2-03d3-4fc0-8aad-c8270524950d_embeddings_meta.json",
-      "scope_slugs_json": "[\"Software & IT Services\"]",
-      "extracted_md_path": "/workspace/uploads/reports/processed/20260714_010100_2ac73cc2-03d3-4fc0-8aad-c8270524950d_extracted.md",
-      "interrupted_job_id": "report_226f0b19847b412eaf9c315b86c413be",
-      "processing_error": null
-    },
     "38be6545-5910-4af2-86c0-7e385735a1f4": {
       "file_id": "38be6545-5910-4af2-86c0-7e385735a1f4",
       "original_name": "Dell2024.pdf",
@@ -444,52 +392,6 @@
       "embeddings_meta_path": "/workspace/uploads/outputs/embeddings/7b185b4f-7595-41e9-8e95-9468b5de4341_embeddings_meta.json",
       "extracted_md_path": "/workspace/uploads/reports/processed/20260717_064757_7b185b4f-7595-41e9-8e95-9468b5de4341_extracted.md",
       "company_analysis_version": 1
-    },
-    "58d1da5d-62b1-4f4c-b180-4284b34c267b": {
-      "file_id": "58d1da5d-62b1-4f4c-b180-4284b34c267b",
-      "original_name": "Dell2024.pdf",
-      "safe_filename": "20260808_153637_58d1da5d-62b1-4f4c-b180-4284b34c267b.pdf",
-      "file_path": "/workspace/uploads/reports/processed/20260808_153637_58d1da5d-62b1-4f4c-b180-4284b34c267b.pdf",
-      "file_type": "report",
-      "file_size": 12049968,
-      "page_count": 116,
-      "file_hash": "c0461379c802d3c6e43cde5e730ffbcd",
-      "upload_time": "2026-08-08T15:36:39.611761",
-      "status": "failed",
-      "processing_history": [
-        {
-          "timestamp": "2026-08-08T15:41:32.911168",
-          "action": "moved_to_processed",
-          "previous_path": "/workspace/uploads/reports/pending/20260808_153637_58d1da5d-62b1-4f4c-b180-4284b34c267b.pdf",
-          "new_path": "/workspace/uploads/reports/processed/20260808_153637_58d1da5d-62b1-4f4c-b180-4284b34c267b.pdf"
-        },
-        {
-          "time": "2026-08-09T02:12:09.263673",
-          "stage": "interrupted_recovery",
-          "previous_stage": "extracted"
-        }
-      ],
-      "industry": "Technology & Communications",
-      "framework": "SASB",
-      "semi_industry": "Software & IT Services",
-      "gri_sector": null,
-      "gri_topic": null,
-      "user_id": 526078,
-      "company_id": "company_bc3c62c47b574889bf3dea76f921efaa",
-      "company_name": "dell 2024",
-      "report_year": 2024,
-      "upload_mode": "single",
-      "scope_slugs_json": "[\"Software & IT Services\"]",
-      "batch_id": "batch_e3d705318c7b450e880a56f0bf0c16e1",
-      "processing_stage": "interrupted",
-      "processing_progress": 100,
-      "segments_path": "/workspace/uploads/outputs/embeddings/58d1da5d-62b1-4f4c-b180-4284b34c267b_segments.json",
-      "embeddings_path": "/workspace/uploads/outputs/embeddings/58d1da5d-62b1-4f4c-b180-4284b34c267b_embeddings.npz",
-      "embeddings_meta_path": "/workspace/uploads/outputs/embeddings/58d1da5d-62b1-4f4c-b180-4284b34c267b_embeddings_meta.json",
-      "extracted_md_path": "/workspace/uploads/reports/processed/20260808_153637_58d1da5d-62b1-4f4c-b180-4284b34c267b_extracted.md",
-      "visual_assets_path": "/workspace/uploads/reports/processed/20260808_153637_58d1da5d-62b1-4f4c-b180-4284b34c267b_visual_assets",
-      "interrupted_job_id": "report_acd5348457744c80b2a5a8fe3d127118",
-      "processing_error": "Processing was interrupted by a backend restart. Please reprocess the report."
     },
     "8e1ac205-94bc-41b4-8948-6675767cde6b": {
       "file_id": "8e1ac205-94bc-41b4-8948-6675767cde6b",
