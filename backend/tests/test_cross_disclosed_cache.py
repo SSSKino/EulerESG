@@ -54,6 +54,7 @@ class CrossDisclosedCacheLockTests(unittest.TestCase):
                 patch.object(
                     cross_analysis_service,
                     "_validate_cross_analysis_compatibility",
+                    return_value=[],
                 ),
                 patch.object(
                     cross_analysis_service.file_manager,
@@ -93,7 +94,7 @@ class CrossDisclosedCacheLockTests(unittest.TestCase):
         self.assertTrue(second["from_cache"])
         self.assertEqual(second["records"], records)
         build_records.assert_called_once_with(
-            ["report-a", "report-b"], user_id=7
+            ["report-a", "report-b"], user_id=7, reports=[]
         )
 
 

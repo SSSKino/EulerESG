@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Layout } from "antd";
 import DashboardSidebar from "@/components/navbar/DashboardSidebar";
+import { CrossAnalysisNavigationSlotContext } from "@/components/cross-analysis/CrossAnalysisNavigationPortal";
 import { usePathname } from "next/navigation";
 
 const { Content } = Layout;
 
 export default function CrossAnalysisLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
+  const [navigationSlot, setNavigationSlot] = useState<HTMLElement | null>(null);
 
   const isEvidenceRoute = useMemo(() => pathname.includes("/cross-analysis/evidence"), [pathname]);
 
@@ -35,11 +37,13 @@ export default function CrossAnalysisLayout({ children }: { children: React.Reac
   // no extra framework selection gate is required.
 
   return (
-    <Layout style={{ minHeight: "100vh", flexDirection: "row" }}>
-      <DashboardSidebar />
-      <Content style={{ display: "flex", minWidth: 0 }}>
-        {children}
-      </Content>
-    </Layout>
+    <CrossAnalysisNavigationSlotContext.Provider value={navigationSlot}>
+      <Layout style={{ minHeight: "100vh", flexDirection: "row" }}>
+        <DashboardSidebar crossAnalysisNavigationSlotRef={setNavigationSlot} />
+        <Content style={{ display: "flex", minWidth: 0 }}>
+          {children}
+        </Content>
+      </Layout>
+    </CrossAnalysisNavigationSlotContext.Provider>
   );
 }

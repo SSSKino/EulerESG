@@ -27,10 +27,14 @@ export interface NewSidebarProps {
   expandedPrimaries: Record<string, boolean>;
   primaryIsActivityMetrics?: boolean;
   forceSecondaryLeafMode?: boolean;
+  /** Render as a nested section of the global dashboard sidebar. */
+  embedded?: boolean;
+  /** @deprecated Disclosure completeness is now opened from DashboardSidebar. */
   viewMode?: "issue" | "disclosure";
   onTogglePrimary: (primary: string) => void;
   onSelectSecondary: (primary: string, secondary: string) => void;
   onSelectTertiary: (primary: string, secondary: string, metricName: string) => void;
+  /** @deprecated Disclosure completeness is now opened from DashboardSidebar. */
   onSelectDisclosure?: () => void;
 }
 
@@ -49,11 +53,10 @@ export function NewSidebar({
   expandedPrimaries,
   primaryIsActivityMetrics = false,
   forceSecondaryLeafMode = false,
-  viewMode = "issue",
+  embedded = false,
   onTogglePrimary,
   onSelectSecondary,
   onSelectTertiary,
-  onSelectDisclosure,
 }: NewSidebarProps) {
   const { t } = useT();
   const selectedSecondarySet = useMemo(() => new Set(selectedSecondaries || []), [selectedSecondaries]);
@@ -67,10 +70,12 @@ export function NewSidebar({
   }, []);
 
   return (
-    <div className="w-[320px] bg-white rounded-2xl shadow-sm p-4 h-fit">
-      <h3 className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-4 pl-8">
-        {t("crossAnalysis.navigation")}
-      </h3>
+    <div className={embedded ? "min-w-0 py-1 pl-5" : "w-[320px] bg-white rounded-2xl shadow-sm p-4 h-fit"}>
+      {!embedded ? (
+        <h3 className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-4 pl-8">
+          {t("crossAnalysis.navigation")}
+        </h3>
+      ) : null}
 
       <div className="space-y-1">
         {primaryOptions.map((primary) => {
@@ -186,18 +191,6 @@ export function NewSidebar({
         })}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-slate-200">
-        <button
-          onClick={() => onSelectDisclosure?.()}
-          className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-[color,background-color,border-color,box-shadow] duration-150 ease-[var(--motion-fluid)] ${
-            viewMode === "disclosure"
-              ? "bg-[#EFF6FF] border border-[#BFDBFE] text-[#0F172A] font-medium"
-              : "bg-transparent border border-transparent text-[#64748B] hover:bg-slate-50"
-          }`}
-        >
-          {t("crossAnalysis.disclosureCompleteness")}
-        </button>
-      </div>
     </div>
   );
 }

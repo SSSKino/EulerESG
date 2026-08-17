@@ -127,6 +127,7 @@ const FileTable: React.FC<FileTableProps> = ({
       void message.info(t("files.selectAtLeastTwoReports"));
       return;
     }
+    apiService.prefetchCrossAnalysis(ids);
     router.push(`/cross-analysis?ids=${encodeURIComponent(ids.join(","))}`);
   };
 
@@ -191,6 +192,7 @@ const FileTable: React.FC<FileTableProps> = ({
           apiService.subscribeReportJob(jobId, {
             onDone: () => {
               apiService.invalidateAssessmentByFileCache(fileId);
+              apiService.invalidateCrossAnalysisCache();
               void useFileStore.getState().loadFilesFromBackend({ showLoading: false });
               setReanalyzing(fileId, false);
               void message.success({

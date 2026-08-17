@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, Check, HelpCircle, House, Languages, PanelLeftClose, PanelLeftOpen, Repeat2, ShieldCheck, Star } from "lucide-react";
+import type { RefCallback } from "react";
+import { BarChart3, Check, HelpCircle, House, Languages, ListChecks, PanelLeftClose, PanelLeftOpen, Repeat2, ShieldCheck, Star } from "lucide-react";
 import { MdLogout, MdSettings } from "react-icons/md";
 import { message, Modal, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
@@ -30,16 +31,23 @@ import type { File } from "@/store/useFileStore";
 
 const SIDEBAR_STORAGE_KEY = "dashboard-sidebar-collapsed";
 
-export default function DashboardSidebar() {
+type DashboardSidebarProps = {
+  crossAnalysisNavigationSlotRef?: RefCallback<HTMLDivElement>;
+};
+
+export default function DashboardSidebar({
+  crossAnalysisNavigationSlotRef,
+}: DashboardSidebarProps = {}) {
   const router = useRouter();
   const pathname = usePathname() || "";
+  const searchParams = useSearchParams();
   const clearFiles = useFileStore((state) => state.clearFiles);
   const files = useFileStore((state) => state.files);
   const { lang, setLang } = useAppLang();
   const { t } = useT();
   const [collapsed, setCollapsed] = useState(false);
   const [displayName, setDisplayName] = useState("User");
-  const [selectorMode, setSelectorMode] = useState<"compliance" | "cross" | null>(null);
+  const [selectorMode, setSelectorMode] = useState<"compliance" | "cross" | "disclosure" | null>(null);
   const [selectedReportKeys, setSelectedReportKeys] = useState<string[]>([]);
 
   const readyReports = useMemo(
@@ -49,6 +57,7 @@ export default function DashboardSidebar() {
   const reportKey = (file: (typeof readyReports)[number]) =>
     `${file.file_id}::${file.analysis_scope_key || ""}`;
   const selectedReports = readyReports.filter((file) => selectedReportKeys.includes(reportKey(file)));
+  const isMultiReportSelector = selectorMode === "cross" || selectorMode === "disclosure";
   const selectorColumns: ColumnsType<File> = [
     { title: t("files.columns.name"), dataIndex: "name", key: "name", ellipsis: true },
     { title: t("files.columns.size"), dataIndex: "size", key: "size", width: 100 },
@@ -100,6 +109,7 @@ export default function DashboardSidebar() {
 
   useEffect(() => {
     router.prefetch("/dashboard/chat");
+    router.prefetch("/cross-analysis");
   }, [router]);
 
   const initials = useMemo(() => {
@@ -134,7 +144,7 @@ export default function DashboardSidebar() {
     void message.info(lang === "zh" ? `${label}功能即将开放` : `${label} is coming soon`);
   };
 
-  const openReportSelector = (mode: "compliance" | "cross") => {
+  const openReportSelector = (mode: "compliance" | "cross" | "disclosure") => {
     setSelectorMode(mode);
     setSelectedReportKeys([]);
     if (files.length === 0) {
@@ -171,16 +181,26 @@ export default function DashboardSidebar() {
       void message.warning(lang === "zh" ? "所选报告的框架或分析范围不兼容" : "The selected reports are not compatible for cross analysis");
       return;
     }
+    if (selectorMode === "disclosure") {
+      void apiService.getCrossAnalysisReports(uniqueFileIds).catch(() => undefined);
+      uniqueFileIds.forEach((fileId) => apiService.prefetchAssessmentByFile(fileId));
+    } else {
+      apiService.prefetchCrossAnalysis(uniqueFileIds);
+    }
     setSelectorMode(null);
-    router.push(`/cross-analysis?ids=${encodeURIComponent(uniqueFileIds.join(","))}`);
+    const viewParam = selectorMode === "disclosure" ? "&view=disclosure" : "";
+    router.push(`/cross-analysis?ids=${encodeURIComponent(uniqueFileIds.join(","))}${viewParam}`);
   };
 
   const isHomepage = pathname === "/dashboard";
   const isCompliance = pathname.startsWith("/dashboard/chat") || pathname.startsWith("/dashboard/company");
-  const isCrossAnalysis = pathname.startsWith("/cross-analysis");
+  const isCrossAnalysisRoute = pathname.startsWith("/cross-analysis");
+  const isDisclosureCompleteness =
+    isCrossAnalysisRoute && (searchParams.get("view") || "").trim().toLowerCase() === "disclosure";
+  const isCrossAnalysis = isCrossAnalysisRoute && !isDisclosureCompleteness;
   const isFavourite = pathname.startsWith("/dashboard/favourite");
   const navigationClass = (active: boolean) =>
-    `flex h-10 w-full items-center rounded-xl transition-colors ${
+    `flex h-10 w-full shrink-0 items-center rounded-xl transition-colors ${
       active
         ? "bg-[#ececec] text-slate-900 hover:bg-[#e5e5e5]"
         : "text-slate-700 hover:bg-[#ececec] hover:text-slate-950"
@@ -240,7 +260,7 @@ export default function DashboardSidebar() {
         )}
       </div>
 
-      <nav className={`flex-1 space-y-1 ${collapsed ? "px-2 pt-1" : "px-2.5 pt-1"}`}>
+      <nav className={`flex min-h-0 flex-1 flex-col gap-1 ${collapsed ? "px-2 pt-1" : "px-2.5 pt-1"}`}>
         <button
           type="button"
           onClick={() => router.push("/dashboard")}
@@ -264,10 +284,49 @@ export default function DashboardSidebar() {
           onClick={() => openReportSelector("cross")}
           className={navigationClass(isCrossAnalysis)}
           title={collapsed ? "Cross Analysis" : undefined}
+          aria-current={isCrossAnalysis ? "page" : undefined}
         >
-          <BarChart3 className={`h-[18px] w-[18px] shrink-0 ${isCrossAnalysis ? "text-[#2274BC]" : ""}`} />
+          <BarChart3 className={`h-[18px] w-[18px] shrink-0 ${isCrossAnalysisRoute ? "text-[#2274BC]" : ""}`} />
           {!collapsed && <span className="truncate text-sm">Cross Analysis</span>}
         </button>
+        <div
+          role="group"
+          aria-label="Cross Analysis"
+          data-testid="cross-analysis-subnavigation"
+          className={`flex min-h-0 flex-col ${isCrossAnalysis && !collapsed ? "flex-1" : ""}`}
+        >
+          <button
+            type="button"
+            data-testid="disclosure-completeness-nav"
+            onClick={() => openReportSelector("disclosure")}
+            aria-label={t("crossAnalysis.disclosureCompleteness")}
+            aria-current={isDisclosureCompleteness ? "page" : undefined}
+            className={`flex shrink-0 items-center border border-transparent transition-colors ${
+              isDisclosureCompleteness
+                ? "bg-[#ececec] text-slate-900 hover:bg-[#e5e5e5]"
+                : "text-slate-600 hover:bg-[#ececec] hover:text-slate-950"
+            } ${
+              collapsed
+                ? "h-9 w-full justify-center rounded-lg px-2"
+                : "ml-5 w-[calc(100%-1.25rem)] rounded-xl px-3 py-2 text-left"
+            }`}
+            title={collapsed ? t("crossAnalysis.disclosureCompleteness") : undefined}
+          >
+            {collapsed ? (
+              <ListChecks className={`h-4 w-4 shrink-0 ${isDisclosureCompleteness ? "text-[#2274BC]" : ""}`} />
+            ) : (
+              <span className="truncate text-sm font-medium">{t("crossAnalysis.disclosureCompleteness")}</span>
+            )}
+          </button>
+          {isCrossAnalysis ? (
+            <div
+              ref={crossAnalysisNavigationSlotRef}
+              data-testid="cross-analysis-navigation-slot"
+              hidden={collapsed}
+              className="min-h-0 flex-1 overflow-y-auto"
+            />
+          ) : null}
+        </div>
         <button
           type="button"
           onClick={() => void message.info(lang === "zh" ? "收藏功能即将开放" : "Favourites are coming soon")}
@@ -345,14 +404,16 @@ export default function DashboardSidebar() {
 
       <Modal
         open={selectorMode !== null}
-        title={selectorMode === "cross"
-          ? (lang === "zh" ? "选择综合分析报告" : "Select reports for cross analysis")
-          : (lang === "zh" ? "选择合规分析报告" : "Select a report for compliance analysis")}
+        title={selectorMode === "disclosure"
+          ? (lang === "zh" ? "选择披露完整度报告" : "Select reports for disclosure completeness")
+          : selectorMode === "cross"
+            ? (lang === "zh" ? "选择综合分析报告" : "Select reports for cross analysis")
+            : (lang === "zh" ? "选择合规分析报告" : "Select a report for compliance analysis")}
         okText={lang === "zh" ? "开始分析" : "Start analysis"}
         cancelText={t("common.cancel")}
         onOk={confirmReportSelection}
         onCancel={() => setSelectorMode(null)}
-        okButtonProps={{ disabled: selectorMode === "cross" ? selectedReportKeys.length < 2 : selectedReportKeys.length !== 1 }}
+        okButtonProps={{ disabled: isMultiReportSelector ? selectedReportKeys.length < 2 : selectedReportKeys.length !== 1 }}
         width={1100}
         destroyOnClose
       >
@@ -366,14 +427,14 @@ export default function DashboardSidebar() {
           locale={{ emptyText: lang === "zh" ? "暂无已处理完成的报告" : "No processed reports available" }}
           pagination={{ pageSize: 8, showSizeChanger: false, hideOnSinglePage: true }}
           rowSelection={{
-            type: selectorMode === "cross" ? "checkbox" : "radio",
+            type: isMultiReportSelector ? "checkbox" : "radio",
             selectedRowKeys: selectedReportKeys,
             onChange: (keys) => setSelectedReportKeys(keys.map(String)),
           }}
           onRow={(file) => ({
             onClick: () => {
               const key = reportKey(file);
-              if (selectorMode !== "cross") {
+              if (!isMultiReportSelector) {
                 apiService.prefetchAssessmentByFile(
                   file.file_id,
                   file.analysis_scope_key,

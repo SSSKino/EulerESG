@@ -1,25 +1,36 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { Button, Card, Empty, Modal, Space, Table, Tag, Typography, Skeleton, Grid } from "antd";
-import type { ColumnsType } from "antd/es/table";
+import dynamic from "next/dynamic";
+import { Button, Modal, Skeleton } from "antd";
 
-import { getStoredAuth } from "@/lib/auth";
+import { apiService } from "@/lib/api";
 import type { CrossExtractedRecord, CrossReportSummary } from "@/features/crossAnalysis/types";
 import { normalizeCrossRecords } from "@/features/crossAnalysis/recordAdapter";
 import { NewSidebar } from "@/components/cross-analysis/NewSidebar";
+import { useCrossAnalysisNavigationSlot } from "@/components/cross-analysis/CrossAnalysisNavigationPortal";
 import { NewHeader } from "@/components/cross-analysis/NewHeader";
-import { MetricChartsGrid, type MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
-import { NewDataTable } from "@/components/cross-analysis/NewDataTable";
-import DisclosureCompletenessComparison from "@/components/cross-analysis/DisclosureCompletenessComparison";
-import FloatingChatAssistant from "@/components/cross-analysis/FloatingChatAssistant";
+import type { MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
 import { useT } from "@/i18n/useT";
 
-const { Title } = Typography;
-const { useBreakpoint } = Grid;
+const MetricChartsGrid = dynamic(
+  () => import("@/components/cross-analysis/MetricChartsGrid").then((mod) => mod.MetricChartsGrid),
+  { loading: () => <Skeleton active paragraph={{ rows: 8 }} />, ssr: false },
+);
+const NewDataTable = dynamic(
+  () => import("@/components/cross-analysis/NewDataTable").then((mod) => mod.NewDataTable),
+  { loading: () => <Skeleton active paragraph={{ rows: 10 }} />, ssr: false },
+);
+const DisclosureCompletenessComparison = dynamic(
+  () => import("@/components/cross-analysis/DisclosureCompletenessComparison"),
+  { loading: () => <Skeleton active paragraph={{ rows: 10 }} />, ssr: false },
+);
+const FloatingChatAssistant = dynamic(
+  () => import("@/components/cross-analysis/FloatingChatAssistant"),
+  { ssr: false },
+);
 
 function safeTrim(v: any): string {
   if (v === null || v === undefined) return "";
@@ -77,31 +88,22 @@ function parseIds(raw: string | null): string[] {
     .filter((x, idx, arr) => arr.indexOf(x) === idx);
 }
 
+function updateCrossAnalysisHistory(url: string, mode: "push" | "replace"): void {
+  if (typeof window === "undefined") return;
+  const current = `${window.location.pathname}${window.location.search}`;
+  if (current === url) return;
+  if (mode === "push") window.history.pushState(null, "", url);
+  else window.history.replaceState(null, "", url);
+}
+
 function arraysEqual(a: string[], b: string[]): boolean {
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
   return true;
 }
 
-async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const auth = getStoredAuth();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...(init?.headers as Record<string, string> | undefined),
-  };
-  if (auth?.token) headers["Authorization"] = `Bearer ${auth.token}`;
-  const res = await fetch(url, { ...init, headers });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `HTTP ${res.status}`);
-  }
-  return res.json() as Promise<T>;
-}
-
 // NOTE: Cross Analysis no longer reads cross_analysis/output/all_records.json nor triggers
 // any re-extraction. It builds its dataset directly from per-report assessment outputs.
-
-type TableRow = CrossExtractedRecord;
 
 export default function CrossAnalysisDimensionPage() {
   const { t } = useT();
@@ -109,15 +111,12 @@ export default function CrossAnalysisDimensionPage() {
   const params = useParams();
   const searchParams = useSearchParams();
 
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
-
   const dimensionSlug = safeTrim((params as any)?.dimension || "");
 
   // IMPORTANT:
   // Next.js `useSearchParams()` may return a new object identity across renders.
   // If we depend on that object in useMemo/useCallback, we can accidentally retrigger
-  // data loading (runExtract) on every render, which causes chart flicker.
+  // data loading on every render, which causes chart flicker.
   // Therefore we only depend on the *string values* we actually use.
   const idsParam = searchParams.get("ids") || "";
 
@@ -127,10 +126,28 @@ export default function CrossAnalysisDimensionPage() {
   const primaryQ = safeTrim(searchParams.get("primary"));
   const secondaryQ = safeTrim(searchParams.get("secondary"));
   const metricQ = safeTrim(searchParams.get("metric") || "");
+  const isDisclosureQuery = safeTrim(searchParams.get("view")).toLowerCase() === "disclosure";
   const ids = useMemo(() => parseIds(idsParam), [idsParam]);
+  const idsKey = ids.join("|");
+  const [viewMode, setViewMode] = useState<"issue" | "disclosure">(
+    isDisclosureQuery ? "disclosure" : "issue",
+  );
 
-  const [reports, setReports] = useState<CrossReportSummary[]>([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  useEffect(() => {
+    setViewMode(isDisclosureQuery ? "disclosure" : "issue");
+  }, [isDisclosureQuery]);
+
+  const [reportsRequest, setReportsRequest] = useState<{
+    key: string;
+    loading: boolean;
+    data: CrossReportSummary[];
+    error: string | null;
+  }>({ key: "", loading: false, data: [], error: null });
+  const reports = reportsRequest.key === idsKey ? reportsRequest.data : [];
+  const reportsLoading =
+    ids.length >= 2 && (reportsRequest.key !== idsKey || reportsRequest.loading);
+  const reportsError = reportsRequest.key === idsKey ? reportsRequest.error : null;
+  const navigationSlot = useCrossAnalysisNavigationSlot();
 
   const currentFramework = useMemo(() => {
     if (!reports.length) return "";
@@ -141,9 +158,20 @@ export default function CrossAnalysisDimensionPage() {
 
   const isSasbFramework = currentFramework === "SASB";
 
-  const [allRecords, setAllRecords] = useState<CrossExtractedRecord[]>([]);
-  const [recordsLoading, setRecordsLoading] = useState(false);
-  const [recordsError, setRecordsError] = useState<string | null>(null);
+  const [recordsRequest, setRecordsRequest] = useState<{
+    key: string;
+    loading: boolean;
+    data: CrossExtractedRecord[];
+    error: string | null;
+  }>({ key: "", loading: false, data: [], error: null });
+  const allRecords = recordsRequest.key === idsKey ? recordsRequest.data : [];
+  const recordsLoading =
+    viewMode === "issue" && ids.length >= 2 && (recordsRequest.key !== idsKey || recordsRequest.loading);
+  const recordsError = recordsRequest.key === idsKey ? recordsRequest.error : null;
+  const bootstrapLoading = reportsLoading || recordsLoading;
+  const loadError =
+    reportsError ||
+    (recordsError === "empty" ? null : recordsError);
 
   const ACTIVITY_METRICS_PRIMARY = "Activity Metrics";
   const isActivityMetricsPrimary = (p: string) =>
@@ -220,19 +248,6 @@ export default function CrossAnalysisDimensionPage() {
   const [selectedTertiary, setSelectedTertiary] = useState<string | null>(null);
   const [expandedPrimaries, setExpandedPrimaries] = useState<Record<string, boolean>>({});
 
-  // Table filters (header filter dropdowns)
-  const [filterTopics, setFilterTopics] = useState<string[]>([]);
-  const [filterYears, setFilterYears] = useState<string[]>([]);
-  const [filterCompanies, setFilterCompanies] = useState<string[]>([]);
-  const [filterSubTopics, setFilterSubTopics] = useState<string[]>([]);
-
-  const clearTableFilters = useCallback(() => {
-    setFilterTopics([]);
-    setFilterSubTopics([]);
-    setFilterYears([]);
-    setFilterCompanies([]);
-  }, []);
-
   // Resolve selectedPrimary / Secondaries / Tertiary (metric) from URL after data arrives.
   useEffect(() => {
     if (!primaryOptions.length) return;
@@ -292,69 +307,39 @@ export default function CrossAnalysisDimensionPage() {
     });
   }, [allRecords, selectedPrimary, selectedSecondaries, selectedTertiary, isSasbFramework]);
 
-  const topicOptions = useMemo(() => {
-    return uniqPreserveOrder(records.map((r) => safeTrim((r as any).topic)).filter(Boolean)).sort((a, b) => a.localeCompare(b));
-  }, [records]);
-
-  const yearOptions = useMemo(() => {
-    const xs = uniqPreserveOrder(records.map((r) => safeTrim((r as any).year)).filter(Boolean));
-    return xs.sort((a, b) => b.localeCompare(a));
-  }, [records]);
-
-  const companyOptions = useMemo(() => {
-    return uniqPreserveOrder(records.map((r) => safeTrim((r as any).name)).filter(Boolean)).sort((a, b) => a.localeCompare(b));
-  }, [records]);
-
-  const subTopicOptions = useMemo(() => {
-    return uniqPreserveOrder(records.map((r) => safeTrim((r as any).sub_topic)).filter(Boolean)).sort((a, b) => a.localeCompare(b));
-  }, [records]);
-
-  // When new data arrives, prune invalid selections so filters don't get "stuck".
+  // Load report metadata immediately. The request is single-flight cached by
+  // apiService, so StrictMode and click-time prefetch share the same promise.
   useEffect(() => {
-    const topicSet = new Set(topicOptions);
-    const yearSet = new Set(yearOptions);
-    const compSet = new Set(companyOptions);
-    const subTopicSet = new Set(subTopicOptions);
-    setFilterTopics((prev) => prev.filter((v) => topicSet.has(v)));
-    setFilterYears((prev) => prev.filter((v) => yearSet.has(v)));
-    setFilterCompanies((prev) => prev.filter((v) => compSet.has(v)));
-    setFilterSubTopics((prev) => prev.filter((v) => subTopicSet.has(v)));
-  }, [topicOptions, yearOptions, companyOptions, subTopicOptions]);
-
-  // Note: we intentionally do NOT pre-filter the table dataset with these filter states.
-  // Ant Design Table will apply the filters internally, preventing double-filter issues.
-
-  // Load report display names
-  useEffect(() => {
-    if (ids.length < 2) return;
+    if (ids.length < 2) {
+      setReportsRequest({ key: idsKey, loading: false, data: [], error: null });
+      return;
+    }
     let cancelled = false;
-    (async () => {
-      try {
-        const resp = await fetchJson<{ reports: CrossReportSummary[] }>(
-          `/api/cross-analysis/reports?ids=${encodeURIComponent(ids.join(","))}`
-        );
-        if (!cancelled) setReports(resp.reports || []);
-      } catch {
-        if (!cancelled) {
-          setReports(
-            ids.map((id, idx) => ({
-              file_id: id,
-              display_name: `Report ${idx + 1}`,
-              short_name: `R${idx + 1}`,
-              confidence: 0,
-              filename: id,
-              has_assessment: false,
-            }))
-          );
-        }
-      } finally {
-        // no-op
-      }
-    })();
+    setReportsRequest({ key: idsKey, loading: true, data: [], error: null });
+    void apiService.getCrossAnalysisReports(ids).then(
+      (resp) => {
+        if (cancelled) return;
+        setReportsRequest({
+          key: idsKey,
+          loading: false,
+          data: (resp.reports || []) as CrossReportSummary[],
+          error: null,
+        });
+      },
+      (error: unknown) => {
+        if (cancelled) return;
+        setReportsRequest({
+          key: idsKey,
+          loading: false,
+          data: [],
+          error: error instanceof Error ? error.message : String(error),
+        });
+      },
+    );
     return () => {
       cancelled = true;
     };
-  }, [ids.join(",")]);
+  }, [ids, idsKey]);
 
   // Only allow comparison when all selected reports share the same framework and scope:
   // - SASB/TCFD: same industry and sub-industry (semi_industry).
@@ -415,324 +400,46 @@ export default function CrossAnalysisDimensionPage() {
   }, [reports]);
 
 
-  const runExtract = useCallback(async () => {
-    setRecordsLoading(true);
-    setRecordsError(null);
-    try {
-      if (!ids || ids.length < 2) {
-        setAllRecords([]);
-        return;
-      }
-
-      // Prefer the backend cached JSON built from per-report assessment outputs.
-      // Cache location:
-      //   uploads/outputs/cross_analysis/output/json/{cache_key}.json
-      const resp = await fetchJson<any>(
-        `/api/cross-analysis/disclosed-cache?ids=${encodeURIComponent(ids.join(","))}`
-      );
-
-      const recordsFlat: any[] = Array.isArray(resp?.records) ? resp.records : [];
-      const normalized = normalizeCrossRecords(recordsFlat);
-      setAllRecords(normalized);
-
-      if (!normalized.length) setRecordsError(t("crossAnalysis.noRecordsFound"));
-    } catch (e: any) {
-      setRecordsError(e?.message || t("crossAnalysis.failedToLoadRecords"));
-      setAllRecords([]);
-    } finally {
-      setRecordsLoading(false);
-    }
-  }, [ids.join("|"), t]);
-
-  // Load comparative data only when all reports share the same framework and scope (SASB: sub-industry; GRI: Sector+Topic).
+  // Start the heavier records request at the same time as report metadata.
+  // Entry points already validate compatibility; direct links are checked as
+  // soon as the parallel metadata request resolves.
   useEffect(() => {
-    if (!canCompare || ids.length < 2) return;
-    runExtract();
-  }, [ids.join("|"), runExtract, canCompare]);
-
-  // Grouping by Secondary Navigation (this is the "active panel" selector)
-  const recordsBySecondaryAll = useMemo(() => {
-    const g: Record<string, CrossExtractedRecord[]> = {};
-    for (const r of records) {
-      const k = safeTrim((r as any).secondary_navigation) || "(unknown)";
-      (g[k] = g[k] || []).push(r);
-    }
-    for (const k of Object.keys(g)) {
-      g[k].sort((a, b) => {
-        const na = safeTrim((a as any).name);
-        const nb = safeTrim((b as any).name);
-        if (na !== nb) return na.localeCompare(nb);
-        const ta = safeTrim((a as any).topic);
-        const tb = safeTrim((b as any).topic);
-        if (ta !== tb) return ta.localeCompare(tb);
-        const sa = safeTrim((a as any).sub_topic);
-        const sb = safeTrim((b as any).sub_topic);
-        if (sa !== sb) return sa.localeCompare(sb);
-        const ya = safeTrim((a as any).year);
-        const yb = safeTrim((b as any).year);
-        return yb.localeCompare(ya);
-      });
-    }
-    return g;
-  }, [records]);
-
-  // Table always renders all records under the current Primary + selected Secondary(ies).
-  // (If multiple secondaries are selected, the table shows their union.)
-
-  const secondaryLabels = useMemo(() => Object.keys(recordsBySecondaryAll), [recordsBySecondaryAll]);
-  const [activeSecondary, setActiveSecondary] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!secondaryLabels.length) {
-      setActiveSecondary(null);
+    if (viewMode === "disclosure") {
+      setRecordsRequest({ key: idsKey, loading: false, data: [], error: null });
       return;
     }
-    // Prefer first selected secondary.
-    const preferred = selectedSecondaries.find((s) => secondaryLabels.includes(s));
-    const next = preferred || secondaryLabels[0];
-    setActiveSecondary((prev) => (prev === next ? prev : next));
-  }, [secondaryLabels.join("|"), selectedSecondaries.join("|")]);
-
-  const activeRowsChart = useMemo(() => {
-    if (!activeSecondary) return [] as CrossExtractedRecord[];
-    return recordsBySecondaryAll[activeSecondary] || ([] as CrossExtractedRecord[]);
-  }, [activeSecondary, recordsBySecondaryAll]);
-
-  const tableRows = records;
-
-  const columns: ColumnsType<TableRow> = useMemo(() => {
-    const wrapCell = () => ({ style: { whiteSpace: "normal" as const, wordBreak: "break-word" as const } });
-
-    return [
-      {
-        title: t("crossAnalysis.table.report"),
-        dataIndex: "name",
-        key: "name",
-        width: isMobile ? 140 : 180,
-        onCell: wrapCell,
-        filters: companyOptions.map((v) => ({ text: v, value: v })),
-        filterSearch: true,
-        filterMultiple: true,
-        filteredValue: filterCompanies.length ? filterCompanies : null,
-        onFilter: (value, record) => safeTrim((record as any).name) === String(value),
-        render: (v: string) => <span className="text-slate-900">{v || "—"}</span>,
+    if (ids.length < 2) {
+      setRecordsRequest({ key: idsKey, loading: false, data: [], error: null });
+      return;
+    }
+    let cancelled = false;
+    setRecordsRequest({ key: idsKey, loading: true, data: [], error: null });
+    void apiService.getCrossAnalysisDisclosedCache(ids).then(
+      (resp) => {
+        if (cancelled) return;
+        const recordsFlat: unknown[] = Array.isArray(resp?.records) ? resp.records : [];
+        const normalized = normalizeCrossRecords(recordsFlat as any[]);
+        setRecordsRequest({
+          key: idsKey,
+          loading: false,
+          data: normalized,
+          error: normalized.length ? null : "empty",
+        });
       },
-      {
-        title: t("crossAnalysis.table.metric"),
-        dataIndex: "topic",
-        key: "topic",
-        width: isMobile ? 220 : 260,
-        onCell: wrapCell,
-        filters: topicOptions.map((v) => ({ text: v, value: v })),
-        filterSearch: true,
-        filterMultiple: true,
-        filteredValue: filterTopics.length ? filterTopics : null,
-        onFilter: (value, record) => safeTrim((record as any).topic) === String(value),
-        render: (_: string, record: any) => {
-          const t = safeTrim(record?.topic);
-          const st = safeTrim(record?.sub_topic);
-          // On mobile, show Sub-topic as a secondary line to avoid horizontal scrolling.
-          return isMobile ? (
-            <div className="space-y-1">
-              <div className="font-medium text-slate-900">{t || "—"}</div>
-              {st ? <div className="text-xs text-slate-600">{st}</div> : null}
-            </div>
-          ) : (
-            <span className="text-slate-900">{t || "—"}</span>
-          );
-        },
+      (error: unknown) => {
+        if (cancelled) return;
+        setRecordsRequest({
+          key: idsKey,
+          loading: false,
+          data: [],
+          error: error instanceof Error ? error.message : String(error),
+        });
       },
-      {
-        title: t("crossAnalysis.table.subTopic"),
-        dataIndex: "sub_topic",
-        key: "sub_topic",
-        width: 220,
-        onCell: wrapCell,
-        responsive: ["md"],
-        filters: subTopicOptions.map((v) => ({ text: v, value: v })),
-        filterSearch: true,
-        filterMultiple: true,
-        filteredValue: filterSubTopics.length ? filterSubTopics : null,
-        onFilter: (value, record) => safeTrim((record as any).sub_topic) === String(value),
-        render: (v: string) => <span className="text-slate-700">{v || "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.value"),
-        dataIndex: "data",
-        key: "data",
-        width: 110,
-        onCell: wrapCell,
-        render: (v: string) => <span className="font-medium text-slate-900">{v ?? "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.unit"),
-        dataIndex: "unit",
-        key: "unit",
-        width: 90,
-        onCell: wrapCell,
-        render: (v: string | null) => <span className="text-slate-600">{v || "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.year"),
-        dataIndex: "year",
-        key: "year",
-        width: 90,
-        onCell: wrapCell,
-        filters: yearOptions.map((v) => ({ text: v, value: v })),
-        filterSearch: true,
-        filterMultiple: true,
-        filteredValue: filterYears.length ? filterYears : null,
-        onFilter: (value, record) => safeTrim((record as any).year) === String(value),
-        render: (v: string) => <span className="text-slate-700">{v || "—"}</span>,
-      },
-      {
-        title: t("crossAnalysis.table.detail"),
-        dataIndex: "detail",
-        key: "detail",
-        onCell: wrapCell,
-        responsive: ["md"],
-        render: (v: string) => <span className="text-slate-700">{v || "—"}</span>,
-      },
-      {
-        title: "",
-        key: "evidence",
-        width: 110,
-        render: (_: any, record: any) => {
-          const rawId = safeTrim(record?.id) || safeTrim((record as any)?.file_id) || safeTrim(record?.name);
-          const fileId = rawId
-            ? (isUuid(rawId)
-                ? rawId
-                : reportKeyToFileId.get(normalizeReportKey(rawId)) || reportKeyToFileId.get(normalizeReportKey(record?.name)) || rawId)
-            : "";
-          const page = record?.page ? String(record.page) : "1";
-          const title = `${safeTrim(record?.name) || t("crossAnalysis.table.report")} · ${safeTrim(record?.topic) || t("crossAnalysis.evidence.defaultName")}`;
-          const qs = new URLSearchParams({
-            file_id: fileId,
-            page,
-            name: title,
-          }).toString();
-          const href = `/cross-analysis/evidence?${qs}`;
-          return fileId ? (
-            <Link href={href} target="_blank" rel="noopener noreferrer">
-              <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
-                {t("crossAnalysis.table.evidence")} <span aria-hidden className="text-slate-400">↗</span>
-              </span>
-            </Link>
-          ) : (
-            <span className="text-slate-300">—</span>
-          );
-        },
-      },
-    ];
-  }, [companyOptions, topicOptions, subTopicOptions, yearOptions, filterCompanies, filterTopics, filterSubTopics, filterYears, isMobile, reportKeyToFileId, t]);
-
-  const handleTableChange = useCallback((_: any, filters: any) => {
-    setFilterCompanies((filters?.name as string[]) || []);
-    setFilterTopics((filters?.topic as string[]) || []);
-    setFilterSubTopics((filters?.sub_topic as string[]) || []);
-    setFilterYears((filters?.year as string[]) || []);
-  }, []);
-
-  const tableExpandable = useMemo(() => {
-    if (!isMobile) return undefined;
-    return {
-      expandedRowRender: (record: any) => {
-        const detail = safeTrim(record?.detail);
-        const sub = safeTrim(record?.sub_topic);
-        return (
-          <div className="space-y-1 text-xs text-slate-700">
-            {sub ? (
-              <div>
-                <span className="font-semibold text-slate-900">{t("crossAnalysis.table.subTopic")}: </span>
-                {sub}
-              </div>
-            ) : null}
-            {detail ? (
-              <div>
-                <span className="font-semibold text-slate-900">{t("crossAnalysis.table.detail")}: </span>
-                {detail}
-              </div>
-            ) : (
-              <div className="text-slate-400">{t("crossAnalysis.noAdditionalDetail")}</div>
-            )}
-          </div>
-        );
-      },
-      rowExpandable: () => true,
-    } as const;
-  }, [isMobile, t]);
-
-  const onSelectPrimary = useCallback(
-    (primary: string, secondaryOverride?: string) => {
-      const sp = new URLSearchParams(searchParamsStr);
-      // Preserve framework/industry/semiIndustry when switching navigation
-      sp.set("primary", primary);
-      sp.delete("metric");
-
-      const secs = secondaryByPrimary.get(primary) || [];
-      const nextSecs = secondaryOverride && secs.includes(secondaryOverride)
-        ? [secondaryOverride]
-        : secs.length
-          ? [secs[0]]
-          : [];
-      if (nextSecs.length) sp.set("secondary", nextSecs.join(","));
-      else sp.delete("secondary");
-
-      clearTableFilters();
-      setSelectedTertiary(null);
-
-      const qs = sp.toString();
-      router.push(`/cross-analysis/${slugify(primary)}${qs ? `?${qs}` : ""}`);
-      setSelectedPrimary(primary);
-      setSelectedSecondaries(nextSecs);
-      if (nextSecs.length) setActiveSecondary(nextSecs[0]);
-    },
-    [searchParamsStr, router, secondaryByPrimary, clearTableFilters]
-  );
-
-  const onToggleSecondary = useCallback(
-    (secondary: string, toggleMode: boolean) => {
-      if (!selectedPrimary) return;
-      const sp = new URLSearchParams(searchParamsStr);
-      // Preserve framework/industry/semiIndustry when switching navigation
-      sp.delete("metric");
-
-      const secOptions = secondaryByPrimary.get(selectedPrimary) || [];
-      let next: string[] = [];
-
-      // Default click: single-select. Ctrl/Cmd click: toggle multi-select.
-      if (!toggleMode) {
-        next = [secondary];
-        // Changing the active secondary should not inherit stale header filters.
-        clearTableFilters();
-      } else {
-        const has = selectedSecondaries.includes(secondary);
-        next = has ? selectedSecondaries.filter((x) => x !== secondary) : [...selectedSecondaries, secondary];
-        if (!next.length && secOptions.length) next = [secOptions[0]];
-        // Stable ordering based on the primary's secondary order.
-        const order = new Map(secOptions.map((v, idx) => [v, idx] as const));
-        next.sort((a, b) => (order.get(a) ?? 1e9) - (order.get(b) ?? 1e9));
-      }
-
-      if (next.length) sp.set("secondary", next.join(","));
-      else sp.delete("secondary");
-
-      setSelectedTertiary(null);
-
-      const qs = sp.toString();
-      router.replace(`/cross-analysis/${slugify(selectedPrimary)}${qs ? `?${qs}` : ""}`);
-      setSelectedSecondaries(next);
-      setActiveSecondary(secondary);
-    },
-    [selectedPrimary, selectedSecondaries, searchParamsStr, router, secondaryByPrimary, clearTableFilters]
-  );
-
-  // 允许在没有 ids 的情况下也显示数据（从直接 JSON 文件加载）
-  const isReady = true;
-
-// Cross Analysis navigation is fully data-driven:
-// Primary Navigation -> Secondary Navigation are extracted from all_records.json (and therefore reflect the real dataset).
-const [viewMode, setViewMode] = useState<"issue" | "disclosure">("issue");
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [ids, idsKey, viewMode]);
 
 const buildNavUrl = useCallback(
   (primary: string, secondaries: string[], metric?: string | null) => {
@@ -744,10 +451,10 @@ const buildNavUrl = useCallback(
     else next.delete("secondary");
     if (metric) next.set("metric", metric);
     else next.delete("metric");
+    next.delete("view");
 
-    const slug = slugify(primary || "nav");
     const qs = next.toString();
-    return qs ? `/cross-analysis/${slug}?${qs}` : `/cross-analysis/${slug}`;
+    return qs ? `/cross-analysis?${qs}` : "/cross-analysis";
   },
   [searchParamsStr]
 );
@@ -762,10 +469,10 @@ const handleTogglePrimary = useCallback(
       setSelectedPrimary(primary);
       setSelectedSecondaries(nextSecondaries);
       setSelectedTertiary(null);
-      router.replace(buildNavUrl(primary, nextSecondaries, null));
+      updateCrossAnalysisHistory(buildNavUrl(primary, nextSecondaries, null), "replace");
     }
   },
-  [router, buildNavUrl, selectedPrimary]
+  [buildNavUrl, selectedPrimary]
 );
 
 const handleSelectSecondary = useCallback(
@@ -783,9 +490,9 @@ const handleSelectSecondary = useCallback(
     setSelectedPrimary(primary);
     setSelectedSecondaries(nextSecondaries);
     setSelectedTertiary(null);
-    router.replace(buildNavUrl(primary, nextSecondaries, null));
+    updateCrossAnalysisHistory(buildNavUrl(primary, nextSecondaries, null), "replace");
   },
-  [router, buildNavUrl, selectedPrimary, selectedSecondaries, secondaryByPrimary]
+  [buildNavUrl, selectedPrimary, selectedSecondaries, secondaryByPrimary]
 );
 
 const handleSelectTertiary = useCallback(
@@ -805,37 +512,10 @@ const handleSelectTertiary = useCallback(
     setSelectedPrimary(primary);
     setSelectedSecondaries(nextSecondaries);
     setSelectedTertiary(nextMetric);
-    router.replace(buildNavUrl(primary, nextSecondaries, nextMetric));
+    updateCrossAnalysisHistory(buildNavUrl(primary, nextSecondaries, nextMetric), "replace");
   },
-  [router, buildNavUrl, selectedPrimary, selectedSecondaries, selectedTertiary]
+  [buildNavUrl, selectedPrimary, selectedSecondaries, selectedTertiary]
 );
-
-const handleSelectDisclosure = useCallback(() => {
-  setViewMode((prev) => (prev === "disclosure" ? "issue" : "disclosure"));
-}, []);
-
-// Normalize URL (slug + query) once selection is resolved from data/URL.
-useEffect(() => {
-  if (!selectedPrimary) return;
-
-  const pQ = primaryQ;
-  const sQ = secondaryQ;
-  const mQ = metricQ;
-  const desiredSlug = slugify(selectedPrimary);
-  const curSlug = dimensionSlug;
-  const desiredSecondaryStr = (selectedSecondaries || []).join(",");
-  const desiredMetric = selectedTertiary || "";
-
-  const needsUpdate =
-    pQ !== selectedPrimary ||
-    (desiredSecondaryStr ? sQ !== desiredSecondaryStr : !!sQ) ||
-    desiredMetric !== mQ ||
-    (curSlug && curSlug !== desiredSlug);
-
-  if (needsUpdate) {
-    router.replace(buildNavUrl(selectedPrimary, selectedSecondaries || [], selectedTertiary));
-  }
-}, [selectedPrimary, (selectedSecondaries || []).join("|"), selectedTertiary, primaryQ, secondaryQ, metricQ, router, buildNavUrl, dimensionSlug]);
 
   // 生成新样式需要的表格数据
   const newTableData = useMemo(() => {
@@ -1093,45 +773,16 @@ useEffect(() => {
           </Modal>
         </>
       ) : (
-      <div className="w-full flex gap-4 lg:gap-6 relative">
-        {sidebarCollapsed ? (
-          <button
-            type="button"
-            onClick={() => setSidebarCollapsed(false)}
-            className="fixed left-5 top-24 z-30 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
-            aria-label={t("crossAnalysis.navigation")}
-            title={t("crossAnalysis.navigation")}
-          >
-            <PanelLeftOpen className="w-5 h-5" />
-          </button>
-        ) : null}
-
-        <div className={`${sidebarCollapsed ? "w-0 overflow-visible" : "w-[320px]"} flex-shrink-0 transition-[width] duration-200 ease-[var(--motion-fluid)]`}>
-          <div className="sticky top-6">
-            {!sidebarCollapsed && (recordsLoading ? (
-              <div className="relative w-[320px]">
-                <button
-                  type="button"
-                  onClick={() => setSidebarCollapsed(true)}
-                  className="absolute top-3 left-3 z-10 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
-                  aria-label={t("crossAnalysis.navigation")}
-                >
-                  <PanelLeftClose className="w-5 h-5" />
-                </button>
-                <Skeleton active paragraph={{ rows: 6 }} />
-              </div>
-            ) : (
-              <div className="relative w-[320px]">
-                <button
-                  type="button"
-                  onClick={() => setSidebarCollapsed(true)}
-                  className="absolute top-3 left-3 z-10 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
-                  aria-label={t("crossAnalysis.navigation")}
-                  title={t("crossAnalysis.navigation")}
-                >
-                  <PanelLeftClose className="w-5 h-5" />
-                </button>
+      <div className="w-full relative">
+        {viewMode === "issue" && navigationSlot
+          ? createPortal(
+              bootstrapLoading ? (
+                <div className="px-2 py-2" aria-label={t("crossAnalysis.navigation")}>
+                  <Skeleton active title={false} paragraph={{ rows: 4 }} />
+                </div>
+              ) : (
                 <NewSidebar
+                  embedded
                   primaryOptions={primaryOptions}
                   secondaryByPrimary={secondaryByPrimary}
                   tertiaryByPrimaryAndSecondary={tertiaryByPrimaryAndSecondary}
@@ -1141,16 +792,14 @@ useEffect(() => {
                   expandedPrimaries={expandedPrimaries}
                   primaryIsActivityMetrics={selectedPrimary === ACTIVITY_METRICS_PRIMARY}
                   forceSecondaryLeafMode={isSasbFramework && selectedPrimary !== ACTIVITY_METRICS_PRIMARY}
-                  viewMode={viewMode}
                   onTogglePrimary={handleTogglePrimary}
                   onSelectSecondary={handleSelectSecondary}
                   onSelectTertiary={handleSelectTertiary}
-                  onSelectDisclosure={handleSelectDisclosure}
                 />
-              </div>
-            ))}
-          </div>
-        </div>
+              ),
+              navigationSlot,
+            )
+          : null}
 
         <div className="flex-1 min-w-0 space-y-4">
           <NewHeader
@@ -1170,18 +819,18 @@ useEffect(() => {
           ) : (
             <>
               {/* Comparison Chart Card */}
-              {recordsLoading ? (
+              {bootstrapLoading ? (
                 <Skeleton active paragraph={{ rows: 8 }} />
               ) : (
                 <MetricChartsGrid charts={metricCharts} companyColors={companyColors} />
               )}
 
               {/* Data Table Card */}
-              {recordsLoading ? (
+              {bootstrapLoading ? (
                 <Skeleton active paragraph={{ rows: 10 }} />
-              ) : recordsError ? (
+              ) : loadError ? (
                 <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-red-500">
-                  {recordsError}
+                  {loadError}
                 </div>
               ) : newTableData.length > 0 ? (
                 <NewDataTable

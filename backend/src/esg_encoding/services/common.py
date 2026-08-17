@@ -47,12 +47,9 @@ from ..cross_analysis_models import (
     ExcelMetricsResponse,
     CrossDisclosedCacheResponse,
 )
+from ..cross_report_metadata import get_reports_info
 # Cross-analysis imports are intentionally lazy. Importing them here pulls in
 # HippoRAG / sentence_transformers even for simple compliance/profile operations.
-
-def get_reports_info(*args, **kwargs):
-    from ..cross_analysis import get_reports_info as _get_reports_info
-    return _get_reports_info(*args, **kwargs)
 
 
 def compare_topic(*args, **kwargs):
@@ -66,8 +63,9 @@ def extract_records_for_topic(*args, **kwargs):
 
 
 def _get_cross_cache_dir() -> Path:
-    from ..cross_analysis import CROSS_CACHE_DIR as _CROSS_CACHE_DIR
-    return _CROSS_CACHE_DIR
+    # Keep assessment-driven cache requests independent from the semantic
+    # cross-analysis module and its embedding/model imports.
+    return file_manager.base_dir / "outputs" / "cross_analysis"
 
 
 def dimension_by_key(*args, **kwargs):
@@ -1840,11 +1838,11 @@ def _apply_assessment_year_selection(payload: dict, target_year: Optional[int]) 
     return payload
 
 
-def _validate_cross_analysis_compatibility(file_ids: list[str]) -> None:
+def _validate_cross_analysis_compatibility(file_ids: list[str], reports=None):
     """Raise HTTPException 400 if reports are not comparable: different framework, or GRI with different sector/topic."""
     if len(file_ids) < 2:
-        return
-    reports = get_reports_info(file_ids)
+        return list(reports or [])
+    reports = list(reports) if reports is not None else get_reports_info(file_ids)
     if len(reports) < 2:
         raise HTTPException(status_code=400, detail="Could not resolve at least two reports.")
     frameworks = [str(r.framework or "").strip() for r in reports]
@@ -1862,6 +1860,7 @@ def _validate_cross_analysis_compatibility(file_ids: list[str]) -> None:
                 status_code=400,
                 detail="GRI cross analysis requires the same Sector and Topic for all reports.",
             )
+    return reports
 
 
 def _cross_disclosed_cache_dir() -> Path:
@@ -1959,7 +1958,9 @@ def _normalize_nav_label(v: Optional[str], default: str) -> str:
     return s if s else default
 
 
-def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tuple[list[dict], list[dict], list[float]]:
+def _build_disclosed_records_for_files(
+    file_ids: list[str], user_id: int, reports=None
+) -> tuple[list[dict], list[dict], list[float]]:
     """Build CrossExtractedRecord-like dicts from per-report assessments.
 
     Returns:
@@ -1968,7 +1969,7 @@ def _build_disclosed_records_for_files(file_ids: list[str], user_id: int) -> tup
       - assessment_mtimes (list of mtime floats used for cache invalidation)
     """
     # Labels + years from backend heuristics
-    reports = get_reports_info(file_ids)
+    reports = list(reports) if reports is not None else get_reports_info(file_ids)
     report_map = {r.file_id: r for r in reports}
 
     # Simple normalizers (keep consistent with frontend expectations)

@@ -190,6 +190,28 @@ export interface CrossCompareResponse {
   insight: string;
 }
 
+export interface CrossAnalysisReportsResponse {
+  reports: Array<{
+    file_id: string;
+    display_name: string;
+    short_name: string;
+    report_year?: number | null;
+    confidence: number;
+    filename: string;
+    has_assessment: boolean;
+    framework?: string | null;
+    industry?: string | null;
+    semi_industry?: string | null;
+    gri_sector?: string | null;
+    gri_topic?: string | null;
+  }>;
+}
+
+export interface CrossAnalysisDisclosedCacheResponse {
+  records?: unknown[];
+  [key: string]: unknown;
+}
+
 export interface ComplianceAnalysisResponse {
   status: string;
   assessment: {
@@ -233,6 +255,10 @@ class APIService {
   private griOptionsCache: Promise<GriOptionsResponse> | null = null;
   private visualManifestCache = new Map<string, { etag?: string; data: any }>();
   private visualObjectUrlCache = new Map<string, Promise<string>>();
+  private crossAnalysisRequestCache = new Map<
+    string,
+    { expiresAt: number | null; request: Promise<unknown> }
+  >();
 
   private getAuthToken(): string | null {
     if (typeof window === "undefined") return null;
@@ -282,6 +308,73 @@ class APIService {
 
   private assessmentCacheKey(fileId: string, scope?: string, compact = false) {
     return `${fileId}::${(scope || "").trim()}::${compact ? "compact" : "full"}`;
+  }
+
+  private normalizeCrossAnalysisIds(fileIds: readonly string[]): string[] {
+    return [...new Set(fileIds.map((id) => String(id || "").trim()).filter(Boolean))];
+  }
+
+  private getCachedCrossAnalysisRequest<T>(
+    resource: "reports" | "disclosed-cache",
+    fileIds: readonly string[],
+  ): Promise<T> {
+    const ids = this.normalizeCrossAnalysisIds(fileIds);
+    const authScope = this.getAuthToken() || "anonymous";
+    const cacheKey = `${authScope}::${resource}::${ids.join(",")}`;
+    const now = Date.now();
+    const cached = this.crossAnalysisRequestCache.get(cacheKey);
+    if (cached && (cached.expiresAt === null || cached.expiresAt > now)) {
+      return cached.request as Promise<T>;
+    }
+    if (cached) this.crossAnalysisRequestCache.delete(cacheKey);
+
+    let request: Promise<T>;
+    request = this.fetchWithError(
+      `${API_BASE_URL}/api/cross-analysis/${resource}?ids=${encodeURIComponent(ids.join(","))}`,
+    ).then(
+      (payload) => {
+        const current = this.crossAnalysisRequestCache.get(cacheKey);
+        if (current?.request === request) current.expiresAt = Date.now() + 30_000;
+        return payload as T;
+      },
+      (error) => {
+        const current = this.crossAnalysisRequestCache.get(cacheKey);
+        if (current?.request === request) this.crossAnalysisRequestCache.delete(cacheKey);
+        throw error;
+      },
+    );
+
+    // A short cache window deduplicates StrictMode mounts, route state changes,
+    // and click-time prefetch without keeping regenerated analyses stale.
+    this.crossAnalysisRequestCache.set(cacheKey, {
+      // Pending requests never expire; the TTL starts after a successful response.
+      expiresAt: null,
+      request,
+    });
+    return request;
+  }
+
+  getCrossAnalysisReports(fileIds: readonly string[]): Promise<CrossAnalysisReportsResponse> {
+    return this.getCachedCrossAnalysisRequest("reports", fileIds);
+  }
+
+  getCrossAnalysisDisclosedCache(
+    fileIds: readonly string[],
+  ): Promise<CrossAnalysisDisclosedCacheResponse> {
+    return this.getCachedCrossAnalysisRequest("disclosed-cache", fileIds);
+  }
+
+  prefetchCrossAnalysis(fileIds: readonly string[]): void {
+    const ids = this.normalizeCrossAnalysisIds(fileIds);
+    if (ids.length < 2) return;
+    void Promise.allSettled([
+      this.getCrossAnalysisReports(ids),
+      this.getCrossAnalysisDisclosedCache(ids),
+    ]);
+  }
+
+  invalidateCrossAnalysisCache(): void {
+    this.crossAnalysisRequestCache.clear();
   }
 
   invalidateAssessmentByFileCache(fileId?: string, scope?: string) {
@@ -409,6 +502,7 @@ class APIService {
       try {
         const result = await this.fetchWithError(url, { method: "DELETE" });
         if (!scopeKey) this.invalidateVisualAssetCache(fileId);
+        this.invalidateCrossAnalysisCache();
         return result;
       } catch (error) {
         const status = error instanceof ApiRequestError ? error.status : undefined;
@@ -418,6 +512,7 @@ class APIService {
         // removed instead of reappearing forever after a refresh race.
         if (status === 404) {
           if (!scopeKey) this.invalidateVisualAssetCache(fileId);
+          this.invalidateCrossAnalysisCache();
           return { status: "success", already_deleted: true };
         }
 

@@ -1,5 +1,7 @@
 """Cross-analysis service functions."""
 
+import asyncio
+
 from .common import *  # noqa: F401,F403
 from ..gpu_model_lifecycle import with_backend_model_task
 
@@ -12,8 +14,9 @@ async def cross_analysis_reports(ids: str):
     file_ids = [x.strip() for x in (ids or "").split(",") if x.strip()]
     if len(file_ids) < 2:
         raise HTTPException(status_code=400, detail="At least two file_ids are required")
-    _validate_cross_analysis_compatibility(file_ids)
-    reports = get_reports_info(file_ids)
+    # Metadata resolution performs filesystem I/O; keep it off the event loop.
+    # The validator returns the same resolved objects so this is one pass only.
+    reports = await asyncio.to_thread(_validate_cross_analysis_compatibility, file_ids)
     return CrossReportsResponse(reports=reports)
 
 
@@ -26,9 +29,8 @@ async def cross_analysis_compare(req: CrossCompareRequest):
     - Returns evidence with page for PDF preview.
     """
     file_ids = list(req.file_ids)
-    _validate_cross_analysis_compatibility(file_ids)
-    # Resolve display labels
-    reports = get_reports_info(file_ids)
+    # Resolve and validate labels in one pass.
+    reports = _validate_cross_analysis_compatibility(file_ids)
     label_map = {r.file_id: (r.display_name, r.short_name, r.confidence, getattr(r, "report_year", None)) for r in reports}
 
     labels = req.labels
@@ -65,8 +67,7 @@ async def cross_analysis_records(req: CrossRecordsRequest):
         uploads/outputs/cross_analysis/output/
     """
     file_ids = list(req.file_ids)
-    _validate_cross_analysis_compatibility(file_ids)
-    reports = get_reports_info(file_ids)
+    reports = _validate_cross_analysis_compatibility(file_ids)
     label_map = {r.file_id: (r.display_name, r.short_name, r.confidence, getattr(r, "report_year", None)) for r in reports}
 
     # Compute effective issue keys when caller omitted (backend default = all issues under topic)
@@ -93,21 +94,8 @@ async def cross_analysis_records(req: CrossRecordsRequest):
     )
 
 
-async def cross_analysis_disclosed_cache(ids: str, user_id: int = Depends(get_current_user)):
-    """Cross Analysis: build (and cache) disclosed-data records from per-report assessment outputs.
-
-    Cache location:
-      uploads/outputs/cross_analysis/output/json/{cache_key}.json
-
-    If the same file-id combination is selected again, backend will directly return
-    the cached JSON (unless any underlying per-report assessment JSON was updated).
-    """
-
-    file_ids = [x.strip() for x in (ids or "").split(",") if x.strip()]
-    if len(file_ids) < 2:
-        raise HTTPException(status_code=400, detail="At least two file_ids are required")
-    _validate_cross_analysis_compatibility(file_ids)
-
+def _cross_analysis_disclosed_cache_sync(file_ids, user_id, reports):
+    """Synchronous cache I/O run by the async endpoint's worker thread."""
     # Access check early
     for fid in file_ids:
         if not file_manager.get_file_info(fid, user_id=user_id):
@@ -157,7 +145,9 @@ async def cross_analysis_disclosed_cache(ids: str, user_id: int = Depends(get_cu
                 return payload
 
         # Build new
-        records, _reports_payload, _mtimes = _build_disclosed_records_for_files(ids_sorted, user_id=user_id)
+        records, _reports_payload, _mtimes = _build_disclosed_records_for_files(
+            ids_sorted, user_id=user_id, reports=reports
+        )
         payload = {
             "cache_key": cache_key,
             "file_ids": ids_sorted,
@@ -180,6 +170,27 @@ async def cross_analysis_disclosed_cache(ids: str, user_id: int = Depends(get_cu
                 pass
 
         return payload
+
+
+async def cross_analysis_disclosed_cache(ids: str, user_id: int = Depends(get_current_user)):
+    """Build or load assessment-driven cross-report records without blocking the API loop.
+
+    Cache location:
+      uploads/outputs/cross_analysis/output/json/{cache_key}.json
+    """
+
+    file_ids = [x.strip() for x in (ids or "").split(",") if x.strip()]
+    if len(file_ids) < 2:
+        raise HTTPException(status_code=400, detail="At least two file_ids are required")
+    reports = await asyncio.to_thread(_validate_cross_analysis_compatibility, file_ids)
+    report_map = {report.file_id: report for report in reports}
+    reports_sorted = [report_map[file_id] for file_id in sorted(file_ids) if file_id in report_map]
+    return await asyncio.to_thread(
+        _cross_analysis_disclosed_cache_sync,
+        file_ids,
+        user_id,
+        reports_sorted,
+    )
 
 
 async def cross_analysis_excel_metrics(req: ExcelMetricsRequest):
