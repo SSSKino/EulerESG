@@ -19,12 +19,22 @@ import type { File, ReportCatalogMode } from "@/store/useFileStore";
 import { useT } from "@/i18n/useT";
 import { errorSummary } from "@/lib/logger";
 import { apiService } from "@/lib/api";
+import {
+  FAVOURITE_REPORTS_STORAGE_KEY,
+  favouriteReportKey,
+  readFavouriteReportKeys,
+  removeFavouriteKeysForFile,
+  writeFavouriteReportKeys,
+} from "@/lib/favourites";
 
 interface FileTableProps {
   onChatClick: (file: File) => void;
   selectedRows: File[];
   onSelectionChange: (rows: File[]) => void;
   reportCatalogMode: ReportCatalogMode;
+  favouritesOnly?: boolean;
+  title?: React.ReactNode;
+  emptyText?: React.ReactNode;
 }
 
 type FileTableRow = File & {
@@ -32,8 +42,6 @@ type FileTableRow = File & {
   children?: FileTableRow[];
   reportCount?: number;
 };
-
-const FAVOURITE_REPORTS_STORAGE_KEY = "euleresg-favourite-reports";
 
 function uploadSortKey(f: File): number {
   if (typeof f.uploadedAtMs === "number" && f.uploadedAtMs > 0) return f.uploadedAtMs;
@@ -57,6 +65,9 @@ const FileTable: React.FC<FileTableProps> = ({
   selectedRows,
   onSelectionChange,
   reportCatalogMode,
+  favouritesOnly = false,
+  title,
+  emptyText,
 }) => {
   const { t, lang } = useT();
   const router = useRouter();
@@ -71,27 +82,30 @@ const FileTable: React.FC<FileTableProps> = ({
   const [reanalyzingIds, setReanalyzingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(window.localStorage.getItem(FAVOURITE_REPORTS_STORAGE_KEY) || "[]");
-      if (Array.isArray(stored)) setFavouriteReportKeys(new Set(stored.map(String)));
-    } catch {
-      setFavouriteReportKeys(new Set());
-    }
+    const syncFavourites = () => setFavouriteReportKeys(readFavouriteReportKeys());
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === FAVOURITE_REPORTS_STORAGE_KEY || event.key === null) {
+        syncFavourites();
+      }
+    };
+    syncFavourites();
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   const toggleFavourite = (file: File) => {
-    const favouriteKey = `${file.file_id || file.key}::${file.analysis_scope_key || ""}`;
+    const favouriteKey = favouriteReportKey(file);
     setFavouriteReportKeys((current) => {
       const next = new Set(current);
       if (next.has(favouriteKey)) next.delete(favouriteKey);
       else next.add(favouriteKey);
-      window.localStorage.setItem(FAVOURITE_REPORTS_STORAGE_KEY, JSON.stringify([...next]));
+      writeFavouriteReportKeys(next);
       return next;
     });
   };
 
   const isFavourite = (file: File) =>
-    favouriteReportKeys.has(`${file.file_id || file.key}::${file.analysis_scope_key || ""}`);
+    favouriteReportKeys.has(favouriteReportKey(file));
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -146,6 +160,11 @@ const FileTable: React.FC<FileTableProps> = ({
       // the PDF would reappear after the list refresh.
       await useFileStore.getState().deleteFile(target.file_id);
       onSelectionChange(selectedRows.filter((row) => row.file_id !== target.file_id));
+      setFavouriteReportKeys((current) => {
+        const next = removeFavouriteKeysForFile(current, target.file_id!);
+        writeFavouriteReportKeys(next);
+        return next;
+      });
       setDeleteTarget(null);
       void message.success(lang === "zh" ? "文件已删除" : "File deleted");
     } catch (error) {
@@ -249,15 +268,17 @@ const FileTable: React.FC<FileTableProps> = ({
         )
         .map(([companyId]) => companyId),
     );
-    const visibleFiles = reportFiles.filter((file) => {
-      if (reportCatalogMode === "single") {
-        return getReportCatalogMode(file) === "single";
-      }
-      return (
-        getReportCatalogMode(file) === "multi" ||
-        Boolean(file.company_id && multiReportCompanyIds.has(file.company_id))
-      );
-    });
+    const visibleFiles = favouritesOnly
+      ? reportFiles.filter((file) => favouriteReportKeys.has(favouriteReportKey(file)))
+      : reportFiles.filter((file) => {
+          if (reportCatalogMode === "single") {
+            return getReportCatalogMode(file) === "single";
+          }
+          return (
+            getReportCatalogMode(file) === "multi" ||
+            Boolean(file.company_id && multiReportCompanyIds.has(file.company_id))
+          );
+        });
     const sorted = sortFilesForDisplay(visibleFiles);
     const grouped = new Map<string, File[]>();
     const ungrouped: FileTableRow[] = [];
@@ -265,7 +286,7 @@ const FileTable: React.FC<FileTableProps> = ({
       // Single-report interpretations are always flat, including historical
       // records that happen to carry a company_id. Multi-report interpretations
       // are grouped into their company directory.
-      if (reportCatalogMode === "single" || !file.company_id) {
+      if (favouritesOnly || reportCatalogMode === "single" || !file.company_id) {
         ungrouped.push(file);
         continue;
       }
@@ -299,7 +320,7 @@ const FileTable: React.FC<FileTableProps> = ({
     }
     companyRows.sort((a, b) => uploadSortKey(b) - uploadSortKey(a));
     return [...companyRows, ...ungrouped];
-  }, [files, reportCatalogMode]);
+  }, [favouriteReportKeys, favouritesOnly, files, reportCatalogMode]);
 
   useEffect(() => {
     const totalPages = Math.max(1, Math.ceil(dataSource.length / pageSize));
@@ -382,7 +403,15 @@ const FileTable: React.FC<FileTableProps> = ({
       filterSearch: true,
       onFilter: (value, record) => String(record.name || t("common.unknown")) === String(value),
       render: (value: string, record) => (
-        <span className={record.isCompany ? "font-semibold text-slate-900" : ""}>{value}</span>
+        <span className={`inline-flex items-center gap-2 ${record.isCompany ? "font-semibold text-slate-900" : ""}`}>
+          {!record.isCompany && isFavourite(record) ? (
+            <StarFilled
+              className="shrink-0 text-amber-400"
+              aria-label={lang === "zh" ? "已收藏" : "Favourite"}
+            />
+          ) : null}
+          <span>{value}</span>
+        </span>
       ),
     },
     { title: t("files.columns.size"), dataIndex: "size", key: "size" },
@@ -568,7 +597,7 @@ const FileTable: React.FC<FileTableProps> = ({
       <div className="mt-4 bg-white rounded-lg shadow-sm">
       <div className="p-3 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-700">
-          {t("files.title")}
+          {title ?? t("files.title")}
         </h3>
         <div className="flex items-center space-x-2">
           <Tooltip title={crossAnalysisDisabledReason} placement="top">
@@ -588,7 +617,9 @@ const FileTable: React.FC<FileTableProps> = ({
       </div>
       <div className="overflow-x-auto px-1 pb-2">
         {dataSource.length === 0 && !loading ? (
-          <div className="p-6 text-center text-gray-500">{t("common.noDataAvailable")}</div>
+          <div className="p-6 text-center text-gray-500">
+            {emptyText ?? t("common.noDataAvailable")}
+          </div>
         ) : (
           <Table
             columns={columns}

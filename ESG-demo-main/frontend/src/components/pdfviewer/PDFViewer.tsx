@@ -10,7 +10,7 @@ import { apiService } from "@/lib/api";
 export default function PDFViewer() {
   const router = useRouter();
   const [selectedRows, setSelectedRows] = useState<File[]>([]);
-  const [reportCatalogMode, setReportCatalogMode] = useState<ReportCatalogMode>("single");
+  const reportCatalogMode: ReportCatalogMode = "single";
   const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
 
   // 组件加载时从后端获取文件列表
@@ -39,18 +39,10 @@ export default function PDFViewer() {
     router.push(url);
   };
 
-  const handleReportCatalogModeChange = (mode: ReportCatalogMode) => {
-    setReportCatalogMode(mode);
-    setSelectedRows([]);
-  };
-
   return (
     <div className="w-full flex flex-col justify-start items-center mx-auto pt-1 bg-gray-50 min-h-screen">
       <div className="w-[95%]">
-        <MainContent
-          uploadMode={reportCatalogMode}
-          onUploadModeChange={handleReportCatalogModeChange}
-        />
+        <MainContent uploadMode={reportCatalogMode} />
         <FileTable
           onChatClick={handleChatClick}
           selectedRows={selectedRows}

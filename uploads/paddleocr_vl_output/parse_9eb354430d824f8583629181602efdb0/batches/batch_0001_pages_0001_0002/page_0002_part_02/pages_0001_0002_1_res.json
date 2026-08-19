@@ -1,0 +1,286 @@
+{
+    "input_path": "/workspace/uploads/paddleocr_vl_jobs/parse_9eb354430d824f8583629181602efdb0/batches/pages_0001_0002.pdf",
+    "page_index": 1,
+    "page_count": 2,
+    "width": 2304,
+    "height": 1296,
+    "model_settings": {
+        "use_doc_preprocessor": false,
+        "use_layout_detection": true,
+        "use_chart_recognition": false,
+        "use_seal_recognition": false,
+        "use_ocr_for_image_block": true,
+        "format_block_content": false,
+        "merge_layout_blocks": true,
+        "markdown_ignore_labels": [
+            "number",
+            "footnote",
+            "header",
+            "header_image",
+            "footer",
+            "footer_image",
+            "aside_text"
+        ],
+        "return_layout_polygon_points": true
+    },
+    "parsing_res_list": [
+        {
+            "block_label": "text",
+            "block_content": "At Dell Technologies, our purpose is to create technologies that drive human progress.",
+            "block_bbox": [
+                62,
+                323,
+                696,
+                609
+            ],
+            "block_id": 0,
+            "block_order": 1,
+            "group_id": 0,
+            "block_polygon_points": [
+                [
+                    74.0,
+                    323.0
+                ],
+                [
+                    62.0,
+                    375.0
+                ],
+                [
+                    74.0,
+                    608.0
+                ],
+                [
+                    695.0,
+                    602.0
+                ],
+                [
+                    695.0,
+                    323.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Our commitment to advance sustainability, cultivate inclusion, transform lives and uphold trust is core to who we are and how we deliver technology that propels business and society forward.",
+            "block_bbox": [
+                64,
+                688,
+                810,
+                827
+            ],
+            "block_id": 1,
+            "block_order": 2,
+            "group_id": 1,
+            "block_polygon_points": [
+                [
+                    64.0,
+                    688.0
+                ],
+                [
+                    64.0,
+                    826.0
+                ],
+                [
+                    809.0,
+                    826.0
+                ],
+                [
+                    809.0,
+                    688.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Our environmental, social and governance (ESG) strategy and this report are how we turn this commitment into action, holding ourselves accountable to drive greater impact for business, people and the planet.",
+            "block_bbox": [
+                66,
+                839,
+                817,
+                977
+            ],
+            "block_id": 2,
+            "block_order": 3,
+            "group_id": 2,
+            "block_polygon_points": [
+                [
+                    66.0,
+                    846.0
+                ],
+                [
+                    66.0,
+                    976.0
+                ],
+                [
+                    816.0,
+                    976.0
+                ],
+                [
+                    816.0,
+                    846.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "DELL",
+            "block_bbox": [
+                867,
+                0,
+                2304,
+                1291
+            ],
+            "block_id": 3,
+            "block_order": null,
+            "group_id": 3,
+            "block_polygon_points": [
+                [
+                    867.0,
+                    2.0
+                ],
+                [
+                    902.0,
+                    1290.0
+                ],
+                [
+                    2303.0,
+                    1290.0
+                ],
+                [
+                    2303.0,
+                    -5.0
+                ]
+            ]
+        }
+    ],
+    "layout_det_res": {
+        "input_path": null,
+        "page_index": null,
+        "boxes": [
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9038152098655701,
+                "coordinate": [
+                    62,
+                    323,
+                    696,
+                    609
+                ],
+                "order": 1,
+                "polygon_points": [
+                    [
+                        74.0,
+                        323.0
+                    ],
+                    [
+                        62.0,
+                        375.0
+                    ],
+                    [
+                        74.0,
+                        608.0
+                    ],
+                    [
+                        695.0,
+                        602.0
+                    ],
+                    [
+                        695.0,
+                        323.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9293413758277893,
+                "coordinate": [
+                    64,
+                    688,
+                    810,
+                    827
+                ],
+                "order": 2,
+                "polygon_points": [
+                    [
+                        64.0,
+                        688.0
+                    ],
+                    [
+                        64.0,
+                        826.0
+                    ],
+                    [
+                        809.0,
+                        826.0
+                    ],
+                    [
+                        809.0,
+                        688.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9372545480728149,
+                "coordinate": [
+                    66,
+                    839,
+                    817,
+                    977
+                ],
+                "order": 3,
+                "polygon_points": [
+                    [
+                        66.0,
+                        846.0
+                    ],
+                    [
+                        66.0,
+                        976.0
+                    ],
+                    [
+                        816.0,
+                        976.0
+                    ],
+                    [
+                        816.0,
+                        846.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.965272843837738,
+                "coordinate": [
+                    867,
+                    0,
+                    2304,
+                    1291
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        867.0,
+                        2.0
+                    ],
+                    [
+                        902.0,
+                        1290.0
+                    ],
+                    [
+                        2303.0,
+                        1290.0
+                    ],
+                    [
+                        2303.0,
+                        -5.0
+                    ]
+                ]
+            }
+        ]
+    }
+}

@@ -345,6 +345,9 @@ services:
       - ./uploads:/app/uploads:ro
     environment:
       NEXT_TELEMETRY_DISABLED: '1'
+      # Set NEXT_PUBLIC_SHOW_DEV_TOOLS=true in the repository-root .env to
+      # show Backend System Status and the Next.js development indicator.
+      NEXT_PUBLIC_SHOW_DEV_TOOLS: ${NEXT_PUBLIC_SHOW_DEV_TOOLS:-false}
       BACKEND_URL: http://backend:8000
       CHOKIDAR_USEPOLLING: 'true'
       WATCHPACK_POLLING: 'true'

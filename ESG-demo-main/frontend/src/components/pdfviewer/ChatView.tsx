@@ -1,9 +1,11 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Drawer } from "antd";
 import AnalysisResults from "./AnalysisResults";
+import type { AnalysisDataItem } from "./AnalysisResults";
 import ChatInterface from "./ChatInterface";
-import { ChevronDown, ChevronUp, MessageCircle } from "lucide-react";
+import ComplianceSummaryDrawer from "./ComplianceSummaryDrawer";
+import { ChevronDown, ChevronUp, FileText, MessageCircle } from "lucide-react";
 import { useT } from "@/i18n/useT";
 import type { File as FileData } from "@/store/useFileStore";
 
@@ -76,6 +78,8 @@ const ChatView: React.FC<ChatViewProps> = ({
 }) => {
   const { t } = useT();
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [analysisMetrics, setAnalysisMetrics] = useState<AnalysisDataItem[]>([]);
   const [showAnalysisTable, setShowAnalysisTable] = useState<boolean>(true);
 
   const [targetPage, setTargetPage] = useState<number | undefined>(undefined);
@@ -84,6 +88,15 @@ const ChatView: React.FC<ChatViewProps> = ({
   const [targetPageNonce, setTargetPageNonce] = useState<number>(0);
   const effectiveFileId = fileId || activeFile?.file_id;
   const effectiveScopeKey = scopeKey || activeFile?.analysis_scope_key;
+
+  useEffect(() => {
+    setAnalysisMetrics([]);
+    setSummaryOpen(false);
+  }, [effectiveFileId, effectiveScopeKey]);
+
+  const handleAnalysisDataChange = useCallback((items: AnalysisDataItem[]) => {
+    setAnalysisMetrics(items);
+  }, []);
 
   const navigateToPage = useCallback((page: number) => {
     setTargetPage(page);
@@ -99,17 +112,31 @@ const ChatView: React.FC<ChatViewProps> = ({
             <h3 className="text-md font-semibold text-gray-800 truncate">{t("chat.analysis")}</h3>
 </div>
 
-          <button
-            onClick={() => setShowAnalysisTable((s) => !s)}
-            className="p-1 hover:bg-gray-200 rounded-md transition-colors"
-            title={showAnalysisTable ? t("chat.hideAnalysisResults") : t("chat.showAnalysisResults")}
-          >
-            {showAnalysisTable ? (
-              <ChevronUp className="w-4 h-4 text-gray-600" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-gray-600" />
-            )}
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSummaryOpen(true)}
+              disabled={analysisMetrics.length === 0}
+              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2274BC] px-4 text-xs font-semibold text-white shadow-sm transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-px hover:bg-[#1b63a3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
+              title={t("analysis.generateSummaryTooltip")}
+              aria-haspopup="dialog"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              {t("analysis.generateSummary")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowAnalysisTable((s) => !s)}
+              className="rounded-md p-1 transition-colors hover:bg-gray-200"
+              title={showAnalysisTable ? t("chat.hideAnalysisResults") : t("chat.showAnalysisResults")}
+            >
+              {showAnalysisTable ? (
+                <ChevronUp className="h-4 w-4 text-gray-600" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-gray-600" />
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="p-4">
@@ -118,6 +145,7 @@ const ChatView: React.FC<ChatViewProps> = ({
             scopeKey={effectiveScopeKey}
             onPageNavigate={navigateToPage}
             showTable={showAnalysisTable}
+            onDataChange={handleAnalysisDataChange}
           />
         </div>
       </div>
@@ -179,6 +207,13 @@ const ChatView: React.FC<ChatViewProps> = ({
           />
         </div>
       </Drawer>
+
+      <ComplianceSummaryDrawer
+        metrics={analysisMetrics}
+        open={summaryOpen}
+        onClose={() => setSummaryOpen(false)}
+        reportName={activeFile?.name}
+      />
     </div>
   );
 };

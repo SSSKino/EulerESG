@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 
+const showDevTools = /^(1|true|yes|on)$/i.test(
+  (process.env.NEXT_PUBLIC_SHOW_DEV_TOOLS || "").trim(),
+);
+
 const nextConfig = {
   reactStrictMode: true,
 
@@ -36,10 +40,7 @@ const nextConfig = {
     return config;
   },
 
-  devIndicators: {
-    autoPrerender: false,
-    position: "bottom-right",
-  },
+  devIndicators: showDevTools ? { position: "bottom-right" } : false,
 };
 
 module.exports = nextConfig;

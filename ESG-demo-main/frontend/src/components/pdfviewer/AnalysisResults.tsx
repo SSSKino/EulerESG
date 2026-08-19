@@ -4,9 +4,11 @@ import type { ColumnsType } from "antd/es/table";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
 import { useT } from "@/i18n/useT";
+import { normalizeDisclosureStatus } from "@/lib/complianceSummary";
 
-type AnalysisDataItem = {
+export type AnalysisDataItem = {
   metric_id: string;
+  metric_code?: string;
   metric_name: string;
   disclosure_status: "fully_disclosed" | "partially_disclosed" | "not_disclosed";
   reasoning: string;
@@ -49,6 +51,7 @@ interface AnalysisResultsProps {
    * The summary section is always shown.
    */
   showTable?: boolean;
+  onDataChange?: (items: AnalysisDataItem[]) => void;
 }
 
 // -------------------------
@@ -195,18 +198,6 @@ const pickValue = (...vals: any[]) => {
   return null;
 };
 
-const normalizeStatus = (raw: any): AnalysisDataItem["disclosure_status"] => {
-  const s = String(raw ?? "").trim().toLowerCase();
-  if (!s) return "not_disclosed";
-  if (s.includes("fully")) return "fully_disclosed";
-  if (s.includes("partial")) return "partially_disclosed";
-  if (s.includes("not")) return "not_disclosed";
-  if (s === "fully_disclosed") return "fully_disclosed";
-  if (s === "partially_disclosed") return "partially_disclosed";
-  if (s === "not_disclosed") return "not_disclosed";
-  return "not_disclosed";
-};
-
 const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
   (assessment?.metric_analyses || [])
     .filter((item: any) => {
@@ -223,9 +214,12 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
       const metric_id = String(
         item?.metric_id ?? item?.metric_code ?? item?.metricId ?? item?.Code ?? item?.code
       );
+      const metric_code = String(
+        item?.metric_code ?? item?.Code ?? item?.code ?? item?.metric_id ?? item?.metricId
+      );
       const metric_name = String(item?.metric_name ?? item?.Metric ?? item?.metric);
 
-      const disclosure_status = normalizeStatus(
+      const disclosure_status = normalizeDisclosureStatus(
         item?.disclosure_status ??
           item?.disclosureStatus ??
           item?.status ??
@@ -268,6 +262,7 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
 
       return {
         metric_id,
+        metric_code,
         metric_name,
         disclosure_status,
         reasoning: String(
@@ -294,6 +289,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   scopeKey,
   onPageNavigate,
   showTable = true,
+  onDataChange,
 }) => {
   const { t } = useT();
 
@@ -325,6 +321,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 
       setLoading(true);
       setError(null);
+      setAnalysisData([]);
       try {
         const assessment = await apiService.getAssessmentByFile(
           requestedFileId,
@@ -384,6 +381,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     })),
     [analysisData],
   );
+
+  useEffect(() => {
+    onDataChange?.(data);
+  }, [data, onDataChange]);
 
   const columns: ColumnsType<AnalysisDataItem> = useMemo(
   () => {

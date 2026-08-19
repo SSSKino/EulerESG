@@ -4,8 +4,7 @@ import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { RefCallback } from "react";
-import { BarChart3, Check, HelpCircle, House, Languages, ListChecks, PanelLeftClose, PanelLeftOpen, Repeat2, ShieldCheck, Star } from "lucide-react";
-import { MdLogout, MdSettings } from "react-icons/md";
+import { BarChart3, Check, HelpCircle, House, Languages, ListChecks, LogOut, PanelLeftClose, PanelLeftOpen, Repeat2, Settings, ShieldCheck, Star } from "lucide-react";
 import { message, Modal, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import EulerLogo from "@/assets/Euler-Img.svg";
@@ -109,6 +108,7 @@ export default function DashboardSidebar({
 
   useEffect(() => {
     router.prefetch("/dashboard/chat");
+    router.prefetch("/dashboard/favourite");
     router.prefetch("/cross-analysis");
   }, [router]);
 
@@ -329,9 +329,10 @@ export default function DashboardSidebar({
         </div>
         <button
           type="button"
-          onClick={() => void message.info(lang === "zh" ? "收藏功能即将开放" : "Favourites are coming soon")}
+          onClick={() => router.push("/dashboard/favourite")}
           className={navigationClass(isFavourite)}
           title={collapsed ? "Favourite" : undefined}
+          aria-current={isFavourite ? "page" : undefined}
         >
           <Star className={`h-[18px] w-[18px] shrink-0 ${isFavourite ? "text-[#2274BC]" : ""}`} />
           {!collapsed && <span className="truncate text-sm">Favourite</span>}
@@ -366,7 +367,7 @@ export default function DashboardSidebar({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="h-10 rounded-lg" onClick={() => showUnavailableMessage("settings")}>
-              <MdSettings className="mr-2 h-[18px] w-[18px]" />
+              <Settings className="mr-2 h-[18px] w-[18px]" />
               <span>{t("nav.settings")}</span>
             </DropdownMenuItem>
             <DropdownMenuSub>
@@ -395,7 +396,7 @@ export default function DashboardSidebar({
               <span>{lang === "zh" ? "切换账号" : "Switch account"}</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="h-10 rounded-lg" onClick={handleLogout}>
-              <MdLogout className="mr-2 h-[18px] w-[18px]" />
+              <LogOut className="mr-2 h-[18px] w-[18px]" />
               <span>{t("nav.logout")}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

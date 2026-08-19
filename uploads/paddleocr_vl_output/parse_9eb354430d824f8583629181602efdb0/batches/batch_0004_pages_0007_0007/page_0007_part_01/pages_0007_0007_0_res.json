@@ -1,0 +1,2958 @@
+{
+    "input_path": "/workspace/uploads/paddleocr_vl_jobs/parse_9eb354430d824f8583629181602efdb0/batches/pages_0007_0007.pdf",
+    "page_index": 0,
+    "page_count": 1,
+    "width": 2304,
+    "height": 1296,
+    "model_settings": {
+        "use_doc_preprocessor": false,
+        "use_layout_detection": true,
+        "use_chart_recognition": false,
+        "use_seal_recognition": false,
+        "use_ocr_for_image_block": false,
+        "format_block_content": false,
+        "merge_layout_blocks": true,
+        "markdown_ignore_labels": [
+            "number",
+            "footnote",
+            "header",
+            "header_image",
+            "footer",
+            "footer_image",
+            "aside_text"
+        ],
+        "return_layout_polygon_points": true
+    },
+    "parsing_res_list": [
+        {
+            "block_label": "doc_title",
+            "block_content": "Awards and recognition",
+            "block_bbox": [
+                65,
+                138,
+                385,
+                275
+            ],
+            "block_id": 0,
+            "block_order": 1,
+            "group_id": 0,
+            "block_polygon_points": [
+                [
+                    65.0,
+                    145.0
+                ],
+                [
+                    65.0,
+                    274.0
+                ],
+                [
+                    384.0,
+                    274.0
+                ],
+                [
+                    384.0,
+                    138.0
+                ],
+                [
+                    77.0,
+                    138.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Dell Technologies is investing in initiatives across our ESG impact areas and receiving recognition across the globe. The following FY24 awards highlight areas of excellence and represent our commitment to drive impact. Explore more of our  $ \\underline{\\text{awards and recognition}} $.",
+            "block_bbox": [
+                63,
+                357,
+                575,
+                489
+            ],
+            "block_id": 1,
+            "block_order": 2,
+            "group_id": 1,
+            "block_polygon_points": [
+                [
+                    63.0,
+                    357.0
+                ],
+                [
+                    63.0,
+                    371.0
+                ],
+                [
+                    63.0,
+                    389.0
+                ],
+                [
+                    63.0,
+                    404.0
+                ],
+                [
+                    63.0,
+                    416.0
+                ],
+                [
+                    63.0,
+                    437.0
+                ],
+                [
+                    63.0,
+                    488.0
+                ],
+                [
+                    563.0,
+                    488.0
+                ],
+                [
+                    574.0,
+                    449.0
+                ],
+                [
+                    574.0,
+                    357.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Gartner does not endorse any vendor, product or service depicted in its research publications. Gartner research publications consist of the opinions of Gartner's Research and Advisory organization and should not be construed as statements of fact. Gartner disclaims all warranties, expressed or implied, with respect to this research, including any warranties of merchantability or fitness for a particular purpose. Gartner, Gartner Power of the Profession™ Supply Chain Awards, 2024, https://www.gartner.com/en/supply-chain/research/power-of-the-profession. GARTNER is a registered trademark and service mark of Gartner, Inc. and/or its affiliates in the U.S. and internationally and is used herein with permission. All rights reserved.",
+            "block_bbox": [
+                64,
+                1009,
+                585,
+                1139
+            ],
+            "block_id": 2,
+            "block_order": 3,
+            "group_id": 2,
+            "block_polygon_points": [
+                [
+                    64.0,
+                    1009.0
+                ],
+                [
+                    64.0,
+                    1138.0
+                ],
+                [
+                    573.0,
+                    1138.0
+                ],
+                [
+                    584.0,
+                    1132.0
+                ],
+                [
+                    584.0,
+                    1107.0
+                ],
+                [
+                    584.0,
+                    1080.0
+                ],
+                [
+                    584.0,
+                    1009.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                866,
+                90,
+                962,
+                179
+            ],
+            "block_id": 3,
+            "block_order": null,
+            "group_id": 3,
+            "block_polygon_points": [
+                [
+                    866.0,
+                    90.0
+                ],
+                [
+                    866.0,
+                    178.0
+                ],
+                [
+                    951.0,
+                    178.0
+                ],
+                [
+                    961.0,
+                    172.0
+                ],
+                [
+                    961.0,
+                    148.0
+                ],
+                [
+                    961.0,
+                    134.0
+                ],
+                [
+                    961.0,
+                    90.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "ECOVADIS",
+            "block_bbox": [
+                676,
+                192,
+                768,
+                214
+            ],
+            "block_id": 4,
+            "block_order": 4,
+            "group_id": 4,
+            "block_polygon_points": [
+                [
+                    676.0,
+                    192.0
+                ],
+                [
+                    676.0,
+                    213.0
+                ],
+                [
+                    767.0,
+                    213.0
+                ],
+                [
+                    767.0,
+                    192.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Platinum medal",
+            "block_bbox": [
+                676,
+                224,
+                854,
+                253
+            ],
+            "block_id": 5,
+            "block_order": 5,
+            "group_id": 5,
+            "block_polygon_points": [
+                [
+                    676.0,
+                    224.0
+                ],
+                [
+                    676.0,
+                    252.0
+                ],
+                [
+                    853.0,
+                    252.0
+                ],
+                [
+                    853.0,
+                    224.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Awarded a platinum EcoVadis medal in 2023 for scoring in the top 1% of companies assessed across four major themes: environment, labor and human rights, ethics and sustainable procurement.",
+            "block_bbox": [
+                674,
+                262,
+                1145,
+                368
+            ],
+            "block_id": 6,
+            "block_order": 6,
+            "group_id": 6,
+            "block_polygon_points": [
+                [
+                    674.0,
+                    262.0
+                ],
+                [
+                    674.0,
+                    367.0
+                ],
+                [
+                    1144.0,
+                    367.0
+                ],
+                [
+                    1144.0,
+                    262.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                1377,
+                94,
+                1514,
+                177
+            ],
+            "block_id": 7,
+            "block_order": null,
+            "group_id": 7,
+            "block_polygon_points": [
+                [
+                    1377.0,
+                    94.0
+                ],
+                [
+                    1377.0,
+                    176.0
+                ],
+                [
+                    1513.0,
+                    176.0
+                ],
+                [
+                    1513.0,
+                    94.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "INSTITUTIONAL SHAREHOLDER SERVICES ESG",
+            "block_bbox": [
+                1205,
+                192,
+                1579,
+                214
+            ],
+            "block_id": 8,
+            "block_order": 7,
+            "group_id": 8,
+            "block_polygon_points": [
+                [
+                    1205.0,
+                    192.0
+                ],
+                [
+                    1205.0,
+                    213.0
+                ],
+                [
+                    1578.0,
+                    213.0
+                ],
+                [
+                    1578.0,
+                    192.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Score: Prime status",
+            "block_bbox": [
+                1206,
+                226,
+                1426,
+                253
+            ],
+            "block_id": 9,
+            "block_order": 8,
+            "group_id": 9,
+            "block_polygon_points": [
+                [
+                    1206.0,
+                    226.0
+                ],
+                [
+                    1206.0,
+                    252.0
+                ],
+                [
+                    1425.0,
+                    252.0
+                ],
+                [
+                    1425.0,
+                    226.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Achieved prime status by fulfilling ISS' ESG requirements regarding sustainability performance in our sector.",
+            "block_bbox": [
+                1204,
+                262,
+                1679,
+                340
+            ],
+            "block_id": 10,
+            "block_order": 9,
+            "group_id": 10,
+            "block_polygon_points": [
+                [
+                    1204.0,
+                    262.0
+                ],
+                [
+                    1204.0,
+                    339.0
+                ],
+                [
+                    1678.0,
+                    339.0
+                ],
+                [
+                    1678.0,
+                    269.0
+                ],
+                [
+                    1667.0,
+                    262.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                1911,
+                89,
+                2047,
+                183
+            ],
+            "block_id": 11,
+            "block_order": null,
+            "group_id": 11,
+            "block_polygon_points": [
+                [
+                    1911.0,
+                    89.0
+                ],
+                [
+                    1911.0,
+                    182.0
+                ],
+                [
+                    2035.0,
+                    182.0
+                ],
+                [
+                    2046.0,
+                    149.0
+                ],
+                [
+                    2046.0,
+                    89.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "WORLD'S MOST ETHICAL COMPANIES $ ^{®} $",
+            "block_bbox": [
+                1739,
+                192,
+                2048,
+                214
+            ],
+            "block_id": 12,
+            "block_order": 10,
+            "group_id": 12,
+            "block_polygon_points": [
+                [
+                    1739.0,
+                    192.0
+                ],
+                [
+                    1739.0,
+                    213.0
+                ],
+                [
+                    2047.0,
+                    213.0
+                ],
+                [
+                    2047.0,
+                    192.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Score: 12-time honoree",
+            "block_bbox": [
+                1739,
+                226,
+                1999,
+                253
+            ],
+            "block_id": 13,
+            "block_order": 11,
+            "group_id": 13,
+            "block_polygon_points": [
+                [
+                    1739.0,
+                    226.0
+                ],
+                [
+                    1739.0,
+                    252.0
+                ],
+                [
+                    1998.0,
+                    252.0
+                ],
+                [
+                    1998.0,
+                    226.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Recognized in 2024 as one of the World's Most Ethical Companies $ ^{®} $ by Ethisphere for the 12th time, affirming Dell's robust programs and commitment to integrity.",
+            "block_bbox": [
+                1737,
+                262,
+                2219,
+                343
+            ],
+            "block_id": 14,
+            "block_order": 12,
+            "group_id": 14,
+            "block_polygon_points": [
+                [
+                    1737.0,
+                    262.0
+                ],
+                [
+                    1737.0,
+                    342.0
+                ],
+                [
+                    2218.0,
+                    342.0
+                ],
+                [
+                    2218.0,
+                    262.0
+                ],
+                [
+                    2047.0,
+                    262.0
+                ],
+                [
+                    2023.0,
+                    262.0
+                ],
+                [
+                    1910.0,
+                    262.0
+                ],
+                [
+                    1874.0,
+                    262.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                735,
+                468,
+                1078,
+                516
+            ],
+            "block_id": 15,
+            "block_order": null,
+            "group_id": 15,
+            "block_polygon_points": [
+                [
+                    735.0,
+                    468.0
+                ],
+                [
+                    735.0,
+                    515.0
+                ],
+                [
+                    849.0,
+                    515.0
+                ],
+                [
+                    873.0,
+                    515.0
+                ],
+                [
+                    1077.0,
+                    515.0
+                ],
+                [
+                    1077.0,
+                    468.0
+                ],
+                [
+                    987.0,
+                    468.0
+                ],
+                [
+                    940.0,
+                    468.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "BEST PLACE TO WORK",
+            "block_bbox": [
+                676,
+                560,
+                860,
+                584
+            ],
+            "block_id": 16,
+            "block_order": 13,
+            "group_id": 16,
+            "block_polygon_points": [
+                [
+                    676.0,
+                    560.0
+                ],
+                [
+                    676.0,
+                    583.0
+                ],
+                [
+                    859.0,
+                    583.0
+                ],
+                [
+                    859.0,
+                    566.0
+                ],
+                [
+                    848.0,
+                    560.0
+                ],
+                [
+                    803.0,
+                    560.0
+                ],
+                [
+                    790.0,
+                    560.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Score: 100%",
+            "block_bbox": [
+                676,
+                594,
+                818,
+                621
+            ],
+            "block_id": 17,
+            "block_order": 14,
+            "group_id": 17,
+            "block_polygon_points": [
+                [
+                    676.0,
+                    594.0
+                ],
+                [
+                    676.0,
+                    620.0
+                ],
+                [
+                    817.0,
+                    620.0
+                ],
+                [
+                    817.0,
+                    594.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "The Disability Equality Index (DEI) serves as a benchmark that helps companies build a road map of measurable, tangible actions to achieve disability inclusion and equality.",
+            "block_bbox": [
+                674,
+                631,
+                1133,
+                737
+            ],
+            "block_id": 18,
+            "block_order": 15,
+            "group_id": 18,
+            "block_polygon_points": [
+                [
+                    674.0,
+                    631.0
+                ],
+                [
+                    674.0,
+                    736.0
+                ],
+                [
+                    1132.0,
+                    736.0
+                ],
+                [
+                    1132.0,
+                    638.0
+                ],
+                [
+                    1085.0,
+                    631.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                1410,
+                437,
+                1484,
+                546
+            ],
+            "block_id": 19,
+            "block_order": null,
+            "group_id": 19,
+            "block_polygon_points": [
+                [
+                    1410.0,
+                    437.0
+                ],
+                [
+                    1410.0,
+                    545.0
+                ],
+                [
+                    1483.0,
+                    545.0
+                ],
+                [
+                    1483.0,
+                    437.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "FAST COMPANY'S WORLD CHANGING IDEAS AWARDS",
+            "block_bbox": [
+                1205,
+                561,
+                1629,
+                584
+            ],
+            "block_id": 20,
+            "block_order": 16,
+            "group_id": 20,
+            "block_polygon_points": [
+                [
+                    1205.0,
+                    561.0
+                ],
+                [
+                    1205.0,
+                    583.0
+                ],
+                [
+                    1628.0,
+                    583.0
+                ],
+                [
+                    1628.0,
+                    561.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Score: 2023 Company of the Year",
+            "block_bbox": [
+                1205,
+                594,
+                1576,
+                623
+            ],
+            "block_id": 21,
+            "block_order": 17,
+            "group_id": 21,
+            "block_polygon_points": [
+                [
+                    1205.0,
+                    594.0
+                ],
+                [
+                    1205.0,
+                    622.0
+                ],
+                [
+                    1575.0,
+                    622.0
+                ],
+                [
+                    1575.0,
+                    594.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Selected as Fast Company's World Changing Company of the Year and winner of Corporate Social Responsibility category in recognition of Dell's efforts to address the digital divide and climate change.",
+            "block_bbox": [
+                1203,
+                632,
+                1680,
+                738
+            ],
+            "block_id": 22,
+            "block_order": 18,
+            "group_id": 22,
+            "block_polygon_points": [
+                [
+                    1203.0,
+                    632.0
+                ],
+                [
+                    1203.0,
+                    731.0
+                ],
+                [
+                    1215.0,
+                    737.0
+                ],
+                [
+                    1679.0,
+                    737.0
+                ],
+                [
+                    1679.0,
+                    632.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                1914,
+                448,
+                2044,
+                534
+            ],
+            "block_id": 23,
+            "block_order": null,
+            "group_id": 23,
+            "block_polygon_points": [
+                [
+                    1914.0,
+                    448.0
+                ],
+                [
+                    1914.0,
+                    533.0
+                ],
+                [
+                    2043.0,
+                    533.0
+                ],
+                [
+                    2043.0,
+                    448.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "HUMAN RIGHTS CAMPAIGN CORPORATE EQUALITY INDEX",
+            "block_bbox": [
+                1739,
+                561,
+                2198,
+                584
+            ],
+            "block_id": 24,
+            "block_order": 19,
+            "group_id": 24,
+            "block_polygon_points": [
+                [
+                    1739.0,
+                    561.0
+                ],
+                [
+                    1739.0,
+                    583.0
+                ],
+                [
+                    2197.0,
+                    583.0
+                ],
+                [
+                    2197.0,
+                    561.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Top score of 100 points",
+            "block_bbox": [
+                1740,
+                594,
+                2002,
+                623
+            ],
+            "block_id": 25,
+            "block_order": 20,
+            "group_id": 25,
+            "block_polygon_points": [
+                [
+                    1740.0,
+                    594.0
+                ],
+                [
+                    1740.0,
+                    622.0
+                ],
+                [
+                    2001.0,
+                    622.0
+                ],
+                [
+                    2001.0,
+                    594.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Recognized as a leader in LGBTQ+ inclusion by meeting all criteria to earn a score of 100. This index is the national benchmark for LGBTQ+ related corporate policies, benefits and practices.",
+            "block_bbox": [
+                1738,
+                631,
+                2195,
+                737
+            ],
+            "block_id": 26,
+            "block_order": 21,
+            "group_id": 26,
+            "block_polygon_points": [
+                [
+                    1738.0,
+                    631.0
+                ],
+                [
+                    1738.0,
+                    736.0
+                ],
+                [
+                    2194.0,
+                    736.0
+                ],
+                [
+                    2194.0,
+                    638.0
+                ],
+                [
+                    2183.0,
+                    631.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                824,
+                803,
+                1002,
+                899
+            ],
+            "block_id": 27,
+            "block_order": null,
+            "group_id": 27,
+            "block_polygon_points": [
+                [
+                    824.0,
+                    803.0
+                ],
+                [
+                    824.0,
+                    898.0
+                ],
+                [
+                    1001.0,
+                    898.0
+                ],
+                [
+                    1001.0,
+                    803.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "GARTNER'S POWER OF THE PROFESSION $ ^{TM} $ SUPPLY CHAIN & PEOPLE BREAKTHROUGH OF THE YEAR",
+            "block_bbox": [
+                675,
+                913,
+                1149,
+                956
+            ],
+            "block_id": 28,
+            "block_order": 22,
+            "group_id": 28,
+            "block_polygon_points": [
+                [
+                    675.0,
+                    913.0
+                ],
+                [
+                    675.0,
+                    949.0
+                ],
+                [
+                    1148.0,
+                    949.0
+                ],
+                [
+                    1148.0,
+                    913.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Ranked among the 2024 winners",
+            "block_bbox": [
+                675,
+                965,
+                1039,
+                994
+            ],
+            "block_id": 29,
+            "block_order": 23,
+            "group_id": 29,
+            "block_polygon_points": [
+                [
+                    675.0,
+                    965.0
+                ],
+                [
+                    675.0,
+                    993.0
+                ],
+                [
+                    1038.0,
+                    993.0
+                ],
+                [
+                    1038.0,
+                    965.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "The Gartner Power of the Profession™ Supply Chain Awards are an annual community-driven recognition program that inspires supply chain transformation around the globe.*\n10th out of 200 companies",
+            "block_bbox": [
+                673,
+                1002,
+                1141,
+                1107
+            ],
+            "block_id": 30,
+            "block_order": 24,
+            "group_id": 30,
+            "block_polygon_points": [
+                [
+                    673.0,
+                    1002.0
+                ],
+                [
+                    673.0,
+                    1106.0
+                ],
+                [
+                    1140.0,
+                    1106.0
+                ],
+                [
+                    1140.0,
+                    1002.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                1207,
+                945,
+                1506,
+                976
+            ],
+            "block_id": 31,
+            "block_order": 25,
+            "group_id": 30,
+            "block_polygon_points": [
+                [
+                    1207.0,
+                    945.0
+                ],
+                [
+                    1207.0,
+                    969.0
+                ],
+                [
+                    1219.0,
+                    975.0
+                ],
+                [
+                    1229.0,
+                    975.0
+                ],
+                [
+                    1265.0,
+                    975.0
+                ],
+                [
+                    1505.0,
+                    975.0
+                ],
+                [
+                    1505.0,
+                    945.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                1319,
+                809,
+                1574,
+                893
+            ],
+            "block_id": 32,
+            "block_order": null,
+            "group_id": 32,
+            "block_polygon_points": [
+                [
+                    1319.0,
+                    809.0
+                ],
+                [
+                    1319.0,
+                    892.0
+                ],
+                [
+                    1573.0,
+                    892.0
+                ],
+                [
+                    1573.0,
+                    809.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Recognized in the top 10 of America's Most Innovative Companies, transforming industries from the inside out.\nWORLD BENCHMARKING ALLIANCE'S DIGITAL INCLUSION BENCHMARK",
+            "block_bbox": [
+                1204,
+                983,
+                1670,
+                1062
+            ],
+            "block_id": 33,
+            "block_order": 26,
+            "group_id": 33,
+            "block_polygon_points": [
+                [
+                    1204.0,
+                    983.0
+                ],
+                [
+                    1204.0,
+                    1061.0
+                ],
+                [
+                    1669.0,
+                    1061.0
+                ],
+                [
+                    1669.0,
+                    983.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                1739,
+                913,
+                2194,
+                955
+            ],
+            "block_id": 34,
+            "block_order": 27,
+            "group_id": 33,
+            "block_polygon_points": [
+                [
+                    1739.0,
+                    913.0
+                ],
+                [
+                    1739.0,
+                    954.0
+                ],
+                [
+                    2193.0,
+                    954.0
+                ],
+                [
+                    2193.0,
+                    913.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                1897,
+                807,
+                2063,
+                898
+            ],
+            "block_id": 35,
+            "block_order": null,
+            "group_id": 35,
+            "block_polygon_points": [
+                [
+                    1897.0,
+                    807.0
+                ],
+                [
+                    1897.0,
+                    897.0
+                ],
+                [
+                    2062.0,
+                    897.0
+                ],
+                [
+                    2062.0,
+                    807.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "8th out of 200 companies",
+            "block_bbox": [
+                1738,
+                965,
+                2024,
+                994
+            ],
+            "block_id": 36,
+            "block_order": 28,
+            "group_id": 36,
+            "block_polygon_points": [
+                [
+                    1738.0,
+                    965.0
+                ],
+                [
+                    1738.0,
+                    993.0
+                ],
+                [
+                    2023.0,
+                    993.0
+                ],
+                [
+                    2023.0,
+                    965.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Recognized in the top 10 of the world's 200 most influential digital technology companies, helping to advance a more inclusive digital society.",
+            "block_bbox": [
+                1737,
+                1003,
+                2189,
+                1082
+            ],
+            "block_id": 37,
+            "block_order": 29,
+            "group_id": 37,
+            "block_polygon_points": [
+                [
+                    1737.0,
+                    1003.0
+                ],
+                [
+                    1737.0,
+                    1081.0
+                ],
+                [
+                    2188.0,
+                    1081.0
+                ],
+                [
+                    2188.0,
+                    1003.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "INTRODUCTION CLIMATE ACTION CIRCULAR ECONOMY DIGITAL INCLUSION INCLUSIVE WORKFORCE HUMAN RIGHTS TRUST BY THE NUMBERS APPENDIX",
+            "block_bbox": [
+                65,
+                1201,
+                1680,
+                1223
+            ],
+            "block_id": 38,
+            "block_order": null,
+            "group_id": 38,
+            "block_polygon_points": [
+                [
+                    65.0,
+                    1201.0
+                ],
+                [
+                    65.0,
+                    1222.0
+                ],
+                [
+                    1668.0,
+                    1222.0
+                ],
+                [
+                    1668.0,
+                    1201.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "Dell Technologies FY24 ESG Report",
+            "block_bbox": [
+                1943,
+                1201,
+                2198,
+                1223
+            ],
+            "block_id": 39,
+            "block_order": null,
+            "group_id": 39,
+            "block_polygon_points": [
+                [
+                    1943.0,
+                    1201.0
+                ],
+                [
+                    1943.0,
+                    1222.0
+                ],
+                [
+                    2197.0,
+                    1222.0
+                ],
+                [
+                    2197.0,
+                    1201.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "Messages from our leadership | Our business | Awards | Goals dashboard | ESG materiality | Stakeholder engagement | Reporting frameworks",
+            "block_bbox": [
+                68,
+                1249,
+                1235,
+                1271
+            ],
+            "block_id": 40,
+            "block_order": null,
+            "group_id": 40,
+            "block_polygon_points": [
+                [
+                    68.0,
+                    1249.0
+                ],
+                [
+                    68.0,
+                    1270.0
+                ],
+                [
+                    1234.0,
+                    1270.0
+                ],
+                [
+                    1234.0,
+                    1249.0
+                ]
+            ]
+        },
+        {
+            "block_label": "number",
+            "block_content": "7",
+            "block_bbox": [
+                2218,
+                1204,
+                2237,
+                1221
+            ],
+            "block_id": 41,
+            "block_order": null,
+            "group_id": 41,
+            "block_polygon_points": [
+                [
+                    2218.0,
+                    1204.0
+                ],
+                [
+                    2218.0,
+                    1220.0
+                ],
+                [
+                    2236.0,
+                    1220.0
+                ],
+                [
+                    2236.0,
+                    1204.0
+                ]
+            ]
+        }
+    ],
+    "layout_det_res": {
+        "input_path": null,
+        "page_index": null,
+        "boxes": [
+            {
+                "cls_id": 6,
+                "label": "doc_title",
+                "score": 0.7388246655464172,
+                "coordinate": [
+                    65,
+                    138,
+                    385,
+                    275
+                ],
+                "order": 1,
+                "polygon_points": [
+                    [
+                        65.0,
+                        145.0
+                    ],
+                    [
+                        65.0,
+                        274.0
+                    ],
+                    [
+                        384.0,
+                        274.0
+                    ],
+                    [
+                        384.0,
+                        138.0
+                    ],
+                    [
+                        77.0,
+                        138.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.884830117225647,
+                "coordinate": [
+                    63,
+                    357,
+                    575,
+                    489
+                ],
+                "order": 2,
+                "polygon_points": [
+                    [
+                        63.0,
+                        357.0
+                    ],
+                    [
+                        63.0,
+                        371.0
+                    ],
+                    [
+                        63.0,
+                        389.0
+                    ],
+                    [
+                        63.0,
+                        404.0
+                    ],
+                    [
+                        63.0,
+                        416.0
+                    ],
+                    [
+                        63.0,
+                        437.0
+                    ],
+                    [
+                        63.0,
+                        488.0
+                    ],
+                    [
+                        563.0,
+                        488.0
+                    ],
+                    [
+                        574.0,
+                        449.0
+                    ],
+                    [
+                        574.0,
+                        357.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.45620569586753845,
+                "coordinate": [
+                    64,
+                    1009,
+                    585,
+                    1139
+                ],
+                "order": 3,
+                "polygon_points": [
+                    [
+                        64.0,
+                        1009.0
+                    ],
+                    [
+                        64.0,
+                        1138.0
+                    ],
+                    [
+                        573.0,
+                        1138.0
+                    ],
+                    [
+                        584.0,
+                        1132.0
+                    ],
+                    [
+                        584.0,
+                        1107.0
+                    ],
+                    [
+                        584.0,
+                        1080.0
+                    ],
+                    [
+                        584.0,
+                        1009.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.8221054077148438,
+                "coordinate": [
+                    866,
+                    90,
+                    962,
+                    179
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        866.0,
+                        90.0
+                    ],
+                    [
+                        866.0,
+                        178.0
+                    ],
+                    [
+                        951.0,
+                        178.0
+                    ],
+                    [
+                        961.0,
+                        172.0
+                    ],
+                    [
+                        961.0,
+                        148.0
+                    ],
+                    [
+                        961.0,
+                        134.0
+                    ],
+                    [
+                        961.0,
+                        90.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.5489253401756287,
+                "coordinate": [
+                    676,
+                    192,
+                    768,
+                    214
+                ],
+                "order": 4,
+                "polygon_points": [
+                    [
+                        676.0,
+                        192.0
+                    ],
+                    [
+                        676.0,
+                        213.0
+                    ],
+                    [
+                        767.0,
+                        213.0
+                    ],
+                    [
+                        767.0,
+                        192.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.5739305019378662,
+                "coordinate": [
+                    676,
+                    224,
+                    854,
+                    253
+                ],
+                "order": 5,
+                "polygon_points": [
+                    [
+                        676.0,
+                        224.0
+                    ],
+                    [
+                        676.0,
+                        252.0
+                    ],
+                    [
+                        853.0,
+                        252.0
+                    ],
+                    [
+                        853.0,
+                        224.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8580009341239929,
+                "coordinate": [
+                    674,
+                    262,
+                    1145,
+                    368
+                ],
+                "order": 6,
+                "polygon_points": [
+                    [
+                        674.0,
+                        262.0
+                    ],
+                    [
+                        674.0,
+                        367.0
+                    ],
+                    [
+                        1144.0,
+                        367.0
+                    ],
+                    [
+                        1144.0,
+                        262.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.8045859336853027,
+                "coordinate": [
+                    1377,
+                    94,
+                    1514,
+                    177
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1377.0,
+                        94.0
+                    ],
+                    [
+                        1377.0,
+                        176.0
+                    ],
+                    [
+                        1513.0,
+                        176.0
+                    ],
+                    [
+                        1513.0,
+                        94.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.5892147421836853,
+                "coordinate": [
+                    1205,
+                    192,
+                    1579,
+                    214
+                ],
+                "order": 7,
+                "polygon_points": [
+                    [
+                        1205.0,
+                        192.0
+                    ],
+                    [
+                        1205.0,
+                        213.0
+                    ],
+                    [
+                        1578.0,
+                        213.0
+                    ],
+                    [
+                        1578.0,
+                        192.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.5907105803489685,
+                "coordinate": [
+                    1206,
+                    226,
+                    1426,
+                    253
+                ],
+                "order": 8,
+                "polygon_points": [
+                    [
+                        1206.0,
+                        226.0
+                    ],
+                    [
+                        1206.0,
+                        252.0
+                    ],
+                    [
+                        1425.0,
+                        252.0
+                    ],
+                    [
+                        1425.0,
+                        226.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8316189050674438,
+                "coordinate": [
+                    1204,
+                    262,
+                    1679,
+                    340
+                ],
+                "order": 9,
+                "polygon_points": [
+                    [
+                        1204.0,
+                        262.0
+                    ],
+                    [
+                        1204.0,
+                        339.0
+                    ],
+                    [
+                        1678.0,
+                        339.0
+                    ],
+                    [
+                        1678.0,
+                        269.0
+                    ],
+                    [
+                        1667.0,
+                        262.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.8565492033958435,
+                "coordinate": [
+                    1911,
+                    89,
+                    2047,
+                    183
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1911.0,
+                        89.0
+                    ],
+                    [
+                        1911.0,
+                        182.0
+                    ],
+                    [
+                        2035.0,
+                        182.0
+                    ],
+                    [
+                        2046.0,
+                        149.0
+                    ],
+                    [
+                        2046.0,
+                        89.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.4479065537452698,
+                "coordinate": [
+                    1739,
+                    192,
+                    2048,
+                    214
+                ],
+                "order": 10,
+                "polygon_points": [
+                    [
+                        1739.0,
+                        192.0
+                    ],
+                    [
+                        1739.0,
+                        213.0
+                    ],
+                    [
+                        2047.0,
+                        213.0
+                    ],
+                    [
+                        2047.0,
+                        192.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.5934945940971375,
+                "coordinate": [
+                    1739,
+                    226,
+                    1999,
+                    253
+                ],
+                "order": 11,
+                "polygon_points": [
+                    [
+                        1739.0,
+                        226.0
+                    ],
+                    [
+                        1739.0,
+                        252.0
+                    ],
+                    [
+                        1998.0,
+                        252.0
+                    ],
+                    [
+                        1998.0,
+                        226.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8704356551170349,
+                "coordinate": [
+                    1737,
+                    262,
+                    2219,
+                    343
+                ],
+                "order": 12,
+                "polygon_points": [
+                    [
+                        1737.0,
+                        262.0
+                    ],
+                    [
+                        1737.0,
+                        342.0
+                    ],
+                    [
+                        2218.0,
+                        342.0
+                    ],
+                    [
+                        2218.0,
+                        262.0
+                    ],
+                    [
+                        2047.0,
+                        262.0
+                    ],
+                    [
+                        2023.0,
+                        262.0
+                    ],
+                    [
+                        1910.0,
+                        262.0
+                    ],
+                    [
+                        1874.0,
+                        262.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.36535051465034485,
+                "coordinate": [
+                    737,
+                    468,
+                    825,
+                    516
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        737.0,
+                        468.0
+                    ],
+                    [
+                        737.0,
+                        515.0
+                    ],
+                    [
+                        813.0,
+                        515.0
+                    ],
+                    [
+                        824.0,
+                        509.0
+                    ],
+                    [
+                        824.0,
+                        504.0
+                    ],
+                    [
+                        824.0,
+                        479.0
+                    ],
+                    [
+                        824.0,
+                        468.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.524696946144104,
+                "coordinate": [
+                    735,
+                    468,
+                    1078,
+                    516
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        735.0,
+                        468.0
+                    ],
+                    [
+                        735.0,
+                        515.0
+                    ],
+                    [
+                        849.0,
+                        515.0
+                    ],
+                    [
+                        873.0,
+                        515.0
+                    ],
+                    [
+                        1077.0,
+                        515.0
+                    ],
+                    [
+                        1077.0,
+                        468.0
+                    ],
+                    [
+                        987.0,
+                        468.0
+                    ],
+                    [
+                        940.0,
+                        468.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.4196555018424988,
+                "coordinate": [
+                    676,
+                    560,
+                    860,
+                    584
+                ],
+                "order": 13,
+                "polygon_points": [
+                    [
+                        676.0,
+                        560.0
+                    ],
+                    [
+                        676.0,
+                        583.0
+                    ],
+                    [
+                        859.0,
+                        583.0
+                    ],
+                    [
+                        859.0,
+                        566.0
+                    ],
+                    [
+                        848.0,
+                        560.0
+                    ],
+                    [
+                        803.0,
+                        560.0
+                    ],
+                    [
+                        790.0,
+                        560.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.47065356373786926,
+                "coordinate": [
+                    676,
+                    594,
+                    818,
+                    621
+                ],
+                "order": 14,
+                "polygon_points": [
+                    [
+                        676.0,
+                        594.0
+                    ],
+                    [
+                        676.0,
+                        620.0
+                    ],
+                    [
+                        817.0,
+                        620.0
+                    ],
+                    [
+                        817.0,
+                        594.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8597089052200317,
+                "coordinate": [
+                    674,
+                    631,
+                    1133,
+                    737
+                ],
+                "order": 15,
+                "polygon_points": [
+                    [
+                        674.0,
+                        631.0
+                    ],
+                    [
+                        674.0,
+                        736.0
+                    ],
+                    [
+                        1132.0,
+                        736.0
+                    ],
+                    [
+                        1132.0,
+                        638.0
+                    ],
+                    [
+                        1085.0,
+                        631.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.7837706804275513,
+                "coordinate": [
+                    1410,
+                    437,
+                    1484,
+                    546
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1410.0,
+                        437.0
+                    ],
+                    [
+                        1410.0,
+                        545.0
+                    ],
+                    [
+                        1483.0,
+                        545.0
+                    ],
+                    [
+                        1483.0,
+                        437.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.4302455186843872,
+                "coordinate": [
+                    1205,
+                    561,
+                    1629,
+                    584
+                ],
+                "order": 16,
+                "polygon_points": [
+                    [
+                        1205.0,
+                        561.0
+                    ],
+                    [
+                        1205.0,
+                        583.0
+                    ],
+                    [
+                        1628.0,
+                        583.0
+                    ],
+                    [
+                        1628.0,
+                        561.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.4271014928817749,
+                "coordinate": [
+                    1205,
+                    594,
+                    1576,
+                    623
+                ],
+                "order": 17,
+                "polygon_points": [
+                    [
+                        1205.0,
+                        594.0
+                    ],
+                    [
+                        1205.0,
+                        622.0
+                    ],
+                    [
+                        1575.0,
+                        622.0
+                    ],
+                    [
+                        1575.0,
+                        594.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8416687846183777,
+                "coordinate": [
+                    1203,
+                    632,
+                    1680,
+                    738
+                ],
+                "order": 18,
+                "polygon_points": [
+                    [
+                        1203.0,
+                        632.0
+                    ],
+                    [
+                        1203.0,
+                        731.0
+                    ],
+                    [
+                        1215.0,
+                        737.0
+                    ],
+                    [
+                        1679.0,
+                        737.0
+                    ],
+                    [
+                        1679.0,
+                        632.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.8821062445640564,
+                "coordinate": [
+                    1914,
+                    448,
+                    2044,
+                    534
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1914.0,
+                        448.0
+                    ],
+                    [
+                        1914.0,
+                        533.0
+                    ],
+                    [
+                        2043.0,
+                        533.0
+                    ],
+                    [
+                        2043.0,
+                        448.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.4654964804649353,
+                "coordinate": [
+                    1739,
+                    561,
+                    2198,
+                    584
+                ],
+                "order": 19,
+                "polygon_points": [
+                    [
+                        1739.0,
+                        561.0
+                    ],
+                    [
+                        1739.0,
+                        583.0
+                    ],
+                    [
+                        2197.0,
+                        583.0
+                    ],
+                    [
+                        2197.0,
+                        561.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.574227511882782,
+                "coordinate": [
+                    1740,
+                    594,
+                    2002,
+                    623
+                ],
+                "order": 20,
+                "polygon_points": [
+                    [
+                        1740.0,
+                        594.0
+                    ],
+                    [
+                        1740.0,
+                        622.0
+                    ],
+                    [
+                        2001.0,
+                        622.0
+                    ],
+                    [
+                        2001.0,
+                        594.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8898788094520569,
+                "coordinate": [
+                    1738,
+                    631,
+                    2195,
+                    737
+                ],
+                "order": 21,
+                "polygon_points": [
+                    [
+                        1738.0,
+                        631.0
+                    ],
+                    [
+                        1738.0,
+                        736.0
+                    ],
+                    [
+                        2194.0,
+                        736.0
+                    ],
+                    [
+                        2194.0,
+                        638.0
+                    ],
+                    [
+                        2183.0,
+                        631.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.8892006874084473,
+                "coordinate": [
+                    824,
+                    803,
+                    1002,
+                    899
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        824.0,
+                        803.0
+                    ],
+                    [
+                        824.0,
+                        898.0
+                    ],
+                    [
+                        1001.0,
+                        898.0
+                    ],
+                    [
+                        1001.0,
+                        803.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.5454174280166626,
+                "coordinate": [
+                    675,
+                    913,
+                    1149,
+                    956
+                ],
+                "order": 22,
+                "polygon_points": [
+                    [
+                        675.0,
+                        913.0
+                    ],
+                    [
+                        675.0,
+                        949.0
+                    ],
+                    [
+                        1148.0,
+                        949.0
+                    ],
+                    [
+                        1148.0,
+                        913.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.40807807445526123,
+                "coordinate": [
+                    675,
+                    965,
+                    1039,
+                    994
+                ],
+                "order": 23,
+                "polygon_points": [
+                    [
+                        675.0,
+                        965.0
+                    ],
+                    [
+                        675.0,
+                        993.0
+                    ],
+                    [
+                        1038.0,
+                        993.0
+                    ],
+                    [
+                        1038.0,
+                        965.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8313006162643433,
+                "coordinate": [
+                    673,
+                    1002,
+                    1141,
+                    1107
+                ],
+                "order": 24,
+                "polygon_points": [
+                    [
+                        673.0,
+                        1002.0
+                    ],
+                    [
+                        673.0,
+                        1106.0
+                    ],
+                    [
+                        1140.0,
+                        1106.0
+                    ],
+                    [
+                        1140.0,
+                        1002.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.7736687660217285,
+                "coordinate": [
+                    1319,
+                    809,
+                    1574,
+                    893
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1319.0,
+                        809.0
+                    ],
+                    [
+                        1319.0,
+                        892.0
+                    ],
+                    [
+                        1573.0,
+                        892.0
+                    ],
+                    [
+                        1573.0,
+                        809.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.3154928684234619,
+                "coordinate": [
+                    1207,
+                    945,
+                    1506,
+                    976
+                ],
+                "order": 25,
+                "polygon_points": [
+                    [
+                        1207.0,
+                        945.0
+                    ],
+                    [
+                        1207.0,
+                        969.0
+                    ],
+                    [
+                        1219.0,
+                        975.0
+                    ],
+                    [
+                        1229.0,
+                        975.0
+                    ],
+                    [
+                        1265.0,
+                        975.0
+                    ],
+                    [
+                        1505.0,
+                        975.0
+                    ],
+                    [
+                        1505.0,
+                        945.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.7396506071090698,
+                "coordinate": [
+                    1204,
+                    983,
+                    1670,
+                    1062
+                ],
+                "order": 26,
+                "polygon_points": [
+                    [
+                        1204.0,
+                        983.0
+                    ],
+                    [
+                        1204.0,
+                        1061.0
+                    ],
+                    [
+                        1669.0,
+                        1061.0
+                    ],
+                    [
+                        1669.0,
+                        983.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.9069060683250427,
+                "coordinate": [
+                    1897,
+                    807,
+                    2063,
+                    898
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1897.0,
+                        807.0
+                    ],
+                    [
+                        1897.0,
+                        897.0
+                    ],
+                    [
+                        2062.0,
+                        897.0
+                    ],
+                    [
+                        2062.0,
+                        807.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.4993332624435425,
+                "coordinate": [
+                    1739,
+                    913,
+                    2194,
+                    955
+                ],
+                "order": 27,
+                "polygon_points": [
+                    [
+                        1739.0,
+                        913.0
+                    ],
+                    [
+                        1739.0,
+                        954.0
+                    ],
+                    [
+                        2193.0,
+                        954.0
+                    ],
+                    [
+                        2193.0,
+                        913.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.3876887261867523,
+                "coordinate": [
+                    1738,
+                    965,
+                    2024,
+                    994
+                ],
+                "order": 28,
+                "polygon_points": [
+                    [
+                        1738.0,
+                        965.0
+                    ],
+                    [
+                        1738.0,
+                        993.0
+                    ],
+                    [
+                        2023.0,
+                        993.0
+                    ],
+                    [
+                        2023.0,
+                        965.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8032928109169006,
+                "coordinate": [
+                    1737,
+                    1003,
+                    2189,
+                    1082
+                ],
+                "order": 29,
+                "polygon_points": [
+                    [
+                        1737.0,
+                        1003.0
+                    ],
+                    [
+                        1737.0,
+                        1081.0
+                    ],
+                    [
+                        2188.0,
+                        1081.0
+                    ],
+                    [
+                        2188.0,
+                        1003.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.35085350275039673,
+                "coordinate": [
+                    68,
+                    1202,
+                    198,
+                    1222
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        68.0,
+                        1202.0
+                    ],
+                    [
+                        68.0,
+                        1221.0
+                    ],
+                    [
+                        197.0,
+                        1221.0
+                    ],
+                    [
+                        197.0,
+                        1202.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.3022822439670563,
+                "coordinate": [
+                    243,
+                    1203,
+                    386,
+                    1222
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        243.0,
+                        1203.0
+                    ],
+                    [
+                        243.0,
+                        1221.0
+                    ],
+                    [
+                        374.0,
+                        1221.0
+                    ],
+                    [
+                        385.0,
+                        1215.0
+                    ],
+                    [
+                        385.0,
+                        1203.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.46889758110046387,
+                "coordinate": [
+                    65,
+                    1201,
+                    1680,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        65.0,
+                        1201.0
+                    ],
+                    [
+                        65.0,
+                        1222.0
+                    ],
+                    [
+                        1668.0,
+                        1222.0
+                    ],
+                    [
+                        1668.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.707057535648346,
+                "coordinate": [
+                    1943,
+                    1201,
+                    2198,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1943.0,
+                        1201.0
+                    ],
+                    [
+                        1943.0,
+                        1222.0
+                    ],
+                    [
+                        2197.0,
+                        1222.0
+                    ],
+                    [
+                        2197.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.7395532131195068,
+                "coordinate": [
+                    68,
+                    1249,
+                    1235,
+                    1271
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        68.0,
+                        1249.0
+                    ],
+                    [
+                        68.0,
+                        1270.0
+                    ],
+                    [
+                        1234.0,
+                        1270.0
+                    ],
+                    [
+                        1234.0,
+                        1249.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 16,
+                "label": "number",
+                "score": 0.45471253991127014,
+                "coordinate": [
+                    2218,
+                    1204,
+                    2237,
+                    1221
+                ],
+                "order": 30,
+                "polygon_points": [
+                    [
+                        2218.0,
+                        1204.0
+                    ],
+                    [
+                        2218.0,
+                        1220.0
+                    ],
+                    [
+                        2236.0,
+                        1220.0
+                    ],
+                    [
+                        2236.0,
+                        1204.0
+                    ]
+                ]
+            }
+        ]
+    }
+}

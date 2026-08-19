@@ -8,6 +8,7 @@ import type { ReportCatalogMode } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
 import UploadArea from "./UploadArea";
 import UploadOptionsModal from "./UploadOptionsModal";
+import FrameworkReferencePanel from "./FrameworkReferencePanel";
 import type { FileInfoFormValues } from "./FileInfoForm";
 import { useT } from "@/i18n/useT";
 
@@ -66,13 +67,9 @@ function formatReportJobMessage(fileName: string, event: any): string {
 
 interface MainContentProps {
   uploadMode: ReportCatalogMode;
-  onUploadModeChange: (mode: ReportCatalogMode) => void;
 }
 
-const MainContent: React.FC<MainContentProps> = ({
-  uploadMode,
-  onUploadModeChange,
-}) => {
+const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
   const { t } = useT();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -293,11 +290,20 @@ const MainContent: React.FC<MainContentProps> = ({
           })}
         </div>
       )}
-      <UploadArea
-        onBeforeUpload={handleBeforeUpload}
-        uploadMode={uploadMode}
-        onUploadModeChange={onUploadModeChange}
-      />
+      <div className="pt-3 sm:pt-4">
+        <div
+          className="grid grid-cols-1 items-stretch overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] lg:grid-cols-[minmax(0,1.7fr)_minmax(292px,0.8fr)]"
+          data-testid="upload-framework-layout"
+        >
+          <section className="flex h-full min-w-0 p-4 sm:p-5" data-testid="upload-dropzone-region">
+            <UploadArea
+              onBeforeUpload={handleBeforeUpload}
+              uploadMode={uploadMode}
+            />
+          </section>
+          <FrameworkReferencePanel />
+        </div>
+      </div>
       <UploadOptionsModal
         isOpen={isModalOpen}
         selectedUploadFiles={selectedUploadFiles}

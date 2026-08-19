@@ -17,13 +17,11 @@
         ]
       },
       "scope_signature": "{\"framework\":\"SASB\",\"gri_sector\":\"\",\"gri_topic\":\"\",\"industry\":\"Technology & Communications\",\"scope_slugs\":[\"Software & IT Services\"],\"semi_industry\":\"Software & IT Services\"}",
-      "report_ids": [
-        "7b185b4f-7595-41e9-8e95-9468b5de4341"
-      ],
+      "report_ids": [],
       "batch_ids": [
         "batch_5952bc2875d7486e8c365e79e4db9f08"
       ],
-      "status": "ready",
+      "status": "empty",
       "analysis_version": 1,
       "active_analysis_id": "company_91498d146e804e1ab49783bd9da7cfcd:v1",
       "assessment_outputs": [
@@ -36,9 +34,9 @@
           "total_metrics": 40
         }
       ],
-      "stale": false,
+      "stale": true,
       "created_at": "2026-07-17T06:47:57.489386+00:00",
-      "updated_at": "2026-07-17T10:49:00.201388+00:00",
+      "updated_at": "2026-08-19T13:19:39.719297+00:00",
       "last_error": null
     },
     "company_bc3c62c47b574889bf3dea76f921efaa": {

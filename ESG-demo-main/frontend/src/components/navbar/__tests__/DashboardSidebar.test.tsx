@@ -292,6 +292,37 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
   });
 });
 
+describe("DashboardSidebar favourites navigation", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.pathname = "/dashboard";
+    mocks.search = "";
+    window.localStorage.clear();
+  });
+
+  it("opens the favourites report directory", () => {
+    render(<DashboardSidebar />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Favourite" }));
+
+    expect(mocks.push).toHaveBeenCalledTimes(1);
+    expect(mocks.push).toHaveBeenCalledWith("/dashboard/favourite");
+  });
+
+  it("marks Favourite as the current directory on its route", () => {
+    mocks.pathname = "/dashboard/favourite";
+
+    render(<DashboardSidebar />);
+
+    const favourite = screen.getByRole("button", { name: "Favourite" });
+    expect(favourite).toHaveAttribute("aria-current", "page");
+    expect(favourite).toHaveClass("bg-[#ececec]");
+    expect(screen.getByRole("button", { name: "Homepage" })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+});
+
 describe("DashboardSidebar cross-analysis navigation directory", () => {
   beforeEach(() => {
     vi.clearAllMocks();

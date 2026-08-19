@@ -7,7 +7,6 @@ import { useT } from "@/i18n/useT";
 const FloatingStatusButton: React.FC = () => {
   const { t } = useT();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const isDevelopment = process.env.NODE_ENV === "development";
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -16,8 +15,6 @@ const FloatingStatusButton: React.FC = () => {
   const hideModal = () => {
     setIsModalOpen(false);
   };
-
-  if (!isDevelopment) return null;
 
   return (
     <>
