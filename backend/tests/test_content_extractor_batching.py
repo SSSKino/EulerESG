@@ -10,7 +10,9 @@ from unittest.mock import patch
 from esg_encoding.content_extractor import (
     ContentExtractor,
     _batch_timing_summary,
+    _merge_native_and_ocr_page,
     _page_batch_ranges,
+    _selected_page_batch_ranges,
 )
 from esg_encoding.exceptions import ContentExtractionError
 
@@ -24,6 +26,21 @@ class PageBatchRangeTests(unittest.TestCase):
         self.assertEqual(ranges[-1], (113, 116))
         pages = [page for start, end in ranges for page in range(start, end + 1)]
         self.assertEqual(pages, list(range(1, 117)))
+
+    def test_selected_pages_are_batched_without_crossing_native_gaps(self):
+        ranges = _selected_page_batch_ranges(15, 2, [1, 2, 5, 6, 7, 15])
+
+        self.assertEqual(ranges, [(1, 2), (5, 6), (7, 7), (15, 15)])
+
+    def test_hybrid_merge_prefers_native_text_and_keeps_ocr_structure(self):
+        merged = _merge_native_and_ocr_page(
+            "Revenue was 100% in FY24.",
+            "<table><tr><td>FY24</td><td>100%</td></tr></table>",
+        )
+
+        self.assertIn("Revenue was 100% in FY24.", merged)
+        self.assertIn("<table>", merged)
+        self.assertIn("OCR structure supplement", merged)
 
     def test_batch_timing_summary_uses_worker_results(self):
         states = [
@@ -150,6 +167,44 @@ class PyMuPdfSplitTests(unittest.TestCase):
                     batch.close()
 
             self.assertEqual(copied_labels, [f"PAGE-{page:02d}" for page in range(1, 16)])
+
+    def test_selected_scan_pages_are_the_only_pages_copied(self):
+        try:
+            import fitz
+        except ImportError:
+            self.skipTest("PyMuPDF is not installed")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source_path = root / "mixed.pdf"
+            source = fitz.open()
+            for page_number in range(1, 7):
+                page = source.new_page()
+                page.insert_text((72, 72), f"PAGE-{page_number:02d}")
+            source.save(source_path)
+            source.close()
+
+            with patch.dict(os.environ, {"PADDLEOCR_JOB_WORK_DIR": str(root / "jobs")}):
+                units, total_pages, _ = ContentExtractor()._split_pdf_for_page_batch_queue(
+                    source_path,
+                    "adaptive_split",
+                    2,
+                    page_numbers=[2, 3, 6],
+                )
+
+            self.assertEqual(total_pages, 6)
+            self.assertEqual(
+                [(unit["start_page"], unit["end_page"]) for unit in units],
+                [(2, 3), (6, 6)],
+            )
+            copied_labels: list[str] = []
+            for unit in units:
+                batch = fitz.open(unit["input_path"])
+                try:
+                    copied_labels.extend(page.get_text("text").strip() for page in batch)
+                finally:
+                    batch.close()
+            self.assertEqual(copied_labels, ["PAGE-02", "PAGE-03", "PAGE-06"])
 
 
 class PageBatchMergeValidationTests(unittest.TestCase):

@@ -8,8 +8,10 @@ import os
 import re
 import statistics
 import time
+import unicodedata
 import uuid
 from datetime import datetime
+from difflib import SequenceMatcher
 from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -22,6 +24,77 @@ from loguru import logger
 from .exceptions import ContentExtractionError
 from .models import DocumentContent, ProcessingConfig, TextSegment
 from .visual_assets import append_visual_markers, load_visual_manifest, parse_visual_marker, promote_visual_assets
+
+
+_HTML_IMAGE_TAG_RE = re.compile(r"<\s*img\b[^>]*>", re.IGNORECASE | re.DOTALL)
+_HTML_WRAPPER_TAG_RE = re.compile(
+    r"</?\s*(?:div|span|p|center|figure|picture|source|br)\b[^>]*>",
+    re.IGNORECASE | re.DOTALL,
+)
+_MARKDOWN_IMAGE_TAG_RE = re.compile(
+    r"!\[([^\]]*)\]\((?:[^()\s]+|\([^)]*\))+(?:\s+['\"].*?['\"])?\)",
+    re.IGNORECASE | re.DOTALL,
+)
+_BARE_IMAGE_PATH_RE = re.compile(
+    r"^(?:\.\.?/)?(?:imgs?|images?|assets?)/[^\s]+\.(?:png|jpe?g|webp|gif|svg)$",
+    re.IGNORECASE,
+)
+
+
+def _visual_has_searchable_content(value: Dict[str, Any]) -> bool:
+    """Return whether a visual asset carries evidence worth indexing as text."""
+    if value.get("chart_data") not in (None, "", [], {}):
+        return True
+    return any(str(value.get(field) or "").strip() for field in ("caption", "summary", "ocr_text"))
+
+
+def _clean_non_table_markdown_block(value: str) -> str:
+    """Remove image-only HTML/Markdown emitted alongside durable visual assets.
+
+    PaddleOCR saves image crops separately and may also emit ``<div><img ...>``
+    fragments in Markdown.  Keeping both creates duplicate, non-semantic retrieval
+    rows.  Meaningful surrounding prose is retained while image-only fragments are
+    discarded.
+    """
+    text = str(value or "")
+    text = _HTML_IMAGE_TAG_RE.sub(" ", text)
+
+    def replace_markdown_image(match: re.Match[str]) -> str:
+        alt = re.sub(r"\s+", " ", str(match.group(1) or "")).strip()
+        if alt.lower() in {"", "image", "img", "figure", "photo", "chart"}:
+            return " "
+        return f" {alt} "
+
+    text = _MARKDOWN_IMAGE_TAG_RE.sub(replace_markdown_image, text)
+    text = _HTML_WRAPPER_TAG_RE.sub("\n", text)
+    # Remaining presentation tags (for example <b>) should not become embedding
+    # tokens.  Table HTML is handled before this helper is called.
+    text = re.sub(r"</?\s*[A-Za-z][^>]*>", " ", text)
+    lines = []
+    for line in text.splitlines():
+        cleaned = re.sub(r"\s+", " ", unescape(line)).strip()
+        if not cleaned or _BARE_IMAGE_PATH_RE.fullmatch(cleaned):
+            continue
+        lines.append(cleaned)
+    text = "\n".join(lines).strip()
+    if text.lower() in {"image", "img", "figure", "photo", "chart"}:
+        return ""
+    return text
+
+
+def _is_meaningful_short_text(value: str) -> bool:
+    """Keep standalone codes, years, units and values despite length limits."""
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    if not text:
+        return False
+    patterns = (
+        r"\b[A-Z]{2,8}-[A-Z]{2,8}-\d{3}[a-z]?\.\d\b",
+        r"\b(?:19|20)\d{2}\b",
+        r"\b(?:scope|范围)\s*[123]\b",
+        r"[-+]?\d+(?:[.,]\d+)?\s*%",
+        r"[-+]?\d+(?:[.,]\d+)?\s*(?:tco2e|co2e|mwh|kwh|gj|mj|kg|mt|t|m3|m²|m2)\b",
+    )
+    return any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in patterns)
 
 
 def _shared_dir_mode() -> int:
@@ -124,6 +197,235 @@ def _page_batch_ranges(total_pages: int, batch_size: int) -> list[tuple[int, int
         (start + 1, min(start + effective_batch_size, total_pages))
         for start in range(0, total_pages, effective_batch_size)
     ]
+
+
+def _selected_page_batch_ranges(
+    total_pages: int,
+    batch_size: int,
+    page_numbers: Optional[Sequence[int]] = None,
+) -> list[tuple[int, int]]:
+    """Return contiguous OCR ranges for selected one-based pages.
+
+    Native digital pages can be omitted while scanned/hybrid runs are still
+    grouped up to ``batch_size``.  ``None`` preserves the legacy all-page plan.
+    """
+    if page_numbers is None:
+        return _page_batch_ranges(total_pages, batch_size)
+    selected = sorted({int(page) for page in page_numbers if 1 <= int(page) <= total_pages})
+    if not selected:
+        return []
+    effective_batch_size = max(1, int(batch_size))
+    ranges: list[tuple[int, int]] = []
+    run_start = selected[0]
+    previous = selected[0]
+    for page in selected[1:] + [None]:
+        if page is not None and page == previous + 1:
+            previous = page
+            continue
+        chunk_start = run_start
+        while chunk_start <= previous:
+            chunk_end = min(previous, chunk_start + effective_batch_size - 1)
+            ranges.append((chunk_start, chunk_end))
+            chunk_start = chunk_end + 1
+        if page is not None:
+            run_start = page
+            previous = page
+    return ranges
+
+
+_PAGE_MARKER_RE = re.compile(r"<!--\s*page\s+(\d+)\b[^>]*-->", re.IGNORECASE)
+
+
+def _markdown_content_by_page(markdown: str) -> Dict[int, str]:
+    """Split Paddle/native Markdown into page bodies without retaining markers."""
+    text = str(markdown or "")
+    matches = list(_PAGE_MARKER_RE.finditer(text))
+    pages: Dict[int, str] = {}
+    for index, match in enumerate(matches):
+        page = max(1, int(match.group(1)))
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        body = text[match.end():end].strip()
+        if body:
+            pages[page] = body
+        else:
+            pages.setdefault(page, "")
+    return pages
+
+
+def _normalise_page_text(value: str) -> str:
+    text = unescape(str(value or "")).casefold()
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"[^\w%]+", " ", text, flags=re.UNICODE)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _bbox_values(value: Any) -> Optional[List[float]]:
+    """Coerce rects or four-point polygons to ``[x0, y0, x1, y1]``."""
+    if not isinstance(value, (list, tuple)):
+        return None
+    coordinates: List[float] = []
+    try:
+        if value and all(isinstance(item, (list, tuple)) for item in value):
+            for point in value:
+                if len(point) >= 2:
+                    coordinates.extend((float(point[0]), float(point[1])))
+        else:
+            coordinates = [float(item) for item in value]
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if len(coordinates) == 4:
+        x0, y0, x1, y1 = coordinates
+    elif len(coordinates) >= 8 and len(coordinates) % 2 == 0:
+        xs = coordinates[0::2]
+        ys = coordinates[1::2]
+        x0, y0, x1, y1 = min(xs), min(ys), max(xs), max(ys)
+    else:
+        return None
+    if not all(value == value and abs(value) != float("inf") for value in (x0, y0, x1, y1)):
+        return None
+    if x1 < x0:
+        x0, x1 = x1, x0
+    if y1 < y0:
+        y0, y1 = y1, y0
+    if x1 <= x0 or y1 <= y0:
+        return None
+    return [x0, y0, x1, y1]
+
+
+def _normalized_bbox(
+    value: Any,
+    *,
+    page_width: float = 0.0,
+    page_height: float = 0.0,
+) -> Optional[List[float]]:
+    bbox = _bbox_values(value)
+    if bbox is None:
+        return None
+    if max(abs(item) for item in bbox) > 1.0001:
+        if page_width <= 0.0 or page_height <= 0.0:
+            return None
+        bbox = [
+            bbox[0] / page_width,
+            bbox[1] / page_height,
+            bbox[2] / page_width,
+            bbox[3] / page_height,
+        ]
+    return [max(0.0, min(1.0, item)) for item in bbox]
+
+
+def _bbox_iou(first: Any, second: Any) -> float:
+    left = _bbox_values(first)
+    right = _bbox_values(second)
+    if left is None or right is None:
+        return 0.0
+    x0, y0 = max(left[0], right[0]), max(left[1], right[1])
+    x1, y1 = min(left[2], right[2]), min(left[3], right[3])
+    intersection = max(0.0, x1 - x0) * max(0.0, y1 - y0)
+    if intersection <= 0.0:
+        return 0.0
+    left_area = (left[2] - left[0]) * (left[3] - left[1])
+    right_area = (right[2] - right[0]) * (right[3] - right[1])
+    union = left_area + right_area - intersection
+    return intersection / union if union > 0.0 else 0.0
+
+
+def _bbox_union(values: Sequence[Any]) -> Optional[List[float]]:
+    boxes = [box for value in values if (box := _bbox_values(value)) is not None]
+    if not boxes:
+        return None
+    return [
+        min(box[0] for box in boxes),
+        min(box[1] for box in boxes),
+        max(box[2] for box in boxes),
+        max(box[3] for box in boxes),
+    ]
+
+
+def _normalised_table_text(rows: Sequence[Sequence[Any]]) -> str:
+    parts: List[str] = []
+    for row in rows:
+        cells = [
+            re.sub(r"\s+", " ", unicodedata.normalize("NFKC", unescape(str(cell or ""))))
+            .casefold()
+            .strip()
+            for cell in row
+        ]
+        if any(cells):
+            parts.append(" | ".join(cells))
+    return " || ".join(parts)
+
+
+def _merge_native_and_ocr_page(native_markdown: str, ocr_markdown: str) -> str:
+    """Prefer native text while retaining OCR-only structures on hybrid pages."""
+    native = str(native_markdown or "").strip()
+    ocr = str(ocr_markdown or "").strip()
+    if not native:
+        return ocr
+    if not ocr:
+        return native
+    native_key = _normalise_page_text(native)
+    ocr_key = _normalise_page_text(ocr)
+    if native_key and (native_key in ocr_key or ocr_key in native_key):
+        # Native characters are authoritative for born-digital content.  Keep OCR
+        # only when it adds a table/visual structure not represented natively.
+        if "<table" not in ocr.casefold() and "|" not in ocr:
+            return native
+    return f"{native}\n\n<!-- OCR structure supplement -->\n\n{ocr}"
+
+
+def _adaptive_analysis_maps(analysis: Any) -> tuple[Dict[int, str], Dict[int, str]]:
+    """Return route and native-Markdown maps from a page-parser analysis."""
+    routes: Dict[int, str] = {}
+    native_pages: Dict[int, str] = {}
+    if analysis is None or not bool(getattr(analysis, "available", False)):
+        return routes, native_pages
+    for fallback_page, profile in enumerate(list(getattr(analysis, "pages", []) or []), 1):
+        try:
+            page = max(1, int(getattr(profile, "page_number", fallback_page) or fallback_page))
+        except Exception:
+            page = fallback_page
+        route = str(getattr(profile, "route", "ocr") or "ocr").strip().lower()
+        if route not in {"native", "ocr", "hybrid"}:
+            route = "ocr"
+        routes[page] = route
+        native_markdown = str(getattr(profile, "native_markdown", "") or "").strip()
+        if native_markdown:
+            native_pages[page] = native_markdown
+    return routes, native_pages
+
+
+def _native_only_result(analysis: Any) -> Dict[str, Any]:
+    """Build a queue-compatible extraction result for an all-native PDF."""
+    routes, native_pages = _adaptive_analysis_maps(analysis)
+    total_pages = int(getattr(analysis, "total_pages", 0) or len(routes))
+    missing = [page for page in range(1, total_pages + 1) if not native_pages.get(page)]
+    if total_pages <= 0 or missing:
+        raise ValueError(f"Native PDF analysis is incomplete; missing pages={missing[:20]}")
+    markdown = "\n\n".join(
+        f"<!-- Page {page} | adaptive parser route=native -->\n\n{native_pages[page]}"
+        for page in range(1, total_pages + 1)
+    )
+    return {
+        "status": "success",
+        "parser": "adaptive-native",
+        "pipeline_version": "adaptive-v1",
+        "queue_granularity": "none",
+        "mode": "native",
+        "page_batch_size": 0,
+        "total_pages": total_pages,
+        "units_processed": 0,
+        "elapsed_worker_seconds_sum": 0.0,
+        "visual_asset_count": 0,
+        "visual_assets": [],
+        "table_records": [],
+        "output_dir": "",
+        "result_markdown_path": "",
+        "intermediate_output_removed": True,
+        "page_routes": routes,
+        "native_page_count": total_pages,
+        "ocr_page_count": 0,
+        "markdown": markdown,
+    }
 
 
 def _paddle_markdown_page_markers(markdown: object) -> list[int]:
@@ -710,7 +1012,41 @@ class ContentExtractor:
         try:
             self.logger.info(f"开始使用 PaddleOCR-VL v1.6 提取报告内容: {source_path}")
             self._emit_progress("ocr_start", "PaddleOCR-VL extraction started.", 10)
-            result = self._run_paddleocr_vl_page_batch_queue(source_path)
+            page_analysis = None
+            adaptive_started = time.perf_counter()
+            if _env_bool("REPORT_ADAPTIVE_PAGE_ROUTING_ENABLED", True):
+                try:
+                    from .page_parser import analyze_pdf_pages
+
+                    page_analysis = analyze_pdf_pages(source_path)
+                    if bool(getattr(page_analysis, "available", False)):
+                        route_counts = dict(getattr(page_analysis, "route_counts", {}) or {})
+                        self.logger.info(
+                            f"Adaptive PDF page analysis completed: file={source_path.name}, "
+                            f"pages={getattr(page_analysis, 'total_pages', 0)}, routes={route_counts}"
+                        )
+                        self._emit_progress(
+                            "page_routing",
+                            f"Page routing ready: {route_counts}",
+                            11,
+                            route_counts=route_counts,
+                        )
+                    else:
+                        self.logger.warning(
+                            f"Adaptive page analysis unavailable; using full OCR: "
+                            f"{getattr(page_analysis, 'error', '')}"
+                        )
+                except Exception as exc:
+                    page_analysis = None
+                    self.logger.warning(f"Adaptive page analysis failed; using full OCR: {exc}")
+
+            result = self._run_paddleocr_vl_page_batch_queue(
+                source_path,
+                page_analysis=page_analysis,
+            )
+            stage_timings = dict(result.get("stage_timings") or {})
+            stage_timings["page_analysis_seconds"] = round(time.perf_counter() - adaptive_started, 3)
+            result["stage_timings"] = stage_timings
             markdown = str(result.get("markdown") or "").strip()
             if not markdown:
                 raise ContentExtractionError(
@@ -725,6 +1061,8 @@ class ContentExtractor:
             if table_records:
                 self._enrich_table_segments_from_records(segments, table_records)
             self._stitch_continued_tables(segments)
+            if page_analysis is not None and bool(getattr(page_analysis, "available", False)):
+                self._enrich_segments_from_native_layout(segments, page_analysis)
             if not segments:
                 segments = [
                     TextSegment(
@@ -1181,6 +1519,7 @@ class ContentExtractor:
         source_path: Path,
         job_id: str,
         batch_size: int,
+        page_numbers: Optional[Sequence[int]] = None,
     ) -> tuple[list[dict], int, Path]:
         try:
             import fitz  # type: ignore
@@ -1205,10 +1544,8 @@ class ContentExtractor:
                 raise ContentExtractionError("PDF 没有可解析页", file_path=str(source_path))
 
             units: list[dict] = []
-            for unit_index, (start_page, end_page) in enumerate(
-                _page_batch_ranges(total_pages, batch_size),
-                1,
-            ):
+            selected_ranges = _selected_page_batch_ranges(total_pages, batch_size, page_numbers)
+            for unit_index, (start_page, end_page) in enumerate(selected_ranges, 1):
                 batch_path = batch_dir / f"pages_{start_page:04d}_{end_page:04d}.pdf"
                 # Keep the .pdf suffix so PyMuPDF can infer the output format.
                 tmp_path = batch_path.with_name(f"{batch_path.stem}.tmp.pdf")
@@ -1296,11 +1633,30 @@ class ContentExtractor:
 
         return units, total_pages, batch_dir
 
-    def _run_paddleocr_vl_page_batch_queue(self, source_path: Path) -> Dict[str, Any]:
+    def _run_paddleocr_vl_page_batch_queue(
+        self,
+        source_path: Path,
+        *,
+        page_analysis: Any = None,
+    ) -> Dict[str, Any]:
+        routes, _native_pages = _adaptive_analysis_maps(page_analysis)
+        total_pages = int(getattr(page_analysis, "total_pages", 0) or 0) if page_analysis is not None else 0
+        if total_pages > 0 and len(routes) == total_pages and all(
+            routes.get(page) == "native" for page in range(1, total_pages + 1)
+        ):
+            self.logger.info(f"Skipping PaddleOCR for all-native PDF: file={source_path.name}, pages={total_pages}")
+            return _native_only_result(page_analysis)
+
         job_id = f"parse_{uuid.uuid4().hex}"
         self._wake_paddleocr_vlm()
         try:
-            return self._run_paddleocr_vl_page_batch_queue_active(source_path, job_id)
+            if page_analysis is None:
+                return self._run_paddleocr_vl_page_batch_queue_active(source_path, job_id)
+            return self._run_paddleocr_vl_page_batch_queue_active(
+                source_path,
+                job_id,
+                page_analysis=page_analysis,
+            )
         finally:
             self._release_paddle_after_document(job_id)
 
@@ -1308,6 +1664,8 @@ class ContentExtractor:
         self,
         source_path: Path,
         job_id: str,
+        *,
+        page_analysis: Any = None,
     ) -> Dict[str, Any]:
         queue_run_started = time.perf_counter()
         client = self._redis_client()
@@ -1325,25 +1683,83 @@ class ContentExtractor:
         _ensure_shared_writable_dir(output_dir)
         _ensure_shared_writable_dir(output_dir / "batches")
 
+        page_routes, native_page_markdown = _adaptive_analysis_maps(page_analysis)
+        analysis_total_pages = int(getattr(page_analysis, "total_pages", 0) or 0) if page_analysis is not None else 0
+        analysis_is_complete = (
+            analysis_total_pages > 0
+            and set(page_routes) == set(range(1, analysis_total_pages + 1))
+            and all(
+                page_routes.get(page) != "native" or bool(native_page_markdown.get(page))
+                for page in range(1, analysis_total_pages + 1)
+            )
+        )
+        selected_ocr_pages: Optional[List[int]] = None
+        if analysis_is_complete:
+            selected_ocr_pages = [
+                page
+                for page in range(1, analysis_total_pages + 1)
+                if page_routes.get(page) != "native"
+            ]
+
         split_started = time.perf_counter()
-        units, total_pages, batch_dir = self._split_pdf_for_page_batch_queue(source_path, job_id, batch_size)
+        units, total_pages, batch_dir = self._split_pdf_for_page_batch_queue(
+            source_path,
+            job_id,
+            batch_size,
+            page_numbers=selected_ocr_pages,
+        )
+        if analysis_is_complete and analysis_total_pages != total_pages:
+            self.logger.warning(
+                f"Adaptive page count changed during split; reverting to full OCR: "
+                f"analysis={analysis_total_pages}, pdf={total_pages}"
+            )
+            page_routes = {}
+            native_page_markdown = {}
+            selected_ocr_pages = None
+            units, total_pages, batch_dir = self._split_pdf_for_page_batch_queue(
+                source_path,
+                job_id,
+                batch_size,
+            )
         split_seconds = time.perf_counter() - split_started
         total_units = len(units)
+        expected_ranges = [
+            (int(unit["start_page"]), int(unit["end_page"]))
+            for unit in units
+        ]
+        native_page_count = sum(1 for route in page_routes.values() if route == "native")
+        ocr_page_count = sum(end - start + 1 for start, end in expected_ranges)
+        if total_units == 0 and native_page_count == total_pages:
+            result = _native_only_result(page_analysis)
+            result["stage_timings"] = {
+                "split_seconds": round(split_seconds, 3),
+                "queue_submit_seconds": 0.0,
+                "ocr_queue_seconds": 0.0,
+                "merge_seconds": 0.0,
+                "queue_total_seconds": round(time.perf_counter() - queue_run_started, 3),
+            }
+            _cleanup_path_tree(
+                Path(os.getenv("PADDLEOCR_JOB_WORK_DIR", "/workspace/uploads/paddleocr_vl_jobs")) / job_id,
+                label="all-native batch workspace",
+            )
+            return result
 
         self.logger.info(
             f"提交 PaddleOCR-VL 页级 batch 队列任务: job_id={job_id}, file={source_path.name}, "
             f"pages={total_pages}, units={total_units}, batch_size={batch_size}, queue={queue_name}, "
+            f"native_pages={native_page_count}, ocr_pages={ocr_page_count}, "
             f"split_seconds={split_seconds:.3f}"
         )
         self._emit_progress(
             "ocr_queued",
-            f"PaddleOCR queued: {total_pages} pages split into {total_units} batch(es).",
+            f"PaddleOCR queued: {ocr_page_count}/{total_pages} pages in {total_units} batch(es); "
+            f"{native_page_count} native page(s) bypassed OCR.",
             12,
             paddle_progress={
                 "paddle_job_id": job_id,
                 "total_pages": total_pages,
-                "pages_done": 0,
-                "pages_success": 0,
+                "pages_done": native_page_count,
+                "pages_success": native_page_count,
                 "pages_failed": 0,
                 "total_units": total_units,
                 "units_done": 0,
@@ -1352,6 +1768,8 @@ class ContentExtractor:
                 "units_running": 0,
                 "units_queued": total_units,
                 "page_batch_size": batch_size,
+                "native_pages": native_page_count,
+                "ocr_pages": ocr_page_count,
                 "running_batches": [],
             },
             paddle_job_id=job_id,
@@ -1376,6 +1794,8 @@ class ContentExtractor:
                 "total_units": total_units,
                 "units_done": 0,
                 "page_batch_size": batch_size,
+                "native_pages": native_page_count,
+                "ocr_pages": ocr_page_count,
                 "split_seconds": round(split_seconds, 3),
             },
         )
@@ -1455,7 +1875,7 @@ class ContentExtractor:
                 except Exception:
                     return default
 
-            pages_success = sum(
+            ocr_pages_success = sum(
                 max(0, _int_field(st, "end_page") - _int_field(st, "start_page") + 1)
                 for st, status in zip(batch_states, statuses)
                 if status in {"success", "completed"}
@@ -1465,6 +1885,7 @@ class ContentExtractor:
                 for st, status in zip(batch_states, statuses)
                 if status == "failed"
             )
+            pages_success = native_page_count + ocr_pages_success
             pages_done = pages_success + pages_failed
             running_batches = []
             for st, status in zip(batch_states, statuses):
@@ -1616,6 +2037,9 @@ class ContentExtractor:
                         total_pages=total_pages,
                         total_units=total_units,
                         batch_size=batch_size,
+                        expected_ranges=expected_ranges,
+                        native_page_markdown=native_page_markdown,
+                        page_routes=page_routes,
                     )
                 except ContentExtractionError as exc:
                     self._redis_hash_set(
@@ -1652,6 +2076,9 @@ class ContentExtractor:
                 }
                 result["stage_timings"] = stage_timings
                 result["batch_timing"] = batch_timing
+                result["page_routes"] = page_routes
+                result["native_page_count"] = native_page_count
+                result["ocr_page_count"] = ocr_page_count
                 result["_task_key"] = task_key
                 elapsed_stats = batch_timing["elapsed_seconds"]
                 redis_result = {
@@ -1721,15 +2148,22 @@ class ContentExtractor:
         total_pages: int,
         total_units: int,
         batch_size: int,
+        expected_ranges: Optional[Sequence[tuple[int, int]]] = None,
+        native_page_markdown: Optional[Dict[int, str]] = None,
+        page_routes: Optional[Dict[int, str]] = None,
     ) -> Dict[str, Any]:
-        combined_parts: list[str] = []
+        ocr_page_markdown: Dict[int, str] = {}
         combined_page_markers: list[int] = []
         elapsed_total = 0.0
-        expected_ranges = _page_batch_ranges(total_pages, batch_size)
-        if len(expected_ranges) != total_units:
+        planned_ranges = list(
+            _page_batch_ranges(total_pages, batch_size)
+            if expected_ranges is None
+            else expected_ranges
+        )
+        if len(planned_ranges) != total_units:
             raise ContentExtractionError(
                 f"PaddleOCR-VL batch plan mismatch: job_id={job_id}, "
-                f"expected_units={len(expected_ranges)}, reported_units={total_units}",
+                f"expected_units={len(planned_ranges)}, reported_units={total_units}",
                 file_path=str(source_path),
             )
 
@@ -1744,7 +2178,7 @@ class ContentExtractor:
                         result = json.loads(raw_result or "{}")
                     except Exception:
                         result = dict(state)
-                expected_start, expected_end = expected_ranges[idx - 1]
+                expected_start, expected_end = planned_ranges[idx - 1]
                 expected_count = expected_end - expected_start + 1
 
                 def _required_result_int(name: str) -> int:
@@ -1793,7 +2227,7 @@ class ContentExtractor:
                         f"returned={page_markers}",
                         file_path=str(source_path),
                     )
-                combined_parts.append(md)
+                ocr_page_markdown.update(_markdown_content_by_page(md))
                 combined_page_markers.extend(page_markers)
                 try:
                     elapsed_total += float(result.get("elapsed_seconds") or 0.0)
@@ -1811,16 +2245,44 @@ class ContentExtractor:
                     file_path=str(source_path),
                 )
 
-        expected_document_markers = list(range(1, total_pages + 1))
-        if combined_page_markers != expected_document_markers:
+        expected_ocr_markers = [
+            page
+            for start_page, end_page in planned_ranges
+            for page in range(start_page, end_page + 1)
+        ]
+        if combined_page_markers != expected_ocr_markers:
             raise ContentExtractionError(
-                f"PaddleOCR-VL merged document pages are incomplete or out of order: "
-                f"job_id={job_id}, expected=1-{total_pages}, "
+                f"PaddleOCR-VL merged OCR pages are incomplete or out of order: "
+                f"job_id={job_id}, expected={expected_ocr_markers}, "
                 f"returned={combined_page_markers}",
                 file_path=str(source_path),
             )
 
-        markdown = "\n".join(part for part in combined_parts if str(part).strip()).strip()
+        native_pages = {int(page): str(body or "").strip() for page, body in (native_page_markdown or {}).items()}
+        routes = {int(page): str(route or "ocr").strip().lower() for page, route in (page_routes or {}).items()}
+        combined_parts: list[str] = []
+        missing_pages: list[int] = []
+        for page in range(1, total_pages + 1):
+            native_body = native_pages.get(page, "")
+            ocr_body = ocr_page_markdown.get(page, "")
+            route = routes.get(page, "ocr")
+            if route == "native":
+                body = native_body or ocr_body
+            elif route == "hybrid":
+                body = _merge_native_and_ocr_page(native_body, ocr_body)
+            else:
+                body = ocr_body or native_body
+            if not body:
+                missing_pages.append(page)
+                continue
+            combined_parts.append(f"<!-- Page {page} | adaptive parser route={route} -->\n\n{body}")
+        if missing_pages:
+            raise ContentExtractionError(
+                f"Adaptive PDF merge produced no content for pages: {missing_pages[:20]}",
+                file_path=str(source_path),
+            )
+
+        markdown = "\n\n".join(combined_parts).strip()
         if not markdown:
             raise ContentExtractionError("PaddleOCR-VL 页级 batch 没有生成 Markdown", file_path=str(source_path))
 
@@ -1889,6 +2351,7 @@ class ContentExtractor:
         table_index = 0
         current_page = 1
         current_heading = ""
+        section_path: List[str] = []
 
         for block in blocks:
             marker = self._page_marker(block)
@@ -1902,6 +2365,10 @@ class ContentExtractor:
 
             visual = parse_visual_marker(block)
             if visual:
+                # Preserve the durable asset in its manifest, but do not create a
+                # dense-retrieval row for an empty crop placeholder.
+                if not _visual_has_searchable_content(visual):
+                    continue
                 page = max(1, int(visual.get("page_number") or current_page))
                 caption = str(visual.get("caption") or "").strip()
                 summary = str(visual.get("summary") or "").strip()
@@ -1920,12 +2387,13 @@ class ContentExtractor:
                     position_y=float(seq),
                     position_x=0.0,
                     segment_type=segment_type,
-                    structured_data={
-                        **visual,
-                        "source": "paddleocr_vl_visual_asset",
-                        "parser": "paddleocr-vl",
-                        "evidence_type": segment_type,
-                    },
+                        structured_data={
+                            **visual,
+                            "source": "paddleocr_vl_visual_asset",
+                            "parser": "paddleocr-vl",
+                            "evidence_type": segment_type,
+                            "section_path": list(section_path),
+                        },
                 ))
                 continue
 
@@ -1947,6 +2415,7 @@ class ContentExtractor:
                             "parser": "paddleocr-vl",
                             "table_id": table_id,
                             "table_title": current_heading,
+                            "section_path": list(section_path),
                         },
                     )
                 )
@@ -1957,17 +2426,28 @@ class ContentExtractor:
                     table_id,
                     start_seq=seq,
                     table_title=current_heading,
+                    section_path=section_path,
                 )
                 if table_segments:
                     segments.extend(table_segments)
                     seq += len(table_segments)
                 continue
 
-            segment_type = "heading" if re.match(r"^#{1,6}\s+", block) else "text"
+            block = _clean_non_table_markdown_block(block)
+            if not block:
+                continue
+            heading_match = re.match(r"^(#{1,6})\s+", block)
+            segment_type = "heading" if heading_match else "text"
             content = re.sub(r"^#{1,6}\s+", "", block).strip() if segment_type == "heading" else block
             if segment_type == "heading":
                 current_heading = content
-            if segment_type == "text" and len(content.strip()) < int(getattr(self.config, "min_text_length", 10) or 10):
+                level = len(heading_match.group(1)) if heading_match else 1
+                section_path = section_path[: max(0, level - 1)] + [content]
+            if (
+                segment_type == "text"
+                and len(content.strip()) < int(getattr(self.config, "min_text_length", 10) or 10)
+                and not _is_meaningful_short_text(content)
+            ):
                 continue
             seq += 1
             segments.append(
@@ -1978,7 +2458,11 @@ class ContentExtractor:
                     position_y=float(seq),
                     position_x=0.0,
                     segment_type=segment_type,
-                    structured_data={"source": "paddleocr_vl_markdown", "parser": "paddleocr-vl"},
+                    structured_data={
+                        "source": "paddleocr_vl_markdown",
+                        "parser": "paddleocr-vl",
+                        "section_path": list(section_path),
+                    },
                 )
             )
 
@@ -2081,6 +2565,7 @@ class ContentExtractor:
         *,
         start_seq: int = 0,
         table_title: str = "",
+        section_path: Optional[Sequence[str]] = None,
     ) -> List[TextSegment]:
         rows, physical_cells, quality = self._parse_table_details(table_md)
         if not rows:
@@ -2132,6 +2617,7 @@ class ContentExtractor:
                         "row_header": row_header,
                         "row_text": row_text,
                         "column_headers": headers,
+                        "section_path": list(section_path or []),
                         **common_quality,
                     },
                 )
@@ -2180,6 +2666,7 @@ class ContentExtractor:
                             "col_header": col_header,
                             "value_text": value,
                             "column_headers": headers,
+                            "section_path": list(section_path or []),
                             "row_text": row_text,
                             "row_segment_id": row_segment_id,
                             "header_path": header_path,
@@ -2191,6 +2678,125 @@ class ContentExtractor:
                     )
                 )
         return segments
+
+    def _enrich_segments_from_native_layout(self, segments: List[TextSegment], analysis: Any) -> None:
+        """Attach page geometry and reading order from the native PDF preflight."""
+        profiles: Dict[int, Any] = {}
+        for fallback_page, profile in enumerate(list(getattr(analysis, "pages", []) or []), 1):
+            try:
+                page = max(1, int(getattr(profile, "page_number", fallback_page) or fallback_page))
+            except Exception:
+                page = fallback_page
+            profiles[page] = profile
+
+        for page, profile in profiles.items():
+            raw_blocks = list(getattr(profile, "native_blocks", []) or [])
+            blocks: list[dict[str, Any]] = []
+            for order, raw in enumerate(raw_blocks):
+                if isinstance(raw, dict):
+                    getter = raw.get
+                else:
+                    getter = lambda name, default=None, item=raw: getattr(item, name, default)
+                text = str(getter("text", "") or "").strip()
+                key = _normalise_page_text(text)
+                # ``page_parser`` deliberately preserves both PDF-point and
+                # normalized coordinates.  Retrieval/layout metadata always
+                # uses normalized boxes, so prefer that representation and
+                # only normalize the absolute fallback here.
+                bbox = getter("normalized_bbox", None)
+                bbox_is_normalized = bbox is not None
+                if bbox is None:
+                    bbox = getter("bbox", None)
+                if not key or not isinstance(bbox, (list, tuple)) or len(bbox) < 4:
+                    continue
+                try:
+                    raw_bbox = [float(value) for value in bbox[:4]]
+                    if bbox_is_normalized:
+                        normalized_bbox = raw_bbox
+                    else:
+                        page_width = float(getattr(profile, "page_width", 0.0) or 0.0)
+                        page_height = float(getattr(profile, "page_height", 0.0) or 0.0)
+                        if page_width <= 0.0 or page_height <= 0.0:
+                            continue
+                        normalized_bbox = [
+                            raw_bbox[0] / page_width,
+                            raw_bbox[1] / page_height,
+                            raw_bbox[2] / page_width,
+                            raw_bbox[3] / page_height,
+                        ]
+                    normalized_bbox = [max(0.0, min(1.0, value)) for value in normalized_bbox]
+                except Exception:
+                    continue
+                reading_order = getter("reading_order", None)
+                try:
+                    reading_order = order if reading_order is None else int(reading_order)
+                except (TypeError, ValueError):
+                    reading_order = order
+                blocks.append(
+                    {
+                        "text": text,
+                        "key": key,
+                        "bbox": normalized_bbox,
+                        "block_type": str(getter("block_type", "text") or "text"),
+                        "reading_order": reading_order,
+                    }
+                )
+
+            route = str(getattr(profile, "route", "ocr") or "ocr").strip().lower()
+            page_width = float(getattr(profile, "page_width", 0.0) or 0.0)
+            page_height = float(getattr(profile, "page_height", 0.0) or 0.0)
+            page_segments = [segment for segment in segments if int(segment.page_number or 1) == page]
+            for segment in page_segments:
+                data = dict(segment.structured_data or {})
+                data.update(
+                    {
+                        "parser_route": route,
+                        "page_width": page_width or None,
+                        "page_height": page_height or None,
+                    }
+                )
+                segment.structured_data = data
+                # Paddle's structured table/visual adapter has more precise
+                # geometry than a flattened native text block.  Never replace
+                # those boxes during the native-text enrichment pass.
+                if segment.segment_type in {"table", "table_row", "table_cell", "chart", "figure", "link_anchor"}:
+                    continue
+                segment_key = _normalise_page_text(segment.content)
+                if not segment_key:
+                    continue
+                best_score = 0.0
+                best: Optional[dict[str, Any]] = None
+                for block in blocks:
+                    block_key = str(block["key"])
+                    if segment_key == block_key:
+                        score = 1.0
+                    elif segment_key in block_key or block_key in segment_key:
+                        score = min(len(segment_key), len(block_key)) / max(len(segment_key), len(block_key))
+                    else:
+                        score = SequenceMatcher(None, segment_key, block_key, autojunk=False).ratio()
+                    if score > best_score:
+                        best_score = score
+                        best = block
+                if best is None or best_score < 0.55:
+                    continue
+                bbox = list(best["bbox"])
+                segment.position_x = bbox[0]
+                segment.position_y = bbox[1]
+                block_type = str(best["block_type"] or "text").lower()
+                if segment.segment_type == "text" and any(
+                    token in block_type for token in ("title", "heading", "section_header")
+                ):
+                    segment.segment_type = "heading"
+                data = dict(segment.structured_data or {})
+                data.update(
+                    {
+                        "bbox": bbox,
+                        "block_type": block_type,
+                        "reading_order": int(best["reading_order"]),
+                        "native_layout_match": round(best_score, 4),
+                    }
+                )
+                segment.structured_data = data
 
     def _enrich_table_segments_from_records(self, segments: List[TextSegment], records: List[Dict[str, Any]]) -> None:
         table_segments = [segment for segment in segments if segment.segment_type == "table" and segment.source_table_id]
