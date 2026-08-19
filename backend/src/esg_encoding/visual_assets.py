@@ -10,6 +10,7 @@ import os
 import re
 import threading
 import unicodedata
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any, Iterator
 from urllib.parse import unquote, urlparse
@@ -34,8 +35,20 @@ _DECORATIVE_TYPES = {
 }
 _CAPTION_TYPES = {
     "caption", "chart_caption", "chart_title", "figure_caption", "figure_title",
-    "image_caption", "image_title", "table_caption", "table_title",
+    "figure_footnote", "image_caption", "image_title", "table_caption", "table_title",
+    "vision_footnote",
 }
+_GENERIC_VISUAL_TEXT_RE = re.compile(
+    r"^(?:image|img|figure|fig|photo|picture|chart|graphic|illustration|untitled|"
+    r"visual(?:\s+evidence)?)(?:[\s_.-]*\d+)?$",
+    re.I,
+)
+_GENERIC_IMAGE_FILENAME_RE = re.compile(
+    r"^(?:img|image|figure|fig|chart|photo|picture|asset|crop)[\s_.-]*\d*\."
+    r"(?:png|jpe?g|webp)$",
+    re.I,
+)
+_DECORATIVE_FILENAME_RE = re.compile(r"(?:^|[_\s.-])(?:logo|background|watermark|header|footer)(?:[_\s.-]|$)", re.I)
 _DIAGNOSTIC_IMAGE_RE = re.compile(
     r"(?:layout(?:_det|_order)?_res|overall_ocr_res|text_paragraphs_ocr_res|"
     r"doc_preprocessor_res|formula_res_region|seal_res_region|table_cell_img)",
@@ -272,6 +285,20 @@ def _meaningful_text(value: Any) -> str:
     return text
 
 
+def _informative_visual_text(value: Any) -> str:
+    text = _meaningful_text(value)
+    if not text:
+        return ""
+    candidate = text.strip().strip("'\"")
+    if _GENERIC_VISUAL_TEXT_RE.fullmatch(candidate):
+        return ""
+    if _GENERIC_IMAGE_FILENAME_RE.fullmatch(Path(candidate).name):
+        return ""
+    if re.fullmatch(r"(?:va_)?[0-9a-f]{12,}", candidate, flags=re.I):
+        return ""
+    return candidate
+
+
 def _text_fingerprint(value: Any) -> str | None:
     text = unicodedata.normalize("NFKC", _meaningful_text(value)).casefold()
     text = re.sub(r"[^\w%+.-]+", " ", text, flags=re.UNICODE)
@@ -315,10 +342,13 @@ def _page_record(root: Path, json_path: Path, payload: dict[str, Any]) -> dict[s
             else (source_page_index or 0) + 1,
         )
     width, height = _page_dimensions(payload)
+    source_page_count = _coerce_int(payload.get("page_count"))
     return {
         "page_number": global_page,
         "source_page_index": source_page_index,
-        "page_count": _coerce_int(payload.get("page_count")),
+        # For a split PDF this is the number of pages in the worker batch, not
+        # the report total.  Name it explicitly to avoid false provenance.
+        "batch_page_count": source_page_count,
         "page_width": width,
         "page_height": height,
         "source_json_path": _relative_path(json_path, root),
@@ -352,9 +382,10 @@ def _block_record(
         for reference in references
         if (path := _resolve_image_reference(reference, json_path, root)) is not None
     ]
-    reading_order = _coerce_int(item.get("block_order"))
-    if reading_order is None:
-        reading_order = list_order
+    source_block_order = _coerce_int(item.get("block_order"))
+    # Canonical order is always zero-based and stable within parsing_res_list;
+    # retain Paddle's raw order separately for audit/debugging.
+    reading_order = list_order
     confidence = _coerce_float(item.get("confidence") if item.get("confidence") is not None else item.get("score"))
     chart_data = None
     if block_type == "chart":
@@ -370,6 +401,7 @@ def _block_record(
         "block_id": item.get("block_id", item.get("index")),
         "block_type": block_type,
         "reading_order": reading_order,
+        "source_block_order": source_block_order,
         "bbox": _record_bbox(bbox_value, width, height),
         "bbox_pixels": raw_bbox if raw_bbox and max(raw_bbox) > 1.0 else None,
         "caption": caption,
@@ -407,38 +439,136 @@ def _ocr_regions(
     return regions
 
 
+def _layout_regions(
+    payload: dict[str, Any],
+    width: float | None,
+    height: float | None,
+) -> list[dict[str, Any]]:
+    layout = payload.get("layout_det_res")
+    if not isinstance(layout, dict):
+        return []
+    boxes = layout.get("boxes") or layout.get("box_list") or []
+    if not isinstance(boxes, list):
+        return []
+    regions: list[dict[str, Any]] = []
+    for item in boxes:
+        if not isinstance(item, dict):
+            continue
+        bbox_value = next(
+            (
+                item.get(key)
+                for key in ("coordinate", "block_bbox", "bbox", "box", "poly", "polygon")
+                if item.get(key) is not None
+            ),
+            None,
+        )
+        bbox = _record_bbox(bbox_value, width, height)
+        if bbox is None:
+            continue
+        regions.append(
+            {
+                "bbox": bbox,
+                "block_type": _normalized_type(
+                    item.get("label") or item.get("block_label") or item.get("type")
+                ),
+                "confidence": _coerce_float(item.get("score") or item.get("confidence")),
+            }
+        )
+    return regions
+
+
+def _chart_data_from_content(value: Any) -> dict[str, Any] | list[Any] | None:
+    if isinstance(value, (dict, list)):
+        return value
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, (dict, list)):
+            return parsed
+    except (TypeError, ValueError, json.JSONDecodeError):
+        pass
+    plain = _meaningful_text(text)
+    pairs: list[dict[str, Any]] = []
+    for match in re.finditer(
+        r"\b((?:19|20)\d{2})\b[^\d%+\-]{0,30}([-+]?\d[\d,]*(?:\.\d+)?)\s*(%)?",
+        plain,
+    ):
+        raw_value = match.group(2).replace(",", "")
+        try:
+            number = float(raw_value)
+        except ValueError:
+            continue
+        pairs.append(
+            {
+                "label": match.group(1),
+                "value": int(number) if number.is_integer() else number,
+                "unit": "%" if match.group(3) else None,
+            }
+        )
+    return {"series": pairs} if pairs else None
+
+
 def _enrich_visual_blocks(blocks: list[dict[str, Any]], payload: dict[str, Any]) -> None:
     captions = [block for block in blocks if block.get("block_type") in _CAPTION_TYPES and block.get("ocr_text")]
     width = blocks[0].get("page_width") if blocks else None
     height = blocks[0].get("page_height") if blocks else None
     ocr_regions = _ocr_regions(payload, width, height)
-    for block in blocks:
-        if block.get("block_type") not in _SEMANTIC_VISUAL_TYPES:
+    layout_regions = _layout_regions(payload, width, height)
+    semantic_blocks = [block for block in blocks if block.get("block_type") in _SEMANTIC_VISUAL_TYPES]
+
+    # Caption assignment is one-to-one.  Geometry wins over raw list distance,
+    # which prevents two adjacent charts from sharing the same footnote.
+    candidates: list[tuple[float, int, int]] = []
+    for block_index, block in enumerate(semantic_blocks):
+        if block.get("caption") or not block.get("bbox"):
             continue
-        if not block.get("caption") and captions:
+        for caption_index, caption in enumerate(captions):
+            if not caption.get("bbox"):
+                continue
             block_type = str(block.get("block_type") or "")
-            compatible = [
-                candidate
-                for candidate in captions
-                if candidate.get("block_type") == "caption"
-                or (
-                    block_type == "table"
-                    and str(candidate.get("block_type") or "").startswith("table_")
-                )
-                or (
-                    block_type != "table"
-                    and not str(candidate.get("block_type") or "").startswith("table_")
-                )
-            ]
-            order = int(block.get("reading_order") or 0)
-            nearby = sorted(
-                compatible,
-                key=lambda candidate: abs(int(candidate.get("reading_order") or 0) - order),
+            caption_type = str(caption.get("block_type") or "")
+            compatible = (
+                caption_type in {"caption", "vision_footnote", "figure_footnote"}
+                or (block_type == "table" and caption_type.startswith("table_"))
+                or (block_type != "table" and not caption_type.startswith("table_"))
             )
-            if nearby:
-                candidate = nearby[0]
-                if abs(int(candidate.get("reading_order") or 0) - order) <= 2:
-                    block["caption"] = candidate.get("ocr_text") or ""
+            if not compatible:
+                continue
+            visual_box = block["bbox"]
+            caption_box = caption["bbox"]
+            horizontal_overlap = max(0.0, min(visual_box[2], caption_box[2]) - max(visual_box[0], caption_box[0]))
+            min_width = max(1e-6, min(visual_box[2] - visual_box[0], caption_box[2] - caption_box[0]))
+            overlap_ratio = horizontal_overlap / min_width
+            vertical_gap = min(abs(caption_box[1] - visual_box[3]), abs(visual_box[1] - caption_box[3]))
+            order_gap = abs(int(caption.get("reading_order") or 0) - int(block.get("reading_order") or 0))
+            score = overlap_ratio * 0.65 + max(0.0, 1.0 - vertical_gap * 8.0) * 0.25 + max(0.0, 1.0 - order_gap / 4.0) * 0.10
+            if overlap_ratio >= 0.2 and vertical_gap <= 0.15:
+                candidates.append((score, block_index, caption_index))
+    used_blocks: set[int] = set()
+    used_captions: set[int] = set()
+    for _score, block_index, caption_index in sorted(candidates, reverse=True):
+        if block_index in used_blocks or caption_index in used_captions:
+            continue
+        semantic_blocks[block_index]["caption"] = captions[caption_index].get("ocr_text") or ""
+        used_blocks.add(block_index)
+        used_captions.add(caption_index)
+
+    for block in semantic_blocks:
+        if block.get("confidence") is None and block.get("bbox"):
+            compatible_layout = [
+                region
+                for region in layout_regions
+                if region.get("block_type") == block.get("block_type")
+                or {region.get("block_type"), block.get("block_type")} <= {"image", "figure", "picture"}
+            ]
+            if compatible_layout:
+                best = max(compatible_layout, key=lambda region: _bbox_iou(block["bbox"], region["bbox"]))
+                if _bbox_iou(block["bbox"], best["bbox"]) >= 0.3 and best.get("confidence") is not None:
+                    block["confidence"] = max(0.0, min(1.0, float(best["confidence"])))
+        if block.get("block_type") == "chart" and not block.get("chart_data"):
+            block["chart_data"] = _chart_data_from_content(block.get("ocr_text"))
         if not block.get("ocr_text") and block.get("bbox"):
             matched = [
                 (text, score)
@@ -524,11 +654,23 @@ def _table_record(
 def _same_table(first: dict[str, Any], second: dict[str, Any]) -> bool:
     if first.get("page_number") != second.get("page_number"):
         return False
-    if first.get("text_fingerprint") and first.get("text_fingerprint") == second.get("text_fingerprint"):
-        if not first.get("bbox") or not second.get("bbox"):
-            return True
-        return _bbox_iou(first.get("bbox"), second.get("bbox")) >= 0.3
-    return _bbox_iou(first.get("bbox"), second.get("bbox")) >= 0.6
+    if (
+        first.get("block_id") is not None
+        and second.get("block_id") is not None
+        and first.get("block_id") == second.get("block_id")
+    ):
+        return True
+    overlap = _bbox_iou(first.get("bbox"), second.get("bbox"))
+    if overlap >= 0.6:
+        return True
+    if not first.get("bbox") or not second.get("bbox"):
+        # Two distinct tables can legitimately repeat the same template/text.
+        # Without either geometry or a shared block id, do not collapse them.
+        return False
+    left = _meaningful_text(first.get("pred_html")).casefold()
+    right = _meaningful_text(second.get("pred_html")).casefold()
+    similarity = SequenceMatcher(None, left, right, autojunk=False).ratio() if left and right else 0.0
+    return overlap >= 0.2 and similarity >= 0.88
 
 
 def _merge_table(first: dict[str, Any], second: dict[str, Any]) -> None:
@@ -558,11 +700,12 @@ def _adapt_paddleocr_v16(root: Path) -> tuple[list[dict[str, Any]], list[dict[st
             raw_blocks = [payload] if (
                 payload.get("block_label") or payload.get("type") or payload.get("label")
             ) else []
-        page_blocks = [
-            _block_record(root, json_path, page, item, order)
+        page_pairs = [
+            (item, _block_record(root, json_path, page, item, order))
             for order, item in enumerate(raw_blocks)
             if isinstance(item, dict)
         ]
+        page_blocks = [record for _item, record in page_pairs]
         _enrich_visual_blocks(page_blocks, payload)
         blocks.extend(page_blocks)
 
@@ -572,8 +715,8 @@ def _adapt_paddleocr_v16(root: Path) -> tuple[list[dict[str, Any]], list[dict[st
             for table in raw_tables:
                 if isinstance(table, dict) and (record := _table_record(table, page)) is not None:
                     candidates.append(record)
-        for block, raw_block in zip(page_blocks, raw_blocks):
-            if block.get("block_type") != "table" or not isinstance(raw_block, dict):
+        for raw_block, block in page_pairs:
+            if block.get("block_type") != "table":
                 continue
             record = _table_record(
                 raw_block,
@@ -599,6 +742,19 @@ def _adapt_paddleocr_v16(root: Path) -> tuple[list[dict[str, Any]], list[dict[st
             )
         )
         table["table_id"] = f"vt_{hashlib.sha256(identity.encode('utf-8')).hexdigest()[:20]}"
+    pages_by_number: dict[int, dict[str, Any]] = {}
+    for page in pages:
+        page_number = int(page.get("page_number") or 1)
+        existing = pages_by_number.get(page_number)
+        if existing is None:
+            pages_by_number[page_number] = page
+        else:
+            for key, value in page.items():
+                if existing.get(key) in (None, "", [], {}) and value not in (None, "", [], {}):
+                    existing[key] = value
+    pages = [pages_by_number[key] for key in sorted(pages_by_number)]
+    blocks.sort(key=lambda item: (int(item.get("page_number") or 1), int(item.get("reading_order") or 0)))
+    tables.sort(key=lambda item: (int(item.get("page_number") or 1), int(item.get("reading_order") or 0)))
     return pages, blocks, tables
 
 
@@ -655,6 +811,28 @@ def invalidate_visual_manifest(pdf_path: str | Path) -> None:
     key = str((visual_asset_dir(pdf_path) / "manifest.json").resolve())
     with _manifest_cache_lock:
         _manifest_cache.pop(key, None)
+
+
+def write_empty_visual_manifest(
+    pdf_path: str | Path,
+    pages: list[dict[str, Any]] | None = None,
+) -> None:
+    """Atomically clear stale OCR visuals after an all-native parse."""
+    destination = visual_asset_dir(pdf_path)
+    destination.mkdir(parents=True, exist_ok=True)
+    manifest = {
+        "version": 4,
+        "parser_schema": "adaptive-native-v1",
+        "pages": sorted(list(pages or []), key=lambda item: int(item.get("page_number") or 1)),
+        "blocks": [],
+        "assets": [],
+        "tables": [],
+    }
+    manifest_path = destination / "manifest.json"
+    temporary = destination / f"manifest.{os.getpid()}.{threading.get_ident()}.tmp"
+    temporary.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    os.replace(temporary, manifest_path)
+    invalidate_visual_manifest(pdf_path)
 
 
 def _fallback_crop_block(source: Path, pages: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -754,11 +932,26 @@ def _is_searchable_asset(record: dict[str, Any]) -> bool:
     if record.get("searchable") is False:
         return False
     return bool(
-        _meaningful_text(record.get("caption"))
-        or _meaningful_text(record.get("summary"))
-        or _meaningful_text(record.get("ocr_text"))
+        _informative_visual_text(record.get("caption"))
+        or _informative_visual_text(record.get("summary"))
+        or _informative_visual_text(record.get("ocr_text"))
         or record.get("chart_data")
     )
+
+
+def _is_probable_decorative(record: dict[str, Any], repeated_pages: int) -> bool:
+    source_name = Path(str(record.get("source_image_path") or "")).name
+    if _DECORATIVE_FILENAME_RE.search(source_name):
+        return True
+    bbox = normalize_bbox(record.get("bbox"))
+    if not bbox:
+        return False
+    area = max(0.0, bbox[2] - bbox[0]) * max(0.0, bbox[3] - bbox[1])
+    near_edge = bbox[1] <= 0.10 or bbox[3] >= 0.90
+    semantic = _is_searchable_asset(record)
+    if not semantic and (area >= 0.85 or (near_edge and area <= 0.08)):
+        return True
+    return repeated_pages >= 3 and near_edge and area <= 0.12
 
 
 def _link_tables_to_assets(tables: list[dict[str, Any]], assets: list[dict[str, Any]]) -> None:
@@ -768,6 +961,8 @@ def _link_tables_to_assets(tables: list[dict[str, Any]], assets: list[dict[str, 
             if asset.get("page_number") != table.get("page_number"):
                 continue
             same_source = asset.get("_source_image_absolute") in table_paths
+            if not same_source and asset.get("block_type") != "table":
+                continue
             same_box = _bbox_iou(asset.get("bbox"), table.get("bbox")) >= 0.6
             same_text = bool(
                 asset.get("text_fingerprint")
@@ -799,7 +994,7 @@ def _public_block_record(record: dict[str, Any]) -> dict[str, Any]:
         "page_number", "source_page_index", "page_width", "page_height",
         "source_json_path", "batch_id", "batch_start_page", "batch_end_page",
         "block_id", "block_type", "reading_order", "bbox", "bbox_pixels",
-        "confidence",
+        "source_block_order", "confidence",
     ]
     if record.get("block_type") in _SEMANTIC_VISUAL_TYPES | _CAPTION_TYPES:
         keys.extend([
@@ -823,7 +1018,14 @@ def promote_visual_assets(output_dir: str | Path, pdf_path: str | Path) -> list[
     seen_occurrences: set[str] = set()
     page_records, block_records, table_records = _adapt_paddleocr_v16(root)
 
+    resolved_root = root.resolve()
     for source in sorted(p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in IMAGE_SUFFIXES):
+        if source.is_symlink() or _DECORATIVE_FILENAME_RE.search(source.name):
+            continue
+        try:
+            source.resolve().relative_to(resolved_root)
+        except (OSError, ValueError):
+            continue
         if _DIAGNOSTIC_IMAGE_RE.search(source.stem):
             continue
         block = _select_block_for_image(source, block_records, page_records)
@@ -876,6 +1078,18 @@ def promote_visual_assets(output_dir: str | Path, pdf_path: str | Path) -> list[
         record["searchable"] = _is_searchable_asset(record)
         records.append(record)
 
+    repeated_by_hash: dict[str, set[int]] = {}
+    for record in records:
+        repeated_by_hash.setdefault(str(record.get("sha256") or ""), set()).add(int(record.get("page_number") or 1))
+    records = [
+        record
+        for record in records
+        if not _is_probable_decorative(
+            record,
+            len(repeated_by_hash.get(str(record.get("sha256") or ""), set())),
+        )
+    ]
+
     _link_tables_to_assets(table_records, records)
     public_records = [_public_record(record) for record in records]
     public_blocks = [_public_block_record(record) for record in block_records]
@@ -897,7 +1111,7 @@ def promote_visual_assets(output_dir: str | Path, pdf_path: str | Path) -> list[
         "tables": public_tables,
     }
     if keep_layout_audit:
-        audit_tmp = destination / f"layout_audit.{os.getpid()}.tmp"
+        audit_tmp = destination / f"layout_audit.{os.getpid()}.{threading.get_ident()}.tmp"
         audit_payload = {
             "adapter": "paddleocr-vl-v1.6",
             "pages": page_records,
@@ -910,7 +1124,7 @@ def promote_visual_assets(output_dir: str | Path, pdf_path: str | Path) -> list[
     else:
         audit_path.unlink(missing_ok=True)
     manifest_path = destination / "manifest.json"
-    temporary_manifest = destination / f"manifest.{os.getpid()}.tmp"
+    temporary_manifest = destination / f"manifest.{os.getpid()}.{threading.get_ident()}.tmp"
     temporary_manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     os.replace(temporary_manifest, manifest_path)
     invalidate_visual_manifest(pdf_path)
@@ -931,6 +1145,7 @@ def append_visual_markers(markdown: str, assets: list[dict[str, Any]]) -> str:
             "asset_id", "relative_path", "mime_type", "page_number", "bbox", "caption",
             "summary", "ocr_text", "chart_data", "confidence", "parser_version",
             "page_width", "page_height", "block_type", "reading_order", "table_ids",
+            "searchable",
         )}
         markers.append(f"<!-- visual-asset: {json.dumps(public, ensure_ascii=False)} -->")
     if not markers:

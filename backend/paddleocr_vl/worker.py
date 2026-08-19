@@ -171,6 +171,11 @@ def _handle_page_batch(r, worker_id: str, payload: Dict[str, Any]) -> None:
     input_path = str(payload.get("input_path") or "")
     ready_path = str(payload.get("ready_path") or "")
     filename = str(payload.get("filename") or "")
+    prediction_options = payload.get("prediction_options")
+    if prediction_options is None:
+        prediction_options = {}
+    if not isinstance(prediction_options, dict):
+        raise ValueError("page_batch prediction_options must be an object")
 
     logger.debug(
         "Starting page batch job={} unit={}/{} pages={}-{}",
@@ -218,6 +223,7 @@ def _handle_page_batch(r, worker_id: str, payload: Dict[str, Any]) -> None:
             "start_page": start_page,
             "end_page": end_page,
             "total_pages": total_pages,
+            "prediction_options": prediction_options,
         },
     )
 
@@ -236,6 +242,7 @@ def _handle_page_batch(r, worker_id: str, payload: Dict[str, Any]) -> None:
                 end_page=end_page,
                 total_pages=total_pages,
                 ready_path=ready_path or None,
+                prediction_options=prediction_options,
             )
         result_for_redis = dict(result)
         _set_batch_status(

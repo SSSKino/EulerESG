@@ -300,11 +300,14 @@ def env_str(name: str, default: str = "") -> str:
 
 def _pipeline_init_options() -> Dict[str, Any]:
     """Return explicit, reproducible options for the long-lived worker pipeline."""
+    adaptive_preprocessing = env_bool("PADDLEOCR_ADAPTIVE_PREPROCESSING_ENABLED", False)
     options: Dict[str, Any] = {
         "pipeline_version": PIPELINE_VERSION,
         "device": env_str("PADDLEOCR_DEVICE", "gpu:0") or "gpu:0",
-        "use_doc_orientation_classify": env_bool("PADDLEOCR_USE_DOC_ORIENTATION_CLASSIFY", False),
-        "use_doc_unwarping": env_bool("PADDLEOCR_USE_DOC_UNWARPING", False),
+        # Components must be available in the long-lived pipeline before an
+        # individual batch can selectively enable them at prediction time.
+        "use_doc_orientation_classify": env_bool("PADDLEOCR_USE_DOC_ORIENTATION_CLASSIFY", False) or adaptive_preprocessing,
+        "use_doc_unwarping": env_bool("PADDLEOCR_USE_DOC_UNWARPING", False) or adaptive_preprocessing,
         "use_layout_detection": env_bool("PADDLEOCR_USE_LAYOUT_DETECTION", True),
         "use_chart_recognition": env_bool("PADDLEOCR_USE_CHART_RECOGNITION", False),
         "use_seal_recognition": env_bool("PADDLEOCR_USE_SEAL_RECOGNITION", False),
@@ -343,7 +346,7 @@ def _pipeline_init_options() -> Dict[str, Any]:
     return options
 
 
-def _prediction_options() -> Dict[str, Any]:
+def _prediction_options(overrides: Dict[str, Any] | None = None) -> Dict[str, Any]:
     """Build bounded options for one PDF/image unit passed to ``predict``."""
     min_pixels = env_int("PADDLEOCR_VLM_MIN_PIXELS", 112896, min_value=784)
     max_pixels = max(
@@ -358,7 +361,7 @@ def _prediction_options() -> Dict[str, Any]:
         )
         layout_shape_mode = "rect"
 
-    return {
+    options: Dict[str, Any] = {
         "use_queues": env_bool("PADDLEOCR_USE_INTERNAL_QUEUES", False),
         "use_doc_orientation_classify": env_bool("PADDLEOCR_USE_DOC_ORIENTATION_CLASSIFY", False),
         "use_doc_unwarping": env_bool("PADDLEOCR_USE_DOC_UNWARPING", False),
@@ -373,6 +376,34 @@ def _prediction_options() -> Dict[str, Any]:
         # prevents one repetitive block from monopolising a page task for minutes.
         "max_new_tokens": env_int("PADDLEOCR_VLM_MAX_NEW_TOKENS", 2048, min_value=128),
     }
+    allowed_booleans = {
+        "use_doc_orientation_classify",
+        "use_doc_unwarping",
+        "use_layout_detection",
+        "use_chart_recognition",
+        "use_seal_recognition",
+        "use_ocr_for_image_block",
+    }
+    allowed_integers = {"min_pixels", "max_pixels", "max_new_tokens"}
+    for key, value in dict(overrides or {}).items():
+        if key in allowed_booleans:
+            if not isinstance(value, bool):
+                raise ValueError(f"prediction option {key} must be boolean")
+            options[key] = value
+        elif key in allowed_integers:
+            if isinstance(value, bool):
+                raise ValueError(f"prediction option {key} must be an integer")
+            try:
+                parsed = int(value)
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise ValueError(f"prediction option {key} must be an integer") from exc
+            lower = 128 if key == "max_new_tokens" else 784
+            upper = 8192 if key == "max_new_tokens" else 4_014_080
+            options[key] = max(lower, min(upper, parsed))
+        else:
+            raise ValueError(f"unsupported prediction option: {key}")
+    options["max_pixels"] = max(int(options["min_pixels"]), int(options["max_pixels"]))
+    return options
 
 
 def _read_text_file(path: Path) -> str:
@@ -621,6 +652,7 @@ def parse_page_batch(
     total_pages: int | None = None,
     output_root: str | Path | None = None,
     ready_path: str | Path | None = None,
+    prediction_options: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     """解析一个页级 batch PDF/图片任务，并持久化该 batch 的输出。
 
@@ -673,7 +705,7 @@ def parse_page_batch(
     model_wait_started = time.monotonic()
     pipeline = get_pipeline()
     model_ready_seconds = time.monotonic() - model_wait_started
-    predict_options = _prediction_options()
+    predict_options = _prediction_options(prediction_options)
     expected_result_count = end_page - start_page + 1
     if expected_result_count <= 0:
         raise ValueError(

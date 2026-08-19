@@ -50,8 +50,14 @@ class PageParserConfig:
     large_image_ratio: float = 0.45
     dense_block_count: int = 24
     table_drawing_count: int = 6
+    chart_drawing_count: int = 80
+    aligned_table_row_count: int = 3
     header_footer_ratio: float = 0.075
     min_column_chars: int = 18
+    skew_degrees_threshold: float = 1.5
+    low_contrast_threshold: float = 0.18
+    raster_quality_dpi: int = 36
+    heading_size_ratio: float = 1.25
 
 
 @dataclass
@@ -295,10 +301,16 @@ def _native_quality(text: str) -> float:
 
 
 def _page_geometry(page: Any) -> tuple[tuple[float, float, float, float], float, float]:
-    rect = _rect_values(getattr(page, "rect", None))
+    # PyMuPDF's ``page.rect`` reflects page rotation, while extracted text and
+    # image coordinates use the unrotated page coordinate system.  Prefer the
+    # crop/media boxes so normalization remains valid on 90/270-degree pages.
+    rect = _rect_values(getattr(page, "cropbox", None))
     if rect is None:
-        media_box = _rect_values(getattr(page, "mediabox", None))
-        rect = media_box or (0.0, 0.0, 612.0, 792.0)
+        rect = _rect_values(getattr(page, "mediabox", None))
+    if rect is None:
+        rect = _rect_values(getattr(page, "rect", None))
+    if rect is None:
+        rect = (0.0, 0.0, 612.0, 792.0)
     width = max(rect[2] - rect[0], 1.0)
     height = max(rect[3] - rect[1], 1.0)
     return rect, width, height
@@ -401,6 +413,147 @@ def _extract_native_blocks(
     for reading_order, block in enumerate(blocks):
         block["reading_order"] = reading_order
     return blocks
+
+
+def _rect_iou(first: Sequence[float], second: Sequence[float]) -> float:
+    x0, y0 = max(first[0], second[0]), max(first[1], second[1])
+    x1, y1 = min(first[2], second[2]), min(first[3], second[3])
+    intersection = max(0.0, x1 - x0) * max(0.0, y1 - y0)
+    if intersection <= 0.0:
+        return 0.0
+    first_area = max(0.0, first[2] - first[0]) * max(0.0, first[3] - first[1])
+    second_area = max(0.0, second[2] - second[0]) * max(0.0, second[3] - second[1])
+    union = first_area + second_area - intersection
+    return intersection / union if union > 0.0 else 0.0
+
+
+def _native_style_records(
+    page: Any,
+    page_bounds: tuple[float, float, float, float],
+) -> tuple[list[dict[str, Any]], float]:
+    """Read span styles and line directions without making them mandatory."""
+    getter = getattr(page, "get_text", None)
+    if not callable(getter):
+        return [], 0.0
+    try:
+        payload = getter("dict", sort=True) or {}
+    except TypeError:
+        try:
+            payload = getter("dict") or {}
+        except Exception:
+            return [], 0.0
+    except Exception:
+        return [], 0.0
+    if not isinstance(payload, Mapping):
+        return [], 0.0
+
+    records: list[dict[str, Any]] = []
+    skew_angles: list[float] = []
+    for block in payload.get("blocks", []) or []:
+        if not isinstance(block, Mapping) or block.get("type", 0) not in (0, "0", "text"):
+            continue
+        spans: list[Mapping[str, Any]] = []
+        for line in block.get("lines", []) or []:
+            if not isinstance(line, Mapping):
+                continue
+            direction = line.get("dir")
+            if isinstance(direction, (list, tuple)) and len(direction) >= 2:
+                try:
+                    angle = math.degrees(math.atan2(float(direction[1]), float(direction[0])))
+                    # Measure deviation from the nearest horizontal/vertical axis.
+                    deviation = ((angle + 45.0) % 90.0) - 45.0
+                    if abs(deviation) <= 20.0:
+                        skew_angles.append(deviation)
+                except (TypeError, ValueError, OverflowError):
+                    pass
+            spans.extend(span for span in (line.get("spans", []) or []) if isinstance(span, Mapping))
+        bbox = _clip_rect(block.get("bbox"), page_bounds)
+        if bbox is None or not spans:
+            continue
+        sizes = []
+        bold = False
+        for span in spans:
+            try:
+                size = float(span.get("size") or 0.0)
+            except (TypeError, ValueError, OverflowError):
+                size = 0.0
+            if size > 0.0:
+                sizes.append(size)
+            font = str(span.get("font") or "").casefold()
+            flags = _safe_int(span.get("flags")) or 0
+            bold = bold or "bold" in font or bool(flags & 16)
+        if sizes:
+            records.append(
+                {
+                    "bbox": bbox,
+                    "font_size": max(sizes),
+                    "bold": bold,
+                }
+            )
+    skew = 0.0
+    if skew_angles:
+        ordered = sorted(skew_angles)
+        skew = ordered[len(ordered) // 2]
+    return records, _round(skew)
+
+
+def _apply_native_block_styles(
+    blocks: list[dict[str, Any]],
+    styles: Sequence[Mapping[str, Any]],
+    config: PageParserConfig,
+) -> None:
+    if not blocks or not styles:
+        return
+    base_sizes = sorted(float(style.get("font_size") or 0.0) for style in styles if float(style.get("font_size") or 0.0) > 0.0)
+    if not base_sizes:
+        return
+    median_size = base_sizes[len(base_sizes) // 2]
+    for block in blocks:
+        best = max(styles, key=lambda style: _rect_iou(block["bbox"], style.get("bbox") or (0, 0, 0, 0)))
+        overlap = _rect_iou(block["bbox"], best.get("bbox") or (0, 0, 0, 0))
+        if overlap <= 0.0:
+            continue
+        size = float(best.get("font_size") or 0.0)
+        bold = bool(best.get("bold"))
+        heading = (
+            len(str(block.get("text") or "")) <= 180
+            and size >= median_size * max(1.05, config.heading_size_ratio)
+            and (bold or size >= median_size * 1.45)
+        )
+        block["font_size"] = _round(size)
+        block["font_bold"] = bold
+        if heading:
+            block["block_type"] = "heading"
+
+
+def _raster_contrast(page: Any, dpi: int) -> Optional[float]:
+    """Return a cheap 0..1 luminance range for likely scanned pages."""
+    renderer = getattr(page, "get_pixmap", None)
+    if not callable(renderer):
+        return None
+    try:
+        pixmap = renderer(dpi=max(18, min(72, int(dpi))), alpha=False)
+        samples = bytes(getattr(pixmap, "samples", b"") or b"")
+        channels = max(1, int(getattr(pixmap, "n", 1) or 1))
+    except Exception:
+        return None
+    if not samples:
+        return None
+    pixels = len(samples) // channels
+    stride = max(1, pixels // 4096)
+    luminance: list[int] = []
+    for pixel in range(0, pixels, stride):
+        offset = pixel * channels
+        sample = samples[offset:offset + min(3, channels)]
+        if not sample:
+            continue
+        luminance.append(sum(sample) // len(sample))
+    if len(luminance) < 16:
+        return None
+    luminance.sort()
+    low = luminance[int((len(luminance) - 1) * 0.10)]
+    high = luminance[int((len(luminance) - 1) * 0.90)]
+    return _round(max(0.0, min(1.0, (high - low) / 255.0)))
 
 
 def _fallback_image_info(page: Any) -> list[dict[str, Any]]:
@@ -669,7 +822,10 @@ def render_native_markdown(
             continue
         text = _clean_text(block.get("text"))
         if text:
-            paragraphs.append(text)
+            if str(block.get("block_type") or "").casefold() in {"heading", "title", "section_header"}:
+                paragraphs.append(f"## {text}")
+            else:
+                paragraphs.append(text)
     return "\n\n".join(paragraphs)
 
 
@@ -723,6 +879,8 @@ def analyze_pdf_page(
         parser_config,
         warnings,
     )
+    style_records, skew_angle = _native_style_records(page, page_bounds)
+    _apply_native_block_styles(native_blocks, style_records, parser_config)
     image_regions = _extract_image_regions(page, page_bounds, warnings)
     drawing_count = _count_drawings(page)
     column_count = _estimate_columns(native_blocks, parser_config)
@@ -739,7 +897,16 @@ def analyze_pdf_page(
     text_area_ratio = min(1.0, _union_area(text_rects) / page_area)
     image_area_ratio = min(1.0, _union_area(image_rects) / page_area)
 
-    blank_page = char_count == 0 and image_area_ratio < 0.01 and drawing_count == 0
+    native_failed = any(
+        warning in {"native_text_extraction_failed", "native_text_api_unavailable"}
+        for warning in warnings
+    )
+    blank_page = (
+        char_count == 0
+        and image_area_ratio < 0.01
+        and drawing_count == 0
+        and not native_failed
+    )
     has_native_text = (
         char_count >= parser_config.min_digital_chars
         and quality >= parser_config.min_native_quality
@@ -747,7 +914,9 @@ def analyze_pdf_page(
     sparse_native_text = 0 < char_count < parser_config.min_digital_chars
     poor_native_text = char_count > 0 and quality < parser_config.min_native_quality
 
-    if has_native_text and image_area_ratio < parser_config.hybrid_image_ratio:
+    if blank_page:
+        content_kind = "blank"
+    elif has_native_text and image_area_ratio < parser_config.hybrid_image_ratio:
         content_kind = "digital"
     elif (
         char_count < parser_config.min_any_text_chars
@@ -757,26 +926,49 @@ def analyze_pdf_page(
     else:
         content_kind = "hybrid"
 
+    compact_numeric_block = any(
+        len(str(block.get("text") or "")) <= 300
+        and len(_NUMBER_TOKEN_RE.findall(str(block.get("text") or ""))) >= 3
+        for block in native_blocks
+    )
     possible_table = (
-        drawing_count >= parser_config.table_drawing_count and char_count >= parser_config.min_any_text_chars
-    ) or _aligned_table_rows(native_blocks) >= 2 or _looks_like_borderless_table(native_blocks)
+        _aligned_table_rows(native_blocks) >= parser_config.aligned_table_row_count
+        or _looks_like_borderless_table(native_blocks)
+        or (
+            drawing_count >= parser_config.table_drawing_count
+            and compact_numeric_block
+        )
+    )
     visual_heavy = image_area_ratio >= parser_config.hybrid_image_ratio
     image_dominant = image_area_ratio >= parser_config.large_image_ratio
+    raster_contrast = (
+        _raster_contrast(page, parser_config.raster_quality_dpi)
+        if not blank_page and (not has_native_text or image_dominant)
+        else None
+    )
+    low_contrast = raster_contrast is not None and raster_contrast < parser_config.low_contrast_threshold
+    skewed = abs(skew_angle) >= parser_config.skew_degrees_threshold
     multi_column = column_count > 1
     rotated = rotation != 0
     dense_layout = len(native_blocks) >= parser_config.dense_block_count
     possible_chart = (
-        drawing_count >= parser_config.table_drawing_count * 2
+        drawing_count >= parser_config.chart_drawing_count
         or any(
             parser_config.hybrid_image_ratio <= region["area_ratio"] < 0.90
             for region in image_regions
         )
     ) and char_count >= parser_config.min_any_text_chars
-    complex_layout = any(
-        (multi_column, possible_table, possible_chart, dense_layout, rotated)
-    )
+    # Native text already carries coordinates and the reader below handles
+    # columns/dense pages. OCR is reserved for structures native extraction
+    # cannot faithfully represent: tables, charts and geometric correction.
+    complex_layout = any((possible_table, possible_chart, rotated, skewed))
 
-    if content_kind == "scanned":
+    if content_kind == "blank":
+        # A confirmed blank page is a successful parse result, not a failed OCR
+        # page.  Preserve its page marker without submitting it to a worker that
+        # intentionally rejects empty Markdown.
+        route = "native"
+    elif content_kind == "scanned":
         route = "ocr"
     elif content_kind == "hybrid" or complex_layout or visual_heavy:
         route = "hybrid"
@@ -794,9 +986,14 @@ def analyze_pdf_page(
         "possible_chart": possible_chart,
         "dense_layout": dense_layout,
         "rotated": rotated,
+        "skewed": skewed,
+        "skew_angle": skew_angle,
+        "low_contrast": low_contrast,
+        "raster_contrast": raster_contrast,
         "complex_layout": complex_layout,
         "needs_orientation": rotated,
-        "needs_high_resolution_ocr": content_kind == "scanned" and image_dominant,
+        "needs_unwarping": skewed,
+        "needs_high_resolution_ocr": content_kind == "scanned" and (image_dominant or low_contrast),
     }
     paragraphs = _native_paragraphs(native_blocks)
     return PageProfile(
@@ -895,8 +1092,13 @@ def _failed_page(page_number: int, error: Exception) -> PageProfile:
             "possible_chart": False,
             "dense_layout": False,
             "rotated": False,
+            "skewed": False,
+            "skew_angle": 0.0,
+            "low_contrast": False,
+            "raster_contrast": None,
             "complex_layout": False,
             "needs_orientation": False,
+            "needs_unwarping": False,
             "needs_high_resolution_ocr": False,
         },
         warnings=["native_page_analysis_failed"],

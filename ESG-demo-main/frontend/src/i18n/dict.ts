@@ -91,7 +91,7 @@ export const DICT = {
       },
       actions: {
         chat: "对话",
-        analysis: "综合结果",
+        analysis: "合规",
         delete: "删除",
         refresh: "刷新",
       },
@@ -478,7 +478,7 @@ export const DICT = {
       },
       actions: {
         chat: "Chat",
-        analysis: "Company results",
+        analysis: "Compliance",
         delete: "Delete",
         refresh: "Refresh",
       },

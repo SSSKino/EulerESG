@@ -54,6 +54,63 @@ class _FakeRedis:
 
 
 class PaddleRuntimeTests(unittest.TestCase):
+    def test_prediction_overrides_are_allowlisted_and_type_checked(self) -> None:
+        allowed = {
+            "use_doc_orientation_classify": True,
+            "use_doc_unwarping": True,
+            "use_layout_detection": False,
+            "use_chart_recognition": True,
+            "use_seal_recognition": True,
+            "use_ocr_for_image_block": True,
+            "min_pixels": 200704,
+            "max_pixels": 1605632,
+            "max_new_tokens": 3072,
+        }
+
+        options = parse_core._prediction_options(allowed)
+
+        for key, expected in allowed.items():
+            self.assertEqual(options[key], expected)
+
+        with self.assertRaisesRegex(ValueError, "unsupported prediction option"):
+            parse_core._prediction_options({"use_queues": True})
+        with self.assertRaisesRegex(ValueError, "must be boolean"):
+            parse_core._prediction_options({"use_doc_unwarping": "true"})
+        with self.assertRaisesRegex(ValueError, "must be an integer"):
+            parse_core._prediction_options({"max_pixels": True})
+        with self.assertRaisesRegex(ValueError, "must be an integer"):
+            parse_core._prediction_options({"max_new_tokens": "many"})
+
+    def test_prediction_override_numeric_values_are_clamped_to_safe_bounds(self) -> None:
+        lower = parse_core._prediction_options(
+            {
+                "min_pixels": -1,
+                "max_pixels": -1,
+                "max_new_tokens": -1,
+            }
+        )
+        upper = parse_core._prediction_options(
+            {
+                "min_pixels": 40_000_000,
+                "max_pixels": 50_000_000,
+                "max_new_tokens": 50_000,
+            }
+        )
+        inverted = parse_core._prediction_options(
+            {
+                "min_pixels": 200704,
+                "max_pixels": 1000,
+            }
+        )
+
+        self.assertEqual(lower["min_pixels"], 784)
+        self.assertEqual(lower["max_pixels"], 784)
+        self.assertEqual(lower["max_new_tokens"], 128)
+        self.assertEqual(upper["min_pixels"], 4_014_080)
+        self.assertEqual(upper["max_pixels"], 4_014_080)
+        self.assertEqual(upper["max_new_tokens"], 8192)
+        self.assertEqual(inverted["max_pixels"], inverted["min_pixels"])
+
     def test_document_release_request_unloads_and_acknowledges_when_queue_is_idle(self) -> None:
         redis = _FakeRedis()
         redis.hashes["paddleocr:control:release"] = {
@@ -126,6 +183,7 @@ class PaddleRuntimeTests(unittest.TestCase):
         fake_pipeline = _FakePipeline()
         env = {
             "PADDLEOCR_USE_INTERNAL_QUEUES": "false",
+            "PADDLEOCR_LAYOUT_SHAPE_MODE": "rect",
             "PADDLEOCR_VLM_MIN_PIXELS": "112896",
             "PADDLEOCR_VLM_MAX_PIXELS": "1003520",
             "PADDLEOCR_VLM_MAX_NEW_TOKENS": "2048",
@@ -152,6 +210,83 @@ class PaddleRuntimeTests(unittest.TestCase):
         self.assertEqual(fake_pipeline.options["max_pixels"], 1003520)
         self.assertEqual(fake_pipeline.options["max_new_tokens"], 2048)
         self.assertEqual(fake_pipeline.options["layout_shape_mode"], "rect")
+
+    def test_page_batch_passes_bounded_prediction_overrides_to_pipeline(self) -> None:
+        fake_pipeline = _FakePipeline()
+        overrides = {
+            "use_doc_orientation_classify": True,
+            "use_doc_unwarping": True,
+            "use_chart_recognition": True,
+            "use_ocr_for_image_block": True,
+            "min_pixels": 200704,
+            "max_pixels": 1605632,
+            "max_new_tokens": 3072,
+        }
+        with tempfile.TemporaryDirectory() as tmp, patch.object(
+            parse_core, "get_pipeline", return_value=fake_pipeline
+        ):
+            root = Path(tmp)
+            source = root / "page.pdf"
+            marker = root / "page.pdf.ready"
+            source.write_bytes(b"single-page-pdf")
+            marker.write_text("ready", encoding="utf-8")
+
+            parse_core.parse_page_batch(
+                source,
+                job_id="job-options",
+                batch_id="batch-options",
+                output_root=root / "output",
+                ready_path=marker,
+                prediction_options=overrides,
+            )
+
+        for key, expected in overrides.items():
+            self.assertEqual(fake_pipeline.options[key], expected)
+
+    def test_worker_forwards_payload_prediction_options_to_page_parser(self) -> None:
+        redis = _FakeRedis()
+        prediction_options = {
+            "use_doc_orientation_classify": True,
+            "use_doc_unwarping": True,
+            "max_pixels": 1605632,
+        }
+        payload = {
+            "task_type": "page_batch",
+            "job_id": "job-options",
+            "batch_id": "batch-options",
+            "unit_index": 2,
+            "total_units": 4,
+            "start_page": 3,
+            "end_page": 4,
+            "total_pages": 8,
+            "input_path": "/tmp/pages.pdf",
+            "ready_path": "/tmp/pages.pdf.ready",
+            "filename": "report.pdf",
+            "prediction_options": prediction_options,
+        }
+
+        with patch.object(
+            worker,
+            "parse_page_batch",
+            return_value={"status": "success"},
+        ) as parse_batch, patch.object(worker, "_env_int", return_value=0):
+            worker._handle_page_batch(redis, "worker-options", payload)
+
+        parse_batch.assert_called_once_with(
+            "/tmp/pages.pdf",
+            filename="report.pdf",
+            job_id="job-options",
+            batch_id="batch-options",
+            unit_index=2,
+            total_units=4,
+            start_page=3,
+            end_page=4,
+            total_pages=8,
+            ready_path="/tmp/pages.pdf.ready",
+            prediction_options=prediction_options,
+        )
+        state = redis.hashes["paddleocr:task:job-options:batch:0002"]
+        self.assertEqual(state["status"], "success")
 
     def test_eight_page_batch_preserves_all_page_markers(self) -> None:
         fake_pipeline = _FakePipeline(result_count=8)

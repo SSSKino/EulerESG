@@ -65,7 +65,6 @@ const UploadArea: React.FC<UploadAreaProps> = ({
             onChange={(value) => onUploadModeChange(value as "single" | "multi")}
             options={[
               { label: t("upload.singleReport"), value: "single" },
-              { label: t("upload.multiReport"), value: "multi" },
             ]}
           />
         </div>

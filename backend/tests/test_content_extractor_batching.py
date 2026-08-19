@@ -40,7 +40,8 @@ class PageBatchRangeTests(unittest.TestCase):
 
         self.assertIn("Revenue was 100% in FY24.", merged)
         self.assertIn("<table>", merged)
-        self.assertIn("OCR structure supplement", merged)
+        self.assertEqual(merged.count("Revenue was 100% in FY24."), 1)
+        self.assertNotIn("OCR structure supplement", merged)
 
     def test_batch_timing_summary_uses_worker_results(self):
         states = [

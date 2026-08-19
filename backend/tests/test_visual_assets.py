@@ -1,4 +1,5 @@
 import json
+import unittest
 from pathlib import Path
 
 from esg_encoding.models import ProcessingConfig
@@ -104,6 +105,114 @@ def test_paddleocr_v16_layout_keeps_global_page_geometry_and_table_link(tmp_path
     assert table_asset["table_ids"] == [table["table_id"]]
 
 
+def test_real_v16_res_wrapper_assigns_layout_scores_and_footnotes_one_to_one(tmp_path: Path):
+    worker = tmp_path / "worker"
+    output = (
+        worker / "job" / "batches" / "batch_0003_pages_0021_0024"
+        / "page_0023_part_03"
+    )
+    images = output / "imgs"
+    images.mkdir(parents=True)
+    (images / "panel_a.png").write_bytes(b"first-visual")
+    (images / "panel_b.png").write_bytes(b"second-visual")
+
+    result = {
+        "request_id": "paddle-serving-envelope",
+        "res": {
+            "input_path": "/workspace/worker/batch_0003.pdf",
+            # Paddle reports a zero-based page within the split PDF. The page
+            # directory remains the source of truth for the report-wide page.
+            "page_index": 2,
+            "page_count": 4,
+            "layout_det_res": {
+                "input_img_shape": [400, 200, 3],
+                "boxes": [
+                    {"label": "image", "coordinate": [10, 20, 90, 140], "score": 0.97},
+                    {"label": "image", "coordinate": [110, 200, 190, 320], "score": 0.88},
+                ],
+            },
+            "parsing_res_list": [
+                {
+                    "block_label": "image",
+                    "block_bbox": [10, 20, 90, 140],
+                    "block_id": 101,
+                    "block_order": 17,
+                    "block_content": "![](imgs/panel_a.png)",
+                },
+                {
+                    "block_label": "vision_footnote",
+                    "block_bbox": [10, 142, 90, 160],
+                    "block_id": 102,
+                    "block_order": 18,
+                    "block_content": "Water withdrawals by year",
+                },
+                {
+                    "block_label": "image",
+                    "block_bbox": [110, 200, 190, 320],
+                    "block_id": 103,
+                    "block_order": 31,
+                    "block_content": "![](imgs/panel_b.png)",
+                },
+                {
+                    "block_label": "vision_footnote",
+                    "block_bbox": [110, 322, 190, 340],
+                    "block_id": 104,
+                    "block_order": 32,
+                    "block_content": "Waste recycled by year",
+                },
+            ],
+        },
+    }
+    (output / "report_res.json").write_text(
+        json.dumps(result), encoding="utf-8"
+    )
+    # Multiple result files for the same physical page must not create
+    # duplicate page entries in the durable manifest.
+    (output / "report_metadata.json").write_text(json.dumps({
+        "res": {
+            "input_path": "/workspace/worker/batch_0003.pdf",
+            "page_index": 2,
+            "page_count": 4,
+            "layout_det_res": {"input_img_shape": [400, 200, 3], "boxes": []},
+        },
+    }), encoding="utf-8")
+    pdf = tmp_path / "wrapped.pdf"
+    pdf.write_bytes(b"pdf")
+
+    assets = promote_visual_assets(worker, pdf)
+
+    assert len(assets) == 2
+    by_source = {Path(asset["source_image_path"]).name: asset for asset in assets}
+    first = by_source["panel_a.png"]
+    second = by_source["panel_b.png"]
+    assert first["page_number"] == second["page_number"] == 23
+    assert first["source_page_index"] == second["source_page_index"] == 2
+    assert first["page_width"] == second["page_width"] == 200
+    assert first["page_height"] == second["page_height"] == 400
+    assert first["caption"] == "Water withdrawals by year"
+    assert second["caption"] == "Waste recycled by year"
+    assert first["confidence"] == 0.97
+    assert second["confidence"] == 0.88
+    # Canonical reading order follows parsing_res_list; Paddle's order is
+    # retained separately on the manifest block for auditability.
+    assert first["reading_order"] == 0
+    assert second["reading_order"] == 2
+
+    manifest = json.loads(
+        (tmp_path / "wrapped_visual_assets" / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert len(manifest["pages"]) == 1
+    page = manifest["pages"][0]
+    assert page["page_number"] == 23
+    assert page["source_page_index"] == 2
+    assert page["batch_page_count"] == 4
+    assert page["batch_id"] == "batch_0003"
+    assert page["batch_start_page"] == 21
+    assert page["batch_end_page"] == 24
+    visual_blocks = [block for block in manifest["blocks"] if block["block_type"] == "image"]
+    assert [block["source_block_order"] for block in visual_blocks] == [17, 31]
+
+
 def test_same_basename_on_different_pages_never_cross_links(tmp_path: Path):
     worker = tmp_path / "worker"
     for page, caption, bbox in (
@@ -162,6 +271,52 @@ def test_decorative_diagnostics_and_html_placeholders_are_filtered(tmp_path: Pat
     assert promote_visual_assets(worker, pdf) == []
     manifest = json.loads((tmp_path / "empty_visual_assets" / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["assets"] == []
+
+
+def test_image_label_does_not_override_logo_and_repeated_page_decoration_filters(tmp_path: Path):
+    worker = tmp_path / "worker"
+    for page in (1, 2, 3):
+        output = (
+            worker / "job" / "batches" / "batch_0001_pages_0001_0003"
+            / f"page_{page:04d}_part_{page:02d}"
+        )
+        images = output / "imgs"
+        images.mkdir(parents=True)
+        # A repeated, thin top-of-page image is a decorative band even when
+        # Paddle labels it as a regular image and extracts meaningful alt text.
+        (images / "top_band.png").write_bytes(b"same-decoration-on-every-page")
+        blocks = [{
+            "block_label": "image",
+            "block_bbox": [0, 0, 200, 20],
+            "block_content": "![Company navigation band](imgs/top_band.png)",
+        }]
+        if page == 1:
+            # Filename-level logo filtering must also win over a generic image
+            # layout label.
+            (images / "company_logo.png").write_bytes(b"logo")
+            blocks.append({
+                "block_label": "image",
+                "block_bbox": [5, 25, 35, 45],
+                "block_content": "![Company logo](imgs/company_logo.png)",
+            })
+        (output / "result.json").write_text(json.dumps({
+            "res": {
+                "page_index": page - 1,
+                "page_count": 3,
+                "width": 200,
+                "height": 200,
+                "parsing_res_list": blocks,
+            },
+        }), encoding="utf-8")
+    pdf = tmp_path / "decorations.pdf"
+    pdf.write_bytes(b"pdf")
+
+    assert promote_visual_assets(worker, pdf) == []
+    manifest = json.loads(
+        (tmp_path / "decorations_visual_assets" / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert manifest["assets"] == []
+    assert [page["page_number"] for page in manifest["pages"]] == [1, 2, 3]
 
 
 def test_layout_audit_is_omitted_by_default(tmp_path: Path, monkeypatch):
@@ -229,3 +384,52 @@ def test_empty_visual_asset_does_not_create_embedding_marker():
     }
 
     assert append_visual_markers("Report text", [empty_asset]) == "Report text"
+
+
+def test_generic_visual_placeholders_do_not_create_embedding_markers():
+    for placeholder in ("Figure", "Figure 12", "image", "img_04.png"):
+        asset = {
+            "asset_id": "va_0123456789abcdef0123",
+            "relative_path": "blob.png",
+            "mime_type": "image/png",
+            "page_number": 4,
+            "block_type": "image",
+            "caption": placeholder,
+            "summary": "",
+            "ocr_text": placeholder,
+            "chart_data": None,
+        }
+
+        assert append_visual_markers("Report text", [asset]) == "Report text"
+
+
+def test_visual_promotion_does_not_follow_image_symlinks(tmp_path: Path):
+    worker = tmp_path / "worker"
+    output = worker / "page_0001_part_01"
+    images = output / "imgs"
+    images.mkdir(parents=True)
+    external = tmp_path / "outside-chart.png"
+    external.write_bytes(b"must-not-be-copied")
+    linked = images / "linked-chart.png"
+    try:
+        linked.symlink_to(external)
+    except (NotImplementedError, OSError):
+        raise unittest.SkipTest("Creating symlinks is unavailable for this Windows test account")
+    (output / "result.json").write_text(json.dumps({
+        "page_index": 0,
+        "width": 100,
+        "height": 100,
+        "parsing_res_list": [{
+            "block_label": "chart",
+            "block_bbox": [10, 10, 90, 90],
+            "block_content": "![Energy use](imgs/linked-chart.png)",
+        }],
+    }), encoding="utf-8")
+    pdf = tmp_path / "symlink.pdf"
+    pdf.write_bytes(b"pdf")
+
+    assert promote_visual_assets(worker, pdf) == []
+    manifest = json.loads(
+        (tmp_path / "symlink_visual_assets" / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert manifest["assets"] == []

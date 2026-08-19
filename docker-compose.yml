@@ -25,6 +25,9 @@ x-paddleocr-worker-env: &paddleocr-worker-env
   PADDLEOCR_VL_REC_MAX_CONCURRENCY: '16'
   # 外层 Redis 已按页批次调度；关闭 PaddleX 内部线程队列，避免超时后 VLM worker 无法退出。
   PADDLEOCR_USE_INTERNAL_QUEUES: 'false'
+  # Load preprocessing components once; each adaptive page batch explicitly
+  # enables only the options required by its page profile.
+  PADDLEOCR_ADAPTIVE_PREPROCESSING_ENABLED: 'true'
   PADDLEOCR_USE_DOC_ORIENTATION_CLASSIFY: 'false'
   PADDLEOCR_USE_DOC_UNWARPING: 'false'
   PADDLEOCR_USE_LAYOUT_DETECTION: 'true'
@@ -248,6 +251,9 @@ services:
       REPORT_TABLE_SECOND_PASS_ENABLED: 'true'
       REPORT_TABLE_SECOND_PASS_MAX_RATIO: '0.30'
       REPORT_TABLE_SECOND_PASS_RENDER_ZOOM: '2.0'
+      REPORT_ADAPTIVE_PAGE_ROUTING_ENABLED: 'true'
+      PADDLEOCR_VLM_HIGH_RES_MIN_PIXELS: '200704'
+      PADDLEOCR_VLM_HIGH_RES_MAX_PIXELS: '1605632'
 
       # Backend is the only service that splits PDF pages.
       # One Redis task processes up to 7 PDF pages; a 116-page report creates 17 tasks.

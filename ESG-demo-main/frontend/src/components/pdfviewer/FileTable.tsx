@@ -568,9 +568,7 @@ const FileTable: React.FC<FileTableProps> = ({
       <div className="mt-4 bg-white rounded-lg shadow-sm">
       <div className="p-3 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-700">
-          {reportCatalogMode === "multi"
-            ? t("files.multiReportDirectory")
-            : t("files.singleReportDirectory")}
+          {t("files.title")}
         </h3>
         <div className="flex items-center space-x-2">
           <Tooltip title={crossAnalysisDisabledReason} placement="top">

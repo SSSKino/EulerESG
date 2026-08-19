@@ -23,7 +23,13 @@ from loguru import logger
 
 from .exceptions import ContentExtractionError
 from .models import DocumentContent, ProcessingConfig, TextSegment
-from .visual_assets import append_visual_markers, load_visual_manifest, parse_visual_marker, promote_visual_assets
+from .visual_assets import (
+    append_visual_markers,
+    load_visual_manifest,
+    parse_visual_marker,
+    promote_visual_assets,
+    write_empty_visual_manifest,
+)
 
 
 _HTML_IMAGE_TAG_RE = re.compile(r"<\s*img\b[^>]*>", re.IGNORECASE | re.DOTALL)
@@ -39,13 +45,32 @@ _BARE_IMAGE_PATH_RE = re.compile(
     r"^(?:\.\.?/)?(?:imgs?|images?|assets?)/[^\s]+\.(?:png|jpe?g|webp|gif|svg)$",
     re.IGNORECASE,
 )
+_GENERIC_VISUAL_LABEL_RE = re.compile(
+    r"^(?:image|img|figure|fig|photo|picture|chart|graphic|illustration|untitled|"
+    r"visual(?:\s+evidence)?)(?:[\s_.-]*\d+)?$",
+    re.IGNORECASE,
+)
+_INTERNAL_SEGMENT_MARKER_RE = re.compile(
+    r"^(?:\*{1,2})?P\d{1,5}_[ST]\d{1,5}(?:\*{1,2})?$",
+    re.IGNORECASE,
+)
+_BARE_VISUAL_EVIDENCE_RE = re.compile(
+    r"^visual\s+evidence\s+va_[0-9a-f]{8,}$",
+    re.IGNORECASE,
+)
 
 
 def _visual_has_searchable_content(value: Dict[str, Any]) -> bool:
     """Return whether a visual asset carries evidence worth indexing as text."""
+    if value.get("searchable") is False:
+        return False
     if value.get("chart_data") not in (None, "", [], {}):
         return True
-    return any(str(value.get(field) or "").strip() for field in ("caption", "summary", "ocr_text"))
+    for field in ("caption", "summary", "ocr_text"):
+        text = re.sub(r"\s+", " ", str(value.get(field) or "")).strip()
+        if text and not _GENERIC_VISUAL_LABEL_RE.fullmatch(text):
+            return True
+    return False
 
 
 def _clean_non_table_markdown_block(value: str) -> str:
@@ -77,7 +102,11 @@ def _clean_non_table_markdown_block(value: str) -> str:
             continue
         lines.append(cleaned)
     text = "\n".join(lines).strip()
-    if text.lower() in {"image", "img", "figure", "photo", "chart"}:
+    if (
+        text.lower() in {"image", "img", "figure", "photo", "chart"}
+        or _INTERNAL_SEGMENT_MARKER_RE.fullmatch(text)
+        or _BARE_VISUAL_EVIDENCE_RE.fullmatch(text)
+    ):
         return ""
     return text
 
@@ -203,6 +232,7 @@ def _selected_page_batch_ranges(
     total_pages: int,
     batch_size: int,
     page_numbers: Optional[Sequence[int]] = None,
+    page_options: Optional[Dict[int, Dict[str, Any]]] = None,
 ) -> list[tuple[int, int]]:
     """Return contiguous OCR ranges for selected one-based pages.
 
@@ -216,20 +246,26 @@ def _selected_page_batch_ranges(
         return []
     effective_batch_size = max(1, int(batch_size))
     ranges: list[tuple[int, int]] = []
+
+    def signature(page: int) -> str:
+        options = (page_options or {}).get(page, {})
+        return json.dumps(options, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+
     run_start = selected[0]
     previous = selected[0]
+    current_signature = signature(run_start)
     for page in selected[1:] + [None]:
-        if page is not None and page == previous + 1:
+        contiguous = page is not None and page == previous + 1
+        within_batch = page is not None and page - run_start < effective_batch_size
+        same_options = page is not None and signature(page) == current_signature
+        if contiguous and within_batch and same_options:
             previous = page
             continue
-        chunk_start = run_start
-        while chunk_start <= previous:
-            chunk_end = min(previous, chunk_start + effective_batch_size - 1)
-            ranges.append((chunk_start, chunk_end))
-            chunk_start = chunk_end + 1
+        ranges.append((run_start, previous))
         if page is not None:
             run_start = page
             previous = page
+            current_signature = signature(page)
     return ranges
 
 
@@ -366,11 +402,53 @@ def _merge_native_and_ocr_page(native_markdown: str, ocr_markdown: str) -> str:
     native_key = _normalise_page_text(native)
     ocr_key = _normalise_page_text(ocr)
     if native_key and (native_key in ocr_key or ocr_key in native_key):
-        # Native characters are authoritative for born-digital content.  Keep OCR
-        # only when it adds a table/visual structure not represented natively.
-        if "<table" not in ocr.casefold() and "|" not in ocr:
+        if "<table" not in ocr.casefold() and "|" not in ocr and "visual-asset:" not in ocr:
             return native
-    return f"{native}\n\n<!-- OCR structure supplement -->\n\n{ocr}"
+
+    # Paddle often repeats the native paragraph before an OCR-only table.  A
+    # page-level concatenation indexes that paragraph twice and can introduce a
+    # second, mis-OCRed copy of important numbers.  Keep structural blocks and
+    # only retain non-structural OCR text when it is genuinely absent natively.
+    fragments = [fragment.strip() for fragment in re.split(r"\n\s*\n", ocr) if fragment.strip()]
+    supplements: List[str] = []
+    native_tokens = set(re.findall(r"[\w%+.-]+", native_key, flags=re.UNICODE))
+    for fragment in fragments:
+        lowered = fragment.casefold()
+        fragment_lines = [line.strip() for line in fragment.splitlines() if line.strip()]
+        is_markdown_table = (
+            len(fragment_lines) >= 2
+            and sum("|" in line for line in fragment_lines) >= 2
+            and any(re.search(r"\|?\s*:?-{2,}:?\s*\|", line) for line in fragment_lines)
+        )
+        is_structure = (
+            "<table" in lowered
+            or "visual-asset:" in lowered
+            or is_markdown_table
+        )
+        if is_structure:
+            supplements.append(fragment)
+            continue
+        cleaned = _clean_non_table_markdown_block(fragment)
+        if not cleaned or _PAGE_MARKER_RE.search(cleaned):
+            continue
+        fragment_key = _normalise_page_text(cleaned)
+        if not fragment_key:
+            continue
+        if fragment_key in native_key or native_key in fragment_key:
+            continue
+        similarity = SequenceMatcher(None, fragment_key, native_key, autojunk=False).ratio()
+        fragment_tokens = set(re.findall(r"[\w%+.-]+", fragment_key, flags=re.UNICODE))
+        token_coverage = (
+            len(fragment_tokens & native_tokens) / len(fragment_tokens)
+            if fragment_tokens
+            else 0.0
+        )
+        if similarity >= 0.82 or token_coverage >= 0.72:
+            continue
+        supplements.append(cleaned)
+    if not supplements:
+        return native
+    return f"{native}\n\n" + "\n\n".join(supplements)
 
 
 def _adaptive_analysis_maps(analysis: Any) -> tuple[Dict[int, str], Dict[int, str]]:
@@ -389,16 +467,49 @@ def _adaptive_analysis_maps(analysis: Any) -> tuple[Dict[int, str], Dict[int, st
             route = "ocr"
         routes[page] = route
         native_markdown = str(getattr(profile, "native_markdown", "") or "").strip()
-        if native_markdown:
+        if native_markdown or route == "native":
             native_pages[page] = native_markdown
     return routes, native_pages
+
+
+def _adaptive_prediction_options_by_page(analysis: Any) -> Dict[int, Dict[str, Any]]:
+    """Translate conservative page hints into worker prediction overrides."""
+    options_by_page: Dict[int, Dict[str, Any]] = {}
+    if analysis is None or not bool(getattr(analysis, "available", False)):
+        return options_by_page
+    try:
+        high_min = max(784, int(os.getenv("PADDLEOCR_VLM_HIGH_RES_MIN_PIXELS", "200704") or "200704"))
+        high_max = max(high_min, int(os.getenv("PADDLEOCR_VLM_HIGH_RES_MAX_PIXELS", "1605632") or "1605632"))
+    except (TypeError, ValueError, OverflowError):
+        high_min, high_max = 200704, 1605632
+    for fallback_page, profile in enumerate(list(getattr(analysis, "pages", []) or []), 1):
+        try:
+            page = max(1, int(getattr(profile, "page_number", fallback_page) or fallback_page))
+        except (TypeError, ValueError, OverflowError):
+            page = fallback_page
+        hints = getattr(profile, "complexity_hints", {}) or {}
+        if not isinstance(hints, dict):
+            hints = {}
+        possible_chart = bool(hints.get("possible_chart"))
+        visual_heavy = bool(hints.get("visual_heavy"))
+        options: Dict[str, Any] = {
+            "use_doc_orientation_classify": bool(hints.get("needs_orientation")),
+            "use_doc_unwarping": bool(hints.get("needs_unwarping")),
+            "use_chart_recognition": possible_chart,
+            "use_ocr_for_image_block": possible_chart or visual_heavy,
+        }
+        if bool(hints.get("needs_high_resolution_ocr")):
+            options["min_pixels"] = high_min
+            options["max_pixels"] = high_max
+        options_by_page[page] = options
+    return options_by_page
 
 
 def _native_only_result(analysis: Any) -> Dict[str, Any]:
     """Build a queue-compatible extraction result for an all-native PDF."""
     routes, native_pages = _adaptive_analysis_maps(analysis)
     total_pages = int(getattr(analysis, "total_pages", 0) or len(routes))
-    missing = [page for page in range(1, total_pages + 1) if not native_pages.get(page)]
+    missing = [page for page in range(1, total_pages + 1) if page not in native_pages]
     if total_pages <= 0 or missing:
         raise ValueError(f"Native PDF analysis is incomplete; missing pages={missing[:20]}")
     markdown = "\n\n".join(
@@ -426,6 +537,25 @@ def _native_only_result(analysis: Any) -> Dict[str, Any]:
         "ocr_page_count": 0,
         "markdown": markdown,
     }
+
+
+def _native_manifest_pages(analysis: Any) -> List[Dict[str, Any]]:
+    pages: List[Dict[str, Any]] = []
+    for fallback_page, profile in enumerate(list(getattr(analysis, "pages", []) or []), 1):
+        try:
+            page_number = max(1, int(getattr(profile, "page_number", fallback_page) or fallback_page))
+        except (TypeError, ValueError, OverflowError):
+            page_number = fallback_page
+        pages.append(
+            {
+                "page_number": page_number,
+                "page_width": float(getattr(profile, "page_width", 0.0) or 0.0) or None,
+                "page_height": float(getattr(profile, "page_height", 0.0) or 0.0) or None,
+                "rotation": int(getattr(profile, "rotation", 0) or 0),
+                "parser_route": str(getattr(profile, "route", "native") or "native"),
+            }
+        )
+    return pages
 
 
 def _paddle_markdown_page_markers(markdown: object) -> list[int]:
@@ -1040,12 +1170,13 @@ class ContentExtractor:
                     page_analysis = None
                     self.logger.warning(f"Adaptive page analysis failed; using full OCR: {exc}")
 
+            page_analysis_seconds = time.perf_counter() - adaptive_started
             result = self._run_paddleocr_vl_page_batch_queue(
                 source_path,
                 page_analysis=page_analysis,
             )
             stage_timings = dict(result.get("stage_timings") or {})
-            stage_timings["page_analysis_seconds"] = round(time.perf_counter() - adaptive_started, 3)
+            stage_timings["page_analysis_seconds"] = round(page_analysis_seconds, 3)
             result["stage_timings"] = stage_timings
             markdown = str(result.get("markdown") or "").strip()
             if not markdown:
@@ -1520,6 +1651,7 @@ class ContentExtractor:
         job_id: str,
         batch_size: int,
         page_numbers: Optional[Sequence[int]] = None,
+        page_options: Optional[Dict[int, Dict[str, Any]]] = None,
     ) -> tuple[list[dict], int, Path]:
         try:
             import fitz  # type: ignore
@@ -1544,7 +1676,12 @@ class ContentExtractor:
                 raise ContentExtractionError("PDF 没有可解析页", file_path=str(source_path))
 
             units: list[dict] = []
-            selected_ranges = _selected_page_batch_ranges(total_pages, batch_size, page_numbers)
+            selected_ranges = _selected_page_batch_ranges(
+                total_pages,
+                batch_size,
+                page_numbers,
+                page_options,
+            )
             for unit_index, (start_page, end_page) in enumerate(selected_ranges, 1):
                 batch_path = batch_dir / f"pages_{start_page:04d}_{end_page:04d}.pdf"
                 # Keep the .pdf suffix so PyMuPDF can infer the output format.
@@ -1598,6 +1735,7 @@ class ContentExtractor:
                         "end_page": end_page,
                         "input_path": str(batch_path),
                         "ready_path": str(ready_path),
+                        "prediction_options": dict((page_options or {}).get(start_page, {})),
                     }
                 )
 
@@ -1645,7 +1783,10 @@ class ContentExtractor:
             routes.get(page) == "native" for page in range(1, total_pages + 1)
         ):
             self.logger.info(f"Skipping PaddleOCR for all-native PDF: file={source_path.name}, pages={total_pages}")
-            return _native_only_result(page_analysis)
+            result = _native_only_result(page_analysis)
+            if source_path.is_file():
+                write_empty_visual_manifest(source_path, _native_manifest_pages(page_analysis))
+            return result
 
         job_id = f"parse_{uuid.uuid4().hex}"
         self._wake_paddleocr_vlm()
@@ -1684,15 +1825,23 @@ class ContentExtractor:
         _ensure_shared_writable_dir(output_dir / "batches")
 
         page_routes, native_page_markdown = _adaptive_analysis_maps(page_analysis)
+        page_prediction_options = _adaptive_prediction_options_by_page(page_analysis)
         analysis_total_pages = int(getattr(page_analysis, "total_pages", 0) or 0) if page_analysis is not None else 0
         analysis_is_complete = (
             analysis_total_pages > 0
             and set(page_routes) == set(range(1, analysis_total_pages + 1))
             and all(
-                page_routes.get(page) != "native" or bool(native_page_markdown.get(page))
+                page_routes.get(page) != "native" or page in native_page_markdown
                 for page in range(1, analysis_total_pages + 1)
             )
         )
+        if not analysis_is_complete:
+            # Never let a partial preflight influence the full-OCR fallback.
+            # Retaining a few native routes here can over-count progress and
+            # replace complete OCR pages with incomplete native content.
+            page_routes = {}
+            native_page_markdown = {}
+            page_prediction_options = {}
         selected_ocr_pages: Optional[List[int]] = None
         if analysis_is_complete:
             selected_ocr_pages = [
@@ -1707,6 +1856,7 @@ class ContentExtractor:
             job_id,
             batch_size,
             page_numbers=selected_ocr_pages,
+            page_options=page_prediction_options if analysis_is_complete else None,
         )
         if analysis_is_complete and analysis_total_pages != total_pages:
             self.logger.warning(
@@ -1715,6 +1865,7 @@ class ContentExtractor:
             )
             page_routes = {}
             native_page_markdown = {}
+            page_prediction_options = {}
             selected_ocr_pages = None
             units, total_pages, batch_dir = self._split_pdf_for_page_batch_queue(
                 source_path,
@@ -1731,6 +1882,8 @@ class ContentExtractor:
         ocr_page_count = sum(end - start + 1 for start, end in expected_ranges)
         if total_units == 0 and native_page_count == total_pages:
             result = _native_only_result(page_analysis)
+            if source_path.is_file():
+                write_empty_visual_manifest(source_path, _native_manifest_pages(page_analysis))
             result["stage_timings"] = {
                 "split_seconds": round(split_seconds, 3),
                 "queue_submit_seconds": 0.0,
@@ -1817,6 +1970,7 @@ class ContentExtractor:
                 "total_pages": total_pages,
                 "input_path": unit["input_path"],
                 "ready_path": unit.get("ready_path", ""),
+                "prediction_options": dict(unit.get("prediction_options") or {}),
                 "created_at": datetime.now().isoformat(),
             }
             self._redis_hash_set(
@@ -1833,6 +1987,7 @@ class ContentExtractor:
                     "end_page": unit["end_page"],
                     "input_path": unit["input_path"],
                     "ready_path": unit.get("ready_path", ""),
+                    "prediction_options": dict(unit.get("prediction_options") or {}),
                     "created_at": datetime.now().isoformat(),
                 },
             )
@@ -2077,6 +2232,7 @@ class ContentExtractor:
                 result["stage_timings"] = stage_timings
                 result["batch_timing"] = batch_timing
                 result["page_routes"] = page_routes
+                result["page_prediction_options"] = page_prediction_options
                 result["native_page_count"] = native_page_count
                 result["ocr_page_count"] = ocr_page_count
                 result["_task_key"] = task_key
@@ -2211,13 +2367,25 @@ class ContentExtractor:
                         file_path=str(source_path),
                     )
 
-                md_path = Path(result.get("batch_markdown_path") or state.get("batch_markdown_path") or "")
-                if not md_path.exists():
+                md_path_value = str(
+                    result.get("batch_markdown_path")
+                    or state.get("batch_markdown_path")
+                    or ""
+                ).strip()
+                md_path = Path(md_path_value) if md_path_value else None
+                if md_path is None or not md_path.is_file():
                     raise ContentExtractionError(
                         f"PaddleOCR-VL batch 完成但 batch.md 不存在: job_id={job_id}, unit={idx}, path={md_path}",
                         file_path=str(source_path),
                     )
-                md = md_path.read_text(encoding="utf-8", errors="ignore").strip()
+                try:
+                    md = md_path.read_text(encoding="utf-8", errors="ignore").strip()
+                except OSError as exc:
+                    raise ContentExtractionError(
+                        f"PaddleOCR-VL batch Markdown read failed: job_id={job_id}, "
+                        f"unit={idx}, path={md_path}, error={exc}",
+                        file_path=str(source_path),
+                    ) from exc
                 expected_markers = list(range(expected_start, expected_end + 1))
                 page_markers = _paddle_markdown_page_markers(md)
                 if page_markers != expected_markers:
@@ -2273,6 +2441,11 @@ class ContentExtractor:
             else:
                 body = ocr_body or native_body
             if not body:
+                if route == "native" and page in native_pages:
+                    combined_parts.append(
+                        f"<!-- Page {page} | adaptive parser route=native blank=true -->"
+                    )
+                    continue
                 missing_pages.append(page)
                 continue
             combined_parts.append(f"<!-- Page {page} | adaptive parser route={route} -->\n\n{body}")
@@ -2799,73 +2972,342 @@ class ContentExtractor:
                 segment.structured_data = data
 
     def _enrich_table_segments_from_records(self, segments: List[TextSegment], records: List[Dict[str, Any]]) -> None:
-        table_segments = [segment for segment in segments if segment.segment_type == "table" and segment.source_table_id]
+        """Bind Markdown tables to Paddle's structured records one-to-one.
+
+        Paddle emits Markdown and JSON through separate serializers, so their
+        ordering can diverge when a page contains nested figures or repeated
+        tables.  Pairing merely by list index silently attaches the wrong
+        geometry and confidence.  We instead require the same global page and
+        score text identity, bbox IoU (when available), and reading order.
+        """
+        table_segments = [
+            segment
+            for segment in segments
+            if segment.segment_type == "table" and segment.source_table_id
+        ]
         by_page: Dict[int, List[TextSegment]] = {}
         for segment in table_segments:
             by_page.setdefault(int(segment.page_number), []).append(segment)
         record_by_page: Dict[int, List[Dict[str, Any]]] = {}
         for record in records:
             try:
-                record_by_page.setdefault(max(1, int(record.get("page_number") or 1)), []).append(record)
-            except Exception:
+                page_number = max(1, int(record.get("page_number") or 1))
+            except (TypeError, ValueError, OverflowError):
                 continue
+            record_by_page.setdefault(page_number, []).append(record)
+
+        def safe_confidence(value: Any, fallback: float) -> float:
+            try:
+                parsed = float(value)
+            except (TypeError, ValueError, OverflowError):
+                parsed = float(fallback)
+            return max(0.0, min(1.0, parsed))
+
+        def rows_similarity(first: Sequence[Sequence[Any]], second: Sequence[Sequence[Any]]) -> float:
+            left = _normalised_table_text(first)
+            right = _normalised_table_text(second)
+            if not left or not right:
+                return 0.0
+            if left == right:
+                return 1.0
+            sequence_score = SequenceMatcher(None, left, right, autojunk=False).ratio()
+            left_tokens = set(re.findall(r"[\w%+.-]+", left, flags=re.UNICODE))
+            right_tokens = set(re.findall(r"[\w%+.-]+", right, flags=re.UNICODE))
+            union = left_tokens | right_tokens
+            token_score = len(left_tokens & right_tokens) / len(union) if union else 0.0
+            return max(sequence_score, token_score)
+
+        def record_sort_key(record: Dict[str, Any]) -> tuple:
+            reading_order = record.get("reading_order")
+            try:
+                order_value = int(reading_order) if reading_order is not None else 1_000_000
+            except (TypeError, ValueError, OverflowError):
+                order_value = 1_000_000
+            bbox = _normalized_bbox(
+                record.get("bbox"),
+                page_width=float(record.get("page_width") or 0.0),
+                page_height=float(record.get("page_height") or 0.0),
+            )
+            return (order_value, bbox[1] if bbox else 1.0, bbox[0] if bbox else 1.0)
+
+        def cell_bbox_map(
+            record: Dict[str, Any],
+            raw_cells: Sequence[Dict[str, Any]],
+        ) -> Dict[tuple[int, int], List[float]]:
+            raw_boxes = record.get("cell_box_list")
+            if not isinstance(raw_boxes, list) or not raw_boxes or not raw_cells:
+                return {}
+            boxes: List[Optional[List[float]]] = []
+            for raw_box in raw_boxes:
+                if isinstance(raw_box, dict):
+                    raw_box = raw_box.get("bbox") or raw_box.get("box") or raw_box.get("points")
+                boxes.append(_bbox_values(raw_box))
+            valid_boxes = [box for box in boxes if box is not None]
+            if not valid_boxes:
+                return {}
+
+            table_bbox = _normalized_bbox(
+                record.get("bbox"),
+                page_width=float(record.get("page_width") or 0.0),
+                page_height=float(record.get("page_height") or 0.0),
+            )
+            table_pixels = _bbox_values(record.get("bbox_pixels"))
+            page_width = float(record.get("page_width") or 0.0)
+            page_height = float(record.get("page_height") or 0.0)
+            union = _bbox_union(valid_boxes)
+            assert union is not None
+            normalized_input = max(abs(item) for box in valid_boxes for item in box) <= 1.0001
+
+            coordinate_space = "page"
+            if normalized_input and table_bbox:
+                margin = 0.01
+                contained = (
+                    union[0] >= table_bbox[0] - margin
+                    and union[1] >= table_bbox[1] - margin
+                    and union[2] <= table_bbox[2] + margin
+                    and union[3] <= table_bbox[3] + margin
+                )
+                coordinate_space = "page" if contained else "table_crop"
+            elif not normalized_input and table_pixels:
+                margin = 2.0
+                contained = (
+                    union[0] >= table_pixels[0] - margin
+                    and union[1] >= table_pixels[1] - margin
+                    and union[2] <= table_pixels[2] + margin
+                    and union[3] <= table_pixels[3] + margin
+                )
+                table_width = max(1.0, table_pixels[2] - table_pixels[0])
+                table_height = max(1.0, table_pixels[3] - table_pixels[1])
+                crop_sized = union[0] >= -margin and union[1] >= -margin and union[2] <= table_width + margin and union[3] <= table_height + margin
+                coordinate_space = "page" if contained else ("table_crop" if crop_sized else "page")
+
+            mapped: Dict[tuple[int, int], List[float]] = {}
+            for cell, box in zip(raw_cells, boxes):
+                if box is None:
+                    continue
+                if coordinate_space == "table_crop" and table_bbox:
+                    if normalized_input:
+                        relative = box
+                    elif table_pixels:
+                        width = max(1.0, table_pixels[2] - table_pixels[0])
+                        height = max(1.0, table_pixels[3] - table_pixels[1])
+                        relative = [box[0] / width, box[1] / height, box[2] / width, box[3] / height]
+                    else:
+                        continue
+                    table_width = table_bbox[2] - table_bbox[0]
+                    table_height = table_bbox[3] - table_bbox[1]
+                    normalized = [
+                        table_bbox[0] + relative[0] * table_width,
+                        table_bbox[1] + relative[1] * table_height,
+                        table_bbox[0] + relative[2] * table_width,
+                        table_bbox[1] + relative[3] * table_height,
+                    ]
+                else:
+                    normalized = _normalized_bbox(
+                        box,
+                        page_width=page_width,
+                        page_height=page_height,
+                    )
+                    if normalized is None:
+                        continue
+                try:
+                    key = (int(cell.get("row_index")), int(cell.get("col_index")))
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                mapped[key] = [round(max(0.0, min(1.0, value)), 6) for value in normalized]
+            return mapped
 
         structure_threshold = float(os.getenv("REPORT_TABLE_STRUCTURE_CONFIDENCE_THRESHOLD", "0.80") or "0.80")
         ocr_threshold = float(os.getenv("REPORT_TABLE_OCR_CONFIDENCE_THRESHOLD", "0.75") or "0.75")
         for page, page_tables in by_page.items():
-            page_records = record_by_page.get(page, [])
-            for index, table_segment in enumerate(page_tables):
-                if index >= len(page_records):
+            page_tables = sorted(page_tables, key=lambda item: (item.position_y, item.position_x or 0.0))
+            page_records = sorted(record_by_page.get(page, []), key=record_sort_key)
+            if not page_records:
+                continue
+
+            parsed_tables = [self._parse_table_rows(segment.content) for segment in page_tables]
+            parsed_records = [self._parse_table_rows(str(record.get("pred_html") or "")) for record in page_records]
+            candidates: List[tuple[float, float, float, int, int]] = []
+            for table_index, table_segment in enumerate(page_tables):
+                table_bbox = _normalized_bbox((table_segment.structured_data or {}).get("bbox"))
+                for record_index, record in enumerate(page_records):
+                    record_bbox = _normalized_bbox(
+                        record.get("bbox"),
+                        page_width=float(record.get("page_width") or 0.0),
+                        page_height=float(record.get("page_height") or 0.0),
+                    )
+                    text_score = rows_similarity(parsed_tables[table_index], parsed_records[record_index])
+                    bbox_score = _bbox_iou(table_bbox, record_bbox)
+                    span = max(len(page_tables), len(page_records), 1)
+                    order_score = max(0.0, 1.0 - abs(table_index - record_index) / span)
+                    if table_bbox is not None and record_bbox is not None:
+                        score = 0.65 * text_score + 0.30 * bbox_score + 0.05 * order_score
+                    else:
+                        score = 0.90 * text_score + 0.10 * order_score
+                    singleton = len(page_tables) == 1 and len(page_records) == 1
+                    if text_score < 0.18 and bbox_score < 0.10 and not singleton:
+                        continue
+                    candidates.append((score, text_score, bbox_score, table_index, record_index))
+
+            matched_tables: set[int] = set()
+            matched_records: set[int] = set()
+            matches: List[tuple[TextSegment, Dict[str, Any], float, float, float]] = []
+            for score, text_score, bbox_score, table_index, record_index in sorted(candidates, reverse=True):
+                if table_index in matched_tables or record_index in matched_records:
                     continue
-                record = page_records[index]
+                if score < 0.20:
+                    continue
+                matched_tables.add(table_index)
+                matched_records.add(record_index)
+                matches.append((page_tables[table_index], page_records[record_index], score, text_score, bbox_score))
+
+            for table_segment, record, match_score, text_score, bbox_score in matches:
                 raw_html = str(record.get("pred_html") or "")
                 raw_rows, raw_cells, raw_quality = self._parse_table_details(raw_html)
                 markdown_rows = self._parse_table_rows(table_segment.content)
-                structure_confidence = record.get("structure_confidence")
-                ocr_confidence = record.get("ocr_confidence")
-                structure_confidence = float(structure_confidence) if structure_confidence is not None else raw_quality["structure_confidence"]
-                ocr_confidence = float(ocr_confidence) if ocr_confidence is not None else raw_quality["ocr_confidence"]
+                structure_confidence = safe_confidence(record.get("structure_confidence"), raw_quality["structure_confidence"])
+                ocr_confidence = safe_confidence(record.get("ocr_confidence"), raw_quality["ocr_confidence"])
                 reasons = list(raw_quality["reasons"])
+                if record.get("ocr_confidence") is None:
+                    reasons.append("missing_ocr_confidence")
                 if structure_confidence < structure_threshold:
                     reasons.append("low_structure_confidence")
                 if ocr_confidence < ocr_threshold:
                     reasons.append("low_ocr_confidence")
+                if match_score < 0.55:
+                    reasons.append("weak_table_record_match")
+
                 conflicts: List[Dict[str, Any]] = []
-                normalized_raw = [self._normalise_table_row(row) for row in raw_rows]
-                normalized_markdown = [self._normalise_table_row(row) for row in markdown_rows]
-                if normalized_raw and normalized_markdown and normalized_raw != normalized_markdown:
-                    conflicts.append({
-                        "type": "table_structure_mismatch",
-                        "first_pass_markdown": normalized_markdown,
-                        "paddle_structured_html": normalized_raw,
-                    })
+                source_similarity = rows_similarity(raw_rows, markdown_rows)
+                if raw_rows and markdown_rows and source_similarity < 0.82:
+                    conflicts.append(
+                        {
+                            "type": "table_structure_mismatch",
+                            "similarity": round(source_similarity, 4),
+                            "first_pass_markdown": [self._normalise_table_row(row) for row in markdown_rows],
+                            "paddle_structured_html": [self._normalise_table_row(row) for row in raw_rows],
+                        }
+                    )
                     reasons.append("structure_source_conflict")
                 reasons = list(dict.fromkeys(reasons))
                 review_status = "needs_review" if reasons or conflicts else "verified"
-                related = [segment for segment in segments if segment.source_table_id == table_segment.source_table_id]
+                table_bbox = _normalized_bbox(
+                    record.get("bbox"),
+                    page_width=float(record.get("page_width") or 0.0),
+                    page_height=float(record.get("page_height") or 0.0),
+                )
+                boxes_by_cell = cell_bbox_map(record, raw_cells)
+                row_boxes: Dict[int, List[float]] = {}
+                for row_index in {key[0] for key in boxes_by_cell}:
+                    union = _bbox_union([box for (candidate_row, _), box in boxes_by_cell.items() if candidate_row == row_index])
+                    if union is not None:
+                        row_boxes[row_index] = union
+
+                related = [
+                    segment
+                    for segment in segments
+                    if segment.source_table_id == table_segment.source_table_id
+                ]
+                unit_by_row: Dict[int, str] = {}
+                for related_segment in related:
+                    if related_segment.segment_type != "table_cell":
+                        continue
+                    data = dict(related_segment.structured_data or {})
+                    header = str(data.get("col_header") or related_segment.col_header or "").casefold()
+                    if "unit" not in header and "单位" not in header:
+                        continue
+                    try:
+                        row_index = int(data.get("row_index"))
+                    except (TypeError, ValueError, OverflowError):
+                        continue
+                    unit_value = str(data.get("value_text") or related_segment.value_text or "").strip()
+                    if unit_value:
+                        unit_by_row[row_index] = unit_value
+
+                structured_html_sha256 = hashlib.sha256(raw_html.encode("utf-8")).hexdigest() if raw_html else None
+                provenance = {
+                    "table_record_id": record.get("table_id"),
+                    "block_id": record.get("block_id"),
+                    "block_type": record.get("block_type") or "table",
+                    "reading_order": record.get("reading_order"),
+                    "page_width": record.get("page_width"),
+                    "page_height": record.get("page_height"),
+                    "source_page_index": record.get("source_page_index"),
+                    "source_json_path": record.get("source_json_path"),
+                    "source_image_paths": list(record.get("source_image_paths") or []),
+                    "asset_ids": list(record.get("asset_ids") or []),
+                    "text_fingerprint": record.get("text_fingerprint"),
+                    "table_match_score": round(match_score, 4),
+                    "table_text_match_score": round(text_score, 4),
+                    "table_bbox_iou": round(bbox_score, 4),
+                }
+
                 for related_segment in related:
                     related_segment.structure_confidence = structure_confidence
                     related_segment.ocr_confidence = ocr_confidence
                     related_segment.review_status = review_status
                     related_segment.conflicts = conflicts
                     data = dict(related_segment.structured_data or {})
-                    data.update({
-                        "bbox": record.get("bbox"),
-                        "structure_confidence": structure_confidence,
-                        "ocr_confidence": ocr_confidence,
-                        "parse_pass": 1,
-                        "review_status": review_status,
-                        "quality_reasons": reasons,
-                        "conflicts": conflicts,
-                        "structured_html": raw_html,
-                    })
+                    try:
+                        row_index = int(data.get("row_index")) if data.get("row_index") is not None else None
+                    except (TypeError, ValueError, OverflowError):
+                        row_index = None
+                    try:
+                        col_index = int(data.get("col_index")) if data.get("col_index") is not None else None
+                    except (TypeError, ValueError, OverflowError):
+                        col_index = None
+                    segment_bbox = table_bbox
+                    if related_segment.segment_type == "table_row" and row_index is not None:
+                        segment_bbox = row_boxes.get(row_index) or table_bbox
+                    elif related_segment.segment_type == "table_cell" and row_index is not None and col_index is not None:
+                        segment_bbox = boxes_by_cell.get((row_index, col_index)) or row_boxes.get(row_index) or table_bbox
+
+                    data.update(
+                        {
+                            **provenance,
+                            "bbox": segment_bbox,
+                            "structure_confidence": structure_confidence,
+                            "ocr_confidence": ocr_confidence,
+                            "parse_pass": 1,
+                            "review_status": review_status,
+                            "quality_reasons": reasons,
+                            "conflicts": conflicts,
+                            "structured_html_sha256": structured_html_sha256,
+                        }
+                    )
+                    if related_segment.segment_type == "table":
+                        data["structured_html"] = raw_html
+                    if segment_bbox is not None:
+                        related_segment.position_x = float(segment_bbox[0])
+                        related_segment.position_y = float(segment_bbox[1])
                     if related_segment.segment_type == "table_cell":
-                        cell = next((item for item in raw_cells if item.get("row_index") == data.get("row_index") and item.get("col_index") == data.get("col_index")), None)
+                        cell = next(
+                            (
+                                item
+                                for item in raw_cells
+                                if item.get("row_index") == row_index and item.get("col_index") == col_index
+                            ),
+                            None,
+                        )
                         if cell:
                             related_segment.rowspan = int(cell.get("rowspan") or 1)
                             related_segment.colspan = int(cell.get("colspan") or 1)
                             data["rowspan"] = related_segment.rowspan
                             data["colspan"] = related_segment.colspan
+                        header = str(data.get("col_header") or related_segment.col_header or "")
+                        year_match = re.search(r"\b((?:19|20)\d{2})\b", header)
+                        if year_match:
+                            data["year"] = int(year_match.group(1))
+                        if row_index is not None:
+                            inferred_unit = unit_by_row.get(row_index, "")
+                        else:
+                            inferred_unit = ""
+                        value_text = str(data.get("value_text") or related_segment.value_text or "")
+                        if not inferred_unit and "%" in value_text:
+                            inferred_unit = "%"
+                        if inferred_unit:
+                            related_segment.unit = related_segment.unit or inferred_unit
+                            data["unit"] = related_segment.unit
                     related_segment.structured_data = data
 
     def _stitch_continued_tables(self, segments: List[TextSegment]) -> None:
