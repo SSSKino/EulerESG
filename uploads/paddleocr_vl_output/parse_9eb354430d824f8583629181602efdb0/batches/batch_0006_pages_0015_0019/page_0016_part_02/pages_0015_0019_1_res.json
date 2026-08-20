@@ -1,0 +1,2382 @@
+{
+    "input_path": "/workspace/uploads/paddleocr_vl_jobs/parse_9eb354430d824f8583629181602efdb0/batches/pages_0015_0019.pdf",
+    "page_index": 1,
+    "page_count": 5,
+    "width": 2304,
+    "height": 1296,
+    "model_settings": {
+        "use_doc_preprocessor": false,
+        "use_layout_detection": true,
+        "use_chart_recognition": true,
+        "use_seal_recognition": false,
+        "use_ocr_for_image_block": true,
+        "format_block_content": false,
+        "merge_layout_blocks": true,
+        "markdown_ignore_labels": [
+            "number",
+            "footnote",
+            "header",
+            "header_image",
+            "footer",
+            "footer_image",
+            "aside_text"
+        ],
+        "return_layout_polygon_points": true
+    },
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Strategy",
+            "block_bbox": [
+                69,
+                140,
+                295,
+                205
+            ],
+            "block_id": 0,
+            "block_order": 1,
+            "group_id": 0,
+            "block_polygon_points": [
+                [
+                    69.0,
+                    140.0
+                ],
+                [
+                    69.0,
+                    198.0
+                ],
+                [
+                    160.0,
+                    204.0
+                ],
+                [
+                    283.0,
+                    204.0
+                ],
+                [
+                    294.0,
+                    198.0
+                ],
+                [
+                    294.0,
+                    140.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Decarbonize our operations, customers and society",
+            "block_bbox": [
+                67,
+                286,
+                522,
+                367
+            ],
+            "block_id": 1,
+            "block_order": 2,
+            "group_id": 1,
+            "block_polygon_points": [
+                [
+                    67.0,
+                    286.0
+                ],
+                [
+                    67.0,
+                    360.0
+                ],
+                [
+                    521.0,
+                    366.0
+                ],
+                [
+                    521.0,
+                    286.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Our climate action strategy is comprehensive because we understand that no single solution will help us meet our climate goals. We incorporate carbon mitigation actions within our own operations, for our customers, partners and society:",
+            "block_bbox": [
+                65,
+                383,
+                574,
+                513
+            ],
+            "block_id": 2,
+            "block_order": 3,
+            "group_id": 2,
+            "block_polygon_points": [
+                [
+                    65.0,
+                    383.0
+                ],
+                [
+                    65.0,
+                    512.0
+                ],
+                [
+                    573.0,
+                    512.0
+                ],
+                [
+                    573.0,
+                    383.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "- Decarbonize Dell: We internally reduce emissions, implement operational resilience strategies and manage the carbon footprint of our operations and products. We also engage with our suppliers to drive down emissions upstream of our operations.",
+            "block_bbox": [
+                66,
+                530,
+                558,
+                661
+            ],
+            "block_id": 3,
+            "block_order": 4,
+            "group_id": 3,
+            "block_polygon_points": [
+                [
+                    66.0,
+                    530.0
+                ],
+                [
+                    66.0,
+                    660.0
+                ],
+                [
+                    557.0,
+                    660.0
+                ],
+                [
+                    557.0,
+                    550.0
+                ],
+                [
+                    557.0,
+                    543.0
+                ],
+                [
+                    557.0,
+                    530.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "• Decarbonize customers and partners: As part of a global technology chain, we support our customers' and partners' climate-related goals through breakthrough innovations.",
+            "block_bbox": [
+                64,
+                677,
+                550,
+                783
+            ],
+            "block_id": 4,
+            "block_order": 5,
+            "group_id": 4,
+            "block_polygon_points": [
+                [
+                    549.0,
+                    677.0
+                ],
+                [
+                    469.0,
+                    677.0
+                ],
+                [
+                    64.0,
+                    684.0
+                ],
+                [
+                    64.0,
+                    782.0
+                ],
+                [
+                    549.0,
+                    782.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "• Decarbonize society: Our support for global climate goals drives engagement and advocacy on climate-related issues beyond our immediate community.",
+            "block_bbox": [
+                65,
+                799,
+                554,
+                880
+            ],
+            "block_id": 5,
+            "block_order": 6,
+            "group_id": 5,
+            "block_polygon_points": [
+                [
+                    65.0,
+                    799.0
+                ],
+                [
+                    65.0,
+                    879.0
+                ],
+                [
+                    553.0,
+                    879.0
+                ],
+                [
+                    553.0,
+                    799.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "We ensure that our emissions data is tracked, managed and reported over time. We calculate emissions in accordance with the methodology set out in the Greenhouse Gas Protocol and follow industry best practices in terms of GHG accounting methodologies. We also align our emissions reduction key drivers to Science Based Targets initiative (SBTi) criteria. The ESG Goals and Key Drivers Methodology section contains additional details on how we measure progress to our key drivers.",
+            "block_bbox": [
+                65,
+                904,
+                577,
+                1141
+            ],
+            "block_id": 6,
+            "block_order": 7,
+            "group_id": 6,
+            "block_polygon_points": [
+                [
+                    65.0,
+                    904.0
+                ],
+                [
+                    65.0,
+                    1140.0
+                ],
+                [
+                    576.0,
+                    1140.0
+                ],
+                [
+                    576.0,
+                    904.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Greenhouse gas emissions by scope",
+            "block_bbox": [
+                653,
+                175,
+                998,
+                244
+            ],
+            "block_id": 7,
+            "block_order": 8,
+            "group_id": 7,
+            "block_polygon_points": [
+                [
+                    653.0,
+                    175.0
+                ],
+                [
+                    653.0,
+                    243.0
+                ],
+                [
+                    905.0,
+                    243.0
+                ],
+                [
+                    997.0,
+                    237.0
+                ],
+                [
+                    997.0,
+                    175.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "SCOPE 1\nDirect emissions from Dell Technologies-owned and -controlled resources.",
+            "block_bbox": [
+                652,
+                272,
+                949,
+                356
+            ],
+            "block_id": 8,
+            "block_order": 9,
+            "group_id": 8,
+            "block_polygon_points": [
+                [
+                    652.0,
+                    285.0
+                ],
+                [
+                    652.0,
+                    355.0
+                ],
+                [
+                    948.0,
+                    355.0
+                ],
+                [
+                    948.0,
+                    272.0
+                ],
+                [
+                    688.0,
+                    272.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "F",
+            "block_bbox": [
+                1041,
+                276,
+                1100,
+                344
+            ],
+            "block_id": 9,
+            "block_order": null,
+            "group_id": 9,
+            "block_polygon_points": [
+                [
+                    1041.0,
+                    276.0
+                ],
+                [
+                    1041.0,
+                    343.0
+                ],
+                [
+                    1099.0,
+                    343.0
+                ],
+                [
+                    1099.0,
+                    276.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "SCOPE 2",
+            "block_bbox": [
+                653,
+                421,
+                729,
+                442
+            ],
+            "block_id": 10,
+            "block_order": 10,
+            "group_id": 10,
+            "block_polygon_points": [
+                [
+                    653.0,
+                    421.0
+                ],
+                [
+                    653.0,
+                    441.0
+                ],
+                [
+                    728.0,
+                    441.0
+                ],
+                [
+                    728.0,
+                    421.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Indirect emissions related to consumption of purchased electricity, steam, heating and cooling.",
+            "block_bbox": [
+                652,
+                443,
+                957,
+                512
+            ],
+            "block_id": 11,
+            "block_order": 11,
+            "group_id": 11,
+            "block_polygon_points": [
+                [
+                    652.0,
+                    450.0
+                ],
+                [
+                    652.0,
+                    511.0
+                ],
+                [
+                    956.0,
+                    511.0
+                ],
+                [
+                    956.0,
+                    450.0
+                ],
+                [
+                    945.0,
+                    443.0
+                ],
+                [
+                    699.0,
+                    443.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "un",
+            "block_bbox": [
+                1050,
+                427,
+                1099,
+                498
+            ],
+            "block_id": 12,
+            "block_order": null,
+            "group_id": 12,
+            "block_polygon_points": [
+                [
+                    1050.0,
+                    427.0
+                ],
+                [
+                    1050.0,
+                    497.0
+                ],
+                [
+                    1098.0,
+                    497.0
+                ],
+                [
+                    1098.0,
+                    427.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "SCOPE 3",
+            "block_bbox": [
+                653,
+                574,
+                729,
+                595
+            ],
+            "block_id": 13,
+            "block_order": 12,
+            "group_id": 13,
+            "block_polygon_points": [
+                [
+                    653.0,
+                    574.0
+                ],
+                [
+                    653.0,
+                    594.0
+                ],
+                [
+                    728.0,
+                    594.0
+                ],
+                [
+                    728.0,
+                    574.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Indirect emissions associated with our supply chain, the use of our products by customers, activities like business travel and the transportation of goods and services.",
+            "block_bbox": [
+                652,
+                596,
+                963,
+                707
+            ],
+            "block_id": 14,
+            "block_order": 13,
+            "group_id": 14,
+            "block_polygon_points": [
+                [
+                    652.0,
+                    596.0
+                ],
+                [
+                    652.0,
+                    706.0
+                ],
+                [
+                    951.0,
+                    706.0
+                ],
+                [
+                    962.0,
+                    667.0
+                ],
+                [
+                    962.0,
+                    662.0
+                ],
+                [
+                    962.0,
+                    628.0
+                ],
+                [
+                    962.0,
+                    596.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "回",
+            "block_bbox": [
+                1018,
+                603,
+                1100,
+                671
+            ],
+            "block_id": 15,
+            "block_order": null,
+            "group_id": 15,
+            "block_polygon_points": [
+                [
+                    1030.0,
+                    603.0
+                ],
+                [
+                    1018.0,
+                    634.0
+                ],
+                [
+                    1018.0,
+                    664.0
+                ],
+                [
+                    1042.0,
+                    670.0
+                ],
+                [
+                    1099.0,
+                    670.0
+                ],
+                [
+                    1099.0,
+                    603.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "SBTi has validated our updated set of 2030 emissions targets and classified our scopes 1 and 2 ambition as in line with a 1.5 degrees Celsius trajectory for climate change, which is the most ambitious target companies can set for scopes 1 and 2 emissions.",
+            "block_bbox": [
+                614,
+                779,
+                1105,
+                912
+            ],
+            "block_id": 16,
+            "block_order": 14,
+            "group_id": 16,
+            "block_polygon_points": [
+                [
+                    614.0,
+                    779.0
+                ],
+                [
+                    614.0,
+                    905.0
+                ],
+                [
+                    626.0,
+                    911.0
+                ],
+                [
+                    1104.0,
+                    911.0
+                ],
+                [
+                    1104.0,
+                    798.0
+                ],
+                [
+                    1092.1944580078125,
+                    790.8900146484375
+                ],
+                [
+                    1093.0,
+                    779.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "We continue to participate in the  $ \\underline{\\text{CDP Climate Change}} $ annual disclosure reporting our scopes 1, 2 and 3 footprint. We also ask and expect our suppliers to participate in  $ \\underline{\\text{CDP Supply Chain}} $ disclosure and to report their GHG emissions, reduction targets and mitigation plans.",
+            "block_bbox": [
+                614,
+                927,
+                1135,
+                1060
+            ],
+            "block_id": 17,
+            "block_order": 15,
+            "group_id": 17,
+            "block_polygon_points": [
+                [
+                    614.0,
+                    927.0
+                ],
+                [
+                    614.0,
+                    1053.0
+                ],
+                [
+                    637.0,
+                    1059.0
+                ],
+                [
+                    1101.0,
+                    1059.0
+                ],
+                [
+                    1134.0,
+                    1053.0
+                ],
+                [
+                    1134.0,
+                    927.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                1167,
+                141,
+                1683,
+                1130
+            ],
+            "block_id": 18,
+            "block_order": null,
+            "group_id": 18,
+            "block_polygon_points": [
+                [
+                    1167.0,
+                    141.0
+                ],
+                [
+                    1167.0,
+                    1129.0
+                ],
+                [
+                    1682.0,
+                    1129.0
+                ],
+                [
+                    1682.0,
+                    141.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Public advocacy",
+            "block_bbox": [
+                1716,
+                139,
+                1983,
+                180
+            ],
+            "block_id": 19,
+            "block_order": 16,
+            "group_id": 19,
+            "block_polygon_points": [
+                [
+                    1716.0,
+                    145.0
+                ],
+                [
+                    1716.0,
+                    179.0
+                ],
+                [
+                    1982.0,
+                    179.0
+                ],
+                [
+                    1982.0,
+                    145.0
+                ],
+                [
+                    1832.0,
+                    139.0
+                ],
+                [
+                    1728.0,
+                    139.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "We continued to hold paramount our commitments to advancing sustainability in FY24, with a focus on climate action and circular economy. We realize partnerships and collaboration are key to making a sizeable impact in both areas. For instance, we joined our peers in engagements to educate key stakeholders, including policymakers, on the importance of urgent climate action.",
+            "block_bbox": [
+                1711,
+                196,
+                2236,
+                380
+            ],
+            "block_id": 20,
+            "block_order": 17,
+            "group_id": 20,
+            "block_polygon_points": [
+                [
+                    1711.0,
+                    196.0
+                ],
+                [
+                    1711.0,
+                    379.0
+                ],
+                [
+                    2224.0,
+                    379.0
+                ],
+                [
+                    2235.0,
+                    373.0
+                ],
+                [
+                    2235.0,
+                    273.0
+                ],
+                [
+                    2224.0,
+                    203.0
+                ],
+                [
+                    2212.0,
+                    196.0
+                ]
+            ]
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "In FY24, we also:",
+            "block_bbox": [
+                1715,
+                395,
+                1867,
+                421
+            ],
+            "block_id": 21,
+            "block_order": 18,
+            "group_id": 21,
+            "block_polygon_points": [
+                [
+                    1715.0,
+                    395.0
+                ],
+                [
+                    1715.0,
+                    420.0
+                ],
+                [
+                    1866.0,
+                    420.0
+                ],
+                [
+                    1866.0,
+                    395.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "• Continued partnership with like-minded multinational companies as a member of the World Economic Forum's (WEF) Alliance of CEO Climate Leaders and participation in the WEF Climate Adaptation Community. Michael Dell signed the WEF business coalition  $ \\underline{\\text{letter}} $ in support of global climate action.",
+            "block_bbox": [
+                1711,
+                439,
+                2211,
+                598
+            ],
+            "block_id": 22,
+            "block_order": 19,
+            "group_id": 22,
+            "block_polygon_points": [
+                [
+                    1711.0,
+                    439.0
+                ],
+                [
+                    1711.0,
+                    597.0
+                ],
+                [
+                    2210.0,
+                    597.0
+                ],
+                [
+                    2210.0,
+                    439.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "- Took part in CDP's 2023-2024 Science-Based Targets (SBT) Campaign. Campaign participants, which included financial institutions and other companies, were added to the CDP website and to a letter sent in October to over 2,100 CDP-targeted multinational businesses, a group that includes certain Dell suppliers, encouraging them to adopt SBTs.",
+            "block_bbox": [
+                1709,
+                613,
+                2235,
+                799
+            ],
+            "block_id": 23,
+            "block_order": 20,
+            "group_id": 23,
+            "block_polygon_points": [
+                [
+                    1709.0,
+                    613.0
+                ],
+                [
+                    1709.0,
+                    798.0
+                ],
+                [
+                    2234.0,
+                    798.0
+                ],
+                [
+                    2234.0,
+                    660.0
+                ],
+                [
+                    2223.0,
+                    613.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "• Continued our membership in the  $ \\underline{\\text{Digital Climate Alliance}} $ and the  $ \\underline{\\text{GridWise Alliance}} $.",
+            "block_bbox": [
+                1712,
+                813,
+                2174,
+                867
+            ],
+            "block_id": 24,
+            "block_order": 21,
+            "group_id": 24,
+            "block_polygon_points": [
+                [
+                    1712.0,
+                    813.0
+                ],
+                [
+                    1712.0,
+                    866.0
+                ],
+                [
+                    2173.0,
+                    866.0
+                ],
+                [
+                    2173.0,
+                    819.0
+                ],
+                [
+                    2150.0,
+                    813.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "• Supported a letter through our membership with the Responsible Business Alliance (RBA), urging the European Union's co-legislators to set a common European standard for responsible business conduct. This would pave the way for a cross-sectoral and EU-wide level playing field for sustainability due diligence: the Corporate Sustainability Due Diligence Directive (CS3D).",
+            "block_bbox": [
+                1709,
+                884,
+                2214,
+                1094
+            ],
+            "block_id": 25,
+            "block_order": 22,
+            "group_id": 25,
+            "block_polygon_points": [
+                [
+                    1709.0,
+                    891.0
+                ],
+                [
+                    1709.0,
+                    1049.0
+                ],
+                [
+                    1709.0,
+                    1087.0
+                ],
+                [
+                    1721.0,
+                    1093.0
+                ],
+                [
+                    2213.0,
+                    1093.0
+                ],
+                [
+                    2213.0,
+                    891.0
+                ],
+                [
+                    2202.0,
+                    884.0
+                ],
+                [
+                    1721.0,
+                    884.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "INTRODUCTION CLIMATE ACTION CIRCULAR ECONOMY DIGITAL INCLUSION INCLUSIVE WORKFORCE HUMAN RIGHTS TRUST BY THE NUMBERS APPENDIX",
+            "block_bbox": [
+                53,
+                1201,
+                1688,
+                1223
+            ],
+            "block_id": 26,
+            "block_order": null,
+            "group_id": 26,
+            "block_polygon_points": [
+                [
+                    65.0,
+                    1201.0
+                ],
+                [
+                    65.0,
+                    1222.0
+                ],
+                [
+                    1664.0,
+                    1222.0
+                ],
+                [
+                    1664.0,
+                    1201.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "Dell Technologies FY24 ESG Report",
+            "block_bbox": [
+                1943,
+                1201,
+                2235,
+                1223
+            ],
+            "block_id": 27,
+            "block_order": null,
+            "group_id": 27,
+            "block_polygon_points": [
+                [
+                    1943.0,
+                    1201.0
+                ],
+                [
+                    1943.0,
+                    1222.0
+                ],
+                [
+                    2199.0,
+                    1222.0
+                ],
+                [
+                    2199.0,
+                    1207.0
+                ],
+                [
+                    2188.0,
+                    1201.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "Strategy | GHG inventory | Product carbon footprint | Innovation | Supply chain environmental management",
+            "block_bbox": [
+                241,
+                1249,
+                1112,
+                1271
+            ],
+            "block_id": 28,
+            "block_order": null,
+            "group_id": 28,
+            "block_polygon_points": [
+                [
+                    241.0,
+                    1249.0
+                ],
+                [
+                    241.0,
+                    1270.0
+                ],
+                [
+                    1111.0,
+                    1270.0
+                ],
+                [
+                    1111.0,
+                    1249.0
+                ]
+            ]
+        },
+        {
+            "block_label": "number",
+            "block_content": "16",
+            "block_bbox": [
+                2212,
+                1204,
+                2237,
+                1222
+            ],
+            "block_id": 29,
+            "block_order": null,
+            "group_id": 29,
+            "block_polygon_points": [
+                [
+                    2212.0,
+                    1204.0
+                ],
+                [
+                    2212.0,
+                    1221.0
+                ],
+                [
+                    2236.0,
+                    1221.0
+                ],
+                [
+                    2236.0,
+                    1204.0
+                ]
+            ]
+        }
+    ],
+    "layout_det_res": {
+        "input_path": null,
+        "page_index": null,
+        "boxes": [
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.8711036443710327,
+                "coordinate": [
+                    69,
+                    140,
+                    295,
+                    205
+                ],
+                "order": 1,
+                "polygon_points": [
+                    [
+                        69.0,
+                        140.0
+                    ],
+                    [
+                        69.0,
+                        198.0
+                    ],
+                    [
+                        160.0,
+                        204.0
+                    ],
+                    [
+                        283.0,
+                        204.0
+                    ],
+                    [
+                        294.0,
+                        198.0
+                    ],
+                    [
+                        294.0,
+                        140.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.8973019123077393,
+                "coordinate": [
+                    67,
+                    286,
+                    522,
+                    367
+                ],
+                "order": 2,
+                "polygon_points": [
+                    [
+                        67.0,
+                        286.0
+                    ],
+                    [
+                        67.0,
+                        360.0
+                    ],
+                    [
+                        521.0,
+                        366.0
+                    ],
+                    [
+                        521.0,
+                        286.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9452793002128601,
+                "coordinate": [
+                    65,
+                    383,
+                    574,
+                    513
+                ],
+                "order": 3,
+                "polygon_points": [
+                    [
+                        65.0,
+                        383.0
+                    ],
+                    [
+                        65.0,
+                        512.0
+                    ],
+                    [
+                        573.0,
+                        512.0
+                    ],
+                    [
+                        573.0,
+                        383.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9376198053359985,
+                "coordinate": [
+                    66,
+                    530,
+                    558,
+                    661
+                ],
+                "order": 4,
+                "polygon_points": [
+                    [
+                        66.0,
+                        530.0
+                    ],
+                    [
+                        66.0,
+                        660.0
+                    ],
+                    [
+                        557.0,
+                        660.0
+                    ],
+                    [
+                        557.0,
+                        550.0
+                    ],
+                    [
+                        557.0,
+                        543.0
+                    ],
+                    [
+                        557.0,
+                        530.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9261379241943359,
+                "coordinate": [
+                    64,
+                    677,
+                    550,
+                    783
+                ],
+                "order": 5,
+                "polygon_points": [
+                    [
+                        549.0,
+                        677.0
+                    ],
+                    [
+                        469.0,
+                        677.0
+                    ],
+                    [
+                        64.0,
+                        684.0
+                    ],
+                    [
+                        64.0,
+                        782.0
+                    ],
+                    [
+                        549.0,
+                        782.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9185537695884705,
+                "coordinate": [
+                    65,
+                    799,
+                    554,
+                    880
+                ],
+                "order": 6,
+                "polygon_points": [
+                    [
+                        65.0,
+                        799.0
+                    ],
+                    [
+                        65.0,
+                        879.0
+                    ],
+                    [
+                        553.0,
+                        879.0
+                    ],
+                    [
+                        553.0,
+                        799.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.943983793258667,
+                "coordinate": [
+                    65,
+                    904,
+                    577,
+                    1141
+                ],
+                "order": 7,
+                "polygon_points": [
+                    [
+                        65.0,
+                        904.0
+                    ],
+                    [
+                        65.0,
+                        1140.0
+                    ],
+                    [
+                        576.0,
+                        1140.0
+                    ],
+                    [
+                        576.0,
+                        904.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.8630829453468323,
+                "coordinate": [
+                    653,
+                    175,
+                    998,
+                    244
+                ],
+                "order": 8,
+                "polygon_points": [
+                    [
+                        653.0,
+                        175.0
+                    ],
+                    [
+                        653.0,
+                        243.0
+                    ],
+                    [
+                        905.0,
+                        243.0
+                    ],
+                    [
+                        997.0,
+                        237.0
+                    ],
+                    [
+                        997.0,
+                        175.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.4963666796684265,
+                "coordinate": [
+                    654,
+                    270,
+                    727,
+                    290
+                ],
+                "order": 9,
+                "polygon_points": [
+                    [
+                        654.0,
+                        270.0
+                    ],
+                    [
+                        654.0,
+                        289.0
+                    ],
+                    [
+                        726.0,
+                        289.0
+                    ],
+                    [
+                        726.0,
+                        270.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.670791745185852,
+                "coordinate": [
+                    652,
+                    272,
+                    949,
+                    356
+                ],
+                "order": 10,
+                "polygon_points": [
+                    [
+                        652.0,
+                        285.0
+                    ],
+                    [
+                        652.0,
+                        355.0
+                    ],
+                    [
+                        948.0,
+                        355.0
+                    ],
+                    [
+                        948.0,
+                        272.0
+                    ],
+                    [
+                        688.0,
+                        272.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.7965570092201233,
+                "coordinate": [
+                    1041,
+                    276,
+                    1100,
+                    344
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1041.0,
+                        276.0
+                    ],
+                    [
+                        1041.0,
+                        343.0
+                    ],
+                    [
+                        1099.0,
+                        343.0
+                    ],
+                    [
+                        1099.0,
+                        276.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.6375046372413635,
+                "coordinate": [
+                    653,
+                    421,
+                    729,
+                    442
+                ],
+                "order": 11,
+                "polygon_points": [
+                    [
+                        653.0,
+                        421.0
+                    ],
+                    [
+                        653.0,
+                        441.0
+                    ],
+                    [
+                        728.0,
+                        441.0
+                    ],
+                    [
+                        728.0,
+                        421.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.767941415309906,
+                "coordinate": [
+                    652,
+                    443,
+                    957,
+                    512
+                ],
+                "order": 12,
+                "polygon_points": [
+                    [
+                        652.0,
+                        450.0
+                    ],
+                    [
+                        652.0,
+                        511.0
+                    ],
+                    [
+                        956.0,
+                        511.0
+                    ],
+                    [
+                        956.0,
+                        450.0
+                    ],
+                    [
+                        945.0,
+                        443.0
+                    ],
+                    [
+                        699.0,
+                        443.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.8000873923301697,
+                "coordinate": [
+                    1050,
+                    427,
+                    1099,
+                    498
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1050.0,
+                        427.0
+                    ],
+                    [
+                        1050.0,
+                        497.0
+                    ],
+                    [
+                        1098.0,
+                        497.0
+                    ],
+                    [
+                        1098.0,
+                        427.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.6832339763641357,
+                "coordinate": [
+                    653,
+                    574,
+                    729,
+                    595
+                ],
+                "order": 13,
+                "polygon_points": [
+                    [
+                        653.0,
+                        574.0
+                    ],
+                    [
+                        653.0,
+                        594.0
+                    ],
+                    [
+                        728.0,
+                        594.0
+                    ],
+                    [
+                        728.0,
+                        574.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8613268136978149,
+                "coordinate": [
+                    652,
+                    596,
+                    963,
+                    707
+                ],
+                "order": 14,
+                "polygon_points": [
+                    [
+                        652.0,
+                        596.0
+                    ],
+                    [
+                        652.0,
+                        706.0
+                    ],
+                    [
+                        951.0,
+                        706.0
+                    ],
+                    [
+                        962.0,
+                        667.0
+                    ],
+                    [
+                        962.0,
+                        662.0
+                    ],
+                    [
+                        962.0,
+                        628.0
+                    ],
+                    [
+                        962.0,
+                        596.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.8552207350730896,
+                "coordinate": [
+                    1018,
+                    603,
+                    1100,
+                    671
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1030.0,
+                        603.0
+                    ],
+                    [
+                        1018.0,
+                        634.0
+                    ],
+                    [
+                        1018.0,
+                        664.0
+                    ],
+                    [
+                        1042.0,
+                        670.0
+                    ],
+                    [
+                        1099.0,
+                        670.0
+                    ],
+                    [
+                        1099.0,
+                        603.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9351842403411865,
+                "coordinate": [
+                    614,
+                    779,
+                    1105,
+                    912
+                ],
+                "order": 15,
+                "polygon_points": [
+                    [
+                        614.0,
+                        779.0
+                    ],
+                    [
+                        614.0,
+                        905.0
+                    ],
+                    [
+                        626.0,
+                        911.0
+                    ],
+                    [
+                        1104.0,
+                        911.0
+                    ],
+                    [
+                        1104.0,
+                        798.0
+                    ],
+                    [
+                        1092.1944580078125,
+                        790.8900146484375
+                    ],
+                    [
+                        1093.0,
+                        779.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9262791275978088,
+                "coordinate": [
+                    614,
+                    927,
+                    1135,
+                    1060
+                ],
+                "order": 16,
+                "polygon_points": [
+                    [
+                        614.0,
+                        927.0
+                    ],
+                    [
+                        614.0,
+                        1053.0
+                    ],
+                    [
+                        637.0,
+                        1059.0
+                    ],
+                    [
+                        1101.0,
+                        1059.0
+                    ],
+                    [
+                        1134.0,
+                        1053.0
+                    ],
+                    [
+                        1134.0,
+                        927.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.9680869579315186,
+                "coordinate": [
+                    1167,
+                    141,
+                    1683,
+                    1130
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1167.0,
+                        141.0
+                    ],
+                    [
+                        1167.0,
+                        1129.0
+                    ],
+                    [
+                        1682.0,
+                        1129.0
+                    ],
+                    [
+                        1682.0,
+                        141.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.8392801284790039,
+                "coordinate": [
+                    1716,
+                    139,
+                    1983,
+                    180
+                ],
+                "order": 17,
+                "polygon_points": [
+                    [
+                        1716.0,
+                        145.0
+                    ],
+                    [
+                        1716.0,
+                        179.0
+                    ],
+                    [
+                        1982.0,
+                        179.0
+                    ],
+                    [
+                        1982.0,
+                        145.0
+                    ],
+                    [
+                        1832.0,
+                        139.0
+                    ],
+                    [
+                        1728.0,
+                        139.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.941399335861206,
+                "coordinate": [
+                    1711,
+                    196,
+                    2236,
+                    380
+                ],
+                "order": 18,
+                "polygon_points": [
+                    [
+                        1711.0,
+                        196.0
+                    ],
+                    [
+                        1711.0,
+                        379.0
+                    ],
+                    [
+                        2224.0,
+                        379.0
+                    ],
+                    [
+                        2235.0,
+                        373.0
+                    ],
+                    [
+                        2235.0,
+                        273.0
+                    ],
+                    [
+                        2224.0,
+                        203.0
+                    ],
+                    [
+                        2212.0,
+                        196.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.6098188161849976,
+                "coordinate": [
+                    1715,
+                    395,
+                    1867,
+                    421
+                ],
+                "order": 19,
+                "polygon_points": [
+                    [
+                        1715.0,
+                        395.0
+                    ],
+                    [
+                        1715.0,
+                        420.0
+                    ],
+                    [
+                        1866.0,
+                        420.0
+                    ],
+                    [
+                        1866.0,
+                        395.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9369804859161377,
+                "coordinate": [
+                    1711,
+                    439,
+                    2211,
+                    598
+                ],
+                "order": 20,
+                "polygon_points": [
+                    [
+                        1711.0,
+                        439.0
+                    ],
+                    [
+                        1711.0,
+                        597.0
+                    ],
+                    [
+                        2210.0,
+                        597.0
+                    ],
+                    [
+                        2210.0,
+                        439.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9400023221969604,
+                "coordinate": [
+                    1709,
+                    613,
+                    2235,
+                    799
+                ],
+                "order": 21,
+                "polygon_points": [
+                    [
+                        1709.0,
+                        613.0
+                    ],
+                    [
+                        1709.0,
+                        798.0
+                    ],
+                    [
+                        2234.0,
+                        798.0
+                    ],
+                    [
+                        2234.0,
+                        660.0
+                    ],
+                    [
+                        2223.0,
+                        613.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.8862782716751099,
+                "coordinate": [
+                    1712,
+                    813,
+                    2174,
+                    867
+                ],
+                "order": 22,
+                "polygon_points": [
+                    [
+                        1712.0,
+                        813.0
+                    ],
+                    [
+                        1712.0,
+                        866.0
+                    ],
+                    [
+                        2173.0,
+                        866.0
+                    ],
+                    [
+                        2173.0,
+                        819.0
+                    ],
+                    [
+                        2150.0,
+                        813.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9344998598098755,
+                "coordinate": [
+                    1709,
+                    884,
+                    2214,
+                    1094
+                ],
+                "order": 23,
+                "polygon_points": [
+                    [
+                        1709.0,
+                        891.0
+                    ],
+                    [
+                        1709.0,
+                        1049.0
+                    ],
+                    [
+                        1709.0,
+                        1087.0
+                    ],
+                    [
+                        1721.0,
+                        1093.0
+                    ],
+                    [
+                        2213.0,
+                        1093.0
+                    ],
+                    [
+                        2213.0,
+                        891.0
+                    ],
+                    [
+                        2202.0,
+                        884.0
+                    ],
+                    [
+                        1721.0,
+                        884.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.4697742164134979,
+                "coordinate": [
+                    68,
+                    1202,
+                    199,
+                    1222
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        68.0,
+                        1202.0
+                    ],
+                    [
+                        68.0,
+                        1221.0
+                    ],
+                    [
+                        198.0,
+                        1221.0
+                    ],
+                    [
+                        198.0,
+                        1202.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.37122777104377747,
+                "coordinate": [
+                    245,
+                    1201,
+                    386,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        245.0,
+                        1201.0
+                    ],
+                    [
+                        245.0,
+                        1222.0
+                    ],
+                    [
+                        385.0,
+                        1222.0
+                    ],
+                    [
+                        385.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.3659873902797699,
+                "coordinate": [
+                    434,
+                    1201,
+                    604,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        434.0,
+                        1201.0
+                    ],
+                    [
+                        434.0,
+                        1222.0
+                    ],
+                    [
+                        603.0,
+                        1222.0
+                    ],
+                    [
+                        603.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.3725038468837738,
+                "coordinate": [
+                    650,
+                    1201,
+                    814,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        650.0,
+                        1201.0
+                    ],
+                    [
+                        650.0,
+                        1222.0
+                    ],
+                    [
+                        813.0,
+                        1222.0
+                    ],
+                    [
+                        813.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.46546217799186707,
+                "coordinate": [
+                    53,
+                    1201,
+                    1688,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        65.0,
+                        1201.0
+                    ],
+                    [
+                        65.0,
+                        1222.0
+                    ],
+                    [
+                        1664.0,
+                        1222.0
+                    ],
+                    [
+                        1664.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.35562747716903687,
+                "coordinate": [
+                    859,
+                    1201,
+                    1055,
+                    1222
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        859.0,
+                        1201.0
+                    ],
+                    [
+                        859.0,
+                        1221.0
+                    ],
+                    [
+                        1054.0,
+                        1221.0
+                    ],
+                    [
+                        1054.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.316976934671402,
+                "coordinate": [
+                    1102,
+                    1202,
+                    1234,
+                    1222
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1102.0,
+                        1202.0
+                    ],
+                    [
+                        1102.0,
+                        1221.0
+                    ],
+                    [
+                        1233.0,
+                        1221.0
+                    ],
+                    [
+                        1233.0,
+                        1202.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.33963510394096375,
+                "coordinate": [
+                    243,
+                    1249,
+                    313,
+                    1270
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        243.0,
+                        1249.0
+                    ],
+                    [
+                        243.0,
+                        1269.0
+                    ],
+                    [
+                        312.0,
+                        1269.0
+                    ],
+                    [
+                        312.0,
+                        1249.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.32801371812820435,
+                "coordinate": [
+                    339,
+                    1249,
+                    452,
+                    1270
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        351.0,
+                        1249.0
+                    ],
+                    [
+                        351.0,
+                        1269.0
+                    ],
+                    [
+                        451.0,
+                        1269.0
+                    ],
+                    [
+                        451.0,
+                        1249.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.7076078653335571,
+                "coordinate": [
+                    1943,
+                    1201,
+                    2235,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1943.0,
+                        1201.0
+                    ],
+                    [
+                        1943.0,
+                        1222.0
+                    ],
+                    [
+                        2199.0,
+                        1222.0
+                    ],
+                    [
+                        2199.0,
+                        1207.0
+                    ],
+                    [
+                        2188.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.7216147780418396,
+                "coordinate": [
+                    241,
+                    1249,
+                    1112,
+                    1271
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        241.0,
+                        1249.0
+                    ],
+                    [
+                        241.0,
+                        1270.0
+                    ],
+                    [
+                        1111.0,
+                        1270.0
+                    ],
+                    [
+                        1111.0,
+                        1249.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 16,
+                "label": "number",
+                "score": 0.37698647379875183,
+                "coordinate": [
+                    2212,
+                    1204,
+                    2237,
+                    1222
+                ],
+                "order": 24,
+                "polygon_points": [
+                    [
+                        2212.0,
+                        1204.0
+                    ],
+                    [
+                        2212.0,
+                        1221.0
+                    ],
+                    [
+                        2236.0,
+                        1221.0
+                    ],
+                    [
+                        2236.0,
+                        1204.0
+                    ]
+                ]
+            }
+        ]
+    }
+}

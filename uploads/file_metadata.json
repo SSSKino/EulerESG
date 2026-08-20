@@ -213,31 +213,31 @@
       "user_id": 526078,
       "processing_job_id": "report_269d640f2f904ea2a9d6c33e8550565d",
       "processing_stage": "ocr_batch_processing",
-      "processing_progress": 14.75,
+      "processing_progress": 15.4375,
       "processing_error": null,
       "processing_total_pages": 116,
-      "processing_pages_done": 25,
-      "processing_pages_success": 25,
+      "processing_pages_done": 28,
+      "processing_pages_success": 28,
       "processing_pages_failed": 0,
       "processing_total_units": 48,
-      "processing_units_done": 4,
-      "processing_units_success": 4,
+      "processing_units_done": 5,
+      "processing_units_success": 5,
       "processing_units_failed": 0,
       "processing_units_running": 2,
-      "processing_units_queued": 42,
+      "processing_units_queued": 41,
       "processing_page_batch_size": 7,
       "processing_running_batches": [
-        {
-          "unit_index": 5,
-          "start_page": 8,
-          "end_page": 10,
-          "worker_id": "paddleocr-worker-1"
-        },
         {
           "unit_index": 6,
           "start_page": 15,
           "end_page": 19,
           "worker_id": "paddleocr-worker-2"
+        },
+        {
+          "unit_index": 7,
+          "start_page": 20,
+          "end_page": 20,
+          "worker_id": "paddleocr-worker-1"
         }
       ]
     }

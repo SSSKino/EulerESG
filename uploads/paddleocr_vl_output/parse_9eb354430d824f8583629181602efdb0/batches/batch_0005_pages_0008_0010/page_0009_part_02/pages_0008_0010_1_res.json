@@ -1,0 +1,706 @@
+{
+    "input_path": "/workspace/uploads/paddleocr_vl_jobs/parse_9eb354430d824f8583629181602efdb0/batches/pages_0008_0010.pdf",
+    "page_index": 1,
+    "page_count": 3,
+    "width": 2304,
+    "height": 1296,
+    "model_settings": {
+        "use_doc_preprocessor": false,
+        "use_layout_detection": true,
+        "use_chart_recognition": true,
+        "use_seal_recognition": false,
+        "use_ocr_for_image_block": true,
+        "format_block_content": false,
+        "merge_layout_blocks": true,
+        "markdown_ignore_labels": [
+            "number",
+            "footnote",
+            "header",
+            "header_image",
+            "footer",
+            "footer_image",
+            "aside_text"
+        ],
+        "return_layout_polygon_points": true
+    },
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "Goals dashboard",
+            "block_bbox": [
+                69,
+                139,
+                520,
+                197
+            ],
+            "block_id": 0,
+            "block_order": 1,
+            "group_id": 0,
+            "block_polygon_points": [
+                [
+                    69.0,
+                    139.0
+                ],
+                [
+                    69.0,
+                    196.0
+                ],
+                [
+                    519.0,
+                    196.0
+                ],
+                [
+                    519.0,
+                    139.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Our ESG plan lays out ambitious goals for the decade $ ^{*} $ and beyond. We believe how we track our progress is critical. We organize our goals across four pillars: Advancing Sustainability, Cultivating Inclusion, Transforming Lives and Upholding Trust. Our pillars help us organize our ESG work and track progress against our goals.",
+            "block_bbox": [
+                64,
+                284,
+                584,
+                444
+            ],
+            "block_id": 1,
+            "block_order": 2,
+            "group_id": 1,
+            "block_polygon_points": [
+                [
+                    64.0,
+                    284.0
+                ],
+                [
+                    64.0,
+                    443.0
+                ],
+                [
+                    572.0,
+                    443.0
+                ],
+                [
+                    583.0,
+                    437.0
+                ],
+                [
+                    583.0,
+                    284.0
+                ]
+            ]
+        },
+        {
+            "block_label": "text",
+            "block_content": "Read about our progress in  $ \\underline{\\text{By the Numbers}} $. Learn more about the methodologies that we use to calculate progress toward each of our goals and key drivers in the  $ \\underline{\\text{Appendix}} $.",
+            "block_bbox": [
+                64,
+                460,
+                589,
+                540
+            ],
+            "block_id": 2,
+            "block_order": 3,
+            "group_id": 2,
+            "block_polygon_points": [
+                [
+                    64.0,
+                    460.0
+                ],
+                [
+                    64.0,
+                    539.0
+                ],
+                [
+                    588.0,
+                    539.0
+                ],
+                [
+                    588.0,
+                    460.0
+                ]
+            ]
+        },
+        {
+            "block_label": "vision_footnote",
+            "block_content": "*The year presented within each goal statement refers to the calendar year that coincides with the majority of Dell's fiscal year. Our fiscal year is the 52- or 53-week period ending on the Friday nearest January 31. Our ESG activities, including goal progress, are primarily collected and reported by fiscal year, unless otherwise noted. The expected end date of each goal is the end of the associated fiscal year (e.g., \"By 2030\" refers to the end of Dell's Fiscal Year 2031).",
+            "block_bbox": [
+                64,
+                1057,
+                582,
+                1140
+            ],
+            "block_id": 3,
+            "block_order": null,
+            "group_id": 3,
+            "block_polygon_points": [
+                [
+                    64.0,
+                    1057.0
+                ],
+                [
+                    64.0,
+                    1139.0
+                ],
+                [
+                    581.0,
+                    1139.0
+                ],
+                [
+                    581.0,
+                    1115.0
+                ],
+                [
+                    581.0,
+                    1108.0
+                ],
+                [
+                    581.0,
+                    1102.0
+                ],
+                [
+                    570.0,
+                    1057.0
+                ]
+            ]
+        },
+        {
+            "block_label": "image",
+            "block_content": "4 QUALITY EDUCATION 5 GENDER EQUALITY 8 DECENT WORK AND ECONOMIC GROWTH 9 INDUSTRY INNOVATION AND INFRASTRUCTURE 10 REDUCED INEQUALITIES 17 PARTNERSHIP FOR THE GOALS",
+            "block_bbox": [
+                1602,
+                69,
+                2229,
+                164
+            ],
+            "block_id": 4,
+            "block_order": null,
+            "group_id": 4,
+            "block_polygon_points": [
+                [
+                    1602.0,
+                    69.0
+                ],
+                [
+                    1602.0,
+                    163.0
+                ],
+                [
+                    2228.0,
+                    163.0
+                ],
+                [
+                    2228.0,
+                    69.0
+                ]
+            ]
+        },
+        {
+            "block_label": "table",
+            "block_content": "<table><tr><td>Material topic</td><td>Social Goal</td><td>Our status</td><td>SDGs</td></tr><tr><td colspan=\"4\">Transforming lives</td></tr><tr><td rowspan=\"5\">Digital inclusion</td><td>By 2030, we will improve 1 billion lives through digital inclusion</td><td>FY24 396M 1B\\nTotal number of people reached (cumulative, FY20 to current reporting year)</td><td>4,9</td></tr><tr><td>Key Driver: Each year through 2030, 50% of the total people directly reached will be those who identify as girls and women, or underrepresented groups</td><td>FY24 50%\\n51.5%</td><td>5,10</td></tr><tr><td>Key Driver: Each year through 2030, we will deliver future-ready skills development for workers in our supply chain</td><td>FY24: Dell recorded 131,478 hours of future ready skills training at supplier sites and in-house manufacturing locations.</td><td>8</td></tr><tr><td>By 2030, 75% of our team members will participate in giving or volunteerism in their communities</td><td>FY24 48% 75%\\nPercentage of team members participating in giving or volunteering</td><td>17</td></tr><tr><td>Key Driver: By 2030, we will use our expertise and technology to support the digital transformation of 1,000 nonprofit partners</td><td>FY24 535 1,000\\nTotal number of nonprofit partners supported in their digital transformation journey</td><td>9,17</td></tr><tr><td colspan=\"4\">Cultivating inclusion</td></tr><tr><td rowspan=\"4\">Inclusive workforce</td><td rowspan=\"2\">By 2030, 50% of our global workforce and 40% of our global people leaders will be those who identify as women</td><td>FY24 35.0% 50%\\nPercentage of our global workforce who identify as women</td><td rowspan=\"2\">5</td></tr><tr><td>FY24 29.1% 40%\\nPercentage of our global people leaders who identify as women</td></tr><tr><td rowspan=\"2\">By 2030, 25% of our U.S. workforce and 15% of our U.S. people leaders will be those who identify as Black/African American or Hispanic/Latino</td><td>FY24 16.1% 25%\\nPercentage of U.S. workforce who identify as Black/African American or Hispanic/Latino</td><td rowspan=\"2\">10</td></tr><tr><td>FY24 12.6% 15%\\nPercentage of people leaders in the U.S. workforce who identify as Black/African American or Hispanic/Latino</td></tr></table>",
+            "block_bbox": [
+                618,
+                197,
+                2232,
+                1128
+            ],
+            "block_id": 5,
+            "block_order": null,
+            "group_id": 5,
+            "block_polygon_points": [
+                [
+                    618.0,
+                    197.0
+                ],
+                [
+                    618.0,
+                    1127.0
+                ],
+                [
+                    2231.0,
+                    1127.0
+                ],
+                [
+                    2231.0,
+                    197.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "INTRODUCTION CLIMATE ACTION CIRCULAR ECONOMY DIGITAL INCLUSION INCLUSIVE WORKFORCE HUMAN RIGHTS TRUST BY THE NUMBERS APPENDIX",
+            "block_bbox": [
+                68,
+                1200,
+                1671,
+                1223
+            ],
+            "block_id": 6,
+            "block_order": null,
+            "group_id": 6,
+            "block_polygon_points": [
+                [
+                    68.0,
+                    1200.0
+                ],
+                [
+                    68.0,
+                    1222.0
+                ],
+                [
+                    1670.0,
+                    1222.0
+                ],
+                [
+                    1670.0,
+                    1200.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "Dell Technologies FY24 ESG Report",
+            "block_bbox": [
+                1943,
+                1201,
+                2199,
+                1223
+            ],
+            "block_id": 7,
+            "block_order": null,
+            "group_id": 7,
+            "block_polygon_points": [
+                [
+                    1943.0,
+                    1201.0
+                ],
+                [
+                    1943.0,
+                    1222.0
+                ],
+                [
+                    2198.0,
+                    1222.0
+                ],
+                [
+                    2198.0,
+                    1201.0
+                ]
+            ]
+        },
+        {
+            "block_label": "footer",
+            "block_content": "Messages from our leadership | Our business | Awards | Goals dashboard | ESG materiality | Stakeholder engagement | Reporting frameworks",
+            "block_bbox": [
+                68,
+                1248,
+                1235,
+                1271
+            ],
+            "block_id": 8,
+            "block_order": null,
+            "group_id": 8,
+            "block_polygon_points": [
+                [
+                    68.0,
+                    1248.0
+                ],
+                [
+                    68.0,
+                    1270.0
+                ],
+                [
+                    1234.0,
+                    1270.0
+                ],
+                [
+                    1234.0,
+                    1248.0
+                ]
+            ]
+        },
+        {
+            "block_label": "number",
+            "block_content": "9",
+            "block_bbox": [
+                2219,
+                1204,
+                2237,
+                1221
+            ],
+            "block_id": 9,
+            "block_order": null,
+            "group_id": 9,
+            "block_polygon_points": [
+                [
+                    2219.0,
+                    1204.0
+                ],
+                [
+                    2219.0,
+                    1220.0
+                ],
+                [
+                    2236.0,
+                    1220.0
+                ],
+                [
+                    2236.0,
+                    1204.0
+                ]
+            ]
+        }
+    ],
+    "layout_det_res": {
+        "input_path": null,
+        "page_index": null,
+        "boxes": [
+            {
+                "cls_id": 17,
+                "label": "paragraph_title",
+                "score": 0.8717237114906311,
+                "coordinate": [
+                    69,
+                    139,
+                    520,
+                    197
+                ],
+                "order": 1,
+                "polygon_points": [
+                    [
+                        69.0,
+                        139.0
+                    ],
+                    [
+                        69.0,
+                        196.0
+                    ],
+                    [
+                        519.0,
+                        196.0
+                    ],
+                    [
+                        519.0,
+                        139.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9465346932411194,
+                "coordinate": [
+                    64,
+                    284,
+                    584,
+                    444
+                ],
+                "order": 2,
+                "polygon_points": [
+                    [
+                        64.0,
+                        284.0
+                    ],
+                    [
+                        64.0,
+                        443.0
+                    ],
+                    [
+                        572.0,
+                        443.0
+                    ],
+                    [
+                        583.0,
+                        437.0
+                    ],
+                    [
+                        583.0,
+                        284.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 22,
+                "label": "text",
+                "score": 0.9255436062812805,
+                "coordinate": [
+                    64,
+                    460,
+                    589,
+                    540
+                ],
+                "order": 3,
+                "polygon_points": [
+                    [
+                        64.0,
+                        460.0
+                    ],
+                    [
+                        64.0,
+                        539.0
+                    ],
+                    [
+                        588.0,
+                        539.0
+                    ],
+                    [
+                        588.0,
+                        460.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 24,
+                "label": "vision_footnote",
+                "score": 0.5680738687515259,
+                "coordinate": [
+                    64,
+                    1057,
+                    582,
+                    1140
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        64.0,
+                        1057.0
+                    ],
+                    [
+                        64.0,
+                        1139.0
+                    ],
+                    [
+                        581.0,
+                        1139.0
+                    ],
+                    [
+                        581.0,
+                        1115.0
+                    ],
+                    [
+                        581.0,
+                        1108.0
+                    ],
+                    [
+                        581.0,
+                        1102.0
+                    ],
+                    [
+                        570.0,
+                        1057.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 14,
+                "label": "image",
+                "score": 0.5278244614601135,
+                "coordinate": [
+                    1602,
+                    69,
+                    2229,
+                    164
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1602.0,
+                        69.0
+                    ],
+                    [
+                        1602.0,
+                        163.0
+                    ],
+                    [
+                        2228.0,
+                        163.0
+                    ],
+                    [
+                        2228.0,
+                        69.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 21,
+                "label": "table",
+                "score": 0.7839372158050537,
+                "coordinate": [
+                    618,
+                    197,
+                    2232,
+                    1128
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        618.0,
+                        197.0
+                    ],
+                    [
+                        618.0,
+                        1127.0
+                    ],
+                    [
+                        2231.0,
+                        1127.0
+                    ],
+                    [
+                        2231.0,
+                        197.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.3499365746974945,
+                "coordinate": [
+                    68,
+                    1202,
+                    197,
+                    1222
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        68.0,
+                        1202.0
+                    ],
+                    [
+                        68.0,
+                        1221.0
+                    ],
+                    [
+                        196.0,
+                        1221.0
+                    ],
+                    [
+                        196.0,
+                        1202.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.5697295665740967,
+                "coordinate": [
+                    68,
+                    1200,
+                    1671,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        68.0,
+                        1200.0
+                    ],
+                    [
+                        68.0,
+                        1222.0
+                    ],
+                    [
+                        1670.0,
+                        1222.0
+                    ],
+                    [
+                        1670.0,
+                        1200.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.7213438153266907,
+                "coordinate": [
+                    1943,
+                    1201,
+                    2199,
+                    1223
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        1943.0,
+                        1201.0
+                    ],
+                    [
+                        1943.0,
+                        1222.0
+                    ],
+                    [
+                        2198.0,
+                        1222.0
+                    ],
+                    [
+                        2198.0,
+                        1201.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 8,
+                "label": "footer",
+                "score": 0.7403847575187683,
+                "coordinate": [
+                    68,
+                    1248,
+                    1235,
+                    1271
+                ],
+                "order": null,
+                "polygon_points": [
+                    [
+                        68.0,
+                        1248.0
+                    ],
+                    [
+                        68.0,
+                        1270.0
+                    ],
+                    [
+                        1234.0,
+                        1270.0
+                    ],
+                    [
+                        1234.0,
+                        1248.0
+                    ]
+                ]
+            },
+            {
+                "cls_id": 16,
+                "label": "number",
+                "score": 0.44394081830978394,
+                "coordinate": [
+                    2219,
+                    1204,
+                    2237,
+                    1221
+                ],
+                "order": 4,
+                "polygon_points": [
+                    [
+                        2219.0,
+                        1204.0
+                    ],
+                    [
+                        2219.0,
+                        1220.0
+                    ],
+                    [
+                        2236.0,
+                        1220.0
+                    ],
+                    [
+                        2236.0,
+                        1204.0
+                    ]
+                ]
+            }
+        ]
+    }
+}
