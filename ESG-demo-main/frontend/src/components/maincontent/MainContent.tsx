@@ -8,8 +8,8 @@ import type { ReportCatalogMode } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
 import UploadArea from "./UploadArea";
 import UploadOptionsModal from "./UploadOptionsModal";
-import FrameworkReferencePanel from "./FrameworkReferencePanel";
 import type { FileInfoFormValues } from "./FileInfoForm";
+import { isActiveFramework } from "@/data/frameworkOptions";
 import { useT } from "@/i18n/useT";
 
 type ActiveReportJob = {
@@ -101,6 +101,9 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
       await form.validateFields();
       const queuedFiles = [...selectedUploadFiles];
       const values = form.getFieldsValue();
+      if (!isActiveFramework(values.framework)) {
+        throw new Error(t("upload.pleaseSelectFramework"));
+      }
 
       if (!queuedFiles.length) {
         setIsModalOpen(false);
@@ -116,7 +119,6 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
 
       const isGRI = values.framework === "GRI";
       const isCDP = values.framework === "CDP";
-      const isTCFD = values.framework === "TCFD";
       const griTopics = normStrList(values.griTopics);
       const semiVals = normStrList(values.semiIndustry);
       const scopeSlugs =
@@ -149,7 +151,7 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
         ? await apiService.uploadReport(
             nativeFiles[0],
             values.framework,
-            isCDP ? "CDP" : isTCFD ? "TCFD" : values.industry,
+            isCDP ? "CDP" : values.industry,
             isGRI ? "" : semiVals[0] ?? "",
             values.griSector,
             griTopics[0] ?? "",
@@ -161,7 +163,7 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
             companyName: companyId ? undefined : values.companyName,
             reportYears: values.reportYears,
             framework: values.framework,
-            industry: isCDP ? "CDP" : isTCFD ? "TCFD" : values.industry,
+            industry: isCDP ? "CDP" : values.industry,
             semiIndustry: isGRI ? "" : semiVals[0] ?? "",
             griSector: values.griSector,
             griTopic: griTopics[0] ?? "",
@@ -292,16 +294,15 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
       )}
       <div className="pt-3 sm:pt-4">
         <div
-          className="grid grid-cols-1 items-stretch overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] lg:grid-cols-[minmax(0,1.7fr)_minmax(292px,0.8fr)]"
+          className="grid grid-cols-1 items-stretch overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
           data-testid="upload-framework-layout"
         >
-          <section className="flex h-full min-w-0 p-4 sm:p-5" data-testid="upload-dropzone-region">
+          <section className="flex h-full min-w-0 px-2 py-4 sm:px-3 sm:py-5" data-testid="upload-dropzone-region">
             <UploadArea
               onBeforeUpload={handleBeforeUpload}
               uploadMode={uploadMode}
             />
           </section>
-          <FrameworkReferencePanel />
         </div>
       </div>
       <UploadOptionsModal

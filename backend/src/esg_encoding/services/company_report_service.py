@@ -495,6 +495,8 @@ async def upload_report_batch(
         raise HTTPException(status_code=422, detail=f"{mode} mode requires {expected}")
     if any(not str(file.filename or "").lower().endswith(".pdf") for file in files):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
+    if str(framework or "").strip().upper() == "TCFD":
+        raise HTTPException(status_code=422, detail="TCFD is no longer available for new uploads")
 
     try:
         scopes = _build_scopes(

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { RefCallback } from "react";
-import { BarChart3, Check, HelpCircle, House, Languages, ListChecks, LogOut, PanelLeftClose, PanelLeftOpen, Repeat2, Settings, ShieldCheck, Star } from "lucide-react";
+import { BarChart3, Check, HelpCircle, House, Languages, LibraryBig, ListChecks, LogOut, PanelLeftClose, PanelLeftOpen, Repeat2, Settings, ShieldCheck, Star } from "lucide-react";
 import { message, Modal, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import EulerLogo from "@/assets/Euler-Img.svg";
@@ -109,6 +109,7 @@ export default function DashboardSidebar({
   useEffect(() => {
     router.prefetch("/dashboard/chat");
     router.prefetch("/dashboard/favourite");
+    router.prefetch("/dashboard/standards-library");
     router.prefetch("/cross-analysis");
   }, [router]);
 
@@ -199,6 +200,7 @@ export default function DashboardSidebar({
     isCrossAnalysisRoute && (searchParams.get("view") || "").trim().toLowerCase() === "disclosure";
   const isCrossAnalysis = isCrossAnalysisRoute && !isDisclosureCompleteness;
   const isFavourite = pathname.startsWith("/dashboard/favourite");
+  const isStandardsLibrary = pathname.startsWith("/dashboard/standards-library");
   const navigationClass = (active: boolean) =>
     `flex h-10 w-full shrink-0 items-center rounded-xl transition-colors ${
       active
@@ -260,7 +262,7 @@ export default function DashboardSidebar({
         )}
       </div>
 
-      <nav className={`flex min-h-0 flex-1 flex-col gap-1 ${collapsed ? "px-2 pt-1" : "px-2.5 pt-1"}`}>
+      <nav className={`flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain ${collapsed ? "px-2 pt-1" : "px-2.5 pt-1"}`}>
         <button
           type="button"
           onClick={() => router.push("/dashboard")}
@@ -293,7 +295,7 @@ export default function DashboardSidebar({
           role="group"
           aria-label="Cross Analysis"
           data-testid="cross-analysis-subnavigation"
-          className={`flex min-h-0 flex-col ${isCrossAnalysis && !collapsed ? "flex-1" : ""}`}
+          className="flex min-h-0 flex-col"
         >
           <button
             type="button"
@@ -323,7 +325,7 @@ export default function DashboardSidebar({
               ref={crossAnalysisNavigationSlotRef}
               data-testid="cross-analysis-navigation-slot"
               hidden={collapsed}
-              className="min-h-0 flex-1 overflow-y-auto"
+              className="min-h-0 max-h-[min(320px,36vh)] overflow-y-auto overscroll-contain"
             />
           ) : null}
         </div>
@@ -336,6 +338,16 @@ export default function DashboardSidebar({
         >
           <Star className={`h-[18px] w-[18px] shrink-0 ${isFavourite ? "text-[#2274BC]" : ""}`} />
           {!collapsed && <span className="truncate text-sm">Favourite</span>}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push("/dashboard/standards-library")}
+          className={navigationClass(isStandardsLibrary)}
+          title={collapsed ? "Standards Library" : undefined}
+          aria-current={isStandardsLibrary ? "page" : undefined}
+        >
+          <LibraryBig className={`h-[18px] w-[18px] shrink-0 ${isStandardsLibrary ? "text-[#2274BC]" : ""}`} />
+          {!collapsed && <span className="truncate text-sm">Standards Library</span>}
         </button>
       </nav>
 

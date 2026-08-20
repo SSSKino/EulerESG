@@ -323,6 +323,66 @@ describe("DashboardSidebar favourites navigation", () => {
   });
 });
 
+describe("DashboardSidebar Standards Library", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.pathname = "/dashboard";
+    mocks.search = "";
+    window.localStorage.clear();
+  });
+
+  it("places a single Standards Library navigation button directly after Favourite", () => {
+    render(<DashboardSidebar />);
+
+    const favourite = screen.getByRole("button", { name: "Favourite" });
+    const library = screen.getByRole("button", { name: "Standards Library" });
+
+    expect(favourite.nextElementSibling).toBe(library);
+    expect(library).toBeVisible();
+    expect(screen.queryByRole("heading", { name: "Standards Library" })).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
+
+    fireEvent.click(library);
+    expect(mocks.push).toHaveBeenCalledTimes(1);
+    expect(mocks.push).toHaveBeenCalledWith("/dashboard/standards-library");
+  });
+
+  it("marks Standards Library as current only on its dedicated route", () => {
+    mocks.pathname = "/dashboard/standards-library";
+
+    render(<DashboardSidebar />);
+
+    const library = screen.getByRole("button", { name: "Standards Library" });
+    expect(library).toHaveAttribute("aria-current", "page");
+    expect(library).toHaveClass("bg-[#ececec]");
+    expect(screen.getByRole("button", { name: "Homepage" })).not.toHaveAttribute(
+      "aria-current",
+    );
+    expect(screen.getByRole("button", { name: "Favourite" })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+
+  it("keeps the Standards Library navigation operable when collapsed", async () => {
+    render(<DashboardSidebar />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Collapse sidebar" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
+    });
+
+    const library = screen.getByRole("button", { name: "Standards Library" });
+    expect(library).toBeVisible();
+    expect(library).toHaveAttribute("title", "Standards Library");
+    library.focus();
+    expect(library).toHaveFocus();
+
+    fireEvent.click(library);
+    expect(mocks.push).toHaveBeenCalledWith("/dashboard/standards-library");
+  });
+});
+
 describe("DashboardSidebar cross-analysis navigation directory", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -342,11 +402,16 @@ describe("DashboardSidebar cross-analysis navigation directory", () => {
     const navigationSlot = within(subnavigation).getByTestId(
       "cross-analysis-navigation-slot",
     );
+    const favourite = screen.getByRole("button", { name: "Favourite" });
 
     expect(crossAnalysis).toHaveClass("bg-[#ececec]");
     expect(crossAnalysis).toHaveAttribute("aria-current", "page");
     expect(crossAnalysis.nextElementSibling).toBe(subnavigation);
     expect(navigationSlot).toBeVisible();
+    expect(subnavigation).not.toHaveClass("flex-1");
+    expect(navigationSlot).not.toHaveClass("flex-1");
+    expect(navigationSlot).toHaveClass("max-h-[min(320px,36vh)]", "overflow-y-auto");
+    expect(subnavigation.nextElementSibling).toBe(favourite);
     expect(subnavigation).toContainElement(disclosure);
     expect(subnavigation).toContainElement(navigationSlot);
     expect(

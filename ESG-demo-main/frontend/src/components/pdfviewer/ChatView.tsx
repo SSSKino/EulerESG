@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Drawer } from "antd";
 import AnalysisResults from "./AnalysisResults";
 import type { AnalysisDataItem } from "./AnalysisResults";
 import ChatInterface from "./ChatInterface";
 import ComplianceSummaryDrawer from "./ComplianceSummaryDrawer";
-import { ChevronDown, ChevronUp, FileText, MessageCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, FileText, MessageCircle, X } from "lucide-react";
 import { useT } from "@/i18n/useT";
 import type { File as FileData } from "@/store/useFileStore";
 
@@ -81,6 +80,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [analysisMetrics, setAnalysisMetrics] = useState<AnalysisDataItem[]>([]);
   const [showAnalysisTable, setShowAnalysisTable] = useState<boolean>(true);
+  const assistantButtonRef = useRef<HTMLButtonElement>(null);
 
   const [targetPage, setTargetPage] = useState<number | undefined>(undefined);
   // Used to force a new navigation request even if the user clicks the same
@@ -92,11 +92,27 @@ const ChatView: React.FC<ChatViewProps> = ({
   useEffect(() => {
     setAnalysisMetrics([]);
     setSummaryOpen(false);
+    setAssistantOpen(false);
   }, [effectiveFileId, effectiveScopeKey]);
 
   const handleAnalysisDataChange = useCallback((items: AnalysisDataItem[]) => {
     setAnalysisMetrics(items);
   }, []);
+
+  const closeAssistant = useCallback(() => {
+    setAssistantOpen(false);
+    window.requestAnimationFrame(() => assistantButtonRef.current?.focus());
+  }, []);
+
+  useEffect(() => {
+    if (!assistantOpen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeAssistant();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [assistantOpen, closeAssistant]);
 
   const navigateToPage = useCallback((page: number) => {
     setTargetPage(page);
@@ -110,20 +126,9 @@ const ChatView: React.FC<ChatViewProps> = ({
         <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-100">
           <div className="flex items-center gap-2 select-none flex-grow">
             <h3 className="text-md font-semibold text-gray-800 truncate">{t("chat.analysis")}</h3>
-</div>
+          </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setSummaryOpen(true)}
-              disabled={analysisMetrics.length === 0}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2274BC] px-4 text-xs font-semibold text-white shadow-sm transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-px hover:bg-[#1b63a3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
-              title={t("analysis.generateSummaryTooltip")}
-              aria-haspopup="dialog"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              {t("analysis.generateSummary")}
-            </button>
             <button
               type="button"
               onClick={() => setShowAnalysisTable((s) => !s)}
@@ -146,6 +151,22 @@ const ChatView: React.FC<ChatViewProps> = ({
             onPageNavigate={navigateToPage}
             showTable={showAnalysisTable}
             onDataChange={handleAnalysisDataChange}
+            headerAction={(
+              <button
+                type="button"
+                onClick={() => {
+                  setAssistantOpen(false);
+                  setSummaryOpen(true);
+                }}
+                disabled={analysisMetrics.length === 0}
+                className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2274BC] px-4 text-xs font-semibold text-white shadow-sm transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-px hover:bg-[#1b63a3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
+                title={t("analysis.generateSummaryTooltip")}
+                aria-haspopup="dialog"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                {t("analysis.generateSummary")}
+              </button>
+            )}
           />
         </div>
       </div>
@@ -176,37 +197,52 @@ const ChatView: React.FC<ChatViewProps> = ({
         </CollapsibleSection>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setAssistantOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-12 items-center gap-2 rounded-full bg-[#2274BC] px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:bg-[#1b63a3] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2"
+      <section
+        id="compliance-ai-assistant"
+        role="dialog"
+        aria-modal="false"
         aria-label={t("chat.aiAssistant")}
-      >
-        <MessageCircle className="h-5 w-5" />
-        <span className="text-sm font-medium">{t("chat.aiAssistant")}</span>
-      </button>
-
-      <Drawer
-        title={t("chat.aiAssistant")}
-        placement="right"
-        width={440}
-        open={assistantOpen}
-        onClose={() => setAssistantOpen(false)}
-        destroyOnClose={false}
-        styles={{ body: { padding: 0, display: "flex", flexDirection: "column", height: "calc(100% - 55px)" } }}
+        aria-hidden={!assistantOpen}
+        data-testid="compliance-ai-assistant"
+        className={`fixed inset-x-3 bottom-20 z-50 flex h-[min(620px,calc(100dvh-7rem))] min-h-0 origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.22)] transition-[opacity,transform,visibility] duration-300 ease-[var(--motion-fluid)] sm:left-auto sm:right-6 sm:w-[420px] ${
+          assistantOpen
+            ? "visible translate-y-0 scale-100 opacity-100"
+            : "invisible pointer-events-none translate-y-3 scale-[0.98] opacity-0"
+        }`}
       >
         <div className="flex h-full min-h-0 flex-col">
           <ChatInterface
             messages={messages}
             onSendMessage={onSendMessage}
             onClearChat={onClearChat}
+            onClose={closeAssistant}
             onReferenceClick={(page) => {
               navigateToPage(page);
-              setAssistantOpen(false);
+              closeAssistant();
             }}
           />
         </div>
-      </Drawer>
+      </section>
+
+      <button
+        ref={assistantButtonRef}
+        type="button"
+        onClick={() => {
+          setSummaryOpen(false);
+          setAssistantOpen((open) => !open);
+        }}
+        className={`fixed bottom-6 right-6 z-[51] flex h-12 items-center gap-2 rounded-full px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 ${
+          assistantOpen ? "bg-slate-800 hover:bg-slate-700" : "bg-[#2274BC] hover:bg-[#1b63a3]"
+        }`}
+        aria-label={assistantOpen ? t("common.close") : t("chat.aiAssistant")}
+        aria-controls="compliance-ai-assistant"
+        aria-expanded={assistantOpen}
+      >
+        {assistantOpen ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
+        <span className="text-sm font-medium">
+          {assistantOpen ? t("common.close") : t("chat.aiAssistant")}
+        </span>
+      </button>
 
       <ComplianceSummaryDrawer
         metrics={analysisMetrics}

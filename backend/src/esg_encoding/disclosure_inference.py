@@ -3786,6 +3786,7 @@ Return JSON format:
             "partial_disclosed": DisclosureStatus.PARTIALLY_DISCLOSED,
             "partial": DisclosureStatus.PARTIALLY_DISCLOSED,
             "partially": DisclosureStatus.PARTIALLY_DISCLOSED,
+            "disclosed_but_not_clear": DisclosureStatus.PARTIALLY_DISCLOSED,
             "not_disclosed": DisclosureStatus.NOT_DISCLOSED,
             "non_disclosed": DisclosureStatus.NOT_DISCLOSED,
             "none": DisclosureStatus.NOT_DISCLOSED,
@@ -3829,7 +3830,7 @@ Return JSON format:
 
         def _status_label(status: str) -> str:
             return {
-                "fully_disclosed": "Fully Disclosed",
+                "fully_disclosed": "Disclosed",
                 "partially_disclosed": "Partially Disclosed",
                 "not_disclosed": "Not Disclosed",
             }.get(status, status.replace("_", " ").title() or "Unknown")
@@ -4016,7 +4017,7 @@ Return JSON format:
             "## Executive Summary",
             f"- **Overall compliance score**: {overall_score:.2%}",
             (
-                f"- **Coverage**: {disclosure_summary['fully_disclosed']} fully disclosed, "
+                f"- **Coverage**: {disclosure_summary['fully_disclosed']} disclosed, "
                 f"{disclosure_summary['partially_disclosed']} partially disclosed, "
                 f"{disclosure_summary['not_disclosed']} not disclosed out of "
                 f"{_metric_phrase(total_unique_metrics)}."
@@ -4046,7 +4047,7 @@ Return JSON format:
                 "| Disclosure Status | Count | Percentage |",
                 "|---|---:|---:|",
                 (
-                    f"| Fully Disclosed | {disclosure_summary['fully_disclosed']} | "
+                    f"| Disclosed | {disclosure_summary['fully_disclosed']} | "
                     f"{_pct(disclosure_summary['fully_disclosed'], total_unique_metrics)} |"
                 ),
                 (
@@ -4120,7 +4121,7 @@ Return JSON format:
         status_sections = [
             ("partially_disclosed", "Partially Disclosed - Needs Follow-up"),
             ("not_disclosed", "Not Disclosed - Missing Metrics"),
-            ("fully_disclosed", "Fully Disclosed - Supported Metrics"),
+            ("fully_disclosed", "Disclosed - Supported Metrics"),
         ]
         for status, title in status_sections:
             status_metrics = [a for a in unique_metric_analyses if _status_value(a) == status]
@@ -4176,7 +4177,7 @@ Return JSON format:
                 )
             else:
                 lines.append(
-                    "3. Keep current fully disclosed metrics traceable by preserving "
+                    "3. Keep current disclosed metrics traceable by preserving "
                     "value, unit, period, and source page references."
                 )
             lines.append(
@@ -4185,7 +4186,7 @@ Return JSON format:
             )
         else:
             lines.append(
-                "All analyzed metrics are fully disclosed. Maintain the current "
+                "All analyzed metrics are disclosed. Maintain the current "
                 "metric-code mapping, evidence citations, and reporting-period "
                 "consistency in future reports."
             )

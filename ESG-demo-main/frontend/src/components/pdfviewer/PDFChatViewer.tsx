@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import { Button, InputNumber, Space, Typography } from "antd";
 import { Minus, Plus, RotateCcw } from "lucide-react";
@@ -27,6 +28,7 @@ const ZOOM_STEP = 0.1;
 const OVERSCAN_PAGES = 3;
 const MAX_RENDERED_PAGES = 9;
 const PAGE_GAP = 16;
+const POINTER_DRAG_THRESHOLD = 3;
 
 type PageSize = {
   width: number;
@@ -38,7 +40,33 @@ type ScrollAnchor = {
   offsetRatio: number;
 };
 
+type PointerDrag = {
+  activated: boolean;
+  element: HTMLDivElement;
+  pointerId: number;
+  startClientY: number;
+  startScrollTop: number;
+};
+
 const DEFAULT_PAGE_SIZE: PageSize = { width: 612, height: 792 };
+
+const POINTER_DRAG_EXCLUSION_SELECTOR = [
+  "a",
+  "button",
+  "input",
+  "textarea",
+  "select",
+  "option",
+  "label",
+  "[role='button']",
+  "[role='link']",
+  "[contenteditable='true']",
+  ".annotationLayer section",
+  ".annotationLayer [data-annotation-id]",
+  ".react-pdf__Page__annotations [data-annotation-id]",
+  ".textLayer span",
+  ".react-pdf__Page__textContent span",
+].join(",");
 
 export type PDFChatViewerProps = {
   fileUrl: string;
@@ -99,6 +127,7 @@ export default function PDFChatViewer({
   const [containerWidth, setContainerWidth] = useState(0);
   const [pageSizes, setPageSizes] = useState<Record<number, PageSize>>({});
   const [renderedPages, setRenderedPages] = useState<Set<number>>(new Set([1]));
+  const [isPointerDragging, setIsPointerDragging] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const slotRefs = useRef(new Map<number, HTMLDivElement>());
@@ -109,6 +138,7 @@ export default function PDFChatViewer({
   const documentRef = useRef<any>(null);
   const documentGenerationRef = useRef(0);
   const pageSizesRef = useRef<Record<number, PageSize>>({});
+  const pointerDragRef = useRef<PointerDrag | null>(null);
 
   const pdfOptions = useMemo(() => {
     const token = getStoredAuth()?.token;
@@ -209,6 +239,87 @@ export default function PDFChatViewer({
     return () => container.removeEventListener("wheel", onWheel);
   }, [setZoomWithAnchor]);
 
+  const beginPointerDrag = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (
+        event.button !== 0 ||
+        event.isPrimary === false ||
+        event.pointerType !== "mouse"
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest(POINTER_DRAG_EXCLUSION_SELECTOR)
+      ) {
+        return;
+      }
+
+      pointerDragRef.current = {
+        activated: false,
+        element: event.currentTarget,
+        pointerId: event.pointerId,
+        startClientY: event.clientY,
+        startScrollTop: event.currentTarget.scrollTop,
+      };
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+    },
+    [],
+  );
+
+  const movePointerDrag = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const drag = pointerDragRef.current;
+      if (!drag || drag.pointerId !== event.pointerId) return;
+
+      const deltaY = event.clientY - drag.startClientY;
+      if (Math.abs(deltaY) < POINTER_DRAG_THRESHOLD) return;
+
+      if (!drag.activated) {
+        drag.activated = true;
+        pendingAnchorRef.current = null;
+        setIsPointerDragging(true);
+      }
+      event.preventDefault();
+      event.currentTarget.scrollTop = Math.max(
+        0,
+        drag.startScrollTop - deltaY,
+      );
+    },
+    [],
+  );
+
+  const cancelPointerDrag = useCallback((updateUi = true) => {
+    const drag = pointerDragRef.current;
+    if (!drag) return;
+
+    pointerDragRef.current = null;
+    if (drag.element.hasPointerCapture?.(drag.pointerId)) {
+      drag.element.releasePointerCapture?.(drag.pointerId);
+    }
+    if (updateUi) setIsPointerDragging(false);
+  }, []);
+
+  const endPointerDrag = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const drag = pointerDragRef.current;
+      if (!drag || drag.pointerId !== event.pointerId) return;
+      cancelPointerDrag();
+    },
+    [cancelPointerDrag],
+  );
+
+  useEffect(() => {
+    const onWindowBlur = () => cancelPointerDrag();
+    window.addEventListener("blur", onWindowBlur);
+    return () => {
+      window.removeEventListener("blur", onWindowBlur);
+      cancelPointerDrag(false);
+    };
+  }, [cancelPointerDrag]);
+
   const applyVisiblePages = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       for (const entry of entries) {
@@ -261,6 +372,7 @@ export default function PDFChatViewer({
   const scrollToPage = useCallback(
     async (requestedPage: unknown) => {
       if (!numPages) return;
+      cancelPointerDrag();
       const page = normalisePage(requestedPage, numPages);
       if (!page) return;
 
@@ -293,7 +405,7 @@ export default function PDFChatViewer({
         });
       });
     },
-    [numPages, updatePageSize],
+    [cancelPointerDrag, numPages, updatePageSize],
   );
 
   useEffect(() => {
@@ -314,9 +426,10 @@ export default function PDFChatViewer({
     pageSizesRef.current = {};
     setPageSizes({});
     setRenderedPages(new Set([1]));
+    cancelPointerDrag();
     const container = containerRef.current;
     if (container) container.scrollTop = 0;
-  }, [defaultZoom, fileUrl]);
+  }, [cancelPointerDrag, defaultZoom, fileUrl]);
 
   const preloadPageSizes = useCallback(
     async (pdfDocument: any, totalPages: number, generation: number) => {
@@ -443,8 +556,18 @@ export default function PDFChatViewer({
       <div
         ref={containerRef}
         data-testid="pdf-scroll-container"
-        className="min-h-0 flex-1 overflow-auto rounded-b-lg bg-gray-100 p-2"
-        style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}
+        className={`min-h-0 flex-1 overflow-auto rounded-b-lg bg-gray-100 p-2 ${
+          isPointerDragging ? "cursor-grabbing select-none" : "cursor-grab"
+        }`}
+        style={{
+          overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
+        }}
+        onPointerDown={beginPointerDrag}
+        onPointerMove={movePointerDrag}
+        onPointerUp={endPointerDrag}
+        onPointerCancel={endPointerDrag}
+        onLostPointerCapture={endPointerDrag}
       >
         <Document
           key={fileUrl}

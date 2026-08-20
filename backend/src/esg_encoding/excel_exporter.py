@@ -57,6 +57,32 @@ class ExcelExporter:
             Path: Path to the generated Excel file
         """
         try:
+            def _status_of(metric: Dict[str, Any]) -> str:
+                raw = (
+                    metric.get("Disclosure Status")
+                    or metric.get("disclosure_status")
+                    or metric.get("Model Disclosure Status")
+                    or ""
+                )
+                normalized = str(raw).strip().lower().replace("-", "_").replace(" ", "_")
+                if "not_clear" in normalized or "unclear" in normalized:
+                    return "partially_disclosed"
+                if "not" in normalized:
+                    return "not_disclosed"
+                if "partial" in normalized:
+                    return "partially_disclosed"
+                if "full" in normalized or normalized == "disclosed":
+                    return "fully_disclosed"
+                return normalized
+
+            def _status_label(metric: Dict[str, Any]) -> str:
+                status = _status_of(metric)
+                return {
+                    "fully_disclosed": "Disclosed",
+                    "partially_disclosed": "Partially Disclosed",
+                    "not_disclosed": "Not Disclosed",
+                }.get(status, status.replace("_", " ").title())
+
             # Prepare data for Excel
             excel_data = []
             
@@ -77,7 +103,7 @@ class ExcelExporter:
                     ),
                     "Page": self._format_page(metric.get("Page", metric.get("page"))),
                     "Context": metric.get("Context", metric.get("context", "")),
-                    "Disclosure Status": metric.get("Disclosure Status", metric.get("disclosure_status", "")),
+                    "Disclosure Status": _status_label(metric),
                     "LLM Analysis": metric.get("LLM Analysis", metric.get("reasoning", ""))
                 }
                 excel_data.append(row)
@@ -105,22 +131,6 @@ class ExcelExporter:
                 self._apply_excel_formatting(worksheet, df)
                 
                 # Add metadata sheet
-                def _status_of(metric: Dict[str, Any]) -> str:
-                    raw = (
-                        metric.get("Disclosure Status")
-                        or metric.get("disclosure_status")
-                        or metric.get("Model Disclosure Status")
-                        or ""
-                    )
-                    s = str(raw).strip().lower()
-                    if "full" in s:
-                        return "fully_disclosed"
-                    if "partial" in s:
-                        return "partially_disclosed"
-                    if "not" in s:
-                        return "not_disclosed"
-                    return s
-
                 metadata = {
                     "Analysis Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "Company": company_name or "Unknown",
@@ -128,7 +138,7 @@ class ExcelExporter:
                     "Sub-Industry": semi_industry,
                     "Report ID": report_id or "N/A",
                     "Total Metrics": len(metric_analyses),
-                    "Fully Disclosed": sum(1 for m in metric_analyses if _status_of(m) == "fully_disclosed"),
+                    "Disclosed": sum(1 for m in metric_analyses if _status_of(m) == "fully_disclosed"),
                     "Partially Disclosed": sum(1 for m in metric_analyses if _status_of(m) == "partially_disclosed"),
                     "Not Disclosed": sum(1 for m in metric_analyses if _status_of(m) == "not_disclosed")
                 }
@@ -223,9 +233,9 @@ class ExcelExporter:
         
         # Color code disclosure status
         status_colors = {
-            "fully_disclosed": "C6EFCE",  # Light green
-            "partially_disclosed": "FFEB9C",  # Light yellow
-            "not_disclosed": "FFC7CE"  # Light red
+            "Disclosed": "C6EFCE",  # Light green
+            "Partially Disclosed": "FFEB9C",  # Light yellow
+            "Not Disclosed": "FFC7CE"  # Light red
         }
         
         status_col = column_index.get("Disclosure Status")

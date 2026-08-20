@@ -7,6 +7,7 @@ import FrameworkSelectModal, {
   type FrameworkSelectionValues,
 } from "@/components/cross-analysis/FrameworkSelectModal";
 import { getDefaultDimensionKey } from "@/data/crossTaxonomy";
+import { isActiveFramework } from "@/data/frameworkOptions";
 import { isAuthenticated } from "@/lib/auth";
 import { applyFrameworkToSearchParams } from "@/lib/crossAnalysisFramework";
 
@@ -46,7 +47,7 @@ export default function FrameworkGate({ children }: { children: React.ReactNode 
       return;
     }
 
-    if (framework) {
+    if (isActiveFramework(framework)) {
       setOpen(false);
       return;
     }
@@ -57,11 +58,17 @@ export default function FrameworkGate({ children }: { children: React.ReactNode 
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === "object") {
-          setInitialValues({
-            framework: safeTrim((parsed as any).framework) || undefined,
-            industry: safeTrim((parsed as any).industry) || undefined,
-            semiIndustry: safeTrim((parsed as any).semiIndustry) || undefined,
-          });
+          const cachedFramework = safeTrim((parsed as any).framework);
+          if (isActiveFramework(cachedFramework)) {
+            setInitialValues({
+              framework: cachedFramework.toUpperCase(),
+              industry: safeTrim((parsed as any).industry) || undefined,
+              semiIndustry: safeTrim((parsed as any).semiIndustry) || undefined,
+            });
+          } else {
+            localStorage.removeItem(LS_KEY);
+            setInitialValues({});
+          }
         }
       }
     } catch {

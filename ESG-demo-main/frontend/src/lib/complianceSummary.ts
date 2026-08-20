@@ -28,8 +28,11 @@ export const normalizeDisclosureStatus = (value: unknown): DisclosureStatus => {
   if (status === "fully_disclosed") return "fully_disclosed";
   if (status === "partially_disclosed") return "partially_disclosed";
   if (status === "not_disclosed") return "not_disclosed";
-  if (status.includes("partial")) return "partially_disclosed";
+  if (status.includes("not_clear") || status.includes("unclear")) {
+    return "partially_disclosed";
+  }
   if (status.includes("not")) return "not_disclosed";
+  if (status.includes("partial")) return "partially_disclosed";
   if (status.includes("fully") || status === "disclosed" || status === "complete") {
     return "fully_disclosed";
   }
@@ -95,8 +98,8 @@ export const createComplianceSummaryMarkdown = (
     `## ${zh ? "概览" : "Overview"}`,
     "",
     `- ${zh ? "已评估指标" : "Metrics assessed"}: ${summary.total}`,
-    `- ${zh ? "披露较好" : "Well disclosed"}: ${summary.wellDisclosed.length} (${disclosurePercentage(summary.wellDisclosed.length, summary.total)}%)`,
-    `- ${zh ? "部分披露" : "Partially disclosed"}: ${summary.partiallyDisclosed.length} (${disclosurePercentage(summary.partiallyDisclosed.length, summary.total)}%)`,
+    `- ${zh ? "已披露" : "Disclosed"}: ${summary.wellDisclosed.length} (${disclosurePercentage(summary.wellDisclosed.length, summary.total)}%)`,
+    `- ${zh ? "部分披露" : "Partially Disclosed"}: ${summary.partiallyDisclosed.length} (${disclosurePercentage(summary.partiallyDisclosed.length, summary.total)}%)`,
     `- ${zh ? "未披露" : "Not disclosed"}: ${summary.notDisclosed.length} (${disclosurePercentage(summary.notDisclosed.length, summary.total)}%)`,
     "",
   );
@@ -126,7 +129,7 @@ export const createComplianceSummaryMarkdown = (
   };
 
   appendMetrics(
-    zh ? "披露较好的指标" : "Well-disclosed metrics",
+    zh ? "已披露指标" : "Disclosed metrics",
     summary.wellDisclosed,
   );
   appendMetrics(

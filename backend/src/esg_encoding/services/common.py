@@ -994,10 +994,14 @@ def _load_specific_report_context(file_id: str):
             return DisclosureStatus.NOT_DISCLOSED
         s = str(v).strip().lower()
         s = s.replace("-", "_").replace(" ", "_")
-        if s in {"fully_disclosed", "fully", "full", "complete", "disclosed"} or "fully" in s:
-            return DisclosureStatus.FULLY_DISCLOSED
+        if "not_clear" in s or "unclear" in s:
+            return DisclosureStatus.PARTIALLY_DISCLOSED
+        if "not" in s:
+            return DisclosureStatus.NOT_DISCLOSED
         if s in {"partially_disclosed", "partial", "partly"} or "partial" in s:
             return DisclosureStatus.PARTIALLY_DISCLOSED
+        if s in {"fully_disclosed", "fully", "full", "complete", "disclosed"} or "fully" in s:
+            return DisclosureStatus.FULLY_DISCLOSED
         return DisclosureStatus.NOT_DISCLOSED
 
     def _summary_from_metrics(metrics):
@@ -1402,7 +1406,7 @@ ESG合规评估总结:
 - 报告ID: {assessment.report_id}
 - 分析指标总数: {assessment.total_metrics_analyzed}
 - 整体合规分数: {assessment.overall_compliance_score:.1%}
-- 完全披露指标: {assessment.disclosure_summary.get('fully_disclosed', 0)}个
+- 已披露指标: {assessment.disclosure_summary.get('fully_disclosed', 0)}个
 - 部分披露指标: {assessment.disclosure_summary.get('partially_disclosed', 0)}个  
 - 未披露指标: {assessment.disclosure_summary.get('not_disclosed', 0)}个
 """

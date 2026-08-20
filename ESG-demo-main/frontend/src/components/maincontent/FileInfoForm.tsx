@@ -4,7 +4,7 @@ import type { UploadFile } from "antd/es/upload/interface";
 import type { FormInstance } from "antd/es/form";
 import { industries, SASB_OTHER_INDUSTRY_KEY } from "@/data/industries";
 import { CDP_TOPIC_OPTIONS } from "@/data/cdpTopics";
-import { TCFD_TOPIC_OPTIONS } from "@/data/tcfdTopics";
+import { ACTIVE_FRAMEWORK_OPTIONS, isActiveFramework } from "@/data/frameworkOptions";
 import { useT } from "@/i18n/useT";
 import { apiService } from "@/lib/api";
 import type { CompanySummary } from "@/lib/api";
@@ -14,7 +14,7 @@ export type FileInfoFormValues = {
   description: string;
   tags: string[];
   industry: string;
-  /** SASB sub-industries, CDP/TCFD topic slugs (multi-select = one PDF, multiple compliance JSONs). */
+  /** SASB sub-industries or CDP topic slugs (multi-select = one PDF, multiple compliance JSONs). */
   semiIndustry: string | string[];
   framework: string;
   griSector?: string;
@@ -59,7 +59,6 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
   const isSASBSelected = framework === "SASB";
   const isGRISelected = framework === "GRI";
   const isCDPSelected = framework === "CDP";
-  const isTCFDSelected = framework === "TCFD";
 
   const [griOptions, setGriOptions] = useState<{
     sectors: GriOption[];
@@ -74,7 +73,13 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
     }
     apiService
       .getCompanies()
-      .then((response) => setCompanies(response.companies || []))
+      .then((response) =>
+        setCompanies(
+          (response.companies || []).filter((company) =>
+            isActiveFramework(company.scope_config?.framework)
+          )
+        )
+      )
       .catch(() => setCompanies([]));
   }, [selectedUploadFiles, uploadMode]);
 
@@ -133,7 +138,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
         griTopics: form.getFieldValue("griTopics"),
       });
       onIndustryChange("");
-    } else if (value === "CDP" || value === "TCFD") {
+    } else if (value === "CDP") {
       form.setFieldsValue({
         industry: undefined,
         griSector: undefined,
@@ -264,12 +269,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
       >
         <Select
           placeholder={t("upload.selectFramework")}
-          options={[
-            { label: "SASB", value: "SASB" },
-            { label: "GRI", value: "GRI" },
-            { label: "CDP", value: "CDP" },
-            { label: "TCFD", value: "TCFD" },
-          ]}
+          options={ACTIVE_FRAMEWORK_OPTIONS}
           onChange={handleFrameworkChange}
           disabled={scopeLocked}
           style={{ width: "100%" }}
@@ -372,43 +372,6 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
               style={{ width: "100%" }}
               disabled={scopeLocked}
               options={CDP_TOPIC_OPTIONS.map((o) => ({ label: o.label, value: o.slug }))}
-            />
-          </Form.Item>
-        </Card>
-      )}
-
-      {/* TCFD: pillar topic only */}
-      {isTCFDSelected && (
-        <Card
-          size="small"
-          style={{
-            marginBottom: 16,
-            borderColor: "var(--ant-purple-4, #d3adf7)",
-            background: "var(--ant-purple-1, #f9f0ff)",
-          }}
-          styles={{ body: { padding: "12px 16px" } }}
-        >
-          <Form.Item
-            name="semiIndustry"
-            label={t("upload.tcfdTopic")}
-            rules={[
-              { required: true, message: t("upload.pleaseSelectTcfdTopic") },
-              {
-                validator: async (_, v) => {
-                  const arr = Array.isArray(v) ? v : v ? [v] : [];
-                  if (arr.length < 1) throw new Error(t("upload.pleaseSelectTcfdTopic"));
-                },
-              },
-            ]}
-          >
-            <Select
-              mode="multiple"
-              allowClear
-              maxTagCount="responsive"
-              placeholder={t("upload.selectTcfdTopic")}
-              disabled={scopeLocked}
-              style={{ width: "100%" }}
-              options={TCFD_TOPIC_OPTIONS.map((o) => ({ label: o.label, value: o.slug }))}
             />
           </Form.Item>
         </Card>

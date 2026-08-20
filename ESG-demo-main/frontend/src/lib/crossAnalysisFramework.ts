@@ -1,6 +1,7 @@
 "use client";
 
 import type { FrameworkSelectionValues } from "@/components/cross-analysis/FrameworkSelectModal";
+import { isActiveFramework } from "@/data/frameworkOptions";
 
 export const CROSS_FRAMEWORK_LS_KEY = "cross_analysis_framework_selection";
 
@@ -15,8 +16,13 @@ export function readCachedCrossFrameworkSelection(): Partial<FrameworkSelectionV
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return {};
+    const framework = safeTrim((parsed as any).framework);
+    if (!isActiveFramework(framework)) {
+      localStorage.removeItem(CROSS_FRAMEWORK_LS_KEY);
+      return {};
+    }
     return {
-      framework: safeTrim((parsed as any).framework) || undefined,
+      framework: framework.toUpperCase(),
       industry: safeTrim((parsed as any).industry) || undefined,
       semiIndustry: safeTrim((parsed as any).semiIndustry) || undefined,
     };
@@ -27,6 +33,10 @@ export function readCachedCrossFrameworkSelection(): Partial<FrameworkSelectionV
 
 export function writeCachedCrossFrameworkSelection(values: FrameworkSelectionValues): void {
   try {
+    if (!isActiveFramework(values.framework)) {
+      localStorage.removeItem(CROSS_FRAMEWORK_LS_KEY);
+      return;
+    }
     localStorage.setItem(CROSS_FRAMEWORK_LS_KEY, JSON.stringify(values));
   } catch {
     // ignore
@@ -38,22 +48,24 @@ export function applyFrameworkToSearchParams(
   values: FrameworkSelectionValues,
 ): URLSearchParams {
   const out = new URLSearchParams(qs.toString());
-  out.set("framework", safeTrim(values.framework));
+  const framework = safeTrim(values.framework).toUpperCase();
+  if (!isActiveFramework(framework)) {
+    out.delete("framework");
+    out.delete("industry");
+    out.delete("semiIndustry");
+    return out;
+  }
+  out.set("framework", framework);
 
-  if (values.framework === "SASB") {
+  if (framework === "SASB") {
     const ind = safeTrim(values.industry);
     const semi = safeTrim(values.semiIndustry);
     if (ind) out.set("industry", ind);
     else out.delete("industry");
     if (semi) out.set("semiIndustry", semi);
     else out.delete("semiIndustry");
-  } else if (values.framework === "CDP") {
+  } else if (framework === "CDP") {
     out.set("industry", "CDP");
-    const semi = safeTrim(values.semiIndustry);
-    if (semi) out.set("semiIndustry", semi);
-    else out.delete("semiIndustry");
-  } else if (values.framework === "TCFD") {
-    out.set("industry", "TCFD");
     const semi = safeTrim(values.semiIndustry);
     if (semi) out.set("semiIndustry", semi);
     else out.delete("semiIndustry");

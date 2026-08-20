@@ -1493,10 +1493,10 @@ async def upload_report(
         file: PDF file
         industry: Main industry classification (optional, for SASB)
         semiIndustry: Sub-industry (for SASB metrics selection)
-        framework: Framework selection (SASB/GRI/TCFD)
+        framework: Framework selection (SASB/GRI/CDP)
         griSector: GRI sector slug (when framework=GRI)
         griTopic: GRI topic slug (when framework=GRI); if scopeSlugs is set, this is optional fallback for a single topic
-        scopeSlugs: Optional JSON array of scope slugs (GRI topic slugs, SASB semi-industries, CDP/TCFD topic slugs).
+        scopeSlugs: Optional JSON array of scope slugs (GRI topic slugs, SASB semi-industries, CDP topic slugs).
             One PDF encode; one retrieval+assessment per slug; separate *_compliance.json per scope.
         
     Returns:
@@ -1511,6 +1511,8 @@ async def upload_report(
     """
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
+    if str(framework or "").strip().upper() == "TCFD":
+        raise HTTPException(status_code=422, detail="TCFD is no longer available for new uploads")
     
     try:
         content = await file.read()

@@ -494,7 +494,7 @@ class ESGChatbot:
 - Report ID: {self.compliance_assessment.report_id}
 - Total Analyzed Metrics: {self.compliance_assessment.total_metrics_analyzed}
 - Overall Compliance Score: {self.compliance_assessment.overall_compliance_score:.1%}
-- Fully Disclosed: {fully_disclosed} metrics ({f"{fully_disclosed/self.compliance_assessment.total_metrics_analyzed*100:.1f}%" if self.compliance_assessment.total_metrics_analyzed else "N/A"})
+- Disclosed: {fully_disclosed} metrics ({f"{fully_disclosed/self.compliance_assessment.total_metrics_analyzed*100:.1f}%" if self.compliance_assessment.total_metrics_analyzed else "N/A"})
 - Partially Disclosed: {partially_disclosed} metrics ({f"{partially_disclosed/self.compliance_assessment.total_metrics_analyzed*100:.1f}%" if self.compliance_assessment.total_metrics_analyzed else "N/A"})
 - Not Disclosed: {not_disclosed} metrics ({f"{not_disclosed/self.compliance_assessment.total_metrics_analyzed*100:.1f}%" if self.compliance_assessment.total_metrics_analyzed else "N/A"})
 
@@ -504,7 +504,7 @@ Key Metric Analysis Examples:
             if hasattr(self.compliance_assessment, 'metric_analyses') and self.compliance_assessment.metric_analyses:
                 for i, analysis in enumerate(self.compliance_assessment.metric_analyses[:3]):  # 展示前3个作为样例
                     status_text = {
-                        "fully_disclosed": "Fully Disclosed",
+                        "fully_disclosed": "Disclosed",
                         "partially_disclosed": "Partially Disclosed", 
                         "not_disclosed": "Not Disclosed"
                     }

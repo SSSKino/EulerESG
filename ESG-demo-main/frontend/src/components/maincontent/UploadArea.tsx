@@ -1,9 +1,10 @@
 import React, { useRef } from "react";
-import { Upload } from "antd";
+import { Layout, Upload } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useT } from "@/i18n/useT";
 
+const { Content } = Layout;
 const { Dragger } = Upload;
 
 interface UploadAreaProps {
@@ -38,34 +39,40 @@ const UploadArea: React.FC<UploadAreaProps> = ({
     },
   };
 
-  const modeLabel = uploadMode === "multi"
-    ? t("upload.multiReport")
-    : t("upload.singleReport");
-
   return (
-    <div className="h-full w-full" data-testid="upload-area-shell">
-      <Dragger
-        {...props}
-        aria-label={t("upload.draggerText")}
-        className="group h-full w-full overflow-hidden rounded-xl [&_.ant-upload]:h-full [&_.ant-upload-btn]:h-full [&_.ant-upload-drag-container]:h-full"
+    <Layout
+      className="h-full w-full"
+      data-testid="upload-area-shell"
+      style={{
+        margin: 0,
+        padding: "0 4px 12px",
+        background: "#fff",
+        borderRadius: 10,
+      }}
+    >
+      <Content
         style={{
-          height: "100%",
-          borderColor: "#cbd5e1",
-          borderRadius: 14,
-          background: "rgba(248, 250, 252, 0.72)",
+          padding: "12px 4px",
+          margin: 0,
+          minHeight: 180,
+          background: "#fff",
+          borderRadius: 8,
         }}
       >
-        <div className="flex min-h-[180px] flex-col items-center justify-center px-6 py-8 text-center">
-          <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-[20px] text-[#2274BC] transition-colors group-hover:bg-blue-100">
+        <Dragger
+          {...props}
+          aria-label={t("upload.draggerText")}
+          style={{
+            padding: "20px 0",
+          }}
+        >
+          <p className="ant-upload-drag-icon">
             <InboxOutlined />
-          </span>
-          <p className="m-0 text-[15px] font-semibold tracking-[-0.01em] text-slate-800">
-            {t("upload.draggerText")}
           </p>
-          <p className="mb-0 mt-1.5 text-xs text-slate-500">PDF · {modeLabel}</p>
-        </div>
-      </Dragger>
-    </div>
+          <p className="ant-upload-text">{t("upload.draggerText")}</p>
+        </Dragger>
+      </Content>
+    </Layout>
   );
 };
 

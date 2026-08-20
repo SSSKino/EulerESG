@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { DICT } from "@/i18n/dict";
+
 import {
   buildComplianceSummary,
   createComplianceSummaryMarkdown,
@@ -65,6 +67,10 @@ describe("compliance summary", () => {
     expect(markdown).toContain("Value: 87 %");
     expect(markdown).toContain("Page: 108");
     expect(markdown).not.toContain("Page: null");
+    expect(markdown).toContain("- Disclosed: 1 (50.0%)");
+    expect(markdown).toContain("- Partially Disclosed: 0 (0.0%)");
+    expect(markdown).toContain("## Disclosed metrics");
+    expect(markdown).not.toContain("Well disclosed");
     expect(markdown).toContain("Metrics requiring improvement");
   });
 
@@ -75,7 +81,16 @@ describe("compliance summary", () => {
 
   it("does not classify legacy 'not fully disclosed' text as fully disclosed", () => {
     expect(normalizeDisclosureStatus("not fully disclosed")).toBe("not_disclosed");
+    expect(normalizeDisclosureStatus("Disclosed But Not Clear")).toBe("partially_disclosed");
     expect(normalizeDisclosureStatus("partially disclosed")).toBe("partially_disclosed");
     expect(normalizeDisclosureStatus("fully disclosed")).toBe("fully_disclosed");
+  });
+
+  it("uses unified display labels without changing canonical statuses", () => {
+    expect(DICT.en.analysis.status.fully).toBe("Disclosed");
+    expect(DICT.en.analysis.status.partial).toBe("Partially Disclosed");
+    expect(DICT.en.analysis.summary.partial).toBe("Partially Disclosed");
+    expect(DICT.zh.analysis.status.fully).toBe("已披露");
+    expect(DICT.zh.analysis.status.partial).toBe("部分披露");
   });
 });

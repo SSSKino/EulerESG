@@ -7,9 +7,8 @@ import { useRouter } from "next/navigation";
 import { useT } from "@/i18n/useT";
 
 import { apiService } from "@/lib/api";
+import { normalizeDisclosureStatus, type DisclosureStatus } from "@/lib/complianceSummary";
 import type { CrossReportSummary } from "@/features/crossAnalysis/types";
-
-type DisclosureStatus = "fully_disclosed" | "partially_disclosed" | "not_disclosed";
 
 export type AnalysisDataItem = {
   metric_id: string;
@@ -48,15 +47,7 @@ function stripFileExt(name: string): string {
 }
 
 function normalizeStatus(raw: any): DisclosureStatus {
-  const s = String(raw ?? "").trim().toLowerCase();
-  if (!s) return "not_disclosed";
-  if (s.includes("fully")) return "fully_disclosed";
-  if (s.includes("partial")) return "partially_disclosed";
-  if (s.includes("not")) return "not_disclosed";
-  if (s === "fully_disclosed") return "fully_disclosed";
-  if (s === "partially_disclosed") return "partially_disclosed";
-  if (s === "not_disclosed") return "not_disclosed";
-  return "not_disclosed";
+  return normalizeDisclosureStatus(raw);
 }
 
 function pick(...vals: any[]) {

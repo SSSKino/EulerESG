@@ -197,49 +197,49 @@
       "file_id": "de616e24-7605-4263-a779-4288f6e4e981",
       "original_name": "Dell2024.pdf",
       "safe_filename": "20260819_160155_de616e24-7605-4263-a779-4288f6e4e981.pdf",
-      "file_path": "/workspace/uploads/reports/pending/20260819_160155_de616e24-7605-4263-a779-4288f6e4e981.pdf",
+      "file_path": "/workspace/uploads/reports/processed/20260819_160155_de616e24-7605-4263-a779-4288f6e4e981.pdf",
       "file_type": "report",
       "file_size": 12049968,
       "page_count": 116,
       "file_hash": "c0461379c802d3c6e43cde5e730ffbcd",
       "upload_time": "2026-08-19T16:01:56.999572",
-      "status": "processing",
-      "processing_history": [],
+      "status": "processed",
+      "processing_history": [
+        {
+          "timestamp": "2026-08-19T16:38:01.916405",
+          "action": "moved_to_processed",
+          "previous_path": "/workspace/uploads/reports/pending/20260819_160155_de616e24-7605-4263-a779-4288f6e4e981.pdf",
+          "new_path": "/workspace/uploads/reports/processed/20260819_160155_de616e24-7605-4263-a779-4288f6e4e981.pdf"
+        }
+      ],
       "industry": "Technology & Communications",
       "framework": "SASB",
       "semi_industry": "Software & IT Services",
       "gri_sector": null,
       "gri_topic": null,
       "user_id": 526078,
-      "processing_job_id": "report_269d640f2f904ea2a9d6c33e8550565d",
-      "processing_stage": "ocr_batch_processing",
-      "processing_progress": 15.4375,
+      "processing_job_id": null,
+      "processing_stage": "completed",
+      "processing_progress": 100,
       "processing_error": null,
       "processing_total_pages": 116,
-      "processing_pages_done": 28,
-      "processing_pages_success": 28,
+      "processing_pages_done": 116,
+      "processing_pages_success": 116,
       "processing_pages_failed": 0,
       "processing_total_units": 48,
-      "processing_units_done": 5,
-      "processing_units_success": 5,
+      "processing_units_done": 48,
+      "processing_units_success": 48,
       "processing_units_failed": 0,
-      "processing_units_running": 2,
-      "processing_units_queued": 41,
+      "processing_units_running": 0,
+      "processing_units_queued": 0,
       "processing_page_batch_size": 7,
-      "processing_running_batches": [
-        {
-          "unit_index": 6,
-          "start_page": 15,
-          "end_page": 19,
-          "worker_id": "paddleocr-worker-2"
-        },
-        {
-          "unit_index": 7,
-          "start_page": 20,
-          "end_page": 20,
-          "worker_id": "paddleocr-worker-1"
-        }
-      ]
+      "processing_running_batches": [],
+      "segments_path": "/workspace/uploads/outputs/embeddings/de616e24-7605-4263-a779-4288f6e4e981_segments.json",
+      "embeddings_path": "/workspace/uploads/outputs/embeddings/de616e24-7605-4263-a779-4288f6e4e981_embeddings.npz",
+      "embeddings_meta_path": "/workspace/uploads/outputs/embeddings/de616e24-7605-4263-a779-4288f6e4e981_embeddings_meta.json",
+      "scope_slugs_json": "[\"Software & IT Services\"]",
+      "extracted_md_path": "/workspace/uploads/reports/processed/20260819_160155_de616e24-7605-4263-a779-4288f6e4e981_extracted.md",
+      "visual_assets_path": "/workspace/uploads/reports/processed/20260819_160155_de616e24-7605-4263-a779-4288f6e4e981_visual_assets"
     }
   },
   "sessions": {}

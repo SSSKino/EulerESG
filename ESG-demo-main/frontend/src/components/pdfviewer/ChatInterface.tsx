@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input, Button, Popconfirm, Tooltip } from "antd";
-import { LoadingOutlined, DeleteOutlined } from "@ant-design/icons";
+import { CloseOutlined, DeleteOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useT } from "@/i18n/useT";
 
 interface Message {
@@ -13,9 +13,15 @@ interface ChatInterfaceProps {
   onSendMessage: (message: string) => void;
   onClearChat?: () => void;
   onReferenceClick: (page: number) => void;
+  onClose?: () => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, onClearChat }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({
+  messages,
+  onSendMessage,
+  onClearChat,
+  onClose,
+}) => {
   const { t } = useT();
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -43,21 +49,35 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
     <div className="p-3 h-full flex flex-col min-h-0">
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-lg font-semibold text-gray-800">{t("chat.title")}</h3>
-        <Tooltip title={t("chat.clearTitle")}>
-          <Popconfirm
-            title={t("chat.clearTitle")}
-            description={t("chat.clearDesc")}
-            onConfirm={onClearChat}
-            okText={t("common.yes")}
-            cancelText={t("common.no")}
-          >
-            <Button
-              type="text"
-              icon={<DeleteOutlined />}
-              className="text-gray-500 hover:text-red-500"
-            />
-          </Popconfirm>
-        </Tooltip>
+        <div className="flex items-center gap-1">
+          <Tooltip title={t("chat.clearTitle")}>
+            <Popconfirm
+              title={t("chat.clearTitle")}
+              description={t("chat.clearDesc")}
+              onConfirm={onClearChat}
+              okText={t("common.yes")}
+              cancelText={t("common.no")}
+            >
+              <Button
+                type="text"
+                icon={<DeleteOutlined />}
+                className="text-gray-500 hover:text-red-500"
+                aria-label={t("chat.clearTitle")}
+              />
+            </Popconfirm>
+          </Tooltip>
+          {onClose && (
+            <Tooltip title={t("common.close")}>
+              <Button
+                type="text"
+                icon={<CloseOutlined />}
+                className="text-gray-500 hover:text-gray-900"
+                aria-label={t("common.close")}
+                onClick={onClose}
+              />
+            </Tooltip>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto mb-3 border rounded-lg p-3 bg-white">

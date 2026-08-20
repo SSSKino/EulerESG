@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
 
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import PDFChatViewer from "../PDFChatViewer";
@@ -153,7 +159,21 @@ vi.mock("react-pdf", async () => {
         data-mock-page-number={pageNumber}
         data-mock-scale={scale ?? ""}
         data-mock-width={width ?? ""}>
-        Mock page {pageNumber}
+        <canvas data-testid={`mock-canvas-${pageNumber}`} />
+        <div
+          className="react-pdf__Page__textContent textLayer"
+          data-testid={`mock-text-layer-${pageNumber}`}>
+          <span data-testid={`mock-text-${pageNumber}`}>Mock page {pageNumber}</span>
+        </div>
+        <div className="react-pdf__Page__annotations annotationLayer">
+          <a data-testid={`mock-link-${pageNumber}`} href={`#page-${pageNumber}`}>
+            Page link {pageNumber}
+          </a>
+          <input
+            aria-label={`Mock field ${pageNumber}`}
+            data-testid={`mock-input-${pageNumber}`}
+          />
+        </div>
       </div>
     );
   };
@@ -196,6 +216,70 @@ const expectCurrentPage = async (
       ),
     ).toBeInTheDocument();
   });
+};
+
+const mockPointerCapture = (element: HTMLElement) => {
+  const capturedPointers = new Set<number>();
+  const setPointerCapture = vi.fn((pointerId: number) => {
+    capturedPointers.add(pointerId);
+  });
+  const releasePointerCapture = vi.fn((pointerId: number) => {
+    capturedPointers.delete(pointerId);
+  });
+  const hasPointerCapture = vi.fn((pointerId: number) =>
+    capturedPointers.has(pointerId),
+  );
+
+  Object.defineProperties(element, {
+    hasPointerCapture: {
+      configurable: true,
+      value: hasPointerCapture,
+    },
+    releasePointerCapture: {
+      configurable: true,
+      value: releasePointerCapture,
+    },
+    setPointerCapture: {
+      configurable: true,
+      value: setPointerCapture,
+    },
+  });
+
+  return { hasPointerCapture, releasePointerCapture, setPointerCapture };
+};
+
+type MockPointerEventInit = MouseEventInit & {
+  isPrimary?: boolean;
+  pointerId?: number;
+  pointerType?: string;
+};
+
+const dispatchPointerEvent = (
+  target: Node,
+  type: string,
+  init: MockPointerEventInit,
+): MouseEvent => {
+  const event = new MouseEvent(type, {
+    bubbles: true,
+    cancelable: true,
+    ...init,
+  });
+  Object.defineProperties(event, {
+    isPrimary: {
+      configurable: true,
+      value: init.isPrimary ?? true,
+    },
+    pointerId: {
+      configurable: true,
+      value: init.pointerId ?? 1,
+    },
+    pointerType: {
+      configurable: true,
+      value: init.pointerType ?? "mouse",
+    },
+  });
+  fireEvent(target, event);
+  return event;
 };
 
 describe("PDFChatViewer continuous rendering", () => {
@@ -362,6 +446,225 @@ describe("PDFChatViewer continuous rendering", () => {
 
     fireEvent.wheel(scrollContainer, { ctrlKey: true, deltaY: 100 });
     expect(screen.getByText("100%")).toBeInTheDocument();
+  });
+
+  it("drags the document vertically with a primary mouse pointer and restores the cursor on release", async () => {
+    render(<PDFChatViewer fileUrl="report-116.pdf" />);
+    await expectDocumentReady(116);
+
+    const scrollContainer = screen.getByTestId("pdf-scroll-container");
+    const blankTextLayer = screen.getByTestId("mock-text-layer-1");
+    const pointerCapture = mockPointerCapture(scrollContainer);
+    scrollContainer.scrollTop = 300;
+
+    expect(scrollContainer).toHaveClass("cursor-grab");
+
+    dispatchPointerEvent(blankTextLayer, "pointerdown", {
+      button: 0,
+      buttons: 1,
+      clientY: 480,
+      isPrimary: true,
+      pointerId: 7,
+      pointerType: "mouse",
+    });
+
+    expect(pointerCapture.setPointerCapture).toHaveBeenCalledWith(7);
+    expect(scrollContainer).toHaveClass("cursor-grab");
+
+    dispatchPointerEvent(scrollContainer, "pointermove", {
+      buttons: 1,
+      clientY: 478,
+      isPrimary: true,
+      pointerId: 7,
+      pointerType: "mouse",
+    });
+    expect(scrollContainer.scrollTop).toBe(300);
+    expect(scrollContainer).toHaveClass("cursor-grab");
+
+    dispatchPointerEvent(scrollContainer, "pointermove", {
+      buttons: 1,
+      clientY: 360,
+      isPrimary: true,
+      pointerId: 7,
+      pointerType: "mouse",
+    });
+    expect(scrollContainer.scrollTop).toBe(420);
+    expect(scrollContainer).toHaveClass("cursor-grabbing");
+
+    dispatchPointerEvent(scrollContainer, "pointermove", {
+      buttons: 1,
+      clientY: 410,
+      isPrimary: true,
+      pointerId: 7,
+      pointerType: "mouse",
+    });
+    expect(scrollContainer.scrollTop).toBe(370);
+
+    dispatchPointerEvent(scrollContainer, "pointerup", {
+      button: 0,
+      buttons: 0,
+      clientY: 410,
+      isPrimary: true,
+      pointerId: 7,
+      pointerType: "mouse",
+    });
+
+    expect(pointerCapture.releasePointerCapture).toHaveBeenCalledWith(7);
+    expect(scrollContainer).toHaveClass("cursor-grab");
+
+    dispatchPointerEvent(scrollContainer, "pointermove", {
+      buttons: 1,
+      clientY: 300,
+      isPrimary: true,
+      pointerId: 7,
+      pointerType: "mouse",
+    });
+    expect(scrollContainer.scrollTop).toBe(370);
+  });
+
+  it("ends drag state when pointer capture is cancelled or lost and cleans it up on unmount", async () => {
+    const view = render(<PDFChatViewer fileUrl="report-116.pdf" />);
+    await expectDocumentReady(116);
+
+    const scrollContainer = screen.getByTestId("pdf-scroll-container");
+    const pointerCapture = mockPointerCapture(scrollContainer);
+
+    dispatchPointerEvent(scrollContainer, "pointerdown", {
+      button: 0,
+      buttons: 1,
+      clientY: 500,
+      isPrimary: true,
+      pointerId: 11,
+      pointerType: "mouse",
+    });
+    expect(scrollContainer).toHaveClass("cursor-grab");
+
+    dispatchPointerEvent(scrollContainer, "pointercancel", {
+      pointerId: 11,
+      pointerType: "mouse",
+    });
+    expect(scrollContainer).toHaveClass("cursor-grab");
+
+    dispatchPointerEvent(scrollContainer, "pointerdown", {
+      button: 0,
+      buttons: 1,
+      clientY: 500,
+      isPrimary: true,
+      pointerId: 12,
+      pointerType: "mouse",
+    });
+    dispatchPointerEvent(scrollContainer, "lostpointercapture", {
+      pointerId: 12,
+      pointerType: "mouse",
+    });
+    expect(scrollContainer).toHaveClass("cursor-grab");
+
+    dispatchPointerEvent(scrollContainer, "pointerdown", {
+      button: 0,
+      buttons: 1,
+      clientY: 500,
+      isPrimary: true,
+      pointerId: 13,
+      pointerType: "mouse",
+    });
+    dispatchPointerEvent(scrollContainer, "pointermove", {
+      buttons: 1,
+      clientY: 450,
+      isPrimary: true,
+      pointerId: 13,
+      pointerType: "mouse",
+    });
+    expect(scrollContainer).toHaveClass("cursor-grabbing");
+
+    view.unmount();
+    expect(pointerCapture.releasePointerCapture).toHaveBeenCalledWith(13);
+  });
+
+  it("preserves text selection, links, and form controls instead of starting a drag", async () => {
+    render(<PDFChatViewer fileUrl="report-116.pdf" />);
+    await expectDocumentReady(116);
+
+    const scrollContainer = screen.getByTestId("pdf-scroll-container");
+    mockPointerCapture(scrollContainer);
+    scrollContainer.scrollTop = 240;
+
+    const interactiveTargets = [
+      screen.getByTestId("mock-text-1"),
+      screen.getByTestId("mock-link-1"),
+      screen.getByTestId("mock-input-1"),
+    ];
+
+    for (const target of interactiveTargets) {
+      const pointerDown = dispatchPointerEvent(target, "pointerdown", {
+        button: 0,
+        buttons: 1,
+        clientY: 500,
+        isPrimary: true,
+        pointerId: 21,
+        pointerType: "mouse",
+      });
+      expect(pointerDown.defaultPrevented).toBe(false);
+      expect(scrollContainer).toHaveClass("cursor-grab");
+
+      dispatchPointerEvent(scrollContainer, "pointermove", {
+        buttons: 1,
+        clientY: 300,
+        isPrimary: true,
+        pointerId: 21,
+        pointerType: "mouse",
+      });
+      expect(scrollContainer.scrollTop).toBe(240);
+    }
+
+    const input = screen.getByTestId("mock-input-1");
+    input.focus();
+    expect(input).toHaveFocus();
+  });
+
+  it("leaves touch and non-left mouse gestures to their native behavior", async () => {
+    render(<PDFChatViewer fileUrl="report-116.pdf" />);
+    await expectDocumentReady(116);
+
+    const scrollContainer = screen.getByTestId("pdf-scroll-container");
+    const pointerCapture = mockPointerCapture(scrollContainer);
+    scrollContainer.scrollTop = 180;
+
+    const ignoredPointers: MockPointerEventInit[] = [
+      {
+        button: 0,
+        buttons: 1,
+        clientY: 500,
+        isPrimary: true,
+        pointerId: 31,
+        pointerType: "touch",
+      },
+      {
+        button: 2,
+        buttons: 2,
+        clientY: 500,
+        isPrimary: true,
+        pointerId: 32,
+        pointerType: "mouse",
+      },
+    ];
+
+    for (const pointer of ignoredPointers) {
+      const pointerDown = dispatchPointerEvent(
+        scrollContainer,
+        "pointerdown",
+        pointer,
+      );
+      dispatchPointerEvent(scrollContainer, "pointermove", {
+        ...pointer,
+        clientY: 300,
+      });
+
+      expect(pointerDown.defaultPrevented).toBe(false);
+      expect(scrollContainer.scrollTop).toBe(180);
+      expect(scrollContainer).toHaveClass("cursor-grab");
+    }
+
+    expect(pointerCapture.setPointerCapture).not.toHaveBeenCalled();
   });
 
   it("drops the previous virtual window and page state when the file changes", async () => {

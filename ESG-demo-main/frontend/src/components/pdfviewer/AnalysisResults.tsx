@@ -52,6 +52,7 @@ interface AnalysisResultsProps {
    */
   showTable?: boolean;
   onDataChange?: (items: AnalysisDataItem[]) => void;
+  headerAction?: React.ReactNode;
 }
 
 // -------------------------
@@ -290,6 +291,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   onPageNavigate,
   showTable = true,
   onDataChange,
+  headerAction,
 }) => {
   const { t } = useT();
 
@@ -642,12 +644,22 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   }, [data]);
   // console.log("data.length", summary.disclosure);
 
+  const reportHeading = (
+    <div
+      className="flex min-w-0 items-center justify-between gap-3"
+      data-testid="analysis-report-heading"
+    >
+      <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-800 !my-0">
+        {currentFile?.name} ({currentFile?.framework})
+      </h1>
+      {headerAction && <div className="shrink-0">{headerAction}</div>}
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-bold text-gray-800 !my-0">
-          {currentFile?.name} ({currentFile?.framework})
-        </h1>
+        {reportHeading}
         <h2 className="text-xl font-semibold text-gray-800 !my-0">
           {industry && semiIndustry
             ? `${industry} - ${semiIndustry}`
@@ -669,9 +681,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         : t("analysis.failedToLoad");
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-bold text-gray-800 !my-0">
-          {currentFile?.name} ({currentFile?.framework})
-        </h1>
+        {reportHeading}
         <h2 className="text-xl font-semibold text-gray-800 !my-0">
           {industry && semiIndustry
             ? `${industry} - ${semiIndustry}`
@@ -696,9 +706,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-gray-800 !my-0">
-        {currentFile?.name} ({currentFile?.framework})
-      </h1>
+      {reportHeading}
       <h2 className="text-xl font-semibold text-gray-800 !my-0">
         {industry && semiIndustry
           ? `${industry} - ${semiIndustry}`
