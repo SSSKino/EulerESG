@@ -124,20 +124,28 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html,
-  body {
+  html {
     overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+    scroll-behavior: smooth;
   }
 
-  html {
-    scroll-behavior: smooth;
+  /* Keep body out of the scroll-container chain. The document viewport (html)
+     is the single page-level vertical scroll owner across every route. */
+  body {
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   /* Evidence reader (Cross Analysis) can temporarily allow horizontal scroll when the user zooms in.
      This avoids clipping while keeping the rest of the app strictly no-horizontal-scroll. */
-  html.evidence-x-scroll,
-  body.evidence-x-scroll {
+  html.evidence-x-scroll {
     overflow-x: auto !important;
+  }
+
+  body.evidence-x-scroll {
+    overflow-x: visible !important;
   }
 
   body {
@@ -149,7 +157,7 @@
     font-family: Inter, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    overscroll-behavior-y: none;
+    overscroll-behavior-y: auto;
   }
 
   button,
@@ -230,6 +238,13 @@ button:not(:disabled):active,
 
 .analysis-results-table .ant-table-content {
   overflow-x: hidden !important;
+}
+
+/* Table scrollers on every page hand vertical wheel/touch gestures back to the
+   document (or their containing modal) at their top/bottom boundaries. */
+.ant-table-body {
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Metric chart grid row: dynamic columns, but stack on small screens */

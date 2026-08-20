@@ -206,7 +206,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
           <p>
             {t("upload.type")}: {fileTypes}
           </p>
-          <div className="max-h-28 overflow-y-auto rounded-md border border-gray-200 px-3 py-2 bg-gray-50">
+          <div className="max-h-28 overflow-y-auto overscroll-y-auto rounded-md border border-gray-200 px-3 py-2 bg-gray-50">
             {selectedUploadFiles.map((file) => (
               <p key={file.uid} className="mb-1 last:mb-0 break-all text-sm text-gray-700">
                 {file.name}

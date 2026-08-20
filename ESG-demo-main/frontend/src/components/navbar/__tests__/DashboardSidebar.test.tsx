@@ -202,6 +202,18 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     window.localStorage.clear();
   });
 
+  it("configures vertical boundary chaining for the sidebar", () => {
+    mocks.pathname = "/dashboard/chat";
+    render(<DashboardSidebar />);
+
+    expect(
+      screen.getByRole("navigation", { name: "Dashboard navigation" }),
+    ).toHaveClass("overflow-y-auto", "overscroll-y-auto");
+    expect(
+      screen.getByRole("navigation", { name: "Dashboard navigation" }),
+    ).not.toHaveClass("overscroll-contain");
+  });
+
   it("aligns the expanded Disclosure child with embedded primary directory items without an icon gap", () => {
     render(<DashboardSidebar />);
 

@@ -175,7 +175,17 @@ const ComplianceSummaryDrawer: React.FC<ComplianceSummaryDrawerProps> = ({
           {t("analysis.downloadSummary")}
         </button>
       }
-      styles={{ body: { padding: 20, background: "#f8fafc" } }}
+      styles={{
+        body: {
+          padding: 20,
+          background: "#f8fafc",
+          overflowY: "auto",
+          // The summary is a modal surface: wheel/touch gestures stay inside it
+          // instead of moving the obscured Compliance page behind the mask.
+          overscrollBehaviorY: "contain",
+          WebkitOverflowScrolling: "touch",
+        },
+      }}
     >
       <div className="space-y-6">
         <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-4">

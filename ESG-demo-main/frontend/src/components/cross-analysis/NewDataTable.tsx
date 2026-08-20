@@ -114,7 +114,7 @@ function MultiSelectFilter({ ariaLabel, options, selected, onChange }: MultiFilt
               className="fixed bg-white border border-slate-200 rounded-xl shadow-lg p-3 z-[1200]"
               style={{ top: pos.top, left: pos.left, width: pos.width, maxHeight: "72vh" }}
             >
-              <div className="space-y-1.5 overflow-y-auto overflow-x-visible pr-1" style={{ maxHeight: "56vh" }}>
+              <div className="space-y-1.5 overflow-y-auto overflow-x-visible overscroll-y-auto pr-1" style={{ maxHeight: "56vh" }}>
                 {options.length === 0 ? (
                   <div className="text-sm text-slate-500 py-2 text-center">{t("common.noOptions")}</div>
                 ) : (

@@ -250,9 +250,61 @@ type GriOptionsResponse = {
   topicsBySector: Record<string, { slug: string; label: string }[]>;
 };
 
+export interface StandardsLibraryScope {
+  id: string;
+  label: string;
+}
+
+export interface StandardsLibraryGroup {
+  id: string;
+  label: string;
+  scopes: StandardsLibraryScope[];
+}
+
+export interface StandardsLibraryFramework {
+  id: "sasb" | "gri" | "cdp" | "aasb";
+  name: string;
+  as_of: string;
+  source_url: string;
+  available: boolean;
+  scope_count: number;
+  group_label: string;
+  scope_label: string;
+  groups: StandardsLibraryGroup[];
+}
+
+export interface StandardsLibraryCatalogResponse {
+  frameworks: StandardsLibraryFramework[];
+}
+
+export interface StandardsLibraryMetric {
+  id: string;
+  code?: string | null;
+  name: string;
+  topic?: string | null;
+  category?: string | null;
+  type?: string | null;
+  unit?: string | null;
+  standard?: string | null;
+  definition?: string | null;
+  simple_definition?: string | null;
+}
+
+export interface StandardsLibraryMetricsResponse {
+  framework: Pick<
+    StandardsLibraryFramework,
+    "id" | "name" | "as_of" | "source_url" | "group_label" | "scope_label"
+  >;
+  group: { id: string; label: string };
+  scope: StandardsLibraryScope;
+  total_metrics: number;
+  metrics: StandardsLibraryMetric[];
+}
+
 class APIService {
   private assessmentByFileCache = new Map<string, Promise<any>>();
   private griOptionsCache: Promise<GriOptionsResponse> | null = null;
+  private standardsCatalogCache: Promise<StandardsLibraryCatalogResponse> | null = null;
   private visualManifestCache = new Map<string, { etag?: string; data: any }>();
   private visualObjectUrlCache = new Map<string, Promise<string>>();
   private crossAnalysisRequestCache = new Map<
@@ -725,6 +777,36 @@ class APIService {
       }) as Promise<GriOptionsResponse>;
     }
     return this.griOptionsCache;
+  }
+
+  async getStandardsCatalog(
+    forceRefresh = false,
+  ): Promise<StandardsLibraryCatalogResponse> {
+    if (forceRefresh) this.standardsCatalogCache = null;
+    if (!this.standardsCatalogCache) {
+      this.standardsCatalogCache = this.fetchWithError(
+        `${API_BASE_URL}/api/standards-library/catalog`,
+        { method: "GET" },
+      ).catch((error) => {
+        this.standardsCatalogCache = null;
+        throw error;
+      }) as Promise<StandardsLibraryCatalogResponse>;
+    }
+    return this.standardsCatalogCache;
+  }
+
+  async getStandardMetrics(
+    frameworkId: string,
+    groupId: string,
+    scopeId: string,
+    signal?: AbortSignal,
+  ): Promise<StandardsLibraryMetricsResponse> {
+    const query = new URLSearchParams({ scope_id: scopeId });
+    if (groupId) query.set("group_id", groupId);
+    return this.fetchWithError(
+      `${API_BASE_URL}/api/standards-library/${encodeURIComponent(frameworkId)}/metrics?${query.toString()}`,
+      { method: "GET", signal },
+    ) as Promise<StandardsLibraryMetricsResponse>;
   }
 
   // Upload ESG metrics - REMOVED: This function was never used and had misleading logic

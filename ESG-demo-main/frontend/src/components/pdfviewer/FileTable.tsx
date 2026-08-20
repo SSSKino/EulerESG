@@ -9,6 +9,7 @@ import {
   StarOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
+import { ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   canCrossAnalyzeFiles,
@@ -485,7 +486,7 @@ const FileTable: React.FC<FileTableProps> = ({
           <Button
             type="primary"
             size="small"
-            icon={<BarChartOutlined />}
+            icon={<ShieldCheck aria-hidden="true" className="h-4 w-4" data-testid="compliance-action-icon" />}
             disabled={file.status !== "ready"}
             onClick={(event) => {
               event.stopPropagation();
@@ -498,7 +499,7 @@ const FileTable: React.FC<FileTableProps> = ({
           <Button
             type="primary"
             size="small"
-            icon={<BarChartOutlined />}
+            icon={<ShieldCheck aria-hidden="true" className="h-4 w-4" data-testid="compliance-action-icon" />}
             onClick={(event) => {
               event.stopPropagation();
               onChatClick(file);

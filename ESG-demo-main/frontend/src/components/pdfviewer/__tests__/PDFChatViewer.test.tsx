@@ -448,6 +448,23 @@ describe("PDFChatViewer continuous rendering", () => {
     expect(screen.getByText("100%")).toBeInTheDocument();
   });
 
+  it("keeps ordinary vertical wheel native and enables boundary chaining", async () => {
+    render(<PDFChatViewer fileUrl="report-116.pdf" />);
+    await expectDocumentReady(116);
+
+    const scrollContainer = screen.getByTestId("pdf-scroll-container");
+    const wheelEvent = new WheelEvent("wheel", {
+      bubbles: true,
+      cancelable: true,
+      deltaY: 100,
+    });
+    scrollContainer.dispatchEvent(wheelEvent);
+
+    expect(wheelEvent.defaultPrevented).toBe(false);
+    expect(scrollContainer.style.overscrollBehaviorY).toBe("auto");
+    expect(scrollContainer.style.overscrollBehaviorX).toBe("contain");
+  });
+
   it("drags the document vertically with a primary mouse pointer and restores the cursor on release", async () => {
     render(<PDFChatViewer fileUrl="report-116.pdf" />);
     await expectDocumentReady(116);

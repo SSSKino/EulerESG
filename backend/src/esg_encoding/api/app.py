@@ -23,7 +23,17 @@ from ..exceptions import AccessError, InputError
 from ..file_manager import file_manager
 from . import error_handlers
 from ..services import system_service
-from .routers import auth, chat, compliance, cross_analysis, excel_metrics, files, reports, system
+from .routers import (
+    auth,
+    chat,
+    compliance,
+    cross_analysis,
+    excel_metrics,
+    files,
+    reports,
+    standards_library,
+    system,
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -130,3 +140,4 @@ app.include_router(chat.router)
 app.include_router(files.router)
 app.include_router(cross_analysis.router)
 app.include_router(excel_metrics.router)
+app.include_router(standards_library.router)

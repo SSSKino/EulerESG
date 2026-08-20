@@ -129,7 +129,7 @@ export default function AIDrawer({
             <span className="hidden sm:inline text-xs text-slate-500">{t("crossAnalysis.ai.evidenceAware")}</span>
           </button>
         </SheetTrigger>
-        <SheetContent side="right" className="w-[420px] sm:w-[480px]">
+        <SheetContent side="right" className="w-[420px] overflow-y-auto overscroll-y-contain sm:w-[480px]">
           <SheetHeader>
             <div className="flex items-center justify-between gap-3">
               <SheetTitle className="text-base">{t("crossAnalysis.ai.assistant")}</SheetTitle>
@@ -148,7 +148,10 @@ export default function AIDrawer({
           </SheetHeader>
 
           <div className="mt-4 flex h-[65vh] flex-col rounded-2xl border border-slate-200 bg-white/60 p-3 shadow-sm backdrop-blur">
-            <div className="flex-1 space-y-3 overflow-auto pr-1">
+            <div
+              className="flex-1 space-y-3 overflow-auto overscroll-y-contain pr-1"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
               {messages.length === 0 ? (
                 <div className="rounded-xl border border-slate-200 bg-white/70 p-3 text-sm text-slate-700">
                   <div className="font-medium">{t("crossAnalysis.ai.suggestedPrompts")}</div>

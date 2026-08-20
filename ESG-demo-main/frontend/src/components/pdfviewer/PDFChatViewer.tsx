@@ -560,7 +560,10 @@ export default function PDFChatViewer({
           isPointerDragging ? "cursor-grabbing select-none" : "cursor-grab"
         }`}
         style={{
-          overscrollBehavior: "contain",
+          // Keep wide, zoomed pages horizontally contained, but let a vertical
+          // wheel/touch gesture continue onto the Compliance page at PDF bounds.
+          overscrollBehaviorX: "contain",
+          overscrollBehaviorY: "auto",
           WebkitOverflowScrolling: "touch",
         }}
         onPointerDown={beginPointerDrag}

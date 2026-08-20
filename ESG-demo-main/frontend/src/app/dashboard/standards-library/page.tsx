@@ -2,8 +2,8 @@ import FrameworkReferencePanel from "@/components/maincontent/FrameworkReference
 
 export default function StandardsLibraryPage() {
   return (
-    <main className="min-h-screen w-full bg-gray-50 pt-1">
-      <div className="mx-auto w-[95%] max-w-6xl py-4">
+    <main className="min-h-screen w-full bg-white">
+      <div className="mx-auto w-full max-w-[1540px] px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
         <FrameworkReferencePanel />
       </div>
     </main>

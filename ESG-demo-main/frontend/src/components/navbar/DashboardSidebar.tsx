@@ -262,7 +262,10 @@ export default function DashboardSidebar({
         )}
       </div>
 
-      <nav className={`flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain ${collapsed ? "px-2 pt-1" : "px-2.5 pt-1"}`}>
+      <nav
+        aria-label="Dashboard navigation"
+        className={`flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-y-auto ${collapsed ? "px-2 pt-1" : "px-2.5 pt-1"}`}
+      >
         <button
           type="button"
           onClick={() => router.push("/dashboard")}
@@ -325,7 +328,7 @@ export default function DashboardSidebar({
               ref={crossAnalysisNavigationSlotRef}
               data-testid="cross-analysis-navigation-slot"
               hidden={collapsed}
-              className="min-h-0 max-h-[min(320px,36vh)] overflow-y-auto overscroll-contain"
+              className="min-h-0 max-h-[min(320px,36vh)] overflow-y-auto overscroll-y-auto"
             />
           ) : null}
         </div>

@@ -97,12 +97,14 @@ vi.mock("antd", async () => {
     "aria-label": ariaLabel,
     children,
     disabled,
+    icon,
     onClick,
     title,
   }: PropsWithChildren<Record<string, any>>) =>
     React.createElement(
       "button",
       { "aria-label": ariaLabel, disabled, onClick, title, type: "button" },
+      icon,
       children,
     );
   const Modal = Object.assign(
@@ -224,6 +226,35 @@ function renderFavouriteTable() {
     />,
   );
 }
+
+function renderHomepageTable() {
+  return render(
+    <FileTable
+      onChatClick={vi.fn()}
+      onSelectionChange={vi.fn()}
+      reportCatalogMode="single"
+      selectedRows={[]}
+    />,
+  );
+}
+
+describe("FileTable compliance actions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    window.localStorage.clear();
+  });
+
+  it("uses the same shield-check icon as the dashboard sidebar", () => {
+    renderHomepageTable();
+
+    const actions = screen.getAllByRole("button", { name: "Analysis" });
+    expect(actions.length).toBeGreaterThan(0);
+    for (const action of actions) {
+      expect(action.querySelector('[data-testid="compliance-action-icon"]')).not.toBeNull();
+      expect(action.querySelector(".lucide-shield-check")).not.toBeNull();
+    }
+  });
+});
 
 describe("FileTable favourites directory", () => {
   beforeEach(() => {

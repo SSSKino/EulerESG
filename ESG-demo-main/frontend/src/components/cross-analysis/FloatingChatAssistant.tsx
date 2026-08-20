@@ -74,7 +74,17 @@ export default function FloatingChatAssistant() {
         onClose={() => setOpen(false)}
         open={open}
         destroyOnClose={false}
-        styles={{ body: { padding: 0, display: "flex", flexDirection: "column", height: "calc(100% - 55px)" } }}
+        styles={{
+          body: {
+            padding: 0,
+            display: "flex",
+            flexDirection: "column",
+            height: "calc(100% - 55px)",
+            overflowY: "auto",
+            overscrollBehaviorY: "contain",
+            WebkitOverflowScrolling: "touch",
+          },
+        }}
       >
         <div className="flex h-full flex-col min-h-0">
           <ChatInterface

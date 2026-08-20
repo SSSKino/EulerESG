@@ -258,6 +258,8 @@ export default function PDFEvidenceViewer({
         style={{
           flex: scrollMode === "container" ? 1 : "unset",
           overflow: overflowMode as any,
+          overscrollBehaviorY: "auto",
+          WebkitOverflowScrolling: "touch",
           height: scrollMode === "container" ? height : "auto",
           padding: 8,
           background: "rgba(255,255,255,0.7)",

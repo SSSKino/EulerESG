@@ -80,7 +80,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto mb-3 border rounded-lg p-3 bg-white">
+      <div
+        className="mb-3 min-h-0 flex-1 overflow-y-auto overscroll-y-auto rounded-lg border bg-white p-3"
+        data-testid="compliance-message-scroll"
+        style={{
+          overscrollBehaviorY: "auto",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
         {messages.length === 0 ? (
           <p className="text-gray-500 text-center">{t("chat.empty")}</p>
         ) : (
@@ -110,7 +117,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder={t("chat.placeholder")}
           autoSize={{ minRows: 1, maxRows: 4 }}
-          className="flex-1"
+          className="flex-1 overscroll-y-auto"
+          style={{
+            overscrollBehaviorY: "auto",
+            WebkitOverflowScrolling: "touch",
+          }}
           onPressEnter={(e) => {
             if (!e.shiftKey) {
               e.preventDefault();
