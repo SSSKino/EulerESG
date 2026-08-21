@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, Empty, Select, Tabs } from "antd";
 import { useT } from "@/i18n/useT";
-import { Column } from "@ant-design/plots";
+import Column from "@ant-design/plots/es/components/column";
 import type { AllRecord } from "@/features/crossAnalysis/types";
 
 function extractNumber(v: string): number | null {

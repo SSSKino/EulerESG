@@ -198,7 +198,7 @@ function openEvidence(fileId: string, page: number | null, title: string) {
   window.open(`/cross-analysis/evidence?${qs.toString()}`, "_blank", "noopener,noreferrer");
 }
 
-function StatusDonut({ red, yellow, green, total }: { red: number; yellow: number; green: number; total: number }) {
+function StatusDonut({ red, yellow, total }: { red: number; yellow: number; green: number; total: number }) {
   const redPct = total ? (red / total) * 100 : 0;
   const yellowPct = total ? (yellow / total) * 100 : 0;
   const donutStyle: React.CSSProperties = {

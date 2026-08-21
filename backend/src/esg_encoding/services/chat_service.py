@@ -80,6 +80,13 @@ async def chat(request: ChatRequest):
     """
     try:
         chatbot = system_components["chatbot"]
+
+        # General chat must be request-local. Do not load or expose the
+        # process-wide latest report merely because another page used the shared
+        # chatbot first.
+        if not request.include_context:
+            with _chatbot_ops_lock:
+                return chatbot.chat(request)
         
         # 优先使用内存中的数据（如果存在）
         latest_assessment = system_components.get("current_assessment")

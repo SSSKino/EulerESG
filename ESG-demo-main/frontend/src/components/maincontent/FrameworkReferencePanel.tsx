@@ -405,12 +405,12 @@ export default function FrameworkReferencePanel() {
                                   {(metric.simple_definition || metric.definition) && (
                                     <details className="mt-1.5 text-xs text-slate-600">
                                       <summary className="cursor-pointer font-medium text-[#2274BC] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2274BC]">{copy.definition}</summary>
-                                      <p className="mb-0 mt-2 whitespace-pre-wrap leading-5">{metric.simple_definition || metric.definition}</p>
+                                      <p className="mb-0 mt-2 whitespace-pre-wrap break-words leading-5">{metric.simple_definition || metric.definition}</p>
                                     </details>
                                   )}
                                 </td>
                                 <td className="px-3 py-4 text-slate-600">{metric.topic || "—"}</td>
-                                <td className="px-3 py-4 text-slate-600">{[metric.category, metric.type].filter(Boolean).join(" · ") || "—"}</td>
+                                <td className="px-3 py-4 text-slate-600">{metric.category || "—"}</td>
                                 <td className="px-3 py-4 text-slate-600">{metric.unit || "—"}</td>
                               </tr>
                             ))}

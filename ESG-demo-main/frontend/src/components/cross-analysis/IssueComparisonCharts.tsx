@@ -13,10 +13,10 @@ import { useT } from "@/i18n/useT";
 // 1) dynamically import the plot component with ssr:false, and
 // 2) delay the first render until after mount.
 
-const ColumnPlot = dynamic(async () => {
-  const mod: any = await import("@ant-design/plots");
-  return mod.Column;
-}, { ssr: false });
+const ColumnPlot = dynamic(
+  () => import("@ant-design/plots/es/components/column"),
+  { ssr: false },
+);
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);

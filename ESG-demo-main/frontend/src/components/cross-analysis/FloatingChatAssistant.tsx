@@ -12,9 +12,16 @@ interface Message {
   isUser: boolean;
 }
 
-export default function FloatingChatAssistant() {
+interface FloatingChatAssistantProps {
+  includeContext?: boolean;
+}
+
+export default function FloatingChatAssistant({
+  includeContext = true,
+}: FloatingChatAssistantProps) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
+  const [sessionId, setSessionId] = useState<string>();
   const [messages, setMessages] = useState<Message[]>(() => [
     { text: t("chat.welcomeMessage"), isUser: false },
   ]);
@@ -27,8 +34,10 @@ export default function FloatingChatAssistant() {
       try {
         const response: ChatResponse = await apiService.sendMessage({
           message: userMessage,
-          include_context: true,
+          include_context: includeContext,
+          session_id: sessionId,
         });
+        setSessionId(response.session_id);
         setMessages((prev) => {
           const withoutLoading = prev.slice(0, -1);
           return [...withoutLoading, { text: response.response, isUser: false }];
@@ -48,10 +57,11 @@ export default function FloatingChatAssistant() {
         });
       }
     },
-    [t]
+    [includeContext, sessionId, t]
   );
 
   const handleClearChat = useCallback(() => {
+    setSessionId(undefined);
     setMessages([{ text: t("chat.welcomeMessage"), isUser: false }]);
   }, [t]);
 
@@ -60,11 +70,11 @@ export default function FloatingChatAssistant() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 left-6 z-40 flex items-center gap-2 rounded-full bg-slate-700 px-4 py-3 text-white shadow-lg transition hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
-        aria-label={t("crossAnalysis.floatingAssistant")}
+        className="dashboard-chat-launcher fixed z-[51] flex items-center gap-2 rounded-full bg-slate-700 px-4 py-3 text-white shadow-lg transition hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+        aria-label="AI Assistant"
       >
         <MessageCircle className="h-5 w-5" />
-        <span className="text-sm font-medium">{t("crossAnalysis.floatingAssistant")}</span>
+        <span className="text-sm font-medium">AI Assistant</span>
       </button>
 
       <Drawer

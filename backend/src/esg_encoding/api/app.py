@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 import re
 import time
@@ -23,6 +24,7 @@ from ..exceptions import AccessError, InputError
 from ..file_manager import file_manager
 from . import error_handlers
 from ..services import system_service
+from ..services.standards_library_service import get_standards_catalog
 from .routers import (
     auth,
     chat,
@@ -44,6 +46,12 @@ async def lifespan(app: FastAPI):
     startup initialization in one place.
     """
     await system_service.startup_event()
+    try:
+        await asyncio.to_thread(get_standards_catalog)
+    except Exception as exc:
+        # Standards routes already return a controlled data error. Keep the
+        # rest of the backend available if optional catalog data is damaged.
+        logger.warning(f"Standards catalog warmup skipped: {exc}")
     try:
         yield
     finally:

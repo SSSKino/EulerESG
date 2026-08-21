@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { RefCallback } from "react";
 import { BarChart3, Check, HelpCircle, House, Languages, LibraryBig, ListChecks, LogOut, PanelLeftClose, PanelLeftOpen, Repeat2, Settings, ShieldCheck, Star } from "lucide-react";
-import { message, Modal, Table, Tag } from "antd";
-import type { ColumnsType } from "antd/es/table";
+import { message } from "antd";
 import EulerLogo from "@/assets/Euler-Img.svg";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,15 @@ import { useAppLang } from "@/i18n/useAppLang";
 import { useT } from "@/i18n/useT";
 import { canCrossAnalyzeFiles, useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
+import type { DashboardReportSelectorMode } from "./DashboardReportSelector";
+
+const DashboardReportSelector = dynamic(
+  () => import("./DashboardReportSelector"),
+  { ssr: false },
+);
+
+const preloadDashboardReportSelector = () =>
+  import("./DashboardReportSelector");
 
 const SIDEBAR_STORAGE_KEY = "dashboard-sidebar-collapsed";
 
@@ -46,8 +55,10 @@ export default function DashboardSidebar({
   const { t } = useT();
   const [collapsed, setCollapsed] = useState(false);
   const [displayName, setDisplayName] = useState("User");
-  const [selectorMode, setSelectorMode] = useState<"compliance" | "cross" | "disclosure" | null>(null);
+  const [selectorMode, setSelectorMode] = useState<DashboardReportSelectorMode | null>(null);
   const [selectedReportKeys, setSelectedReportKeys] = useState<string[]>([]);
+  const standardsPrefetchStarted = useRef(false);
+  const prefetchedRoutes = useRef(new Set<string>());
 
   const readyReports = useMemo(
     () => files.filter((file) => file.status === "ready" && Boolean(file.file_id)),
@@ -56,48 +67,6 @@ export default function DashboardSidebar({
   const reportKey = (file: (typeof readyReports)[number]) =>
     `${file.file_id}::${file.analysis_scope_key || ""}`;
   const selectedReports = readyReports.filter((file) => selectedReportKeys.includes(reportKey(file)));
-  const isMultiReportSelector = selectorMode === "cross" || selectorMode === "disclosure";
-  const selectorColumns: ColumnsType<File> = [
-    { title: t("files.columns.name"), dataIndex: "name", key: "name", ellipsis: true },
-    { title: t("files.columns.size"), dataIndex: "size", key: "size", width: 100 },
-    { title: t("files.columns.dateUploaded"), dataIndex: "dateUploaded", key: "dateUploaded", width: 120 },
-    { title: t("files.columns.type"), dataIndex: "type", key: "type", width: 85 },
-    {
-      title: t("files.columns.framework"),
-      dataIndex: "framework",
-      key: "framework",
-      width: 110,
-      render: (value?: string) => <Tag>{value || t("common.unknown")}</Tag>,
-    },
-    {
-      title: t("files.columns.industry"),
-      key: "option",
-      width: 150,
-      ellipsis: true,
-      render: (_value, file) => {
-        const framework = (file.framework || "").trim();
-        return (framework === "CDP" || framework === "TCFD" ? file.semiIndustry : file.industry) || t("common.unknown");
-      },
-    },
-    {
-      title: t("files.columns.subOption"),
-      dataIndex: "semiIndustry",
-      key: "subOption",
-      width: 150,
-      ellipsis: true,
-      render: (value, file) => {
-        const framework = (file.framework || "").trim();
-        return framework === "CDP" || framework === "TCFD" ? t("common.na") : value || t("common.unknown");
-      },
-    },
-    {
-      title: t("files.columns.status"),
-      key: "status",
-      width: 100,
-      render: () => <Tag color="success">{t("files.status.ready")}</Tag>,
-    },
-  ];
-
   useEffect(() => {
     const stored = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
     setCollapsed(stored === null ? window.innerWidth < 768 : stored === "true");
@@ -105,13 +74,6 @@ export default function DashboardSidebar({
     const auth = getStoredAuth();
     if (auth?.name || auth?.email) setDisplayName(auth.name || auth.email || "User");
   }, []);
-
-  useEffect(() => {
-    router.prefetch("/dashboard/chat");
-    router.prefetch("/dashboard/favourite");
-    router.prefetch("/dashboard/standards-library");
-    router.prefetch("/cross-analysis");
-  }, [router]);
 
   const initials = useMemo(() => {
     const firstCharacter = displayName.trim().slice(0, 1);
@@ -138,6 +100,15 @@ export default function DashboardSidebar({
     router.push("/login?switch_account=1");
   };
 
+  const prefetchStandardsLibrary = () => {
+    if (standardsPrefetchStarted.current) return;
+    standardsPrefetchStarted.current = true;
+    router.prefetch("/dashboard/standards-library");
+    void apiService.getStandardsCatalog().catch(() => {
+      standardsPrefetchStarted.current = false;
+    });
+  };
+
   const showUnavailableMessage = (feature: "settings" | "help") => {
     const label = feature === "settings"
       ? (lang === "zh" ? "设置" : "Settings")
@@ -145,12 +116,44 @@ export default function DashboardSidebar({
     void message.info(lang === "zh" ? `${label}功能即将开放` : `${label} is coming soon`);
   };
 
-  const openReportSelector = (mode: "compliance" | "cross" | "disclosure") => {
+  const prefetchRoute = (route: string) => {
+    if (prefetchedRoutes.current.has(route)) return;
+    prefetchedRoutes.current.add(route);
+    router.prefetch(route);
+  };
+
+  const prefetchReportFlow = (mode: DashboardReportSelectorMode) => {
+    void preloadDashboardReportSelector().catch(() => undefined);
+    prefetchRoute(mode === "compliance" ? "/dashboard/chat" : "/cross-analysis");
+  };
+
+  const openReportSelector = (mode: DashboardReportSelectorMode) => {
+    prefetchReportFlow(mode);
     setSelectorMode(mode);
     setSelectedReportKeys([]);
     if (files.length === 0) {
       void useFileStore.getState().loadFilesFromBackend({ showLoading: false });
     }
+  };
+
+  const handleReportClick = (file: File) => {
+    const key = reportKey(file);
+    const isMultiReportSelector = selectorMode === "cross" || selectorMode === "disclosure";
+    if (!isMultiReportSelector) {
+      apiService.prefetchAssessmentByFile(
+        file.file_id,
+        file.analysis_scope_key,
+        false,
+        true,
+      );
+      setSelectedReportKeys([key]);
+      return;
+    }
+    setSelectedReportKeys((current) =>
+      current.includes(key)
+        ? current.filter((item) => item !== key)
+        : [...current, key],
+    );
   };
 
   const confirmReportSelection = () => {
@@ -278,6 +281,8 @@ export default function DashboardSidebar({
         <button
           type="button"
           onClick={() => openReportSelector("compliance")}
+          onFocus={() => prefetchReportFlow("compliance")}
+          onMouseEnter={() => prefetchReportFlow("compliance")}
           className={navigationClass(isCompliance)}
           title={collapsed ? "Compliance" : undefined}
         >
@@ -287,6 +292,8 @@ export default function DashboardSidebar({
         <button
           type="button"
           onClick={() => openReportSelector("cross")}
+          onFocus={() => prefetchReportFlow("cross")}
+          onMouseEnter={() => prefetchReportFlow("cross")}
           className={navigationClass(isCrossAnalysis)}
           title={collapsed ? "Cross Analysis" : undefined}
           aria-current={isCrossAnalysis ? "page" : undefined}
@@ -304,6 +311,8 @@ export default function DashboardSidebar({
             type="button"
             data-testid="disclosure-completeness-nav"
             onClick={() => openReportSelector("disclosure")}
+            onFocus={() => prefetchReportFlow("disclosure")}
+            onMouseEnter={() => prefetchReportFlow("disclosure")}
             aria-label={t("crossAnalysis.disclosureCompleteness")}
             aria-current={isDisclosureCompleteness ? "page" : undefined}
             className={`flex shrink-0 items-center border border-transparent transition-colors ${
@@ -335,6 +344,8 @@ export default function DashboardSidebar({
         <button
           type="button"
           onClick={() => router.push("/dashboard/favourite")}
+          onFocus={() => prefetchRoute("/dashboard/favourite")}
+          onMouseEnter={() => prefetchRoute("/dashboard/favourite")}
           className={navigationClass(isFavourite)}
           title={collapsed ? "Favourite" : undefined}
           aria-current={isFavourite ? "page" : undefined}
@@ -345,6 +356,8 @@ export default function DashboardSidebar({
         <button
           type="button"
           onClick={() => router.push("/dashboard/standards-library")}
+          onFocus={prefetchStandardsLibrary}
+          onMouseEnter={prefetchStandardsLibrary}
           className={navigationClass(isStandardsLibrary)}
           title={collapsed ? "Standards Library" : undefined}
           aria-current={isStandardsLibrary ? "page" : undefined}
@@ -418,56 +431,17 @@ export default function DashboardSidebar({
         </DropdownMenu>
       </div>
 
-      <Modal
-        open={selectorMode !== null}
-        title={selectorMode === "disclosure"
-          ? (lang === "zh" ? "选择披露完整度报告" : "Select reports for disclosure completeness")
-          : selectorMode === "cross"
-            ? (lang === "zh" ? "选择综合分析报告" : "Select reports for cross analysis")
-            : (lang === "zh" ? "选择合规分析报告" : "Select a report for compliance analysis")}
-        okText={lang === "zh" ? "开始分析" : "Start analysis"}
-        cancelText={t("common.cancel")}
-        onOk={confirmReportSelection}
-        onCancel={() => setSelectorMode(null)}
-        okButtonProps={{ disabled: isMultiReportSelector ? selectedReportKeys.length < 2 : selectedReportKeys.length !== 1 }}
-        width={1100}
-        destroyOnClose
-      >
-        <Table<File>
-          className="dashboard-file-table"
-          columns={selectorColumns}
-          dataSource={readyReports}
-          rowKey={reportKey}
-          size="small"
-          scroll={{ x: 1000 }}
-          locale={{ emptyText: lang === "zh" ? "暂无已处理完成的报告" : "No processed reports available" }}
-          pagination={{ pageSize: 8, showSizeChanger: false, hideOnSinglePage: true }}
-          rowSelection={{
-            type: isMultiReportSelector ? "checkbox" : "radio",
-            selectedRowKeys: selectedReportKeys,
-            onChange: (keys) => setSelectedReportKeys(keys.map(String)),
-          }}
-          onRow={(file) => ({
-            onClick: () => {
-              const key = reportKey(file);
-              if (!isMultiReportSelector) {
-                apiService.prefetchAssessmentByFile(
-                  file.file_id,
-                  file.analysis_scope_key,
-                  false,
-                  true,
-                );
-                setSelectedReportKeys([key]);
-                return;
-              }
-              setSelectedReportKeys((current) =>
-                current.includes(key) ? current.filter((item) => item !== key) : [...current, key]
-              );
-            },
-            className: "cursor-pointer",
-          })}
+      {selectorMode && (
+        <DashboardReportSelector
+          mode={selectorMode}
+          readyReports={readyReports}
+          selectedReportKeys={selectedReportKeys}
+          onSelectionChange={setSelectedReportKeys}
+          onReportClick={handleReportClick}
+          onConfirm={confirmReportSelection}
+          onCancel={() => setSelectorMode(null)}
         />
-      </Modal>
+      )}
     </aside>
     </>
   );

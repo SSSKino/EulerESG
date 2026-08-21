@@ -25,7 +25,7 @@ vi.mock("../ComplianceSummaryDrawer", () => ({
 }));
 
 vi.mock("../ChatInterface", () => ({
-  default: ({ onClose }: { onClose?: () => void }) => {
+  default: function MockChatInterface({ onClose }: { onClose?: () => void }) {
     const [draft, setDraft] = useState("");
     return (
       <div>
@@ -70,12 +70,15 @@ describe("ChatView floating assistant", () => {
   it("opens as a non-modal floating panel instead of a right-side drawer", () => {
     renderChatView();
 
-    const launcher = screen.getByRole("button", { name: "chat.aiAssistant" });
+    const launcher = screen.getByRole("button", { name: "AI Assistant" });
     const panel = screen.getByTestId("compliance-ai-assistant");
 
     expect(launcher).toHaveAttribute("aria-expanded", "false");
+    expect(launcher).toHaveClass("dashboard-chat-launcher", "fixed");
+    expect(launcher).not.toHaveClass("right-6");
     expect(panel).toHaveAttribute("aria-hidden", "true");
-    expect(panel).toHaveClass("fixed", "bottom-20");
+    expect(panel).toHaveClass("dashboard-chat-panel", "fixed");
+    expect(panel).not.toHaveClass("origin-bottom-right", "sm:right-6");
     expect(document.querySelector(".ant-drawer")).not.toBeInTheDocument();
 
     fireEvent.click(launcher);
@@ -89,14 +92,14 @@ describe("ChatView floating assistant", () => {
     renderChatView();
 
     const panel = screen.getByTestId("compliance-ai-assistant");
-    fireEvent.click(screen.getByRole("button", { name: "chat.aiAssistant" }));
+    fireEvent.click(screen.getByRole("button", { name: "AI Assistant" }));
 
     const draft = screen.getByLabelText("Draft");
     fireEvent.change(draft, { target: { value: "unfinished question" } });
     fireEvent.click(screen.getByRole("button", { name: "assistant-close" }));
 
     expect(panel).toHaveAttribute("aria-hidden", "true");
-    fireEvent.click(screen.getByRole("button", { name: "chat.aiAssistant" }));
+    fireEvent.click(screen.getByRole("button", { name: "AI Assistant" }));
     expect(screen.getByLabelText("Draft")).toHaveValue("unfinished question");
 
     fireEvent.keyDown(window, { key: "Escape" });

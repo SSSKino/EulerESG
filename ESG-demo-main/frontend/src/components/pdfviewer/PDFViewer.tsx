@@ -18,10 +18,6 @@ export default function PDFViewer() {
     loadFilesFromBackend({ showLoading: true });
   }, [loadFilesFromBackend]);
 
-  useEffect(() => {
-    router.prefetch("/dashboard/chat");
-  }, [router]);
-
   const handleChatClick = (file: File) => {
     if (!file.file_id) return;
     useFileStore.getState().setSelectedFileId(file.file_id || null);

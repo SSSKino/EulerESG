@@ -86,6 +86,37 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+/* Floating assistants stay at the lower-left edge of the main content while
+   following the dashboard sidebar's expanded/collapsed width. */
+[data-dashboard-shell] {
+  --dashboard-sidebar-width: 260px;
+}
+
+[data-dashboard-shell]:has(> aside[data-collapsed="true"]) {
+  --dashboard-sidebar-width: 60px;
+}
+
+.dashboard-chat-launcher {
+  right: auto;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  left: calc(var(--dashboard-sidebar-width, 0px) + 1.5rem);
+}
+
+.dashboard-chat-panel {
+  right: 0.75rem;
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  left: calc(var(--dashboard-sidebar-width, 0px) + 0.75rem);
+  transform-origin: bottom left;
+}
+
+@media (min-width: 640px) {
+  .dashboard-chat-panel {
+    right: auto;
+    left: calc(var(--dashboard-sidebar-width, 0px) + 1.5rem);
+    width: min(420px, calc(100vw - var(--dashboard-sidebar-width, 0px) - 3rem));
+  }
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

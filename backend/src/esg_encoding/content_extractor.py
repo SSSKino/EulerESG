@@ -4,18 +4,20 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import re
 import statistics
 import time
 import unicodedata
 import uuid
+from dataclasses import dataclass
 from datetime import datetime
 from difflib import SequenceMatcher
 from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -25,6 +27,7 @@ from .exceptions import ContentExtractionError
 from .models import DocumentContent, ProcessingConfig, TextSegment
 from .visual_assets import (
     append_visual_markers,
+    collect_table_records,
     load_visual_manifest,
     parse_visual_marker,
     promote_visual_assets,
@@ -58,6 +61,53 @@ _BARE_VISUAL_EVIDENCE_RE = re.compile(
     r"^visual\s+evidence\s+va_[0-9a-f]{8,}$",
     re.IGNORECASE,
 )
+
+_TABLE_SECOND_PASS_ACTIONABLE_REASONS = frozenset(
+    {
+        "malformed_html",
+        "inconsistent_column_count",
+        "missing_header",
+        "year_value_count_mismatch",
+        "structure_source_conflict",
+        "low_structure_confidence",
+        "low_ocr_confidence",
+        "weak_table_record_match",
+        "missing_table_record",
+        "unexplained_needs_review",
+    }
+)
+_TABLE_SECOND_PASS_CRITICAL_REASONS = frozenset(
+    {
+        "malformed_html",
+        "inconsistent_column_count",
+        "missing_header",
+        "year_value_count_mismatch",
+        "structure_source_conflict",
+    }
+)
+
+
+@dataclass(frozen=True)
+class TableSecondPassCandidate:
+    source_table_id: str
+    table_segment_id: str
+    page_number: int
+    bbox: Optional[Tuple[float, float, float, float]]
+    reading_order: Optional[int]
+    reasons: Tuple[str, ...]
+    conflict_count: int
+    rank_key: Tuple[Any, ...]
+
+
+@dataclass(frozen=True)
+class TableSecondPassPlan:
+    total_tables: int
+    budget_tables: int
+    candidates: Tuple[TableSecondPassCandidate, ...]
+    selected_table_ids: Tuple[str, ...]
+    pages: Tuple[int, ...]
+    render_zoom: float
+    prediction_options: Dict[int, Dict[str, Any]]
 
 
 def _visual_has_searchable_content(value: Dict[str, Any]) -> bool:
@@ -1139,6 +1189,7 @@ class ContentExtractor:
             raise ContentExtractionError(f"文件不存在: {source_path}", file_path=str(source_path))
 
         start = time.perf_counter()
+        paddle_lifecycle_job_id = ""
         try:
             self.logger.info(f"开始使用 PaddleOCR-VL v1.6 提取报告内容: {source_path}")
             self._emit_progress("ocr_start", "PaddleOCR-VL extraction started.", 10)
@@ -1174,6 +1225,10 @@ class ContentExtractor:
             result = self._run_paddleocr_vl_page_batch_queue(
                 source_path,
                 page_analysis=page_analysis,
+                release_after_document=False,
+            )
+            paddle_lifecycle_job_id = str(
+                result.get("_paddle_lifecycle_job_id") or ""
             )
             stage_timings = dict(result.get("stage_timings") or {})
             stage_timings["page_analysis_seconds"] = round(page_analysis_seconds, 3)
@@ -1190,10 +1245,29 @@ class ContentExtractor:
             segments = self._segments_from_markdown(markdown, document_id)
             table_records = list(result.get("table_records") or [])
             if table_records:
-                self._enrich_table_segments_from_records(segments, table_records)
-            self._stitch_continued_tables(segments)
+                self._prefer_structured_table_records(
+                    segments,
+                    table_records,
+                    document_id,
+                )
             if page_analysis is not None and bool(getattr(page_analysis, "available", False)):
                 self._enrich_segments_from_native_layout(segments, page_analysis)
+            second_pass_started = time.perf_counter()
+            second_pass_summary = self._run_table_second_pass(
+                source_path,
+                document_id,
+                segments,
+                page_analysis=page_analysis,
+                release_after_document=False,
+            )
+            second_pass_job_id = str(
+                second_pass_summary.pop("_paddle_lifecycle_job_id", "") or ""
+            )
+            if not paddle_lifecycle_job_id:
+                paddle_lifecycle_job_id = second_pass_job_id
+            second_pass_seconds = time.perf_counter() - second_pass_started
+            result["table_second_pass"] = second_pass_summary
+            self._stitch_continued_tables(segments)
             if not segments:
                 segments = [
                     TextSegment(
@@ -1211,6 +1285,9 @@ class ContentExtractor:
                     )
                 ]
 
+            markdown = self._markdown_from_final_segments(segments, markdown)
+            result["markdown"] = markdown
+
             document = DocumentContent(
                 document_id=document_id,
                 file_path=str(source_path),
@@ -1218,7 +1295,10 @@ class ContentExtractor:
                 markdown_content=markdown,
                 created_at=datetime.now(),
             )
-            segment_seconds = time.perf_counter() - segment_started
+            segment_seconds = max(
+                0.0,
+                time.perf_counter() - segment_started - second_pass_seconds,
+            )
             link_started = time.perf_counter()
             link_summary = enrich_document_with_pdf_links(document, source_path)
             link_seconds = time.perf_counter() - link_started
@@ -1227,6 +1307,7 @@ class ContentExtractor:
             stage_timings.update(
                 {
                     "segment_build_seconds": round(segment_seconds, 3),
+                    "table_second_pass_seconds": round(second_pass_seconds, 3),
                     "link_seconds": round(link_seconds, 3),
                     "extract_total_seconds": round(elapsed, 3),
                 }
@@ -1278,6 +1359,10 @@ class ContentExtractor:
         except Exception as exc:
             self.logger.exception(f"PaddleOCR-VL 内容提取失败: {source_path}")
             raise ContentExtractionError(f"PaddleOCR-VL 内容提取失败: {exc}", file_path=str(source_path)) from exc
+
+        finally:
+            if paddle_lifecycle_job_id:
+                self._release_paddle_after_document(paddle_lifecycle_job_id)
 
     def save_markdown(self, document_content: DocumentContent, output_path: str | None = None) -> str:
         """保存供检索和审计使用的最终 Markdown，不包含 OCR 中间产物。"""
@@ -1595,23 +1680,24 @@ class ContentExtractor:
             items = client.lrange(queue_name, 0, -1) or []
             if not items:
                 return 0
-            kept = []
-            removed = 0
+            targets = []
             for raw_item in items:
                 try:
                     payload = json.loads(raw_item)
                     if str(payload.get("job_id") or "") == job_id:
-                        removed += 1
+                        targets.append(raw_item)
                         continue
                 except Exception:
                     pass
-                kept.append(raw_item)
-            if removed:
+            removed = 0
+            if targets:
                 pipe = client.pipeline()
-                pipe.delete(queue_name)
-                for raw_item in kept:
-                    pipe.rpush(queue_name, raw_item)
-                pipe.execute()
+                for raw_item in targets:
+                    # LREM is atomic per item and never replaces the shared
+                    # queue, so concurrent uploads cannot be lost here.
+                    pipe.lrem(queue_name, 0, raw_item)
+                results = pipe.execute()
+                removed = sum(int(value or 0) for value in results)
                 self.logger.warning(
                     f"已从 PaddleOCR 队列移除失败 job 的剩余 batch: job_id={job_id}, removed={removed}"
                 )
@@ -1652,6 +1738,7 @@ class ContentExtractor:
         batch_size: int,
         page_numbers: Optional[Sequence[int]] = None,
         page_options: Optional[Dict[int, Dict[str, Any]]] = None,
+        render_zoom: float = 1.0,
     ) -> tuple[list[dict], int, Path]:
         try:
             import fitz  # type: ignore
@@ -1683,29 +1770,83 @@ class ContentExtractor:
                 page_options,
             )
             for unit_index, (start_page, end_page) in enumerate(selected_ranges, 1):
-                batch_path = batch_dir / f"pages_{start_page:04d}_{end_page:04d}.pdf"
-                # Keep the .pdf suffix so PyMuPDF can infer the output format.
-                tmp_path = batch_path.with_name(f"{batch_path.stem}.tmp.pdf")
+                requested_zoom = max(1.0, float(render_zoom or 1.0))
+                effective_zoom = requested_zoom
+                page = None
+                if requested_zoom > 1.0 and start_page == end_page:
+                    page = document.load_page(start_page - 1)
+                    try:
+                        configured_render_pixels = max(
+                            1,
+                            int(
+                                os.getenv(
+                                    "REPORT_TABLE_SECOND_PASS_MAX_RENDER_PIXELS",
+                                    "4014080",
+                                )
+                                or "4014080"
+                            ),
+                        )
+                    except (TypeError, ValueError, OverflowError):
+                        configured_render_pixels = 4_014_080
+                    try:
+                        prediction_render_pixels = max(
+                            1,
+                            int(
+                                ((page_options or {}).get(start_page) or {}).get(
+                                    "max_pixels",
+                                    4_014_080,
+                                )
+                            ),
+                        )
+                    except (TypeError, ValueError, OverflowError):
+                        prediction_render_pixels = 4_014_080
+                    max_render_pixels = min(
+                        configured_render_pixels,
+                        prediction_render_pixels,
+                        4_014_080,
+                    )
+                    page_area = max(1.0, float(page.rect.width) * float(page.rect.height))
+                    effective_zoom = min(
+                        requested_zoom,
+                        max(1.0, math.sqrt(max_render_pixels / page_area)),
+                    )
+                raster_pass = effective_zoom > 1.0 and start_page == end_page
+                suffix = ".png" if raster_pass else ".pdf"
+                batch_path = batch_dir / f"pages_{start_page:04d}_{end_page:04d}{suffix}"
+                # Preserve a real output suffix so image/PDF writers can infer
+                # their format while the final rename remains atomic.
+                tmp_path = batch_path.with_name(f"{batch_path.stem}.tmp{suffix}")
                 if tmp_path.exists():
                     try:
                         tmp_path.unlink()
                     except Exception:
                         pass
 
-                batch_document = fitz.open()
-                try:
-                    batch_document.insert_pdf(
-                        document,
-                        from_page=start_page - 1,
-                        to_page=end_page - 1,
-                        # Link topology is read from the original PDF after OCR.
-                        # Skipping link-object copying keeps temporary batch creation fast.
-                        links=False,
-                        annots=True,
+                if raster_pass:
+                    # The table repair pass intentionally feeds Paddle a
+                    # high-resolution page image.  Merely recording a zoom in
+                    # metadata would leave the first-pass raster unchanged.
+                    page = page or document.load_page(start_page - 1)
+                    pixmap = page.get_pixmap(
+                        matrix=fitz.Matrix(effective_zoom, effective_zoom),
+                        alpha=False,
                     )
-                    batch_document.save(str(tmp_path), garbage=0, deflate=False, clean=False)
-                finally:
-                    batch_document.close()
+                    pixmap.save(str(tmp_path))
+                else:
+                    batch_document = fitz.open()
+                    try:
+                        batch_document.insert_pdf(
+                            document,
+                            from_page=start_page - 1,
+                            to_page=end_page - 1,
+                            # Link topology is read from the original PDF after OCR.
+                            # Skipping link-object copying keeps temporary batch creation fast.
+                            links=False,
+                            annots=True,
+                        )
+                        batch_document.save(str(tmp_path), garbage=0, deflate=False, clean=False)
+                    finally:
+                        batch_document.close()
 
                 # PyMuPDF closes the file after save; fsync before the atomic rename.
                 with tmp_path.open("r+b") as f:
@@ -1724,6 +1865,8 @@ class ContentExtractor:
                         "start_page": start_page,
                         "end_page": end_page,
                         "total_pages": total_pages,
+                        "render_zoom": effective_zoom,
+                        "requested_render_zoom": requested_zoom,
                     },
                     sync_parent=False,
                 )
@@ -1736,6 +1879,8 @@ class ContentExtractor:
                         "input_path": str(batch_path),
                         "ready_path": str(ready_path),
                         "prediction_options": dict((page_options or {}).get(start_page, {})),
+                        "render_zoom": effective_zoom,
+                        "requested_render_zoom": requested_zoom,
                     }
                 )
 
@@ -1776,10 +1921,18 @@ class ContentExtractor:
         source_path: Path,
         *,
         page_analysis: Any = None,
+        selected_page_numbers: Optional[Sequence[int]] = None,
+        prediction_options_by_page: Optional[Dict[int, Dict[str, Any]]] = None,
+        partial_result: bool = False,
+        promote_visuals: bool = True,
+        parse_pass: int = 1,
+        render_zoom: float = 1.0,
+        emit_progress: bool = True,
+        release_after_document: bool = True,
     ) -> Dict[str, Any]:
         routes, _native_pages = _adaptive_analysis_maps(page_analysis)
         total_pages = int(getattr(page_analysis, "total_pages", 0) or 0) if page_analysis is not None else 0
-        if total_pages > 0 and len(routes) == total_pages and all(
+        if selected_page_numbers is None and total_pages > 0 and len(routes) == total_pages and all(
             routes.get(page) == "native" for page in range(1, total_pages + 1)
         ):
             self.logger.info(f"Skipping PaddleOCR for all-native PDF: file={source_path.name}, pages={total_pages}")
@@ -1790,16 +1943,67 @@ class ContentExtractor:
 
         job_id = f"parse_{uuid.uuid4().hex}"
         self._wake_paddleocr_vlm()
+        completed = False
         try:
-            if page_analysis is None:
-                return self._run_paddleocr_vl_page_batch_queue_active(source_path, job_id)
-            return self._run_paddleocr_vl_page_batch_queue_active(
-                source_path,
-                job_id,
-                page_analysis=page_analysis,
-            )
+            if page_analysis is None and selected_page_numbers is None:
+                if emit_progress:
+                    # Preserve the historical call shape for subclasses and
+                    # tests that override the active queue method.
+                    result = self._run_paddleocr_vl_page_batch_queue_active(
+                        source_path,
+                        job_id,
+                    )
+                else:
+                    result = self._run_paddleocr_vl_page_batch_queue_active(
+                        source_path,
+                        job_id,
+                        emit_progress=False,
+                    )
+            else:
+                result = self._run_paddleocr_vl_page_batch_queue_active(
+                    source_path,
+                    job_id,
+                    page_analysis=page_analysis,
+                    selected_page_numbers=selected_page_numbers,
+                    prediction_options_by_page=prediction_options_by_page,
+                    partial_result=partial_result,
+                    promote_visuals=promote_visuals,
+                    parse_pass=parse_pass,
+                    render_zoom=render_zoom,
+                    emit_progress=emit_progress,
+                )
+            completed = True
+            if not release_after_document:
+                result["_paddle_lifecycle_job_id"] = job_id
+            return result
+        except Exception:
+            if not _env_bool("PADDLEOCR_KEEP_PROCESS_OUTPUT", False):
+                _cleanup_path_tree(
+                    Path(
+                        os.getenv(
+                            "PADDLEOCR_OUTPUT_DIR",
+                            "/workspace/uploads/paddleocr_vl_output",
+                        )
+                    )
+                    / job_id,
+                    label="failed OCR output",
+                )
+                _cleanup_path_tree(
+                    Path(
+                        os.getenv(
+                            "PADDLEOCR_JOB_WORK_DIR",
+                            "/workspace/uploads/paddleocr_vl_jobs",
+                        )
+                    )
+                    / job_id,
+                    label="failed OCR split workspace",
+                )
+            raise
         finally:
-            self._release_paddle_after_document(job_id)
+            # Failed attempts always release. Successful extraction may defer
+            # release until its optional table repair pass has completed.
+            if release_after_document or not completed:
+                self._release_paddle_after_document(job_id)
 
     def _run_paddleocr_vl_page_batch_queue_active(
         self,
@@ -1807,15 +2011,55 @@ class ContentExtractor:
         job_id: str,
         *,
         page_analysis: Any = None,
+        selected_page_numbers: Optional[Sequence[int]] = None,
+        prediction_options_by_page: Optional[Dict[int, Dict[str, Any]]] = None,
+        partial_result: bool = False,
+        promote_visuals: bool = True,
+        parse_pass: int = 1,
+        render_zoom: float = 1.0,
+        emit_progress: bool = True,
     ) -> Dict[str, Any]:
         queue_run_started = time.perf_counter()
+
+        def emit_queue_progress(
+            stage: str,
+            message: str,
+            progress: Optional[float] = None,
+            **extra: Any,
+        ) -> None:
+            if not emit_progress:
+                return
+            if partial_result:
+                raw_progress = float(progress if progress is not None else 12.0)
+                fraction = max(0.0, min(1.0, (raw_progress - 12.0) / 33.0))
+                self._emit_progress(
+                    "table_second_pass",
+                    f"Table repair: {message}",
+                    44.0 + 0.9 * fraction,
+                    parse_pass=max(1, int(parse_pass or 1)),
+                    **extra,
+                )
+                return
+            self._emit_progress(stage, message, progress, **extra)
+
         client = self._redis_client()
 
         queue_name = os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse").strip()
         key_prefix = os.getenv("PADDLEOCR_TASK_KEY_PREFIX", "paddleocr:task").strip()
-        timeout = int(os.getenv("PADDLEOCR_VL_TIMEOUT", "14400") or "14400")
+        timeout_env = (
+            "REPORT_TABLE_SECOND_PASS_TIMEOUT_SECONDS"
+            if partial_result
+            else "PADDLEOCR_VL_TIMEOUT"
+        )
+        timeout_default = "1800" if partial_result else "14400"
+        timeout = max(60, int(os.getenv(timeout_env, timeout_default) or timeout_default))
         poll_interval = float(os.getenv("PADDLEOCR_TASK_POLL_INTERVAL", "2.0") or "2.0")
         batch_size = self._get_paddleocr_page_batch_size()
+        if partial_result:
+            # A repair pass is intentionally page-isolated.  One pathological
+            # table must not make a neighbouring candidate page fail or share a
+            # token budget with it.
+            batch_size = 1
         output_root = Path(os.getenv("PADDLEOCR_OUTPUT_DIR", "/workspace/uploads/paddleocr_vl_output"))
 
         task_key = f"{key_prefix}:{job_id}"
@@ -1849,6 +2093,29 @@ class ContentExtractor:
                 for page in range(1, analysis_total_pages + 1)
                 if page_routes.get(page) != "native"
             ]
+        if selected_page_numbers is not None:
+            selected_ocr_pages = sorted(
+                {
+                    int(page)
+                    for page in selected_page_numbers
+                    if int(page) >= 1
+                }
+            )
+            if not selected_ocr_pages:
+                raise ContentExtractionError(
+                    "Selective PaddleOCR pass has no valid pages.",
+                    file_path=str(source_path),
+                )
+            # A partial repair result contains only OCR output for the selected
+            # pages.  It must never be merged with adaptive native content here.
+            page_routes = {}
+            native_page_markdown = {}
+            page_prediction_options = {
+                int(page): dict(options or {})
+                for page, options in (prediction_options_by_page or {}).items()
+                if int(page) in selected_ocr_pages
+            }
+            analysis_is_complete = False
 
         split_started = time.perf_counter()
         units, total_pages, batch_dir = self._split_pdf_for_page_batch_queue(
@@ -1856,7 +2123,12 @@ class ContentExtractor:
             job_id,
             batch_size,
             page_numbers=selected_ocr_pages,
-            page_options=page_prediction_options if analysis_is_complete else None,
+            page_options=(
+                page_prediction_options
+                if analysis_is_complete or selected_page_numbers is not None
+                else None
+            ),
+            render_zoom=render_zoom,
         )
         if analysis_is_complete and analysis_total_pages != total_pages:
             self.logger.warning(
@@ -1871,6 +2143,7 @@ class ContentExtractor:
                 source_path,
                 job_id,
                 batch_size,
+                render_zoom=render_zoom,
             )
         split_seconds = time.perf_counter() - split_started
         total_units = len(units)
@@ -1903,7 +2176,7 @@ class ContentExtractor:
             f"native_pages={native_page_count}, ocr_pages={ocr_page_count}, "
             f"split_seconds={split_seconds:.3f}"
         )
-        self._emit_progress(
+        emit_queue_progress(
             "ocr_queued",
             f"PaddleOCR queued: {ocr_page_count}/{total_pages} pages in {total_units} batch(es); "
             f"{native_page_count} native page(s) bypassed OCR.",
@@ -1921,6 +2194,8 @@ class ContentExtractor:
                 "units_running": 0,
                 "units_queued": total_units,
                 "page_batch_size": batch_size,
+                "parse_pass": max(1, int(parse_pass or 1)),
+                "render_zoom": float(render_zoom or 1.0),
                 "native_pages": native_page_count,
                 "ocr_pages": ocr_page_count,
                 "running_batches": [],
@@ -1971,6 +2246,11 @@ class ContentExtractor:
                 "input_path": unit["input_path"],
                 "ready_path": unit.get("ready_path", ""),
                 "prediction_options": dict(unit.get("prediction_options") or {}),
+                "parse_pass": max(1, int(parse_pass or 1)),
+                "render_zoom": float(unit.get("render_zoom") or render_zoom or 1.0),
+                "requested_render_zoom": float(
+                    unit.get("requested_render_zoom") or render_zoom or 1.0
+                ),
                 "created_at": datetime.now().isoformat(),
             }
             self._redis_hash_set(
@@ -1988,6 +2268,11 @@ class ContentExtractor:
                     "input_path": unit["input_path"],
                     "ready_path": unit.get("ready_path", ""),
                     "prediction_options": dict(unit.get("prediction_options") or {}),
+                    "parse_pass": max(1, int(parse_pass or 1)),
+                    "render_zoom": float(unit.get("render_zoom") or render_zoom or 1.0),
+                    "requested_render_zoom": float(
+                        unit.get("requested_render_zoom") or render_zoom or 1.0
+                    ),
                     "created_at": datetime.now().isoformat(),
                 },
             )
@@ -2112,7 +2397,7 @@ class ContentExtractor:
                         for b in running_batches[:3]
                     )
                     running_text = f" Running: {shown}."
-                self._emit_progress(
+                emit_queue_progress(
                     "ocr_batch_processing",
                     f"PaddleOCR progress: {done_count + failed_count}/{total_units} batches, {pages_done}/{total_pages} pages done.{running_text}",
                     ocr_progress,
@@ -2146,7 +2431,7 @@ class ContentExtractor:
                     running_batches=running_batches,
                 )
 
-            if failed_count:
+            if failed_count and not partial_result:
                 errors = [s.get("error", "unknown worker error") for s in batch_states if str(s.get("status", "")).lower() == "failed"]
                 error_text = errors[0] if errors else "unknown worker error"
                 ocr_queue_seconds = time.perf_counter() - ocr_queue_started
@@ -2177,7 +2462,13 @@ class ContentExtractor:
                 )
 
             if done_count + failed_count >= total_units:
-                self._emit_progress("ocr_merging", "Merging OCR batch results.", 45, paddle_job_id=job_id, total_units=total_units)
+                emit_queue_progress(
+                    "ocr_merging",
+                    "Merging OCR batch results.",
+                    45,
+                    paddle_job_id=job_id,
+                    total_units=total_units,
+                )
                 ocr_queue_seconds = time.perf_counter() - ocr_queue_started
                 batch_timing = _batch_timing_summary(batch_states)
                 merge_started = time.perf_counter()
@@ -2195,6 +2486,11 @@ class ContentExtractor:
                         expected_ranges=expected_ranges,
                         native_page_markdown=native_page_markdown,
                         page_routes=page_routes,
+                        partial_result=partial_result,
+                        promote_visuals=promote_visuals,
+                        parse_pass=parse_pass,
+                        render_zoom=render_zoom,
+                        emit_progress=emit_progress,
                     )
                 except ContentExtractionError as exc:
                     self._redis_hash_set(
@@ -2235,6 +2531,8 @@ class ContentExtractor:
                 result["page_prediction_options"] = page_prediction_options
                 result["native_page_count"] = native_page_count
                 result["ocr_page_count"] = ocr_page_count
+                result["parse_pass"] = max(1, int(parse_pass or 1))
+                result["render_zoom"] = float(render_zoom or 1.0)
                 result["_task_key"] = task_key
                 elapsed_stats = batch_timing["elapsed_seconds"]
                 redis_result = {
@@ -2307,10 +2605,19 @@ class ContentExtractor:
         expected_ranges: Optional[Sequence[tuple[int, int]]] = None,
         native_page_markdown: Optional[Dict[int, str]] = None,
         page_routes: Optional[Dict[int, str]] = None,
+        partial_result: bool = False,
+        promote_visuals: bool = True,
+        parse_pass: int = 1,
+        render_zoom: float = 1.0,
+        emit_progress: bool = True,
     ) -> Dict[str, Any]:
         ocr_page_markdown: Dict[int, str] = {}
         combined_page_markers: list[int] = []
         elapsed_total = 0.0
+        effective_render_zooms: List[float] = []
+        effective_render_zoom_by_page: Dict[int, float] = {}
+        successful_ranges: List[Tuple[int, int]] = []
+        failed_pages: List[int] = []
         planned_ranges = list(
             _page_batch_ranges(total_pages, batch_size)
             if expected_ranges is None
@@ -2322,6 +2629,88 @@ class ContentExtractor:
                 f"expected_units={len(planned_ranges)}, reported_units={total_units}",
                 file_path=str(source_path),
             )
+
+        # The optional repair pass is deliberately best-effort.  A worker can
+        # report success before its batch markdown is durably visible, or it
+        # can leave a malformed range/count/marker payload.  Validate each
+        # purported success independently and demote only that unit to failed;
+        # the normal first pass remains fail-closed in the strict loop below.
+        if partial_result:
+            validated_states: List[Dict[str, Any]] = []
+            for idx, raw_state in enumerate(batch_states, 1):
+                state = dict(raw_state)
+                status = str(state.get("status", "")).lower()
+                if status not in {"success", "completed"}:
+                    validated_states.append(state)
+                    continue
+                expected_start, expected_end = planned_ranges[idx - 1]
+                try:
+                    raw_result = state.get("result_json")
+                    if isinstance(raw_result, dict):
+                        result = dict(raw_result)
+                    else:
+                        try:
+                            result = json.loads(raw_result or "{}")
+                        except Exception:
+                            result = dict(state)
+
+                    def _validated_int(name: str) -> int:
+                        raw_value = result.get(name)
+                        if raw_value is None or raw_value == "":
+                            raw_value = state.get(name)
+                        return int(raw_value)
+
+                    actual_start = _validated_int("start_page")
+                    actual_end = _validated_int("end_page")
+                    result_count = _validated_int("result_count")
+                    expected_count = expected_end - expected_start + 1
+                    if (actual_start, actual_end) != (expected_start, expected_end):
+                        raise ValueError(
+                            f"range {actual_start}-{actual_end} != "
+                            f"{expected_start}-{expected_end}"
+                        )
+                    if result_count != expected_count:
+                        raise ValueError(
+                            f"result_count {result_count} != {expected_count}"
+                        )
+                    md_path_value = str(
+                        result.get("batch_markdown_path")
+                        or state.get("batch_markdown_path")
+                        or ""
+                    ).strip()
+                    md_path = Path(md_path_value) if md_path_value else None
+                    if md_path is None or not md_path.is_file():
+                        raise ValueError(f"batch markdown is missing: {md_path}")
+                    md = md_path.read_text(encoding="utf-8", errors="ignore").strip()
+                    expected_markers = list(range(expected_start, expected_end + 1))
+                    markers = _paddle_markdown_page_markers(md)
+                    if markers != expected_markers:
+                        raise ValueError(
+                            f"page markers {markers} != {expected_markers}"
+                        )
+                    page_bodies = _markdown_content_by_page(md)
+                    empty_pages = [
+                        page
+                        for page in expected_markers
+                        if not str(page_bodies.get(page) or "").strip()
+                    ]
+                    if empty_pages:
+                        raise ValueError(
+                            f"page bodies are empty: {empty_pages}"
+                        )
+                except Exception as exc:
+                    state["status"] = "failed"
+                    state["error"] = (
+                        "optional repair success payload failed validation: "
+                        f"{exc}"
+                    )
+                    logger.warning(
+                        f"Skipping malformed optional table-repair batch: "
+                        f"job_id={job_id}, unit={idx}, "
+                        f"pages={expected_start}-{expected_end}, error={exc}"
+                    )
+                validated_states.append(state)
+            batch_states = validated_states
 
         for idx, state in enumerate(batch_states, 1):
             status = str(state.get("status", "")).lower()
@@ -2366,6 +2755,7 @@ class ContentExtractor:
                         f"unit={idx}, expected={expected_count}, returned={result_count}",
                         file_path=str(source_path),
                     )
+                successful_ranges.append((expected_start, expected_end))
 
                 md_path_value = str(
                     result.get("batch_markdown_path")
@@ -2401,7 +2791,21 @@ class ContentExtractor:
                     elapsed_total += float(result.get("elapsed_seconds") or 0.0)
                 except Exception:
                     pass
+                try:
+                    effective_zoom = max(
+                        1.0,
+                        float(result.get("render_zoom") or render_zoom or 1.0),
+                    )
+                    effective_render_zooms.append(effective_zoom)
+                    for page in range(expected_start, expected_end + 1):
+                        effective_render_zoom_by_page[page] = effective_zoom
+                except (TypeError, ValueError, OverflowError):
+                    pass
             elif status == "failed":
+                if partial_result:
+                    failed_start, failed_end = planned_ranges[idx - 1]
+                    failed_pages.extend(range(failed_start, failed_end + 1))
+                    continue
                 error = state.get("error") or state.get("traceback") or "unknown worker error"
                 raise ContentExtractionError(
                     f"PaddleOCR-VL batch failed: job_id={job_id}, unit={idx}, error={error}",
@@ -2415,7 +2819,7 @@ class ContentExtractor:
 
         expected_ocr_markers = [
             page
-            for start_page, end_page in planned_ranges
+            for start_page, end_page in successful_ranges
             for page in range(start_page, end_page + 1)
         ]
         if combined_page_markers != expected_ocr_markers:
@@ -2430,7 +2834,12 @@ class ContentExtractor:
         routes = {int(page): str(route or "ocr").strip().lower() for page, route in (page_routes or {}).items()}
         combined_parts: list[str] = []
         missing_pages: list[int] = []
-        for page in range(1, total_pages + 1):
+        output_pages = (
+            sorted(set(expected_ocr_markers))
+            if partial_result
+            else list(range(1, total_pages + 1))
+        )
+        for page in output_pages:
             native_body = native_pages.get(page, "")
             ocr_body = ocr_page_markdown.get(page, "")
             route = routes.get(page, "ocr")
@@ -2459,11 +2868,42 @@ class ContentExtractor:
         if not markdown:
             raise ContentExtractionError("PaddleOCR-VL 页级 batch 没有生成 Markdown", file_path=str(source_path))
 
-        self._emit_progress("visual_assets", "Persisting chart and image evidence.", 43)
-        visual_assets = promote_visual_assets(output_dir, source_path)
-        visual_manifest = load_visual_manifest(source_path) or {}
-        table_records = list(visual_manifest.get("tables") or [])
-        markdown = append_visual_markers(markdown, visual_assets)
+        effective_pass = max(1, int(parse_pass or 1))
+        if promote_visuals:
+            if emit_progress:
+                self._emit_progress(
+                    "visual_assets",
+                    "Persisting chart and image evidence.",
+                    43,
+                )
+            visual_assets = promote_visual_assets(output_dir, source_path)
+            visual_manifest = load_visual_manifest(source_path) or {}
+            table_records = list(visual_manifest.get("tables") or [])
+            for record in table_records:
+                if isinstance(record, dict):
+                    record["parse_pass"] = effective_pass
+            markdown = append_visual_markers(markdown, visual_assets)
+        else:
+            # Selective table repair must not overwrite the complete first-pass
+            # visual manifest.  Read only the structured table records produced
+            # for the candidate pages.
+            visual_assets = []
+            table_records = collect_table_records(
+                output_dir,
+                parse_pass=effective_pass,
+            )
+            successful_page_set = set(expected_ocr_markers)
+            successful_table_records: List[Dict[str, Any]] = []
+            for record in table_records:
+                if not isinstance(record, dict):
+                    continue
+                try:
+                    record_page = int(record.get("page_number") or 0)
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if record_page in successful_page_set:
+                    successful_table_records.append(record)
+            table_records = successful_table_records
 
         keep_process_output = _env_bool("PADDLEOCR_KEEP_PROCESS_OUTPUT", False)
         combined_md_path = output_dir / "combined.md"
@@ -2490,6 +2930,17 @@ class ContentExtractor:
             "output_dir": str(output_dir) if keep_process_output else "",
             "result_markdown_path": result_markdown_path,
             "intermediate_output_removed": not keep_process_output,
+            "partial_result": bool(partial_result),
+            "parse_pass": effective_pass,
+            "render_zoom": float(render_zoom or 1.0),
+            "effective_render_zoom": (
+                min(effective_render_zooms)
+                if effective_render_zooms
+                else float(render_zoom or 1.0)
+            ),
+            "effective_render_zoom_by_page": effective_render_zoom_by_page,
+            "processed_pages": output_pages,
+            "failed_pages": sorted(set(failed_pages)),
             "markdown": markdown,
         }
         self._redis_hash_set(
@@ -2512,6 +2963,47 @@ class ContentExtractor:
             _cleanup_path_tree(work_root / job_id, label="backend 拆页 PDF")
 
         return result
+
+    def _markdown_from_final_segments(
+        self,
+        segments: Sequence[TextSegment],
+        fallback: str = "",
+    ) -> str:
+        """Render the final canonical evidence without row/cell duplication.
+
+        Accepted second-pass families live in ``segments``; retaining the raw
+        first-pass Markdown would make direct-LLM consumers see stale tables.
+        Preserve document order, include one full table segment per physical
+        occurrence, and omit its derived row/cell indexing segments.
+        """
+        ordered = sorted(
+            enumerate(segments),
+            key=lambda item: (
+                max(1, int(item[1].page_number or 1)),
+                item[0],
+            ),
+        )
+        parts: List[str] = []
+        current_page: Optional[int] = None
+        seen_segments: set[str] = set()
+        for _index, segment in ordered:
+            if segment.segment_type in {"table_row", "table_cell"}:
+                continue
+            segment_id = str(segment.segment_id or "").strip()
+            if segment_id and segment_id in seen_segments:
+                continue
+            content = str(segment.content or "").strip()
+            if not content:
+                continue
+            page = max(1, int(segment.page_number or 1))
+            if page != current_page:
+                parts.append(f"<!-- Page {page} | canonical evidence -->")
+                current_page = page
+            parts.append(content)
+            if segment_id:
+                seen_segments.add(segment_id)
+        rendered = "\n\n".join(parts).strip()
+        return rendered or str(fallback or "").strip()
 
     # ------------------------------------------------------------------
     # 从 PaddleOCR-VL Markdown 输出构造 TextSegment
@@ -3144,8 +3636,10 @@ class ContentExtractor:
                         score = 0.65 * text_score + 0.30 * bbox_score + 0.05 * order_score
                     else:
                         score = 0.90 * text_score + 0.10 * order_score
-                    singleton = len(page_tables) == 1 and len(page_records) == 1
-                    if text_score < 0.18 and bbox_score < 0.10 and not singleton:
+                    # A same-page singleton is not an identity signal.  Keep a
+                    # minimum content/geometry gate so an unrelated structured
+                    # record cannot silently overwrite the only Markdown table.
+                    if score < 0.35 or (text_score < 0.18 and bbox_score < 0.10):
                         continue
                     candidates.append((score, text_score, bbox_score, table_index, record_index))
 
@@ -3166,13 +3660,19 @@ class ContentExtractor:
                 raw_rows, raw_cells, raw_quality = self._parse_table_details(raw_html)
                 markdown_rows = self._parse_table_rows(table_segment.content)
                 structure_confidence = safe_confidence(record.get("structure_confidence"), raw_quality["structure_confidence"])
-                ocr_confidence = safe_confidence(record.get("ocr_confidence"), raw_quality["ocr_confidence"])
+                raw_ocr_confidence = record.get("ocr_confidence")
+                ocr_confidence = (
+                    safe_confidence(raw_ocr_confidence, 0.0)
+                    if raw_ocr_confidence is not None
+                    else None
+                )
                 reasons = list(raw_quality["reasons"])
-                if record.get("ocr_confidence") is None:
-                    reasons.append("missing_ocr_confidence")
+                quality_notes: List[str] = []
+                if raw_ocr_confidence is None:
+                    quality_notes.append("missing_ocr_confidence")
                 if structure_confidence < structure_threshold:
                     reasons.append("low_structure_confidence")
-                if ocr_confidence < ocr_threshold:
+                if ocr_confidence is not None and ocr_confidence < ocr_threshold:
                     reasons.append("low_ocr_confidence")
                 if match_score < 0.55:
                     reasons.append("weak_table_record_match")
@@ -3190,13 +3690,21 @@ class ContentExtractor:
                     )
                     reasons.append("structure_source_conflict")
                 reasons = list(dict.fromkeys(reasons))
-                review_status = "needs_review" if reasons or conflicts else "verified"
+                review_status = (
+                    "needs_review"
+                    if reasons or conflicts
+                    else ("unverified" if quality_notes else "verified")
+                )
                 table_bbox = _normalized_bbox(
                     record.get("bbox"),
                     page_width=float(record.get("page_width") or 0.0),
                     page_height=float(record.get("page_height") or 0.0),
                 )
                 boxes_by_cell = cell_bbox_map(record, raw_cells)
+                try:
+                    record_parse_pass = max(1, int(record.get("parse_pass") or 1))
+                except (TypeError, ValueError, OverflowError):
+                    record_parse_pass = 1
                 row_boxes: Dict[int, List[float]] = {}
                 for row_index in {key[0] for key in boxes_by_cell}:
                     union = _bbox_union([box for (candidate_row, _), box in boxes_by_cell.items() if candidate_row == row_index])
@@ -3245,6 +3753,7 @@ class ContentExtractor:
                 for related_segment in related:
                     related_segment.structure_confidence = structure_confidence
                     related_segment.ocr_confidence = ocr_confidence
+                    related_segment.parse_pass = record_parse_pass
                     related_segment.review_status = review_status
                     related_segment.conflicts = conflicts
                     data = dict(related_segment.structured_data or {})
@@ -3268,9 +3777,10 @@ class ContentExtractor:
                             "bbox": segment_bbox,
                             "structure_confidence": structure_confidence,
                             "ocr_confidence": ocr_confidence,
-                            "parse_pass": 1,
+                            "parse_pass": record_parse_pass,
                             "review_status": review_status,
                             "quality_reasons": reasons,
+                            "quality_notes": quality_notes,
                             "conflicts": conflicts,
                             "structured_html_sha256": structured_html_sha256,
                         }
@@ -3309,6 +3819,1262 @@ class ContentExtractor:
                             related_segment.unit = related_segment.unit or inferred_unit
                             data["unit"] = related_segment.unit
                     related_segment.structured_data = data
+
+    def _materialize_unmatched_table_records(
+        self,
+        segments: List[TextSegment],
+        records: Sequence[Dict[str, Any]],
+        document_id: str,
+    ) -> int:
+        """Create canonical table families when Markdown omitted a JSON table.
+
+        Paddle can return a usable ``pred_html`` record while its Markdown
+        projection is truncated or malformed.  Those records must become real
+        table/row/cell segments instead of being silently discarded.
+        """
+        used_record_ids = {
+            (
+                int(segment.page_number or 1),
+                str((segment.structured_data or {}).get("table_record_id") or "").strip(),
+            )
+            for segment in segments
+            if (segment.structured_data or {}).get("table_record_id")
+        }
+        existing_fingerprints = {
+            (
+                int(segment.page_number or 1),
+                str((segment.structured_data or {}).get("structured_html_sha256") or ""),
+                tuple(
+                    round(float(value), 4)
+                    for value in (
+                        _normalized_bbox(
+                            (segment.structured_data or {}).get("bbox")
+                        )
+                        or []
+                    )
+                ),
+                str(
+                    (segment.structured_data or {}).get("reading_order")
+                    if (segment.structured_data or {}).get("reading_order") is not None
+                    else segment.position_y
+                ),
+            )
+            for segment in segments
+            if segment.segment_type == "table"
+            and (segment.structured_data or {}).get("structured_html_sha256")
+        }
+        added = 0
+        for ordinal, record in enumerate(records, 1):
+            if not isinstance(record, dict):
+                continue
+            raw_html = str(record.get("pred_html") or "").strip()
+            rows = self._parse_table_rows(raw_html)
+            if len(rows) < 2 or max((len(row) for row in rows), default=0) < 2:
+                continue
+            try:
+                page = max(1, int(record.get("page_number") or 1))
+            except (TypeError, ValueError, OverflowError):
+                page = 1
+            record["page_number"] = page
+            record_id = str(record.get("table_id") or "").strip()
+            fingerprint = hashlib.sha256(raw_html.encode("utf-8")).hexdigest()
+            bbox = _normalized_bbox(
+                record.get("bbox"),
+                page_width=float(record.get("page_width") or 0.0),
+                page_height=float(record.get("page_height") or 0.0),
+            )
+            reading_order_value = record.get("reading_order")
+            record_fingerprint_key = (
+                page,
+                fingerprint,
+                tuple(round(float(value), 4) for value in (bbox or [])),
+                str(reading_order_value if reading_order_value is not None else ""),
+            )
+            if record_id and (page, record_id) in used_record_ids:
+                continue
+            if not record_id and record_fingerprint_key in existing_fingerprints:
+                continue
+
+            identity_basis = (
+                f"record:{record_id}"
+                if record_id
+                else (
+                    "anonymous:"
+                    + json.dumps(
+                        {
+                            "html": fingerprint,
+                            "bbox": [round(float(value), 6) for value in (bbox or [])],
+                            "reading_order": reading_order_value,
+                        },
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        default=str,
+                    )
+                )
+            )
+            identity = hashlib.sha256(
+                f"{page}\0{identity_basis}\0{fingerprint}".encode("utf-8")
+            ).hexdigest()[:16]
+            table_id = f"{document_id}_record_table_{identity}"
+            table_segment_id = f"{document_id}_p{page}_record_{identity}"
+            try:
+                record_parse_pass = max(1, int(record.get("parse_pass") or 1))
+            except (TypeError, ValueError, OverflowError):
+                record_parse_pass = 1
+            try:
+                reading_order = float(reading_order_value)
+            except (TypeError, ValueError, OverflowError):
+                reading_order = float(len(segments) + added + 1)
+            table_title = str(record.get("caption") or record.get("summary") or "").strip()
+            family = [
+                TextSegment(
+                    segment_id=table_segment_id,
+                    content=raw_html,
+                    page_number=page,
+                    position_y=float(bbox[1]) if bbox is not None else reading_order,
+                    position_x=float(bbox[0]) if bbox is not None else 0.0,
+                    segment_type="table",
+                    source_table_id=table_id,
+                    parse_pass=record_parse_pass,
+                    structured_data={
+                        "source": "paddleocr_vl_structured_table_record",
+                        "parser": "paddleocr-vl",
+                        "table_id": table_id,
+                        "table_title": table_title,
+                        "bbox": bbox,
+                        "materialized_from_table_record": True,
+                        "parse_pass": record_parse_pass,
+                    },
+                )
+            ]
+            family.extend(
+                self._table_segments_from_markdown(
+                    raw_html,
+                    f"{document_id}_record_{identity}",
+                    page,
+                    table_id,
+                    start_seq=100_000 + ordinal * 10_000,
+                    table_title=table_title,
+                )
+            )
+            self._enrich_table_segments_from_records(family, [record])
+            segments.extend(family)
+            if record_id:
+                used_record_ids.add((page, record_id))
+            else:
+                existing_fingerprints.add(record_fingerprint_key)
+            added += 1
+        return added
+
+    def _prefer_structured_table_records(
+        self,
+        segments: List[TextSegment],
+        records: Sequence[Dict[str, Any]],
+        document_id: str,
+    ) -> int:
+        """Use complete structured HTML as the canonical table representation.
+
+        Markdown remains useful for surrounding narrative, but it can be a
+        truncated projection of Paddle's structured JSON.  After matching it
+        for section context, replace matched table families with families built
+        from ``pred_html``.  Invalid records never displace usable Markdown.
+        """
+        valid_records: List[Dict[str, Any]] = []
+        valid_record_keys: set[Tuple[int, str]] = set()
+        record_by_key: Dict[Tuple[int, str], Dict[str, Any]] = {}
+        for raw_record in records:
+            record = dict(raw_record) if isinstance(raw_record, dict) else None
+            if not isinstance(record, dict):
+                continue
+            raw_html = str(record.get("pred_html") or "").strip()
+            rows = self._parse_table_rows(raw_html)
+            if len(rows) < 2 or max((len(row) for row in rows), default=0) < 2:
+                continue
+            try:
+                page = max(1, int(record.get("page_number") or 1))
+            except (TypeError, ValueError, OverflowError):
+                page = 1
+            record["page_number"] = page
+            record_id = str(record.get("table_id") or "").strip()
+            if not record_id:
+                bbox = _normalized_bbox(
+                    record.get("bbox"),
+                    page_width=float(record.get("page_width") or 0.0),
+                    page_height=float(record.get("page_height") or 0.0),
+                )
+                occurrence = json.dumps(
+                    {
+                        "page": page,
+                        "html": hashlib.sha256(raw_html.encode("utf-8")).hexdigest(),
+                        "bbox": [round(float(value), 6) for value in (bbox or [])],
+                        "reading_order": record.get("reading_order"),
+                    },
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    default=str,
+                )
+                record_id = "anonymous:" + hashlib.sha256(
+                    occurrence.encode("utf-8")
+                ).hexdigest()[:20]
+                record["table_id"] = record_id
+                record["table_record_source"] = "synthetic_occurrence"
+            key = (page, record_id)
+            valid_record_keys.add(key)
+            record_by_key[key] = record
+            valid_records.append(record)
+        if not valid_records:
+            return 0
+
+        self._enrich_table_segments_from_records(segments, valid_records)
+        context_by_record: Dict[Tuple[int, str], Dict[str, Any]] = {}
+        replaced_table_ids: set[str] = set()
+        matched_record_keys: set[Tuple[int, str]] = set()
+        replaceable_record_keys: set[Tuple[int, str]] = set()
+        for segment in segments:
+            if segment.segment_type != "table" or not segment.source_table_id:
+                continue
+            data = dict(segment.structured_data or {})
+            record_id = str(data.get("table_record_id") or "").strip()
+            key = (int(segment.page_number or 1), record_id)
+            if record_id and key in valid_record_keys:
+                matched_record_keys.add(key)
+                record = record_by_key[key]
+                markdown_rows = self._parse_table_rows(segment.content)
+                structured_rows, _structured_cells, structured_quality = (
+                    self._parse_table_details(str(record.get("pred_html") or ""))
+                )
+
+                def _coverage(rows: Sequence[Sequence[Any]]) -> Tuple[int, int, int]:
+                    nonempty = sum(
+                        1
+                        for row in rows
+                        for value in row
+                        if str(value or "").strip()
+                    )
+                    numeric = sum(
+                        1
+                        for row in rows
+                        for value in row
+                        if re.search(r"\d", str(value or ""))
+                    )
+                    return len(rows), nonempty, numeric
+
+                markdown_coverage = _coverage(markdown_rows)
+                structured_coverage = _coverage(structured_rows)
+                source_similarity = SequenceMatcher(
+                    None,
+                    _normalised_table_text(markdown_rows),
+                    _normalised_table_text(structured_rows),
+                    autojunk=False,
+                ).ratio()
+                no_data_loss = all(
+                    structured >= markdown
+                    for structured, markdown in zip(
+                        structured_coverage,
+                        markdown_coverage,
+                    )
+                )
+                strictly_more_complete = any(
+                    structured > markdown
+                    for structured, markdown in zip(
+                        structured_coverage,
+                        markdown_coverage,
+                    )
+                )
+                structured_reasons = {
+                    str(value).strip()
+                    for value in (structured_quality.get("reasons") or [])
+                    if str(value).strip()
+                }
+                try:
+                    raw_structure_confidence = record.get("structure_confidence")
+                    structure_confidence = (
+                        float(raw_structure_confidence)
+                        if raw_structure_confidence is not None
+                        else float(structured_quality.get("structure_confidence") or 0.0)
+                    )
+                except (TypeError, ValueError, OverflowError):
+                    structure_confidence = 0.0
+                try:
+                    structure_threshold = float(
+                        os.getenv("REPORT_TABLE_STRUCTURE_CONFIDENCE_THRESHOLD", "0.80")
+                        or "0.80"
+                    )
+                except (TypeError, ValueError, OverflowError):
+                    structure_threshold = 0.80
+                may_replace_projection = (
+                    no_data_loss
+                    and (source_similarity >= 0.82 or strictly_more_complete)
+                    and not (
+                        structured_reasons & _TABLE_SECOND_PASS_CRITICAL_REASONS
+                    )
+                    and structure_confidence >= structure_threshold
+                )
+                if not may_replace_projection:
+                    # Keep the enriched Markdown family.  Its retained conflict
+                    # remains actionable and can be repaired by the selective
+                    # high-resolution pass; a weaker JSON projection must not
+                    # delete first-pass cells merely because it parsed as 2x2.
+                    continue
+                replaceable_record_keys.add(key)
+                replaced_table_ids.add(str(segment.source_table_id))
+                inherited_conflicts: List[Dict[str, Any]] = []
+                inherited_reasons: List[str] = []
+                inherited_notes: List[str] = []
+                inherited_statuses: List[str] = []
+                for family_segment in segments:
+                    if family_segment.source_table_id != segment.source_table_id:
+                        continue
+                    family_data = dict(family_segment.structured_data or {})
+                    inherited_status = str(
+                        family_segment.review_status
+                        or family_data.get("review_status")
+                        or ""
+                    ).strip().lower()
+                    if inherited_status and inherited_status not in inherited_statuses:
+                        inherited_statuses.append(inherited_status)
+                    for reason in family_data.get("quality_reasons") or []:
+                        reason_text = str(reason or "").strip()
+                        if reason_text and reason_text not in inherited_reasons:
+                            inherited_reasons.append(reason_text)
+                    for note in family_data.get("quality_notes") or []:
+                        note_text = str(note or "").strip()
+                        if note_text and note_text not in inherited_notes:
+                            inherited_notes.append(note_text)
+                    for conflict in [
+                        *(family_segment.conflicts or []),
+                        *(family_data.get("conflicts") or []),
+                    ]:
+                        if not isinstance(conflict, dict):
+                            continue
+                        conflict_key = json.dumps(
+                            conflict,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            default=str,
+                        )
+                        if any(
+                            json.dumps(
+                                existing,
+                                ensure_ascii=False,
+                                sort_keys=True,
+                                default=str,
+                            )
+                            == conflict_key
+                            for existing in inherited_conflicts
+                        ):
+                            continue
+                        inherited_conflicts.append(dict(conflict))
+                context_by_record[key] = {
+                    field: data.get(field)
+                    for field in ("table_title", "section_path")
+                    if data.get(field) not in (None, "", [])
+                }
+                context_by_record[key].update(
+                    {
+                        "previous_source_table_id": str(segment.source_table_id),
+                        "inherited_conflicts": inherited_conflicts,
+                        "inherited_quality_reasons": inherited_reasons,
+                        "inherited_quality_notes": inherited_notes,
+                        "inherited_review_statuses": inherited_statuses,
+                    }
+                )
+
+        canonical: List[TextSegment] = []
+        records_to_materialize = [
+            record
+            for record in valid_records
+            if (
+                (
+                    int(record.get("page_number") or 1),
+                    str(record.get("table_id") or "").strip(),
+                )
+                not in matched_record_keys
+                or (
+                    int(record.get("page_number") or 1),
+                    str(record.get("table_id") or "").strip(),
+                )
+                in replaceable_record_keys
+            )
+        ]
+        added = self._materialize_unmatched_table_records(
+            canonical,
+            records_to_materialize,
+            document_id,
+        )
+        for segment in canonical:
+            data = dict(segment.structured_data or {})
+            record_id = str(data.get("table_record_id") or "").strip()
+            context = context_by_record.get((int(segment.page_number or 1), record_id), {})
+            inherited_conflicts = list(context.get("inherited_conflicts") or [])
+            merged_conflicts: List[Dict[str, Any]] = []
+            seen_conflicts: set[str] = set()
+            for conflict in [
+                *(segment.conflicts or []),
+                *(data.get("conflicts") or []),
+                *inherited_conflicts,
+            ]:
+                if not isinstance(conflict, dict):
+                    continue
+                conflict_key = json.dumps(
+                    conflict,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    default=str,
+                )
+                if conflict_key in seen_conflicts:
+                    continue
+                seen_conflicts.add(conflict_key)
+                merged_conflicts.append(dict(conflict))
+
+            merged_reasons = list(
+                dict.fromkeys(
+                    str(value).strip()
+                    for value in [
+                        *(data.get("quality_reasons") or []),
+                        *(context.get("inherited_quality_reasons") or []),
+                    ]
+                    if str(value).strip()
+                )
+            )
+            merged_notes = list(
+                dict.fromkeys(
+                    str(value).strip()
+                    for value in [
+                        *(data.get("quality_notes") or []),
+                        *(context.get("inherited_quality_notes") or []),
+                    ]
+                    if str(value).strip()
+                )
+            )
+            statuses = {
+                str(value or "").strip().lower()
+                for value in [
+                    segment.review_status,
+                    data.get("review_status"),
+                    *(context.get("inherited_review_statuses") or []),
+                ]
+                if str(value or "").strip()
+            }
+            if merged_conflicts or merged_reasons or "needs_review" in statuses:
+                review_status = "needs_review"
+            elif merged_notes or "unverified" in statuses:
+                review_status = "unverified"
+            else:
+                review_status = "verified"
+
+            data.update(
+                {
+                    field: value
+                    for field, value in context.items()
+                    if field in {"table_title", "section_path"}
+                }
+            )
+            if context:
+                data["canonicalized_from_markdown"] = True
+                data["previous_source_table_id"] = context.get(
+                    "previous_source_table_id"
+                )
+            data["quality_reasons"] = merged_reasons
+            data["quality_notes"] = merged_notes
+            data["conflicts"] = merged_conflicts
+            data["review_status"] = review_status
+            segment.conflicts = merged_conflicts
+            segment.review_status = review_status
+            segment.structured_data = data
+        canonical_by_previous: Dict[str, List[TextSegment]] = {}
+        unmatched_canonical: List[TextSegment] = []
+        for segment in canonical:
+            previous_table_id = str(
+                (segment.structured_data or {}).get("previous_source_table_id")
+                or ""
+            ).strip()
+            if previous_table_id:
+                canonical_by_previous.setdefault(previous_table_id, []).append(segment)
+            else:
+                unmatched_canonical.append(segment)
+
+        # Replace a matched family at its original list position.  This keeps
+        # section/page reading order stable instead of appending every rebuilt
+        # table to the end of the document.
+        rebuilt: List[TextSegment] = []
+        inserted: set[str] = set()
+        for segment in segments:
+            table_id = str(segment.source_table_id or "")
+            if table_id not in replaced_table_ids:
+                rebuilt.append(segment)
+                continue
+            if table_id not in inserted:
+                rebuilt.extend(canonical_by_previous.get(table_id, []))
+                inserted.add(table_id)
+        rebuilt.extend(unmatched_canonical)
+        segments[:] = rebuilt
+        return added
+
+    def _table_family_quality_details(
+        self,
+        family: Sequence[TextSegment],
+    ) -> Dict[str, Any]:
+        """Return one comparable quality envelope for a physical table family."""
+        table = next(
+            (segment for segment in family if segment.segment_type == "table"),
+            None,
+        )
+        reasons: set[str] = set()
+        notes: set[str] = set()
+        conflict_map: Dict[str, Dict[str, Any]] = {}
+        statuses: List[str] = []
+        structure_values: List[float] = []
+        ocr_values: List[float] = []
+        match_values: List[float] = []
+        has_table_record = False
+
+        for segment in family:
+            data = dict(segment.structured_data or {})
+            reasons.update(
+                str(value).strip()
+                for value in (data.get("quality_reasons") or [])
+                if str(value).strip()
+            )
+            notes.update(
+                str(value).strip()
+                for value in (data.get("quality_notes") or [])
+                if str(value).strip()
+            )
+            status = str(segment.review_status or data.get("review_status") or "").strip().lower()
+            if status:
+                statuses.append(status)
+            for raw_conflict in [*(segment.conflicts or []), *(data.get("conflicts") or [])]:
+                if not isinstance(raw_conflict, dict):
+                    continue
+                key = json.dumps(raw_conflict, ensure_ascii=False, sort_keys=True, default=str)
+                conflict_map.setdefault(key, dict(raw_conflict))
+            if data.get("table_record_id"):
+                has_table_record = True
+            for raw, target in (
+                (segment.structure_confidence, structure_values),
+                (segment.ocr_confidence, ocr_values),
+                (data.get("table_match_score"), match_values),
+            ):
+                if raw is None:
+                    continue
+                try:
+                    target.append(max(0.0, min(1.0, float(raw))))
+                except (TypeError, ValueError, OverflowError):
+                    pass
+
+        rows = self._parse_table_rows(table.content if table is not None else "")
+        if table is not None:
+            raw_quality = self._parse_table_details(table.content)[2]
+            reasons.update(str(value) for value in raw_quality.get("reasons") or [])
+        if not has_table_record:
+            reasons.add("missing_table_record")
+        if "missing_ocr_confidence" in reasons:
+            reasons.discard("missing_ocr_confidence")
+            notes.add("missing_ocr_confidence")
+        widths = [len(row) for row in rows if row]
+        shape_consistency = 1.0 if widths and len(set(widths)) == 1 else 0.0
+        nonempty_cells = sum(
+            1 for row in rows for value in row if str(value or "").strip()
+        )
+        numeric_cells = sum(
+            1 for row in rows for value in row if re.search(r"\d", str(value or ""))
+        )
+        actionable = sorted(reasons & _TABLE_SECOND_PASS_ACTIONABLE_REASONS)
+        critical = sorted(reasons & _TABLE_SECOND_PASS_CRITICAL_REASONS)
+        if "needs_review" in statuses:
+            review_rank = 0
+            review_status = "needs_review"
+        elif statuses and all(status == "verified" for status in statuses):
+            review_rank = 2
+            review_status = "verified"
+        else:
+            review_rank = 1
+            review_status = "unverified"
+        if (
+            review_status == "needs_review"
+            and not (reasons & _TABLE_SECOND_PASS_ACTIONABLE_REASONS)
+            and notes != {"missing_ocr_confidence"}
+        ):
+            reasons.add("unexplained_needs_review")
+            actionable = sorted(reasons & _TABLE_SECOND_PASS_ACTIONABLE_REASONS)
+
+        return {
+            "review_status": review_status,
+            "review_rank": review_rank,
+            "reasons": sorted(reasons),
+            "notes": sorted(notes),
+            "actionable_reasons": actionable,
+            "critical_reasons": critical,
+            "conflicts": list(conflict_map.values()),
+            "conflict_count": len(conflict_map),
+            "structure_confidence": min(structure_values) if structure_values else None,
+            "ocr_confidence": min(ocr_values) if ocr_values else None,
+            "table_match_score": min(match_values) if match_values else None,
+            "has_table_record": has_table_record,
+            "row_count": len(rows),
+            "nonempty_cells": nonempty_cells,
+            "numeric_cells": numeric_cells,
+            "shape_consistency": shape_consistency,
+        }
+
+    def _table_family_quality_key(
+        self,
+        family: Sequence[TextSegment],
+    ) -> Tuple[Any, ...]:
+        """Higher tuples represent strictly safer, more complete table evidence."""
+        details = self._table_family_quality_details(family)
+        structure_confidence = details["structure_confidence"]
+        ocr_confidence = details["ocr_confidence"]
+        match_score = details["table_match_score"]
+        return (
+            -int(details["conflict_count"]),
+            -len(details["critical_reasons"]),
+            -len(details["actionable_reasons"]),
+            int(details["review_rank"]),
+            1 if details["has_table_record"] else 0,
+            float(structure_confidence) if structure_confidence is not None else -1.0,
+            1 if ocr_confidence is not None else 0,
+            float(ocr_confidence) if ocr_confidence is not None else -1.0,
+            float(match_score) if match_score is not None else -1.0,
+            float(details["shape_consistency"]),
+            int(details["nonempty_cells"]),
+        )
+
+    def _table_family_map(
+        self,
+        segments: Sequence[TextSegment],
+    ) -> Dict[str, List[TextSegment]]:
+        families: Dict[str, List[TextSegment]] = {}
+        for segment in segments:
+            table_id = str(segment.source_table_id or "").strip()
+            if not table_id:
+                continue
+            families.setdefault(table_id, []).append(segment)
+        return families
+
+    def _select_table_second_pass_plan(
+        self,
+        segments: Sequence[TextSegment],
+        *,
+        page_analysis: Any = None,
+        max_ratio: Optional[float] = None,
+        render_zoom: Optional[float] = None,
+    ) -> TableSecondPassPlan:
+        """Select a bounded set of actionable physical tables for repair."""
+        tables = [
+            segment
+            for segment in segments
+            if segment.segment_type == "table" and segment.source_table_id
+        ]
+        families = self._table_family_map(segments)
+        try:
+            ratio = float(
+                max_ratio
+                if max_ratio is not None
+                else os.getenv("REPORT_TABLE_SECOND_PASS_MAX_RATIO", "0.30")
+            )
+        except (TypeError, ValueError, OverflowError):
+            ratio = 0.30
+        ratio = max(0.0, min(1.0, ratio))
+        try:
+            requested_zoom = float(
+                render_zoom
+                if render_zoom is not None
+                else os.getenv("REPORT_TABLE_SECOND_PASS_RENDER_ZOOM", "2.0")
+            )
+        except (TypeError, ValueError, OverflowError):
+            requested_zoom = 2.0
+        requested_zoom = max(1.0, min(4.0, requested_zoom))
+
+        candidates: List[TableSecondPassCandidate] = []
+        for table in tables:
+            table_id = str(table.source_table_id)
+            details = self._table_family_quality_details(families.get(table_id, [table]))
+            actionable = tuple(details["actionable_reasons"])
+            conflicts = int(details["conflict_count"])
+            # An absent optional OCR score is a note, not a defect.  It must not
+            # consume the repair budget by itself.
+            if not actionable and conflicts <= 0:
+                continue
+            data = dict(table.structured_data or {})
+            bbox_value = _normalized_bbox(data.get("bbox"))
+            bbox = tuple(bbox_value) if bbox_value is not None else None
+            reading_order: Optional[int]
+            try:
+                reading_order = (
+                    int(data.get("reading_order"))
+                    if data.get("reading_order") is not None
+                    else None
+                )
+            except (TypeError, ValueError, OverflowError):
+                reading_order = None
+            critical_count = len(set(actionable) & _TABLE_SECOND_PASS_CRITICAL_REASONS)
+            known_confidence_deficit = sum(
+                1
+                for reason in actionable
+                if reason in {"low_structure_confidence", "low_ocr_confidence"}
+            )
+            weak_match = int("weak_table_record_match" in actionable or "missing_table_record" in actionable)
+            rank_key = (
+                -int(conflicts > 0),
+                -critical_count,
+                -known_confidence_deficit,
+                -weak_match,
+                int(table.page_number or 1),
+                float(table.position_y or 0.0),
+                table_id,
+            )
+            candidates.append(
+                TableSecondPassCandidate(
+                    source_table_id=table_id,
+                    table_segment_id=table.segment_id,
+                    page_number=max(1, int(table.page_number or 1)),
+                    bbox=bbox,
+                    reading_order=reading_order,
+                    reasons=actionable,
+                    conflict_count=conflicts,
+                    rank_key=rank_key,
+                )
+            )
+
+        candidates.sort(key=lambda item: item.rank_key)
+        budget = (
+            min(len(tables), int(math.ceil(len(tables) * ratio)))
+            if ratio > 0.0 and tables
+            else 0
+        )
+        selected = candidates[:budget]
+        pages = tuple(sorted({candidate.page_number for candidate in selected}))
+
+        adaptive_options = _adaptive_prediction_options_by_page(page_analysis)
+        try:
+            base_min = max(784, int(os.getenv("PADDLEOCR_VLM_MIN_PIXELS", "112896") or "112896"))
+            base_max = max(base_min, int(os.getenv("PADDLEOCR_VLM_MAX_PIXELS", "1003520") or "1003520"))
+            base_tokens = max(128, int(os.getenv("PADDLEOCR_VLM_MAX_NEW_TOKENS", "2048") or "2048"))
+            second_tokens = max(
+                base_tokens,
+                int(os.getenv("REPORT_TABLE_SECOND_PASS_MAX_NEW_TOKENS", "4096") or "4096"),
+            )
+        except (TypeError, ValueError, OverflowError):
+            base_min, base_max, base_tokens, second_tokens = 112896, 1003520, 2048, 4096
+        area_scale = requested_zoom * requested_zoom
+        scaled_min = max(784, min(4_014_080, int(math.ceil(base_min * area_scale))))
+        scaled_max = max(
+            scaled_min,
+            min(4_014_080, int(math.ceil(base_max * area_scale))),
+        )
+        second_tokens = max(128, min(8192, second_tokens))
+        prediction_options: Dict[int, Dict[str, Any]] = {}
+        for page in pages:
+            options = dict(adaptive_options.get(page, {}))
+            options.update(
+                {
+                    "use_layout_detection": True,
+                    "use_ocr_for_image_block": True,
+                    "min_pixels": scaled_min,
+                    "max_pixels": scaled_max,
+                    "max_new_tokens": second_tokens,
+                }
+            )
+            prediction_options[page] = options
+
+        return TableSecondPassPlan(
+            total_tables=len(tables),
+            budget_tables=budget,
+            candidates=tuple(candidates),
+            selected_table_ids=tuple(candidate.source_table_id for candidate in selected),
+            pages=pages,
+            render_zoom=requested_zoom,
+            prediction_options=prediction_options,
+        )
+
+    def _second_pass_table_match_score(
+        self,
+        first: TextSegment,
+        second: TextSegment,
+        *,
+        first_order: int,
+        second_order: int,
+        page_span: int,
+    ) -> Tuple[float, float, float]:
+        first_rows = self._parse_table_rows(first.content)
+        second_rows = self._parse_table_rows(second.content)
+        left = _normalised_table_text(first_rows)
+        right = _normalised_table_text(second_rows)
+        if left and right:
+            sequence_score = SequenceMatcher(None, left, right, autojunk=False).ratio()
+            left_tokens = set(re.findall(r"[\w%+.-]+", left, flags=re.UNICODE))
+            right_tokens = set(re.findall(r"[\w%+.-]+", right, flags=re.UNICODE))
+            union = left_tokens | right_tokens
+            token_score = len(left_tokens & right_tokens) / len(union) if union else 0.0
+            text_score = max(sequence_score, token_score)
+        else:
+            text_score = 0.0
+        first_bbox = _normalized_bbox((first.structured_data or {}).get("bbox"))
+        second_bbox = _normalized_bbox((second.structured_data or {}).get("bbox"))
+        bbox_score = _bbox_iou(first_bbox, second_bbox)
+        order_score = max(0.0, 1.0 - abs(first_order - second_order) / max(1, page_span))
+        if first_bbox is not None and second_bbox is not None:
+            score = 0.55 * bbox_score + 0.35 * text_score + 0.10 * order_score
+        else:
+            score = 0.85 * text_score + 0.15 * order_score
+        return score, text_score, bbox_score
+
+    def _second_pass_family_is_complete(
+        self,
+        first_family: Sequence[TextSegment],
+        second_family: Sequence[TextSegment],
+    ) -> bool:
+        first = self._table_family_quality_details(first_family)
+        second = self._table_family_quality_details(second_family)
+        if not second["has_table_record"] or int(second["row_count"]) < 2:
+            return False
+        if set(second["critical_reasons"]) - set(first["critical_reasons"]):
+            return False
+        if int(first["nonempty_cells"]) > 0 and int(second["nonempty_cells"]) < max(
+            2,
+            int(math.ceil(int(first["nonempty_cells"]) * 0.85)),
+        ):
+            return False
+        if int(first["numeric_cells"]) > 0 and int(second["numeric_cells"]) < int(
+            math.ceil(int(first["numeric_cells"]) * 0.80)
+        ):
+            return False
+        for confidence_name in ("structure_confidence", "ocr_confidence"):
+            first_confidence = first.get(confidence_name)
+            second_confidence = second.get(confidence_name)
+            if (
+                first_confidence is not None
+                and second_confidence is not None
+                and float(second_confidence) + 0.05 < float(first_confidence)
+            ):
+                return False
+        return True
+
+    def _clone_second_pass_family(
+        self,
+        first_family: Sequence[TextSegment],
+        second_family: Sequence[TextSegment],
+        candidate: TableSecondPassCandidate,
+        *,
+        first_quality: Dict[str, Any],
+        second_quality: Dict[str, Any],
+        match_score: float,
+        prediction_options: Dict[str, Any],
+        requested_render_zoom: float,
+        effective_render_zoom: float,
+    ) -> List[TextSegment]:
+        first_table = next(
+            (segment for segment in first_family if segment.segment_type == "table"),
+            first_family[0],
+        )
+        first_data = dict(first_table.structured_data or {})
+        raw_segment_ids = [
+            str(raw_segment.segment_id or "").strip()
+            for raw_segment in second_family
+        ]
+        if (
+            any(not segment_id for segment_id in raw_segment_ids)
+            or len(set(raw_segment_ids)) != len(raw_segment_ids)
+        ):
+            # A family with missing/duplicate IDs cannot be rewritten without
+            # risking broken row_segment_id references.
+            return []
+        id_map = {
+            raw_segment_id: f"{candidate.table_segment_id}_sp2_{index:04d}"
+            for index, raw_segment_id in enumerate(raw_segment_ids, 1)
+        }
+        provenance_fields = (
+            "table_record_id",
+            "table_record_source",
+            "block_id",
+            "block_type",
+            "reading_order",
+            "page_width",
+            "page_height",
+            "source_page_index",
+            "source_json_path",
+            "source_image_paths",
+            "asset_ids",
+            "text_fingerprint",
+            "structured_html",
+            "structured_html_sha256",
+            "bbox",
+            "table_match_score",
+            "table_text_match_score",
+            "table_bbox_iou",
+        )
+        first_pass_provenance = {
+            field: first_data.get(field)
+            for field in provenance_fields
+            if first_data.get(field) not in (None, "", [])
+        }
+        cloned: List[TextSegment] = []
+        for index, raw_segment in enumerate(second_family, 1):
+            copier = getattr(raw_segment, "model_copy", None)
+            segment = copier(deep=True) if callable(copier) else raw_segment.copy(deep=True)
+            segment.segment_id = id_map[str(raw_segment.segment_id)]
+            segment.source_table_id = candidate.source_table_id
+            segment.parse_pass = 2
+            data = dict(segment.structured_data or {})
+            second_pass_provenance = {
+                field: data.get(field)
+                for field in provenance_fields
+                if data.get(field) not in (None, "", [])
+            }
+            raw_row_segment_id = str(data.get("row_segment_id") or "").strip()
+            if raw_row_segment_id:
+                mapped_row_segment_id = id_map.get(raw_row_segment_id)
+                if not mapped_row_segment_id:
+                    return []
+                data["row_segment_id"] = mapped_row_segment_id
+            data.update(
+                {
+                    "table_id": candidate.source_table_id,
+                    "parse_pass": 2,
+                    "second_pass_replaced": True,
+                    "previous_parse_pass": 1,
+                    "second_pass_match_score": round(match_score, 4),
+                }
+            )
+            if segment.segment_type == "table":
+                data.update(
+                    {
+                        "first_pass_quality": first_quality,
+                        "second_pass_quality": second_quality,
+                        "quality_delta": {
+                            "first_key": list(
+                                self._table_family_quality_key(first_family)
+                            ),
+                            "second_key": list(
+                                self._table_family_quality_key(second_family)
+                            ),
+                        },
+                        "second_pass_prediction_options": dict(prediction_options),
+                        "requested_render_zoom": requested_render_zoom,
+                        "effective_render_zoom": effective_render_zoom,
+                        "resolved_conflicts": list(
+                            first_quality.get("conflicts") or []
+                        ),
+                        "second_pass_provenance": second_pass_provenance,
+                        "first_pass_provenance": dict(first_pass_provenance),
+                    }
+                )
+            else:
+                for audit_field in (
+                    "first_pass_quality",
+                    "second_pass_quality",
+                    "quality_delta",
+                    "second_pass_prediction_options",
+                    "requested_render_zoom",
+                    "effective_render_zoom",
+                    "resolved_conflicts",
+                    "second_pass_provenance",
+                    "first_pass_provenance",
+                ):
+                    data.pop(audit_field, None)
+            # The accepted family is an embedded second-pass record: retain its
+            # own block/hash/geometry fields, but never expose the temporary
+            # worker JSON path as if it were a durable manifest record.  The
+            # complete first-pass tuple remains available as one audit envelope.
+            fingerprint = str(
+                second_pass_provenance.get("structured_html_sha256") or ""
+            )[:16]
+            data["table_record_id"] = (
+                f"embedded-pass2:{candidate.source_table_id}:{fingerprint or 'unknown'}"
+            )
+            data["table_record_source"] = "embedded_second_pass"
+            data.pop("source_json_path", None)
+            # Asset blobs describe the same physical table and are durable, so
+            # preserve their first-pass links with an explicit generation tag.
+            for field in ("source_image_paths", "asset_ids"):
+                if (
+                    segment.segment_type == "table"
+                    and first_data.get(field) not in (None, "", [])
+                ):
+                    value = first_data[field]
+                    data[field] = list(value) if isinstance(value, list) else value
+                else:
+                    data.pop(field, None)
+            if data.get("source_image_paths") or data.get("asset_ids"):
+                data["asset_provenance_parse_pass"] = 1
+            for field in ("table_title", "section_path"):
+                if first_data.get(field) not in (None, "", []):
+                    value = first_data[field]
+                    data[field] = list(value) if isinstance(value, list) else value
+            segment.structured_data = data
+            cloned.append(segment)
+        cloned_ids = {segment.segment_id for segment in cloned}
+        if len(cloned_ids) != len(cloned):
+            return []
+        if any(
+            str((segment.structured_data or {}).get("row_segment_id") or "")
+            not in cloned_ids
+            for segment in cloned
+            if (segment.structured_data or {}).get("row_segment_id")
+        ):
+            return []
+        return cloned
+
+    def _apply_table_second_pass(
+        self,
+        segments: List[TextSegment],
+        second_pass_segments: Sequence[TextSegment],
+        plan: TableSecondPassPlan,
+        *,
+        effective_render_zoom: Optional[float] = None,
+        effective_render_zoom_by_page: Optional[Dict[int, float]] = None,
+    ) -> Dict[str, Any]:
+        """Atomically replace selected table families only when quality improves."""
+        first_families = self._table_family_map(segments)
+        second_families = self._table_family_map(second_pass_segments)
+        first_tables = {
+            str(segment.source_table_id): segment
+            for segment in segments
+            if segment.segment_type == "table" and segment.source_table_id
+        }
+        second_tables_by_page: Dict[int, List[TextSegment]] = {}
+        for segment in second_pass_segments:
+            if segment.segment_type == "table" and segment.source_table_id:
+                second_tables_by_page.setdefault(int(segment.page_number), []).append(segment)
+        candidate_map = {
+            candidate.source_table_id: candidate
+            for candidate in plan.candidates
+            if candidate.source_table_id in set(plan.selected_table_ids)
+        }
+        match_candidates: List[Tuple[float, float, float, str, TextSegment]] = []
+        for table_id, candidate in candidate_map.items():
+            first = first_tables.get(table_id)
+            page_tables = second_tables_by_page.get(candidate.page_number, [])
+            if first is None:
+                continue
+            first_page_tables = sorted(
+                [table for table in first_tables.values() if table.page_number == candidate.page_number],
+                key=lambda item: (item.position_y, item.position_x or 0.0),
+            )
+            first_order = first_page_tables.index(first)
+            ordered_second_tables = sorted(
+                page_tables,
+                key=lambda item: (item.position_y, item.position_x or 0.0),
+            )
+            for second_order, second in enumerate(ordered_second_tables):
+                score, text_score, bbox_score = self._second_pass_table_match_score(
+                    first,
+                    second,
+                    first_order=first_order,
+                    second_order=second_order,
+                    page_span=max(len(page_tables), 1),
+                )
+                first_bbox = _normalized_bbox(
+                    (first.structured_data or {}).get("bbox")
+                )
+                second_bbox = _normalized_bbox(
+                    (second.structured_data or {}).get("bbox")
+                )
+                page_has_multiple_tables = (
+                    len(first_page_tables) > 1 or len(ordered_second_tables) > 1
+                )
+                if page_has_multiple_tables:
+                    if first_bbox is None or second_bbox is None:
+                        # Without geometry, text similarity alone cannot safely
+                        # distinguish repeated templates on one page.  Require
+                        # a complete one-to-one ordinal mapping and never cross
+                        # table order.
+                        if (
+                            len(first_page_tables) != len(ordered_second_tables)
+                            or first_order != second_order
+                        ):
+                            continue
+                    elif bbox_score < 0.10:
+                        # Both passes provide geometry, so require a meaningful
+                        # physical overlap before considering textual affinity.
+                        continue
+                if score < 0.45 or (text_score < 0.35 and bbox_score < 0.20):
+                    continue
+                match_candidates.append((score, text_score, bbox_score, table_id, second))
+
+        used_first: set[str] = set()
+        used_second: set[str] = set()
+        matched_first: set[str] = set()
+        replacements: Dict[str, List[TextSegment]] = {}
+        rejected_not_improved = 0
+        rejected_incomplete = 0
+        for score, _text_score, _bbox_score, table_id, second_table in sorted(
+            match_candidates,
+            key=lambda item: item[0],
+            reverse=True,
+        ):
+            second_id = str(second_table.source_table_id or "")
+            if table_id in used_first or not second_id or second_id in used_second:
+                continue
+            candidate = candidate_map[table_id]
+            first_family = first_families.get(table_id, [])
+            second_family = second_families.get(second_id, [])
+            if not first_family or not second_family:
+                continue
+            matched_first.add(table_id)
+            if not self._second_pass_family_is_complete(first_family, second_family):
+                rejected_incomplete += 1
+                continue
+            first_key = self._table_family_quality_key(first_family)
+            second_key = self._table_family_quality_key(second_family)
+            if second_key <= first_key:
+                rejected_not_improved += 1
+                continue
+            first_quality = self._table_family_quality_details(first_family)
+            second_quality = self._table_family_quality_details(second_family)
+            replacement = self._clone_second_pass_family(
+                first_family,
+                second_family,
+                candidate,
+                first_quality=first_quality,
+                second_quality=second_quality,
+                match_score=score,
+                prediction_options=plan.prediction_options.get(candidate.page_number, {}),
+                requested_render_zoom=plan.render_zoom,
+                effective_render_zoom=(
+                    float(
+                        (effective_render_zoom_by_page or {}).get(
+                            candidate.page_number,
+                            effective_render_zoom
+                            if effective_render_zoom is not None
+                            else plan.render_zoom,
+                        )
+                    )
+                ),
+            )
+            if not replacement:
+                rejected_incomplete += 1
+                continue
+            used_first.add(table_id)
+            used_second.add(second_id)
+            replacements[table_id] = replacement
+
+        if replacements:
+            rebuilt: List[TextSegment] = []
+            inserted: set[str] = set()
+            for segment in segments:
+                table_id = str(segment.source_table_id or "")
+                replacement = replacements.get(table_id)
+                if replacement is None:
+                    rebuilt.append(segment)
+                    continue
+                if table_id not in inserted:
+                    rebuilt.extend(replacement)
+                    inserted.add(table_id)
+            segments[:] = rebuilt
+
+        return {
+            "selected_tables": len(plan.selected_table_ids),
+            "selected_pages": list(plan.pages),
+            "accepted_tables": len(replacements),
+            "accepted_table_ids": sorted(replacements),
+            "no_match_tables": max(0, len(plan.selected_table_ids) - len(matched_first)),
+            "rejected_not_improved": rejected_not_improved,
+            "rejected_incomplete": rejected_incomplete,
+        }
+
+    def _run_table_second_pass(
+        self,
+        source_path: Path,
+        document_id: str,
+        segments: List[TextSegment],
+        *,
+        page_analysis: Any = None,
+        release_after_document: bool = True,
+    ) -> Dict[str, Any]:
+        """Best-effort high-resolution repair for a bounded table subset."""
+        if not _env_bool("REPORT_TABLE_SECOND_PASS_ENABLED", False):
+            return {"enabled": False, "accepted_tables": 0}
+        plan = self._select_table_second_pass_plan(
+            segments,
+            page_analysis=page_analysis,
+        )
+        summary: Dict[str, Any] = {
+            "enabled": True,
+            "total_tables": plan.total_tables,
+            "candidate_tables": len(plan.candidates),
+            "budget_tables": plan.budget_tables,
+            "selected_tables": len(plan.selected_table_ids),
+            "selected_pages": list(plan.pages),
+            "render_zoom": plan.render_zoom,
+            "accepted_tables": 0,
+        }
+        if not plan.selected_table_ids or not plan.pages:
+            return summary
+
+        self._emit_progress(
+            "table_second_pass",
+            f"Rechecking {len(plan.selected_table_ids)} table(s) on {len(plan.pages)} page(s).",
+            44,
+            table_second_pass=summary,
+        )
+        started = time.perf_counter()
+        try:
+            result = self._run_paddleocr_vl_page_batch_queue(
+                source_path,
+                page_analysis=page_analysis,
+                selected_page_numbers=plan.pages,
+                prediction_options_by_page=plan.prediction_options,
+                partial_result=True,
+                promote_visuals=False,
+                parse_pass=2,
+                render_zoom=plan.render_zoom,
+                emit_progress=True,
+                release_after_document=release_after_document,
+            )
+            deferred_job_id = str(
+                result.get("_paddle_lifecycle_job_id") or ""
+            )
+            if deferred_job_id:
+                summary["_paddle_lifecycle_job_id"] = deferred_job_id
+            second_markdown = str(result.get("markdown") or "").strip()
+            if not second_markdown:
+                raise ContentExtractionError(
+                    "Table second pass returned empty Markdown.",
+                    file_path=str(source_path),
+                )
+            second_segments = self._segments_from_markdown(
+                second_markdown,
+                f"{document_id}_sp2",
+            )
+            second_records = list(result.get("table_records") or [])
+            if second_records:
+                self._prefer_structured_table_records(
+                    second_segments,
+                    second_records,
+                    f"{document_id}_sp2",
+                )
+            apply_stats = self._apply_table_second_pass(
+                segments,
+                second_segments,
+                plan,
+                effective_render_zoom=float(
+                    result.get("effective_render_zoom") or plan.render_zoom
+                ),
+                effective_render_zoom_by_page={
+                    int(page): float(zoom)
+                    for page, zoom in (
+                        result.get("effective_render_zoom_by_page") or {}
+                    ).items()
+                },
+            )
+            summary.update(apply_stats)
+            summary["successful_pages"] = list(result.get("processed_pages") or plan.pages)
+            summary["failed_pages"] = list(result.get("failed_pages") or [])
+            summary["prediction_options"] = plan.prediction_options
+        except Exception as exc:
+            # The repair layer may improve evidence but must never discard an
+            # otherwise usable first-pass report.
+            self.logger.warning(
+                f"Table second pass failed; preserving first-pass tables: "
+                f"file={source_path.name}, pages={list(plan.pages)}, error={exc}"
+            )
+            summary["error"] = str(exc)
+            summary["failed_pages"] = list(plan.pages)
+        summary["elapsed_seconds"] = round(time.perf_counter() - started, 3)
+        return summary
 
     def _stitch_continued_tables(self, segments: List[TextSegment]) -> None:
         tables = sorted(
@@ -3388,12 +5154,15 @@ class ContentExtractor:
                 reasons.append("year_value_count_mismatch")
 
         structure_confidence = 0.9 if is_html and not reasons else (0.72 if is_html else 0.80)
-        ocr_confidence = 1.0  # Markdown/HTML has no per-cell scores; raw Paddle JSON may override this later.
+        # Markdown/HTML carries no calibrated per-cell OCR score.  Keep this as
+        # unknown instead of manufacturing a perfect 1.0 confidence; a matched
+        # Paddle table record may supply the real value later.
+        ocr_confidence: Optional[float] = None
         structure_threshold = float(os.getenv("REPORT_TABLE_STRUCTURE_CONFIDENCE_THRESHOLD", "0.80") or "0.80")
         ocr_threshold = float(os.getenv("REPORT_TABLE_OCR_CONFIDENCE_THRESHOLD", "0.75") or "0.75")
         if structure_confidence < structure_threshold:
             reasons.append("low_structure_confidence")
-        if ocr_confidence < ocr_threshold:
+        if ocr_confidence is not None and ocr_confidence < ocr_threshold:
             reasons.append("low_ocr_confidence")
         reasons = list(dict.fromkeys(reasons))
         return rows, cells, {

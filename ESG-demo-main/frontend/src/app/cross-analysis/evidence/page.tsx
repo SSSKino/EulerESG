@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useEffect, useState } from "react";
+import React, { Suspense, useMemo, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, Typography } from "antd";
 import PDFEvidenceViewer from "@/components/pdfviewer/PDFEvidenceViewer";
@@ -66,7 +66,7 @@ async function resolveReportId(aliasOrId: string): Promise<string | null> {
   return best?.file_id ? String(best.file_id) : null;
 }
 
-export default function CrossEvidencePage() {
+function CrossEvidencePageContent() {
   const { t } = useT();
   const sp = useSearchParams();
 
@@ -162,5 +162,20 @@ export default function CrossEvidencePage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function CrossEvidencePage() {
+  return (
+    <Suspense
+      fallback={(
+        <div
+          aria-busy="true"
+          style={{ minHeight: "100vh", width: "100%", background: crossTokens.color.bg }}
+        />
+      )}
+    >
+      <CrossEvidencePageContent />
+    </Suspense>
   );
 }

@@ -1004,6 +1004,30 @@ def _public_block_record(record: dict[str, Any]) -> dict[str, Any]:
     return {key: record.get(key) for key in keys}
 
 
+def collect_table_records(
+    output_dir: str | Path,
+    *,
+    parse_pass: int = 1,
+) -> list[dict[str, Any]]:
+    """Read structured Paddle table records without mutating the PDF manifest.
+
+    A selective table repair pass must be able to inspect the worker's JSON
+    output without replacing the first-pass visual manifest or promoting a
+    second copy of every crop.  ``promote_visual_assets`` deliberately keeps
+    those persistence side effects; this helper is the read-only counterpart
+    used by the repair pipeline.
+    """
+    root = Path(output_dir)
+    _, _, table_records = _adapt_paddleocr_v16(root)
+    effective_pass = max(1, int(parse_pass or 1))
+    records: list[dict[str, Any]] = []
+    for raw in table_records:
+        record = _public_record(raw)
+        record["parse_pass"] = effective_pass
+        records.append(record)
+    return records
+
+
 def promote_visual_assets(output_dir: str | Path, pdf_path: str | Path) -> list[dict[str, Any]]:
     """Promote semantic PaddleOCR-VL crops and persist their page provenance.
 

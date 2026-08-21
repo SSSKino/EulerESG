@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { Empty, Skeleton } from "antd";
-import { Bar } from "@ant-design/plots";
+import Bar from "@ant-design/plots/es/components/bar";
 import type { CrossCompareResponse, CrossMetricValue } from "@/lib/api";
 import { ChevronDown } from "lucide-react";
 import { useT } from "@/i18n/useT";

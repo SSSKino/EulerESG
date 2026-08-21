@@ -1,6 +1,6 @@
 // app/dashboard/chat/page.tsx
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { message } from "antd";
 import { useSearchParams } from "next/navigation";
 import ChatView from "@/components/pdfviewer/ChatView";
@@ -14,7 +14,7 @@ interface Message {
   isUser: boolean;
 }
 
-export default function ChatPage() {
+function ChatPageContent() {
   const { t } = useT();
   const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Message[]>(() => [
@@ -134,5 +134,15 @@ export default function ChatPage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense
+      fallback={<div aria-busy="true" className="min-h-screen w-full bg-white" />}
+    >
+      <ChatPageContent />
+    </Suspense>
   );
 }

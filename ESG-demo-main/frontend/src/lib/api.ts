@@ -7,6 +7,8 @@ import { errorSummary } from "@/lib/logger";
 // Prefer same-origin proxy via Next.js rewrites. If you need to bypass Next,
 // set NEXT_PUBLIC_API_BASE_URL to a full backend URL.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const STANDARDS_METRICS_CACHE_TTL_MS = 10 * 60 * 1000;
+const STANDARDS_METRICS_CACHE_MAX_ENTRIES = 32;
 
 class ApiRequestError extends Error {
   readonly status: number;
@@ -305,6 +307,10 @@ class APIService {
   private assessmentByFileCache = new Map<string, Promise<any>>();
   private griOptionsCache: Promise<GriOptionsResponse> | null = null;
   private standardsCatalogCache: Promise<StandardsLibraryCatalogResponse> | null = null;
+  private standardsMetricsCache = new Map<
+    string,
+    { expiresAt: number; data: StandardsLibraryMetricsResponse }
+  >();
   private visualManifestCache = new Map<string, { etag?: string; data: any }>();
   private visualObjectUrlCache = new Map<string, Promise<string>>();
   private crossAnalysisRequestCache = new Map<
@@ -380,8 +386,7 @@ class APIService {
     }
     if (cached) this.crossAnalysisRequestCache.delete(cacheKey);
 
-    let request: Promise<T>;
-    request = this.fetchWithError(
+    const request: Promise<T> = this.fetchWithError(
       `${API_BASE_URL}/api/cross-analysis/${resource}?ids=${encodeURIComponent(ids.join(","))}`,
     ).then(
       (payload) => {
@@ -782,7 +787,10 @@ class APIService {
   async getStandardsCatalog(
     forceRefresh = false,
   ): Promise<StandardsLibraryCatalogResponse> {
-    if (forceRefresh) this.standardsCatalogCache = null;
+    if (forceRefresh) {
+      this.standardsCatalogCache = null;
+      this.standardsMetricsCache.clear();
+    }
     if (!this.standardsCatalogCache) {
       this.standardsCatalogCache = this.fetchWithError(
         `${API_BASE_URL}/api/standards-library/catalog`,
@@ -801,12 +809,34 @@ class APIService {
     scopeId: string,
     signal?: AbortSignal,
   ): Promise<StandardsLibraryMetricsResponse> {
+    const cacheKey = JSON.stringify([frameworkId, groupId, scopeId]);
+    const cached = this.standardsMetricsCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      // Refresh insertion order so the bounded map behaves as an LRU cache.
+      this.standardsMetricsCache.delete(cacheKey);
+      this.standardsMetricsCache.set(cacheKey, cached);
+      return cached.data;
+    }
+    if (cached) this.standardsMetricsCache.delete(cacheKey);
+
     const query = new URLSearchParams({ scope_id: scopeId });
     if (groupId) query.set("group_id", groupId);
-    return this.fetchWithError(
+    const data = (await this.fetchWithError(
       `${API_BASE_URL}/api/standards-library/${encodeURIComponent(frameworkId)}/metrics?${query.toString()}`,
       { method: "GET", signal },
-    ) as Promise<StandardsLibraryMetricsResponse>;
+    )) as StandardsLibraryMetricsResponse;
+    if (!signal?.aborted) {
+      this.standardsMetricsCache.set(cacheKey, {
+        expiresAt: Date.now() + STANDARDS_METRICS_CACHE_TTL_MS,
+        data,
+      });
+      while (this.standardsMetricsCache.size > STANDARDS_METRICS_CACHE_MAX_ENTRIES) {
+        const oldestKey = this.standardsMetricsCache.keys().next().value;
+        if (oldestKey === undefined) break;
+        this.standardsMetricsCache.delete(oldestKey);
+      }
+    }
+    return data;
   }
 
   // Upload ESG metrics - REMOVED: This function was never used and had misleading logic

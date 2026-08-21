@@ -32,6 +32,7 @@ from esg_encoding.retrieval.metric_profile import (
 )
 from esg_encoding.retrieval.scoring import (
     _metric_evidence_quality_adjustment,
+    _qualitative_relevance_adjustment,
     _segment_structure_bonus,
     _topic_relevance_adjustment,
 )
@@ -566,6 +567,100 @@ class RetrievalNoiseControlTests(unittest.TestCase):
         )
         metric.sasb_topic = "Recruiting & Managing a Global, Diverse & Skilled Workforce"
         return metric
+
+    @staticmethod
+    def _qualitative_metric():
+        metric = _metric(
+            "data-security-risk-management",
+            "TC-X-230a.2",
+            "Description of approach to identifying and addressing data security risks",
+        )
+        metric.sasb_category = "Qualitative"
+        metric.sasb_type = "Discussion and Analysis"
+        metric.keywords = ["data security", "risk management", "governance"]
+        return metric
+
+    def test_qualitative_adjustment_is_backward_compatible_without_segment(self):
+        metric = self._qualitative_metric()
+        score = _qualitative_relevance_adjustment(
+            metric,
+            "Our data security risk management policy defines governance and oversight.",
+            ["data security", "risk management"],
+            "paragraph_cluster",
+        )
+        self.assertIsInstance(score, float)
+        self.assertGreater(score, 0.0)
+
+    def test_qualitative_adjustment_uses_segment_review_metadata(self):
+        metric = self._qualitative_metric()
+        content = "Our data security risk management policy defines governance and oversight."
+        anchors = ["data security", "risk management"]
+        verified = TextSegment(
+            segment_id="verified",
+            content=content,
+            page_number=1,
+            position_y=1,
+            segment_type="paragraph_cluster",
+            review_status=" VERIFIED ",
+        )
+        needs_review = TextSegment(
+            segment_id="needs-review",
+            content=content,
+            page_number=2,
+            position_y=1,
+            segment_type="paragraph_cluster",
+            structured_data={"review_status": "needs_review"},
+        )
+
+        verified_score = _qualitative_relevance_adjustment(
+            metric,
+            verified.content,
+            anchors,
+            verified.segment_type,
+            segment=verified,
+        )
+        needs_review_score = _qualitative_relevance_adjustment(
+            metric,
+            needs_review.content,
+            anchors,
+            needs_review.segment_type,
+            segment=needs_review,
+        )
+
+        self.assertAlmostEqual(verified_score - needs_review_score, 0.16)
+
+    def test_bm25_qualitative_retrieval_runs_for_reviewed_segments(self):
+        metric = self._qualitative_metric()
+        profile = build_metric_retrieval_profile(metric)
+        content = "Our data security risk management policy defines governance and oversight."
+        report = _report(
+            [
+                TextSegment(
+                    segment_id="needs-review",
+                    content=content,
+                    page_number=1,
+                    position_y=1,
+                    segment_type="paragraph_cluster",
+                    review_status="needs_review",
+                ),
+                TextSegment(
+                    segment_id="verified",
+                    content=content,
+                    page_number=2,
+                    position_y=1,
+                    segment_type="paragraph_cluster",
+                    review_status="verified",
+                ),
+            ]
+        )
+
+        results = KeywordRetriever(ProcessingConfig()).search_bm25(report, metric, profile)
+
+        self.assertEqual(
+            {result.segment_id for result in results},
+            {"verified", "needs-review"},
+        )
+        self.assertTrue(all(isinstance(result.score, float) for result in results))
 
     def test_topic_unit_and_percentage_tokens_are_not_exact_aliases(self):
         metric = self._metric_with_topic()

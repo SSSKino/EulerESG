@@ -204,7 +204,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         aria-label={t("chat.aiAssistant")}
         aria-hidden={!assistantOpen}
         data-testid="compliance-ai-assistant"
-        className={`fixed inset-x-3 bottom-20 z-50 flex h-[min(620px,calc(100dvh-7rem))] min-h-0 origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.22)] transition-[opacity,transform,visibility] duration-300 ease-[var(--motion-fluid)] sm:left-auto sm:right-6 sm:w-[420px] ${
+        className={`dashboard-chat-panel fixed z-50 flex h-[min(620px,calc(100dvh-7rem))] min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.22)] transition-[opacity,transform,visibility] duration-300 ease-[var(--motion-fluid)] ${
           assistantOpen
             ? "visible translate-y-0 scale-100 opacity-100"
             : "invisible pointer-events-none translate-y-3 scale-[0.98] opacity-0"
@@ -231,16 +231,16 @@ const ChatView: React.FC<ChatViewProps> = ({
           setSummaryOpen(false);
           setAssistantOpen((open) => !open);
         }}
-        className={`fixed bottom-6 right-6 z-[51] flex h-12 items-center gap-2 rounded-full px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 ${
+        className={`dashboard-chat-launcher fixed z-[51] flex h-12 items-center gap-2 rounded-full px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 ${
           assistantOpen ? "bg-slate-800 hover:bg-slate-700" : "bg-[#2274BC] hover:bg-[#1b63a3]"
         }`}
-        aria-label={assistantOpen ? t("common.close") : t("chat.aiAssistant")}
+        aria-label={assistantOpen ? t("common.close") : "AI Assistant"}
         aria-controls="compliance-ai-assistant"
         aria-expanded={assistantOpen}
       >
         {assistantOpen ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
         <span className="text-sm font-medium">
-          {assistantOpen ? t("common.close") : t("chat.aiAssistant")}
+          {assistantOpen ? t("common.close") : "AI Assistant"}
         </span>
       </button>
 

@@ -8,6 +8,7 @@ import DashboardSidebar from "../DashboardSidebar";
 const mocks = vi.hoisted(() => ({
   clearFiles: vi.fn(),
   getCrossAnalysisReports: vi.fn().mockResolvedValue({ reports: [] }),
+  getStandardsCatalog: vi.fn().mockResolvedValue({ frameworks: [] }),
   loadFilesFromBackend: vi.fn(),
   pathname: "/dashboard",
   prefetch: vi.fn(),
@@ -123,6 +124,7 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("@/lib/api", () => ({
   apiService: {
     getCrossAnalysisReports: mocks.getCrossAnalysisReports,
+    getStandardsCatalog: mocks.getStandardsCatalog,
     prefetchAssessmentByFile: mocks.prefetchAssessmentByFile,
     prefetchCrossAnalysis: mocks.prefetchCrossAnalysis,
   },
@@ -214,6 +216,23 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     ).not.toHaveClass("overscroll-contain");
   });
 
+  it("prefetches heavy report routes only after navigation intent", () => {
+    render(<DashboardSidebar />);
+
+    expect(mocks.prefetch).not.toHaveBeenCalled();
+
+    const compliance = screen.getByRole("button", { name: "Compliance" });
+    fireEvent.mouseEnter(compliance);
+    fireEvent.focus(compliance);
+    expect(mocks.prefetch).toHaveBeenCalledTimes(1);
+    expect(mocks.prefetch).toHaveBeenCalledWith("/dashboard/chat");
+
+    const crossAnalysis = screen.getByRole("button", { name: "Cross Analysis" });
+    fireEvent.mouseEnter(crossAnalysis);
+    expect(mocks.prefetch).toHaveBeenCalledTimes(2);
+    expect(mocks.prefetch).toHaveBeenCalledWith("/cross-analysis");
+  });
+
   it("aligns the expanded Disclosure child with embedded primary directory items without an icon gap", () => {
     render(<DashboardSidebar />);
 
@@ -258,13 +277,13 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("reuses multi-report selection and opens the disclosure view directly", () => {
+  it("reuses multi-report selection and opens the disclosure view directly", async () => {
     render(<DashboardSidebar />);
 
     fireEvent.click(
       screen.getByRole("button", { name: "Disclosure Completeness" }),
     );
-    expect(screen.getByRole("dialog")).toBeVisible();
+    expect(await screen.findByRole("dialog")).toBeVisible();
     expect(screen.getByTestId("report-selector")).toHaveAttribute(
       "data-selection-type",
       "checkbox",
@@ -338,6 +357,7 @@ describe("DashboardSidebar favourites navigation", () => {
 describe("DashboardSidebar Standards Library", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.getStandardsCatalog.mockResolvedValue({ frameworks: [] });
     mocks.pathname = "/dashboard";
     mocks.search = "";
     window.localStorage.clear();
@@ -393,6 +413,38 @@ describe("DashboardSidebar Standards Library", () => {
     fireEvent.click(library);
     expect(mocks.push).toHaveBeenCalledWith("/dashboard/standards-library");
   });
+
+  it("deduplicates route and catalog prefetch across pointer and keyboard intent", async () => {
+    render(<DashboardSidebar />);
+
+    const library = screen.getByRole("button", { name: "Standards Library" });
+    fireEvent.mouseEnter(library);
+    library.focus();
+
+    await waitFor(() => {
+      expect(mocks.getStandardsCatalog).toHaveBeenCalledTimes(1);
+    });
+    expect(mocks.prefetch).toHaveBeenCalledWith("/dashboard/standards-library");
+  });
+
+  it("absorbs a failed catalog prefetch and allows the next intent to retry", async () => {
+    mocks.getStandardsCatalog
+      .mockRejectedValueOnce(new Error("prefetch unavailable"))
+      .mockResolvedValueOnce({ frameworks: [] });
+    render(<DashboardSidebar />);
+
+    const library = screen.getByRole("button", { name: "Standards Library" });
+    fireEvent.mouseEnter(library);
+    await waitFor(() => {
+      expect(mocks.getStandardsCatalog).toHaveBeenCalledTimes(1);
+    });
+
+    fireEvent.focus(library);
+    await waitFor(() => {
+      expect(mocks.getStandardsCatalog).toHaveBeenCalledTimes(2);
+    });
+    expect(library).toBeVisible();
+  });
 });
 
 describe("DashboardSidebar cross-analysis navigation directory", () => {
@@ -422,7 +474,12 @@ describe("DashboardSidebar cross-analysis navigation directory", () => {
     expect(navigationSlot).toBeVisible();
     expect(subnavigation).not.toHaveClass("flex-1");
     expect(navigationSlot).not.toHaveClass("flex-1");
-    expect(navigationSlot).toHaveClass("max-h-[min(320px,36vh)]", "overflow-y-auto");
+    expect(navigationSlot).toHaveClass(
+      "max-h-[min(320px,36vh)]",
+      "overflow-y-auto",
+      "overscroll-y-auto",
+    );
+    expect(navigationSlot).not.toHaveClass("overscroll-contain");
     expect(subnavigation.nextElementSibling).toBe(favourite);
     expect(subnavigation).toContainElement(disclosure);
     expect(subnavigation).toContainElement(navigationSlot);

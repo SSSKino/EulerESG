@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MdLogout, MdSettings, MdPerson } from "react-icons/md";
+import { LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EulerLogo from "@/assets/Euler-Img.svg";
 import Image from "next/image";
@@ -118,16 +118,16 @@ export default function Nav({ className }: { className?: string }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-sm sm:text-base">
-              <MdPerson className="mr-2" />
+              <User className="mr-2 h-4 w-4" />
               <span>{t("nav.profile")}</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="text-sm sm:text-base">
-              <MdSettings className="mr-2" />
+              <Settings className="mr-2 h-4 w-4" />
               <span>{t("nav.settings")}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-sm sm:text-base" onClick={handleLogout}>
-              <MdLogout className="mr-2" />
+              <LogOut className="mr-2 h-4 w-4" />
               <span>{t("nav.logout")}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

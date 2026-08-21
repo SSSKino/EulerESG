@@ -105,4 +105,72 @@ describe("Standards Library API client", () => {
     );
     expect(options).toMatchObject({ method: "GET", signal: controller.signal });
   });
+
+  it("reuses a successful metrics response for the same selection", async () => {
+    const scopeId = `Cache scope ${Date.now()}-${Math.random()}`;
+    const metrics = {
+      framework: {
+        id: "sasb",
+        name: "SASB",
+        as_of: "Jan 2026",
+        source_url: "https://example.test/sasb",
+        group_label: "Industry",
+        scope_label: "Sub-industry",
+      },
+      group: { id: "technology_communications", label: "Technology & Communications" },
+      scope: { id: scopeId, label: scopeId },
+      total_metrics: 1,
+      metrics: [{ id: "cached-metric", code: "TC-HW-1", name: "Cached metric" }],
+    };
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(metrics));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      apiService.getStandardMetrics("sasb", "technology_communications", scopeId),
+    ).resolves.toEqual(metrics);
+    await expect(
+      apiService.getStandardMetrics("sasb", "technology_communications", scopeId),
+    ).resolves.toEqual(metrics);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps metrics cache entries isolated by framework, group, and scope", async () => {
+    const suffix = `${Date.now()}-${Math.random()}`;
+    const firstScope = `First scope ${suffix}`;
+    const secondScope = `Second scope ${suffix}`;
+    const responseFor = (scopeId: string) => ({
+      framework: {
+        id: "sasb",
+        name: "SASB",
+        as_of: "Jan 2026",
+        source_url: "https://example.test/sasb",
+        group_label: "Industry",
+        scope_label: "Sub-industry",
+      },
+      group: { id: "technology_communications", label: "Technology & Communications" },
+      scope: { id: scopeId, label: scopeId },
+      total_metrics: 1,
+      metrics: [{ id: scopeId, name: `${scopeId} metric` }],
+    });
+    const firstResponse = responseFor(firstScope);
+    const secondResponse = responseFor(secondScope);
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(firstResponse))
+      .mockResolvedValueOnce(jsonResponse(secondResponse));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      apiService.getStandardMetrics("sasb", "technology_communications", firstScope),
+    ).resolves.toEqual(firstResponse);
+    await expect(
+      apiService.getStandardMetrics("sasb", "technology_communications", secondScope),
+    ).resolves.toEqual(secondResponse);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const urls = fetchMock.mock.calls.map(([url]) => String(url));
+    expect(urls[0]).toContain(`scope_id=${encodeURIComponent(firstScope).replace(/%20/g, "+")}`);
+    expect(urls[1]).toContain(`scope_id=${encodeURIComponent(secondScope).replace(/%20/g, "+")}`);
+  });
 });

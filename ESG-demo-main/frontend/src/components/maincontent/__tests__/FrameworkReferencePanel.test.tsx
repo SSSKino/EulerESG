@@ -266,7 +266,12 @@ describe("FrameworkReferencePanel", () => {
     await chooseFramework(user, "SASB");
     const industry = screen.getByRole("combobox", { name: "Industry" });
     expect(industry).toHaveValue("financials");
-    expect(screen.getByRole("button", { name: /^Commercial Banks$/i })).toBeVisible();
+    const initialScope = screen.getByRole("button", { name: /^Commercial Banks$/i });
+    expect(initialScope).toBeVisible();
+    expect(initialScope.parentElement).toHaveClass(
+      "overflow-y-auto",
+      "overscroll-y-auto",
+    );
     expect(screen.queryByRole("button", { name: /^Hardware$/i })).not.toBeInTheDocument();
 
     await user.selectOptions(industry, "technology_communications");
@@ -288,6 +293,118 @@ describe("FrameworkReferencePanel", () => {
     expect(await screen.findByText("Product security disclosure")).toBeVisible();
     expect(screen.getByText("TC-HW-230a.1")).toBeVisible();
     expect(screen.getByText("Materials sourcing disclosure")).toBeVisible();
+  });
+
+  it("shows only the leading category in the Type column", async () => {
+    standardsApi.getStandardMetrics.mockResolvedValue(
+      metricsResponse(
+        "sasb",
+        "technology_communications",
+        "Technology & Communications",
+        "Hardware",
+        "Hardware",
+        [
+          {
+            ...metric("sasb:hardware:type", "Type display metric", "TC-HW-000.C"),
+            category: "Quantitative",
+            type: "Sustainability Disclosure Topics & Metrics",
+          },
+        ],
+      ),
+    );
+    const user = userEvent.setup();
+    render(<FrameworkReferencePanel />);
+
+    await chooseFramework(user, "SASB");
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Industry" }),
+      "technology_communications",
+    );
+    await user.click(screen.getByRole("button", { name: /^Hardware$/i }));
+    const row = (await screen.findByText("Type display metric")).closest("tr");
+
+    expect(row).not.toBeNull();
+    expect(within(row as HTMLTableRowElement).getByText("Quantitative")).toBeVisible();
+    expect(
+      within(row as HTMLTableRowElement).queryByText("Sustainability Disclosure Topics & Metrics"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the complete simple definition when both definition fields exist", async () => {
+    const simpleDefinition = [
+      "Concise metric definition with its reporting boundary.",
+      "The second line preserves the requested denominator and unit.",
+      "This final sentence proves that the simple definition was not truncated.",
+    ].join("\n");
+    const fullDefinition = "Long technical protocol that should remain hidden when a simple definition exists.";
+    standardsApi.getStandardMetrics.mockResolvedValue(
+      metricsResponse(
+        "sasb",
+        "technology_communications",
+        "Technology & Communications",
+        "Hardware",
+        "Hardware",
+        [
+          {
+            ...metric("sasb:hardware:definition", "Simple definition metric", "TC-HW-000.A"),
+            definition: fullDefinition,
+            simple_definition: simpleDefinition,
+          },
+        ],
+      ),
+    );
+    const user = userEvent.setup();
+    render(<FrameworkReferencePanel />);
+
+    await chooseFramework(user, "SASB");
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Industry" }),
+      "technology_communications",
+    );
+    await user.click(screen.getByRole("button", { name: /^Hardware$/i }));
+    expect(await screen.findByText("Simple definition metric")).toBeVisible();
+
+    await user.click(screen.getByText("View definition"));
+    const renderedDefinition = screen.getByText(
+      /final sentence proves that the simple definition was not truncated/i,
+    );
+    expect(renderedDefinition).toBeVisible();
+    expect(renderedDefinition.textContent).toBe(simpleDefinition);
+    expect(renderedDefinition).toHaveClass("whitespace-pre-wrap", "break-words");
+    expect(screen.queryByText(fullDefinition)).not.toBeInTheDocument();
+  });
+
+  it("falls back to the full definition when the simple definition is missing", async () => {
+    const fullDefinition = "Fallback full definition, including its final sentence.";
+    standardsApi.getStandardMetrics.mockResolvedValue(
+      metricsResponse(
+        "sasb",
+        "technology_communications",
+        "Technology & Communications",
+        "Hardware",
+        "Hardware",
+        [
+          {
+            ...metric("sasb:hardware:fallback-definition", "Fallback definition metric", "TC-HW-000.B"),
+            definition: fullDefinition,
+            simple_definition: null,
+          },
+        ],
+      ),
+    );
+    const user = userEvent.setup();
+    render(<FrameworkReferencePanel />);
+
+    await chooseFramework(user, "SASB");
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Industry" }),
+      "technology_communications",
+    );
+    await user.click(screen.getByRole("button", { name: /^Hardware$/i }));
+    expect(await screen.findByText("Fallback definition metric")).toBeVisible();
+
+    await user.click(screen.getByText("View definition"));
+    expect(screen.getByText(fullDefinition)).toBeVisible();
   });
 
   it("switches GRI sector groups before requesting a topic", async () => {

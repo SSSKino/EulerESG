@@ -213,7 +213,10 @@ const FileTable: React.FC<FileTableProps> = ({
             onDone: () => {
               apiService.invalidateAssessmentByFileCache(fileId);
               apiService.invalidateCrossAnalysisCache();
-              void useFileStore.getState().loadFilesFromBackend({ showLoading: false });
+              void useFileStore.getState().loadFilesFromBackend({
+                showLoading: false,
+                forceFresh: true,
+              });
               setReanalyzing(fileId, false);
               void message.success({
                 key: messageKey,
@@ -504,6 +507,8 @@ const FileTable: React.FC<FileTableProps> = ({
               event.stopPropagation();
               onChatClick(file);
             }}
+            onFocus={() => router.prefetch("/dashboard/chat")}
+            onMouseEnter={() => router.prefetch("/dashboard/chat")}
             disabled={file.status !== "ready"}
           >
             {t("files.actions.analysis")}

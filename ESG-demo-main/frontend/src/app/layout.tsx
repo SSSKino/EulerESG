@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AntdRegistry } from "@/lib/antd";
-// import { StagewiseToolbar } from "@stagewise/toolbar-next"; // 临时注释：如需启用工具条，解除本行和下方块注释
-
+import HtmlLangSync from "@/i18n/HtmlLangSync";
 
 export const metadata: Metadata = {
   title: "Euler ESG",
@@ -20,13 +18,8 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="antialiased">
-        <AntdRegistry>
-          <div id="root-layout">{children}</div>
-        </AntdRegistry>
-        {/* 如需使用 Stagewise 工具条，取消下方注释 */}
-        {/* {process.env.NODE_ENV === "development" && (
-          <StagewiseToolbar config={{ plugins: [] }} />
-        )} */}
+        <HtmlLangSync />
+        <div id="root-layout">{children}</div>
       </body>
     </html>
   );

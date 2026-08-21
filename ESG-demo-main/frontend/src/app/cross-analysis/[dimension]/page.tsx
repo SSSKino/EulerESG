@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -105,7 +105,7 @@ function arraysEqual(a: string[], b: string[]): boolean {
 // NOTE: Cross Analysis no longer reads cross_analysis/output/all_records.json nor triggers
 // any re-extraction. It builds its dataset directly from per-report assessment outputs.
 
-export default function CrossAnalysisDimensionPage() {
+function CrossAnalysisDimensionPageContent() {
   const { t } = useT();
   const router = useRouter();
   const params = useParams();
@@ -866,5 +866,15 @@ const handleSelectTertiary = useCallback(
       {/* 悬浮 AI 助手：仅在对比分析主内容展示时显示 */}
       {canCompare && <FloatingChatAssistant />}
     </div>
+  );
+}
+
+export default function CrossAnalysisDimensionPage() {
+  return (
+    <Suspense
+      fallback={<div aria-busy="true" className="min-h-screen w-full bg-[#F8FAFC]" />}
+    >
+      <CrossAnalysisDimensionPageContent />
+    </Suspense>
   );
 }

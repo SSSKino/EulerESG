@@ -134,6 +134,24 @@ function parseUploadTimeMs(raw: string | undefined | null): number {
   return Number.isFinite(ms) ? ms : 0;
 }
 
+function fileRowsEqual(left: File, right: File): boolean {
+  const leftKeys = Object.keys(left) as (keyof File)[];
+  const rightKeys = Object.keys(right) as (keyof File)[];
+  return (
+    leftKeys.length === rightKeys.length &&
+    leftKeys.every(
+      (key) => Object.prototype.hasOwnProperty.call(right, key) && left[key] === right[key],
+    )
+  );
+}
+
+function fileListsEqual(current: File[], incoming: File[]): boolean {
+  return (
+    current.length === incoming.length &&
+    current.every((file, index) => fileRowsEqual(file, incoming[index]))
+  );
+}
+
 function mapBackendReportStatus(file: any): "pending" | "ready" | "failed" | "partial" {
   const raw = file?.status;
   const partial = file?.scope_analysis_partial === true;
@@ -189,25 +207,42 @@ interface FileStore {
   ) => void;
   updateFilePages: (fileIdOrKey: string, pages: number) => void;
   setSelectedFileId: (fileId: string | null) => void;
-  loadFilesFromBackend: (options?: { showLoading?: boolean }) => Promise<void>;
+  loadFilesFromBackend: (options?: {
+    showLoading?: boolean;
+    /** Queue one trailing request when a mutation must observe the newest backend state. */
+    forceFresh?: boolean;
+  }) => Promise<void>;
   setLoading: (loading: boolean) => void;
   clearFiles: () => void;
 }
 
 export const useFileStore = create<FileStore>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      let filesLoadRequest: Promise<void> | null = null;
+      let filesLoadShowsLoading = false;
+      let filesLoadTrailingRequest: Promise<void> | null = null;
+      let trailingLoadShowsLoading = false;
+      let filesLoadGeneration = 0;
+
+      return {
       files: [],
       selectedFileId: null,
       loading: false,
       lastRefresh: 0,
       setLoading: (loading) => set({ loading }),
       clearFiles: () => {
+        filesLoadGeneration += 1;
+        filesLoadRequest = null;
+        filesLoadShowsLoading = false;
+        filesLoadTrailingRequest = null;
+        trailingLoadShowsLoading = false;
         apiService.invalidateAssessmentByFileCache();
         apiService.invalidateVisualAssetCache();
         set(() => ({
           files: [],
           selectedFileId: null,
+          loading: false,
           lastRefresh: 0,
         }));
       },
@@ -253,21 +288,57 @@ export const useFileStore = create<FileStore>()(
 
         // Deletion already succeeded. Keep a temporary list-refresh failure
         // from being reported to the user as a failed deletion.
-        await get().loadFilesFromBackend({ showLoading: false });
+        await get().loadFilesFromBackend({ showLoading: false, forceFresh: true });
       },
       setSelectedFileId: (fileId) =>
         set(() => ({
           selectedFileId: fileId,
         })),
-      loadFilesFromBackend: async (options) => {
+      loadFilesFromBackend: (options) => {
         const showLoading = options?.showLoading === true;
-        try {
-          if (showLoading) set({ loading: true });
-          const response = await apiService.getFiles();
-          if (response.status === 'success') {
-            const backendFiles: File[] = [];
-            for (const file of response.files as any[]) {
-              const mapped: File = {
+        const forceFresh = options?.forceFresh === true;
+        if (filesLoadRequest) {
+          if (showLoading && !filesLoadShowsLoading) {
+            filesLoadShowsLoading = true;
+            set({ loading: true });
+          }
+          if (!forceFresh) return filesLoadRequest;
+
+          trailingLoadShowsLoading = trailingLoadShowsLoading || showLoading;
+          if (!filesLoadTrailingRequest) {
+            const activeRequest = filesLoadRequest;
+            const trailingGeneration = filesLoadGeneration;
+            const startTrailingRequest = () => {
+              if (filesLoadTrailingRequest !== trailingRequest) return;
+              const trailingShowLoading = trailingLoadShowsLoading;
+              trailingLoadShowsLoading = false;
+              filesLoadTrailingRequest = null;
+              if (trailingGeneration !== filesLoadGeneration) return;
+              return get().loadFilesFromBackend({ showLoading: trailingShowLoading });
+            };
+            const trailingRequest = activeRequest.then(
+              startTrailingRequest,
+              startTrailingRequest,
+            );
+            filesLoadTrailingRequest = trailingRequest;
+          }
+          return filesLoadTrailingRequest;
+        }
+
+        filesLoadShowsLoading = showLoading;
+        if (showLoading) set({ loading: true });
+
+        const requestGeneration = filesLoadGeneration;
+        const request = (async () => {
+          try {
+            const response = await apiService.getFiles();
+            if (
+              requestGeneration === filesLoadGeneration &&
+              response.status === 'success'
+            ) {
+              const backendFiles: File[] = [];
+              for (const file of response.files as any[]) {
+                const mapped: File = {
                 key: file.file_id,
                 name: file.original_name,
                 size: formatFileSize(file.file_size),
@@ -316,40 +387,32 @@ export const useFileStore = create<FileStore>()(
                     ? file.company_analysis_version
                     : undefined,
               };
-              backendFiles.push(...expandMultiScopeBackendRows(file, mapped));
-            }
-            
-            set((state) => {
-              const hasChanges =
-                state.files.length !== backendFiles.length ||
-                backendFiles.some((newFile) => {
-                  const existingFile = state.files.find((f) => f.key === newFile.key);
-                  return !existingFile ||
-                         existingFile.status !== newFile.status ||
-                         existingFile.backend_status !== newFile.backend_status ||
-                         existingFile.scope_analysis_completed !== newFile.scope_analysis_completed ||
-                         existingFile.scope_analysis_total !== newFile.scope_analysis_total ||
-                         existingFile.scope_analysis_partial !== newFile.scope_analysis_partial ||
-                         existingFile.analysis_scope_key !== newFile.analysis_scope_key ||
-                         existingFile.pages !== newFile.pages;
-                });
-
-              if (hasChanges) {
+                backendFiles.push(...expandMultiScopeBackendRows(file, mapped));
               }
 
-              return {
-                files: backendFiles,
-                lastRefresh: Date.now()
-              };
-            });
+              set((state) => ({
+                files: fileListsEqual(state.files, backendFiles)
+                  ? state.files
+                  : backendFiles,
+                lastRefresh: Date.now(),
+              }));
+            }
+          } catch (error) {
+            console.error(`Failed to load files from backend: ${errorSummary(error)}`);
           }
-        } catch (error) {
-          console.error(`Failed to load files from backend: ${errorSummary(error)}`);
-        } finally {
-          if (showLoading) set({ loading: false });
-        }
+        })().finally(() => {
+          if (filesLoadRequest !== request) return;
+          const shouldStopLoading = filesLoadShowsLoading;
+          filesLoadRequest = null;
+          filesLoadShowsLoading = false;
+          if (shouldStopLoading) set({ loading: false });
+        });
+
+        filesLoadRequest = request;
+        return request;
       }
-    }),
+      };
+    },
     {
       name: "file-storage",
       partialize: (state) => ({

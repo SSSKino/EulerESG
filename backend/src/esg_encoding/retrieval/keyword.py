@@ -179,7 +179,13 @@ class KeywordRetriever:
                     expected_unit=getattr(metric, "unit", None),
                     prefer_narrative=not _is_quantitative_metric(metric),
                 )
-                + _qualitative_relevance_adjustment(metric, getattr(segment, "content", "") or "", anchor_terms, getattr(segment, "segment_type", ""))
+                + _qualitative_relevance_adjustment(
+                    metric,
+                    getattr(segment, "content", "") or "",
+                    anchor_terms,
+                    getattr(segment, "segment_type", ""),
+                    segment=segment,
+                )
                 + _metric_evidence_quality_adjustment(metric, segment, anchor_terms)
                 + _topic_relevance_adjustment(metric, getattr(segment, "content", "") or "")
             )
@@ -408,7 +414,13 @@ class KeywordRetriever:
         unique_match_score = matched_weight / total_weight
         density_bonus = min(0.18, 0.02 * max(0, total_matches - len(set(matched_keywords))))
         structure_bonus = _segment_structure_bonus(segment, expected_unit=getattr(metric, "unit", None), prefer_narrative=not _is_quantitative_metric(metric))
-        relevance_adjustment = _qualitative_relevance_adjustment(metric, getattr(segment, "content", "") or "", anchor_terms or [], getattr(segment, "segment_type", ""))
+        relevance_adjustment = _qualitative_relevance_adjustment(
+            metric,
+            getattr(segment, "content", "") or "",
+            anchor_terms or [],
+            getattr(segment, "segment_type", ""),
+            segment=segment,
+        )
         return float(max(0.0, min(1.0, unique_match_score + density_bonus + structure_bonus + relevance_adjustment)))
 
     def _segment_structure_bonus(self, segment, expected_unit: Optional[str] = None, prefer_narrative: bool = False) -> float:

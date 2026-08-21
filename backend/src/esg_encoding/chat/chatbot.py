@@ -187,7 +187,12 @@ class ESGChatbot:
         logger.info(f"Restored session {session_id} with {len(restored_messages)} messages")
         return session_id
 
-    def create_session(self, session_id: Optional[str] = None) -> str:
+    def create_session(
+        self,
+        session_id: Optional[str] = None,
+        *,
+        include_report_context: bool = True,
+    ) -> str:
         """
         创建新的聊天会话
         
@@ -202,8 +207,16 @@ class ESGChatbot:
         
         session = ChatSession(
             session_id=session_id,
-            report_context=self.report_content.document_id if self.report_content else None,
-            compliance_context=self.compliance_assessment.report_id if self.compliance_assessment else None,
+            report_context=(
+                self.report_content.document_id
+                if include_report_context and self.report_content
+                else None
+            ),
+            compliance_context=(
+                self.compliance_assessment.report_id
+                if include_report_context and self.compliance_assessment
+                else None
+            ),
             messages=[]
         )
         
@@ -225,12 +238,39 @@ class ESGChatbot:
         # Resolve Session
         session_id = request.session_id
         if not session_id:
-            session_id = self.create_session()
+            session_id = self.create_session(
+                include_report_context=request.include_context,
+            )
         
         if session_id not in self.sessions:
-            self.create_session(session_id)
+            self.create_session(
+                session_id,
+                include_report_context=request.include_context,
+            )
+
+        # Never reuse a report-bound conversation as a general chat session.
+        # Otherwise its prior answers could reintroduce report details through
+        # conversation history even though include_context is false.
+        existing_session = self.sessions[session_id]
+        if not request.include_context and (
+            existing_session.report_context
+            or existing_session.compliance_context
+        ):
+            session_id = self.create_session(include_report_context=False)
             
         session = self.sessions[session_id]
+        if request.include_context:
+            # A session may have been created before report context became
+            # available. Tag it as soon as a contextual answer can be produced
+            # so a later general-mode request cannot reuse that history.
+            session.report_context = (
+                self.report_content.document_id if self.report_content else None
+            )
+            session.compliance_context = (
+                self.compliance_assessment.report_id
+                if self.compliance_assessment
+                else None
+            )
         
         # 加载对话
         user_message = ChatMessage(
@@ -260,6 +300,7 @@ class ESGChatbot:
             relevant_content=relevant_content_text,
             conversation_history=session.messages[-10:], # Keep context window manageable
             context_payload=context_payload,
+            include_report_context=request.include_context,
         )
         
         assistant_message = ChatMessage(
@@ -374,6 +415,7 @@ class ESGChatbot:
         relevant_content: List[str],
         conversation_history: List[ChatMessage],
         context_payload: Optional[dict] = None,
+        include_report_context: bool = True,
     ) -> str:
         """
         使用LLM生成回复
@@ -394,6 +436,20 @@ class ESGChatbot:
             relevant_content,
             conversation_history,
             context_payload=context_payload,
+            include_report_context=include_report_context,
+        )
+
+        system_message = (
+            "You are an ESG analyst. Use ONLY the provided report segments as "
+            "evidence. Cite sources as [SEGID p#] for each key claim. If evidence "
+            "is missing, say you cannot find it in the report."
+            if include_report_context
+            else (
+                "You are a general ESG assistant. Answer ESG questions clearly "
+                "using general knowledge. Do not claim that you reviewed or have "
+                "access to a specific report unless report evidence is explicitly "
+                "provided in this request."
+            )
         )
         
         try:
@@ -402,7 +458,7 @@ class ESGChatbot:
             response = self.llm_client.chat.completions.create(
                 model=self.config.llm_model,
                 messages=[
-                    {"role": "system", "content": "You are an ESG analyst. Use ONLY the provided report segments as evidence. Cite sources as [SEGID p#] for each key claim. If evidence is missing, say you cannot find it in the report."},
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.2,
@@ -438,6 +494,7 @@ class ESGChatbot:
         relevant_content: List[str],
         conversation_history: List[ChatMessage],
         context_payload: Optional[dict] = None,
+        include_report_context: bool = True,
     ) -> str:
         """
         构建聊天提示词
@@ -481,11 +538,17 @@ class ESGChatbot:
         prompt += f"User question: {question}\n\n"
         
         # 如果没有数据，添加提示
-        if not self.compliance_assessment and not self.report_content:
+        if not include_report_context:
+            prompt += (
+                "Note: This is a general ESG conversation without report or "
+                "compliance-assessment context. Do not infer or mention any "
+                "previously loaded report.\n\n"
+            )
+        elif not self.compliance_assessment and not self.report_content:
             prompt += "Note: No ESG report has been uploaded and analyzed yet. Please answer the user's question about ESG topics in general, and remind them that for specific report analysis, they need to upload a report first.\n\n"
         
         # 添加报告背景信息
-        if self.compliance_assessment:
+        if include_report_context and self.compliance_assessment:
             fully_disclosed = self.compliance_assessment.disclosure_summary.get("fully_disclosed", 0)
             partially_disclosed = self.compliance_assessment.disclosure_summary.get("partially_disclosed", 0)
             not_disclosed = self.compliance_assessment.disclosure_summary.get("not_disclosed", 0)
@@ -523,7 +586,7 @@ Key Metric Analysis Examples:
             prompt += "\n"
         
         # 添加相关内容
-        if relevant_content:
+        if include_report_context and relevant_content:
             prompt += "Relevant Report Content:\n"
             for i, content in enumerate(relevant_content, 1):
                 prompt += f"\nSegment {i}:\n{content}\n"
@@ -539,30 +602,52 @@ Key Metric Analysis Examples:
                     prompt += f"Assistant: {msg.content[:200]}...\n"
             prompt += "\n"
         
-        # Add specific guidance based on question type
-        if question_type == "definition":
-            prompt += "Please provide clear definitions and explanations, including relevant ESG standards."
-        elif question_type == "data_query":
-            prompt += "Please search for specific data from the relevant content, and clearly indicate the source page if found."
-        elif question_type == "summary":
-            prompt += "Please provide a concise summary highlighting key information."
-        elif question_type == "compliance":
-            prompt += "Please answer based on compliance assessment results, explaining disclosure status and relevant evidence."
-        elif question_type == "advice":
-            prompt += "Please provide professional advice and improvement recommendations."
-        else:
-            prompt += "Please provide accurate and professional answers."
-        
-        prompt += "\n\nIf there is specific page information in the content, please point it out in your answer."
-        
+        # Add guidance that matches the request mode. General homepage chat must
+        # never inherit report-only citation requirements.
+        if include_report_context:
+            if question_type == "definition":
+                prompt += "Please provide clear definitions and explanations, including relevant ESG standards."
+            elif question_type == "data_query":
+                prompt += "Please search for specific data from the relevant content, and clearly indicate the source page if found."
+            elif question_type == "summary":
+                prompt += "Please provide a concise summary highlighting key information."
+            elif question_type == "compliance":
+                prompt += "Please answer based on compliance assessment results, explaining disclosure status and relevant evidence."
+            elif question_type == "advice":
+                prompt += "Please provide professional advice and improvement recommendations."
+            else:
+                prompt += "Please provide accurate and professional answers."
 
-        prompt += """
+            prompt += "\n\nIf there is specific page information in the content, please point it out in your answer."
+            prompt += """
 
 Answer Requirements:
 - Ground every key claim in the provided segments.
 - For each key claim, cite at least one source as [SEGID p#].
 - If the report does not contain the requested information, explicitly say so.
 - Do not invent numbers, targets, or policies.
+"""
+        else:
+            if question_type == "definition":
+                prompt += "Please provide a clear general definition and explain any relevant ESG standards."
+            elif question_type == "data_query":
+                prompt += "Please explain generally available ESG data concepts and state any uncertainty or knowledge limitations."
+            elif question_type == "summary":
+                prompt += "Please provide a concise general summary highlighting the key information."
+            elif question_type == "compliance":
+                prompt += "Please explain the compliance concept generally without implying that a specific report was assessed."
+            elif question_type == "advice":
+                prompt += "Please provide practical, professional ESG advice and improvement recommendations."
+            else:
+                prompt += "Please provide an accurate and professional general ESG answer."
+
+            prompt += """
+
+Answer Requirements:
+- Answer from general ESG knowledge only.
+- Clearly distinguish established guidance from examples or assumptions.
+- Do not claim to have reviewed a specific report.
+- Do not invent numbers, targets, policies, or citations.
 """
 
         return prompt

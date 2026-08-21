@@ -5,10 +5,10 @@ import dynamic from "next/dynamic";
 import { Card, Empty } from "antd";
 import { useT } from "@/i18n/useT";
 
-const ColumnPlot = dynamic(async () => {
-  const mod: any = await import("@ant-design/plots");
-  return mod.Column;
-}, { ssr: false });
+const ColumnPlot = dynamic(
+  () => import("@ant-design/plots/es/components/column"),
+  { ssr: false },
+);
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);

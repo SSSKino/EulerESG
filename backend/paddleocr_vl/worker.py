@@ -176,6 +176,12 @@ def _handle_page_batch(r, worker_id: str, payload: Dict[str, Any]) -> None:
         prediction_options = {}
     if not isinstance(prediction_options, dict):
         raise ValueError("page_batch prediction_options must be an object")
+    parse_pass = max(1, int(payload.get("parse_pass") or 1))
+    render_zoom = max(1.0, float(payload.get("render_zoom") or 1.0))
+    requested_render_zoom = max(
+        1.0,
+        float(payload.get("requested_render_zoom") or render_zoom),
+    )
 
     logger.debug(
         "Starting page batch job={} unit={}/{} pages={}-{}",
@@ -224,6 +230,9 @@ def _handle_page_batch(r, worker_id: str, payload: Dict[str, Any]) -> None:
             "end_page": end_page,
             "total_pages": total_pages,
             "prediction_options": prediction_options,
+            "parse_pass": parse_pass,
+            "render_zoom": render_zoom,
+            "requested_render_zoom": requested_render_zoom,
         },
     )
 
@@ -245,6 +254,9 @@ def _handle_page_batch(r, worker_id: str, payload: Dict[str, Any]) -> None:
                 prediction_options=prediction_options,
             )
         result_for_redis = dict(result)
+        result_for_redis["parse_pass"] = parse_pass
+        result_for_redis["render_zoom"] = render_zoom
+        result_for_redis["requested_render_zoom"] = requested_render_zoom
         _set_batch_status(
             r,
             job_id,

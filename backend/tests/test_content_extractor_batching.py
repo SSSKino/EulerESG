@@ -86,6 +86,36 @@ class PaddleDocumentLifecycleTests(unittest.TestCase):
         self.assertEqual(result["status"], "success")
         self.assertEqual(calls, ["wake", "run", "release"])
 
+    def test_queue_wrapper_can_defer_release_until_report_repairs_finish(self):
+        extractor = ContentExtractor()
+        calls: list[str] = []
+
+        def run_active(source_path, job_id):  # noqa: ARG001
+            calls.append("run")
+            return {"status": "success"}
+
+        with patch.object(
+            extractor,
+            "_wake_paddleocr_vlm",
+            side_effect=lambda: calls.append("wake"),
+        ), patch.object(
+            extractor,
+            "_run_paddleocr_vl_page_batch_queue_active",
+            side_effect=run_active,
+        ), patch.object(
+            extractor,
+            "_release_paddle_after_document",
+            side_effect=lambda job_id: calls.append(f"release:{job_id}"),
+        ) as release:
+            result = extractor._run_paddleocr_vl_page_batch_queue(
+                Path("report.pdf"),
+                release_after_document=False,
+            )
+
+        self.assertEqual(calls, ["wake", "run"])
+        release.assert_not_called()
+        self.assertTrue(result["_paddle_lifecycle_job_id"].startswith("parse_"))
+
     def test_queue_wrapper_releases_after_ocr_failure(self):
         extractor = ContentExtractor()
 

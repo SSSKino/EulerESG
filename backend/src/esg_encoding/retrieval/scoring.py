@@ -324,7 +324,20 @@ def _topic_relevance_adjustment(metric: ESGMetric, content: str) -> float:
     return min(0.06, 0.015 * hits)
 
 
-def _qualitative_relevance_adjustment(metric: ESGMetric, content: str, anchors: List[str], segment_type: str = "") -> float:
+def _qualitative_relevance_adjustment(
+    metric: ESGMetric,
+    content: str,
+    anchors: List[str],
+    segment_type: str = "",
+    segment=None,
+) -> float:
+    """Return the bounded qualitative-ranking adjustment for one segment.
+
+    ``segment`` is optional to preserve compatibility with callers that only
+    have text and a segment type.  When it is available, its review metadata is
+    used to prefer verified evidence and penalize evidence that still needs
+    review.
+    """
     category = str(getattr(metric, "sasb_category", "") or "").strip().lower()
     metric_type = str(getattr(metric, "sasb_type", "") or "").strip().lower()
     unit = str(getattr(metric, "unit", "") or "").strip()
@@ -336,9 +349,13 @@ def _qualitative_relevance_adjustment(metric: ESGMetric, content: str, anchors: 
         return min(0.10, anchor_hits * 0.02)
 
     adjustment = 0.0
-    structured = getattr(segment, "structured_data", None)
+    structured = getattr(segment, "structured_data", None) if segment is not None else None
     structured = structured if isinstance(structured, dict) else {}
-    review_status = str(getattr(segment, "review_status", None) or structured.get("review_status") or "").lower()
+    review_status = str(
+        (getattr(segment, "review_status", None) if segment is not None else None)
+        or structured.get("review_status")
+        or ""
+    ).strip().lower()
     if review_status == "verified":
         adjustment += 0.04
     elif review_status == "needs_review":

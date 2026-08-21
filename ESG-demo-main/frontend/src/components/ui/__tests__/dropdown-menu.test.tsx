@@ -40,6 +40,10 @@ describe("DropdownMenuSubContent", () => {
 
     expect(parentMenu).not.toBeNull();
     expect(languageMenu).not.toBeNull();
+    expect(parentMenu).toHaveClass(
+      "overflow-y-auto",
+      "overscroll-y-contain",
+    );
     expect(parentMenu).not.toContainElement(languageMenu);
 
     fireEvent.click(screen.getByText("English"));

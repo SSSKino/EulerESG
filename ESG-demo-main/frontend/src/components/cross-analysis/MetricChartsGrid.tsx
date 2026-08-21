@@ -1,13 +1,107 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Empty } from "antd";
 import { useT } from "@/i18n/useT";
 
-const Column = dynamic(() => import("@ant-design/plots").then((m) => m.Column), {
+const Column = dynamic(() => import("@ant-design/plots/es/components/column"), {
   ssr: false,
 });
+
+function currentDevicePixelRatio(): number {
+  if (typeof window === "undefined") return 1;
+  const ratio = Number(window.devicePixelRatio || 1);
+  return Number.isFinite(ratio) && ratio > 0 ? Math.max(1, Math.ceil(ratio)) : 1;
+}
+
+function useDevicePixelRatioRevision(): number {
+  const ratioRef = useRef(currentDevicePixelRatio());
+  const [revision, setRevision] = useState(0);
+
+  useEffect(() => {
+    let refreshTimer = 0;
+    const refresh = () => {
+      const nextRatio = currentDevicePixelRatio();
+      if (nextRatio === ratioRef.current) return;
+      ratioRef.current = nextRatio;
+      setRevision((value) => value + 1);
+    };
+    const scheduleRefresh = () => {
+      if (refreshTimer) window.clearTimeout(refreshTimer);
+      // G2 debounces its own forceFit for 300 ms. Recreate the canvas after
+      // that settles so the new instance captures the browser's latest DPR.
+      refreshTimer = window.setTimeout(refresh, 400);
+    };
+
+    window.addEventListener("resize", scheduleRefresh);
+    window.visualViewport?.addEventListener("resize", scheduleRefresh);
+    return () => {
+      window.removeEventListener("resize", scheduleRefresh);
+      window.visualViewport?.removeEventListener("resize", scheduleRefresh);
+      if (refreshTimer) window.clearTimeout(refreshTimer);
+    };
+  }, []);
+
+  return revision;
+}
+
+function ResponsiveColumn({
+  chartKey,
+  config,
+  pixelRatioRevision,
+}: {
+  chartKey: string;
+  config: Record<string, unknown>;
+  pixelRatioRevision: number;
+}) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const plotRef = useRef<any>(null);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host || typeof ResizeObserver === "undefined") return;
+
+    let lastWidth = -1;
+    let fitTimer = 0;
+    const observer = new ResizeObserver((entries) => {
+      const width = Math.round(entries[0]?.contentRect.width || 0);
+      if (width <= 0 || width === lastWidth) return;
+      lastWidth = width;
+      if (fitTimer) window.clearTimeout(fitTimer);
+      fitTimer = window.setTimeout(() => {
+        try {
+          const plot = plotRef.current;
+          if (typeof plot?.triggerResize === "function") {
+            plot.triggerResize();
+          } else {
+            const chart = plot?.chart ?? plot;
+            chart?.forceFit?.();
+          }
+        } catch {
+          // The plot may be between destroy/recreate cycles during browser zoom.
+        }
+      }, 240);
+    });
+    observer.observe(host);
+    return () => {
+      observer.disconnect();
+      if (fitTimer) window.clearTimeout(fitTimer);
+    };
+  }, []);
+
+  return (
+    <div ref={hostRef} className="w-full min-w-0">
+      <Column
+        key={`${chartKey}:dpr-${pixelRatioRevision}`}
+        {...(config as any)}
+        onReady={(plot: any) => {
+          plotRef.current = plot;
+        }}
+      />
+    </div>
+  );
+}
 
 export type MetricChartPoint = {
   company: string;
@@ -72,19 +166,6 @@ function formatCompactNumber(value: any): string {
   return num.toLocaleString();
 }
 
-function chunk<T>(arr: T[], size: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-}
-
-function getRowSpan(rowLength: number): string {
-  if (rowLength <= 1) return "md:col-span-12";
-  if (rowLength === 2) return "md:col-span-6";
-  if (rowLength === 3) return "md:col-span-4";
-  return "md:col-span-3";
-}
-
 function MetricChartsGridInner({
   charts,
   companyColors,
@@ -93,6 +174,7 @@ function MetricChartsGridInner({
   companyColors: Record<string, string>;
 }) {
   const { t } = useT();
+  const pixelRatioRevision = useDevicePixelRatioRevision();
 
   const normalizedCharts = useMemo(() => {
     return (charts || [])
@@ -123,132 +205,147 @@ function MetricChartsGridInner({
 
   const colorDomain = Object.keys(companyColors);
   const colorRange = colorDomain.map((key) => companyColors[key]);
-  const rows = chunk(normalizedCharts, 4);
 
   return (
-    <div className="space-y-2.5">
-      {rows.map((row, rowIndex) => (
-        <div key={`chart-row-${rowIndex}`} className="grid grid-cols-1 md:grid-cols-12 gap-2.5">
-          {row.map((chart) => {
-            const percentChart = isPercentUnit(chart.unit);
+    <div
+      className="grid gap-2.5"
+      data-testid="metric-charts-grid"
+      style={{
+        gridTemplateColumns:
+          "repeat(auto-fit, minmax(min(100%, 20rem), 1fr))",
+      }}
+    >
+      {normalizedCharts.map((chart) => {
+        const percentChart = isPercentUnit(chart.unit);
 
-            const data = chart.points.map((point) => {
-              const rawValue = Number(point.value);
-              const finalValue =
-                percentChart && Number.isFinite(rawValue)
-                  ? clampPercentValue(rawValue)
-                  : rawValue;
+        const data = chart.points.map((point) => {
+          const rawValue = Number(point.value);
+          const finalValue =
+            percentChart && Number.isFinite(rawValue)
+              ? clampPercentValue(rawValue)
+              : rawValue;
 
-              return {
-                company: point.company,
-                colorKey: point.colorKey || point.company,
-                value: finalValue,
-                year: point.year ?? null,
-                unit: chart.unit ? String(chart.unit) : "",
-              };
-            });
+          return {
+            company: point.company,
+            colorKey: point.colorKey || point.company,
+            value: finalValue,
+            year: point.year ?? null,
+            unit: chart.unit ? String(chart.unit) : "",
+          };
+        });
 
-            const rowSpanClass = getRowSpan(row.length);
-            const shouldSpanTwo =
-              row.length >= 3 &&
-              (chart.topic.length > 34 || data.length >= 4 || data.some((d) => String(d.company).length > 18));
-            const spanClass = shouldSpanTwo ? "md:col-span-6" : rowSpanClass;
-            const compactLabels = !shouldSpanTwo && row.length === 4;
-            const chartHeight = shouldSpanTwo || row.length < 4 ? 438 : 398;
-            const yValues = data.map((d) => Number(d.value)).filter((n) => Number.isFinite(n));
+        const compactLabels =
+          normalizedCharts.length >= 4 ||
+          data.some((d) => String(d.company).length > 18);
+        const chartHeight = 418;
+        const yValues = data
+          .map((d) => Number(d.value))
+          .filter((n) => Number.isFinite(n));
 
-            const isPercent = isPercentUnit(chart.unit);
-            const config: any = {
-              data,
-              xField: "company",
-              yField: "value",
-              colorField: "colorKey",
-              scale: {
-                color: {
-                  domain: colorDomain,
-                  range: colorRange,
-                },
-                y: {
-                  domainMin: 0,
-                  domainMax: getYAxisMax(yValues, chart.unit),
-                  nice: !isPercent,
-                },
-              },
-              color: ({ colorKey }: any) => companyColors[String(colorKey)] || "#1677ff",
-              legend: false,
-              animation: false,
-              autoFit: true,
-              padding: [0, 0, 0, 0],
-              appendPadding: 0,
-              margin: 0,
-              inset: 5,
-              columnWidthRatio: data.length >= 4 ? 0.58 : data.length === 1 ? 0.44 : 0.54,
-              columnStyle: { radius: [8, 8, 0, 0] },
-              axis: {
-                x: {
-                  title: false,
-                  labelAutoHide: false,
-                  labelAutoRotate: false,
-                  labelAutoWrap: false,
-                  labelFill: "#64748B",
-                  labelFontSize: 13,
-                  labelFormatter: (value: any) => formatAxisLabel(value, compactLabels),
-                },
-                y: {
-                  title: false,
-                  labelAutoHide: false,
-                  labelFill: "#64748B",
-                  labelFontSize: 13,
-                  labelFormatter: (value: any) => formatCompactNumber(value),
-                  line: false,
-                  grid: true,
-                  gridStroke: "#E2E8F0",
-                  gridLineDash: [3, 3],
-                  tick: false,
-                },
-              },
-              tooltip: {
-                title: false,
-                marker: false,
-                shared: false,
-                offset: 200,
-                showDelay: 400,
-                hideDelay: 0,
-                follow: false,
-                enterable: false,
-                items: [
-                  (datum: any) => ({ name: "Name", value: datum.company }),
-                  (datum: any) => ({ name: "Year", value: datum.year || "—" }),
-                  (datum: any) => ({
-                    name: "Value",
-                    value: Number.isFinite(Number(datum.value)) ? Number(datum.value).toLocaleString() : "—",
-                  }),
-                  (datum: any) => ({ name: "Unit", value: datum.unit || "—" }),
-                ],
-              },
-              interaction: { elementHighlight: true },
-              interactions: [{ type: "element-active" }, { type: "tooltip" }],
-              height: chartHeight,
-            };
+        const isPercent = isPercentUnit(chart.unit);
+        const config: any = {
+          data,
+          xField: "company",
+          yField: "value",
+          colorField: "colorKey",
+          scale: {
+            color: {
+              domain: colorDomain,
+              range: colorRange,
+            },
+            y: {
+              domainMin: 0,
+              domainMax: getYAxisMax(yValues, chart.unit),
+              nice: !isPercent,
+            },
+          },
+          color: ({ colorKey }: any) =>
+            companyColors[String(colorKey)] || "#1677ff",
+          legend: false,
+          animation: false,
+          autoFit: true,
+          padding: [0, 0, 0, 0],
+          appendPadding: 0,
+          margin: 0,
+          inset: 5,
+          columnWidthRatio:
+            data.length >= 4 ? 0.58 : data.length === 1 ? 0.44 : 0.54,
+          columnStyle: { radius: [8, 8, 0, 0] },
+          axis: {
+            x: {
+              title: false,
+              labelAutoHide: false,
+              labelAutoRotate: false,
+              labelAutoWrap: false,
+              labelFill: "#64748B",
+              labelFontSize: 13,
+              labelFormatter: (value: any) =>
+                formatAxisLabel(value, compactLabels),
+            },
+            y: {
+              title: false,
+              labelAutoHide: false,
+              labelFill: "#64748B",
+              labelFontSize: 13,
+              labelFormatter: (value: any) => formatCompactNumber(value),
+              line: false,
+              grid: true,
+              gridStroke: "#E2E8F0",
+              gridLineDash: [3, 3],
+              tick: false,
+            },
+          },
+          tooltip: {
+            title: false,
+            marker: false,
+            shared: false,
+            offset: 12,
+            showDelay: 400,
+            hideDelay: 0,
+            follow: true,
+            enterable: false,
+            items: [
+              (datum: any) => ({ name: "Name", value: datum.company }),
+              (datum: any) => ({ name: "Year", value: datum.year || "—" }),
+              (datum: any) => ({
+                name: "Value",
+                value: Number.isFinite(Number(datum.value))
+                  ? Number(datum.value).toLocaleString()
+                  : "—",
+              }),
+              (datum: any) => ({ name: "Unit", value: datum.unit || "—" }),
+            ],
+          },
+          interaction: { elementHighlight: true },
+          interactions: [{ type: "element-active" }, { type: "tooltip" }],
+          height: chartHeight,
+        };
 
-            return (
-              <div key={chart.key} className={`${spanClass} bg-white rounded-2xl shadow-sm px-2 py-2 min-w-0`}>
-                <div className="mb-1 min-w-0 px-1">
-                  <div className="font-semibold text-slate-900 text-[15px] leading-snug break-words">{chart.topic}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">
-                    {chart.unit ? `Unit: ${chart.unit}` : "Unit: —"}
-                    {chart.yearInfo ? ` · ${chart.yearInfo}` : ""}
-                  </div>
-                </div>
-
-                <div className="w-full min-h-[304px] pt-2">
-                  <Column {...config} />
-                </div>
+        return (
+          <div
+            key={chart.key}
+            className="min-w-0 bg-white rounded-2xl shadow-sm px-2 py-2"
+          >
+            <div className="mb-1 min-w-0 px-1">
+              <div className="font-semibold text-slate-900 text-[15px] leading-snug break-words">
+                {chart.topic}
               </div>
-            );
-          })}
-        </div>
-      ))}
+              <div className="text-xs text-slate-500 mt-0.5">
+                {chart.unit ? `Unit: ${chart.unit}` : "Unit: —"}
+                {chart.yearInfo ? ` · ${chart.yearInfo}` : ""}
+              </div>
+            </div>
+
+            <div className="w-full min-w-0 min-h-[304px] pt-2">
+              <ResponsiveColumn
+                chartKey={chart.key}
+                config={config}
+                pixelRatioRevision={pixelRatioRevision}
+              />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

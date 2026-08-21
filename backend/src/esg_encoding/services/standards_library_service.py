@@ -5,7 +5,10 @@ from __future__ import annotations
 import json
 import math
 import re
+from copy import deepcopy
+from functools import lru_cache
 from pathlib import Path
+from threading import Lock
 from typing import Any, Dict, List, Optional, Tuple
 
 
@@ -54,6 +57,8 @@ _LABEL_OVERRIDES = {
     "metrics_and_targets": "Metrics & Targets",
 }
 
+_CATALOG_CACHE_LOCK = Lock()
+
 
 class StandardsLibraryError(RuntimeError):
     """Base error for a malformed or unavailable local standards catalog."""
@@ -82,12 +87,32 @@ def _humanize(value: str) -> str:
     return label.replace(" And ", " & ")
 
 
-def _read_json(path: Path) -> Any:
+def _path_signature(path: Path) -> Tuple[bool, int, int, int]:
+    """Return a cheap cache key that changes when a file or directory changes."""
+    try:
+        stat = path.stat()
+    except OSError:
+        return False, 0, 0, 0
+    return True, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size
+
+
+@lru_cache(maxsize=512)
+def _read_json_cached(
+    resolved_path: str,
+    signature: Tuple[bool, int, int, int],
+) -> Any:
+    del signature
+    path = Path(resolved_path)
     try:
         with path.open("r", encoding="utf-8") as handle:
             return json.load(handle)
     except (OSError, json.JSONDecodeError) as exc:
         raise StandardsDataError(f"Unable to read standards data: {path.name}") from exc
+
+
+def _read_json(path: Path) -> Any:
+    resolved = path.resolve()
+    return _read_json_cached(str(resolved), _path_signature(resolved))
 
 
 def _safe_json_file(directory: Path, filename: str) -> Path:
@@ -245,9 +270,7 @@ def _topic_groups(data_root: Path, framework_id: str) -> List[Dict[str, Any]]:
     return [{"id": "topics", "label": "Topics", "scopes": scopes}] if scopes else []
 
 
-def get_standards_catalog(data_root: Optional[Path] = None) -> Dict[str, Any]:
-    """Return framework/group/scope metadata without exposing filesystem paths."""
-    root = _root(data_root)
+def _build_standards_catalog(root: Path) -> Dict[str, Any]:
     frameworks: List[Dict[str, Any]] = []
     for metadata in _FRAMEWORK_METADATA:
         framework_id = metadata["id"]
@@ -269,6 +292,43 @@ def get_standards_catalog(data_root: Optional[Path] = None) -> Dict[str, Any]:
             }
         )
     return {"frameworks": frameworks}
+
+
+def _catalog_signature(root: Path) -> Tuple[Tuple[bool, int, int, int], ...]:
+    """Track only paths that can change catalog membership or SASB taxonomy."""
+    return tuple(
+        _path_signature(path)
+        for path in (
+            root / "sasb_metrics",
+            root / "sasb_metrics" / "manifest.json",
+            root / "gri_metrics",
+            root / "cdp_metrics",
+        )
+    )
+
+
+@lru_cache(maxsize=16)
+def _get_standards_catalog_cached(
+    resolved_root: str,
+    signature: Tuple[Tuple[bool, int, int, int], ...],
+) -> Dict[str, Any]:
+    del signature
+    return _build_standards_catalog(Path(resolved_root))
+
+
+def _standards_catalog_snapshot(data_root: Optional[Path] = None) -> Dict[str, Any]:
+    root = _root(data_root)
+    signature = _catalog_signature(root)
+    # functools.lru_cache is thread-safe, but concurrent cold misses may still
+    # execute the wrapped function more than once. Serializing the tiny lookup
+    # prevents duplicate 77-file catalog scans during startup traffic.
+    with _CATALOG_CACHE_LOCK:
+        return _get_standards_catalog_cached(str(root), signature)
+
+
+def get_standards_catalog(data_root: Optional[Path] = None) -> Dict[str, Any]:
+    """Return framework metadata without exposing the shared cached snapshot."""
+    return deepcopy(_standards_catalog_snapshot(data_root))
 
 
 def _framework_from_catalog(catalog: Dict[str, Any], framework_id: str) -> Dict[str, Any]:
@@ -396,7 +456,7 @@ def get_standard_metrics(
 ) -> Dict[str, Any]:
     """Return normalized metrics for a scope selected from the server catalog."""
     root = _root(data_root)
-    catalog = get_standards_catalog(root)
+    catalog = _standards_catalog_snapshot(root)
     framework = _framework_from_catalog(catalog, framework_id)
     group, scope = _scope_from_framework(framework, group_id, scope_id)
     path = _metric_file(root, framework["id"], group["id"], scope["id"])

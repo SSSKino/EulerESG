@@ -4,10 +4,10 @@ import { useMemo, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useT } from "@/i18n/useT";
 
-const ColumnPlot = dynamic(async () => {
-  const mod: any = await import("@ant-design/plots");
-  return mod.Column;
-}, { ssr: false });
+const ColumnPlot = dynamic(
+  () => import("@ant-design/plots/es/components/column"),
+  { ssr: false },
+);
 
 interface NewComparisonChartProps {
   data: any[];

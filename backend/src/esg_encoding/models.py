@@ -392,7 +392,10 @@ class ChatRequest(BaseModel):
     """Chat request model"""
     session_id: Optional[str] = Field(default=None, description="会话ID")
     message: str = Field(..., description="User message")
-    include_context: bool = Field(default=True, description="Whether to include context")
+    include_context: bool = Field(
+        default=True,
+        description="Whether to include loaded report and compliance context",
+    )
     # Optional UI/runtime context (e.g., Cross Analysis: selected file_ids, current taxonomy node)
     # This must remain optional for backward compatibility.
     context: Optional[Dict[str, Union[str, int, float, bool, List, Dict]]] = Field(

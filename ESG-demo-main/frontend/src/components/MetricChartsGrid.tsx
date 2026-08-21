@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Empty } from "antd";
 import { useT } from "@/i18n/useT";
 
-const Column = dynamic(() => import("@ant-design/plots").then((m) => m.Column), {
+const Column = dynamic(() => import("@ant-design/plots/es/components/column"), {
   ssr: false,
 });
 
@@ -121,7 +121,6 @@ function MetricChartsGridInner({
               row.length >= 3 &&
               (chart.topic.length > 34 || data.length >= 4 || data.some((d) => String(d.company).length > 18));
             const spanClass = shouldSpanTwo ? "md:col-span-6" : rowSpanClass;
-            const compactLabels = !shouldSpanTwo && row.length === 4;
             const labelWrapLen = row.length < 4 ? 28 : 20;
             const chartHeight = shouldSpanTwo || row.length < 4 ? 430 : 390;
 

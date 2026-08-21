@@ -177,7 +177,7 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
       setSelectedUploadFiles([]);
       setSelectedIndustry("");
       form.resetFields();
-      await store.loadFilesFromBackend();
+      await store.loadFilesFromBackend({ forceFresh: true });
 
       const jobMessageKey = `report-job-${jobId}`;
       setActiveReportJobs((prev) => ({
@@ -233,7 +233,7 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
             });
           }, 8000);
           void message.success(`${displayName}: ${event.message || t("upload.processingCompleted")}`);
-          await store.loadFilesFromBackend();
+          await store.loadFilesFromBackend({ forceFresh: true });
         },
         onError: async () => {
           message.destroy(jobMessageKey);
@@ -249,7 +249,7 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
             },
           }));
           void message.error(`${displayName}: ${errorText}`);
-          await store.loadFilesFromBackend();
+          await store.loadFilesFromBackend({ forceFresh: true });
         },
       });
       void message.success(t("upload.batchQueued", { count: String(nativeFiles.length) }));

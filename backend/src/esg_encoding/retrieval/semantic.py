@@ -339,7 +339,13 @@ class SemanticRetriever:
                 return _clamp_score(
                     float(similarity)
                     + _segment_structure_bonus(segment, expected_unit=getattr(metric, "unit", None), prefer_narrative=not _is_quantitative_metric(metric))
-                    + _qualitative_relevance_adjustment(metric, getattr(segment, "content", "") or "", anchor_terms, getattr(segment, "segment_type", ""))
+                    + _qualitative_relevance_adjustment(
+                        metric,
+                        getattr(segment, "content", "") or "",
+                        anchor_terms,
+                        getattr(segment, "segment_type", ""),
+                        segment=segment,
+                    )
                     + _metric_evidence_quality_adjustment(metric, segment, anchor_terms)
                     + _topic_relevance_adjustment(metric, getattr(segment, "content", "") or "")
                 )

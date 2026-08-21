@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 import unittest
@@ -263,6 +264,9 @@ class PaddleRuntimeTests(unittest.TestCase):
             "ready_path": "/tmp/pages.pdf.ready",
             "filename": "report.pdf",
             "prediction_options": prediction_options,
+            "parse_pass": 2,
+            "render_zoom": 2.0,
+            "requested_render_zoom": 2.5,
         }
 
         with patch.object(
@@ -287,6 +291,10 @@ class PaddleRuntimeTests(unittest.TestCase):
         )
         state = redis.hashes["paddleocr:task:job-options:batch:0002"]
         self.assertEqual(state["status"], "success")
+        result_metadata = json.loads(state["result_json"])
+        self.assertEqual(result_metadata["parse_pass"], 2)
+        self.assertEqual(result_metadata["render_zoom"], 2.0)
+        self.assertEqual(result_metadata["requested_render_zoom"], 2.5)
 
     def test_eight_page_batch_preserves_all_page_markers(self) -> None:
         fake_pipeline = _FakePipeline(result_count=8)

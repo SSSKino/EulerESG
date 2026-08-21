@@ -3,8 +3,12 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Barrier
+from unittest.mock import patch
 
+from esg_encoding.services import standards_library_service as standards_service
 from esg_encoding.services.standards_library_service import (
     StandardsDataError,
     StandardsScopeNotFound,
@@ -144,6 +148,22 @@ class StandardsLibraryBundledDataTests(unittest.TestCase):
         self.assertEqual(result["scope"]["id"], "Hardware")
         self.assertEqual(result["total_metrics"], 24)
 
+    def test_real_sasb_long_definition_reaches_its_final_sentence(self) -> None:
+        result = get_standard_metrics(
+            "sasb",
+            "Solar Technology & Project Developers",
+        )
+        metric = next(
+            item for item in result["metrics"] if item["code"] == "RR-ST-140a.2"
+        )
+
+        self.assertGreater(len(metric["definition"]), 4_000)
+        self.assertTrue(
+            metric["definition"].endswith(
+                "and why the entity chose these practices despite lifecycle trade-offs."
+            )
+        )
+
     def test_real_sasb_scope_rejects_an_explicit_wrong_group(self) -> None:
         with self.assertRaises(StandardsScopeNotFound):
             get_standard_metrics(
@@ -169,10 +189,14 @@ class StandardsLibraryBundledDataTests(unittest.TestCase):
 
 class StandardsLibraryValidationTests(unittest.TestCase):
     def setUp(self) -> None:
+        standards_service._get_standards_catalog_cached.cache_clear()
+        standards_service._read_json_cached.cache_clear()
         self._temporary_directory = tempfile.TemporaryDirectory()
         self.data_root = Path(self._temporary_directory.name)
 
     def tearDown(self) -> None:
+        standards_service._get_standards_catalog_cached.cache_clear()
+        standards_service._read_json_cached.cache_clear()
         self._temporary_directory.cleanup()
 
     @staticmethod
@@ -187,6 +211,154 @@ class StandardsLibraryValidationTests(unittest.TestCase):
             {"semi_industry_to_file": {"Example Industry": "Example.json"}},
         )
         self._write_json(directory / "Example.json", rows)
+
+    def test_repeated_catalog_calls_reuse_the_cached_build_and_manifest_json(self) -> None:
+        self._write_sasb_scope([{"Metric": "Cached metric"}])
+
+        first = get_standards_catalog(self.data_root)
+        catalog_after_first = standards_service._get_standards_catalog_cached.cache_info()
+        json_after_first = standards_service._read_json_cached.cache_info()
+
+        second = get_standards_catalog(self.data_root)
+        catalog_after_second = standards_service._get_standards_catalog_cached.cache_info()
+        json_after_second = standards_service._read_json_cached.cache_info()
+
+        self.assertEqual(second, first)
+        self.assertEqual(catalog_after_first.misses, 1)
+        self.assertEqual(catalog_after_second.misses, catalog_after_first.misses)
+        self.assertEqual(catalog_after_second.hits, catalog_after_first.hits + 1)
+        self.assertEqual(json_after_first.misses, 1)
+        self.assertEqual(json_after_second.misses, json_after_first.misses)
+
+        first["frameworks"].clear()
+        third = get_standards_catalog(self.data_root)
+        self.assertEqual(third, second)
+        self.assertIsNot(third, second)
+
+    def test_concurrent_cold_catalog_requests_build_one_cached_snapshot(self) -> None:
+        self._write_sasb_scope([{"Metric": "Concurrent metric"}])
+        worker_count = 8
+        start_barrier = Barrier(worker_count)
+
+        def load_catalog(_: int) -> dict:
+            start_barrier.wait(timeout=5)
+            return get_standards_catalog(self.data_root)
+
+        original_builder = standards_service._build_standards_catalog
+        with patch.object(
+            standards_service,
+            "_build_standards_catalog",
+            wraps=original_builder,
+        ) as build_catalog:
+            with ThreadPoolExecutor(max_workers=worker_count) as executor:
+                catalogs = list(executor.map(load_catalog, range(worker_count)))
+
+        self.assertEqual(build_catalog.call_count, 1)
+        self.assertTrue(all(catalog == catalogs[0] for catalog in catalogs[1:]))
+        self.assertEqual(len({id(catalog) for catalog in catalogs}), worker_count)
+
+    def test_manifest_change_invalidates_the_cached_catalog(self) -> None:
+        self._write_sasb_scope([{"Metric": "First metric"}])
+        first = get_standards_catalog(self.data_root)
+        first_sasb = next(
+            framework for framework in first["frameworks"] if framework["id"] == "sasb"
+        )
+        cache_after_first = standards_service._get_standards_catalog_cached.cache_info()
+
+        directory = self.data_root / "sasb_metrics"
+        self._write_json(directory / "Second.json", [{"Metric": "Second metric"}])
+        self._write_json(
+            directory / "manifest.json",
+            {
+                "semi_industry_to_file": {
+                    "Example Industry": "Example.json",
+                    "Second Industry": "Second.json",
+                }
+            },
+        )
+
+        second = get_standards_catalog(self.data_root)
+        second_sasb = next(
+            framework for framework in second["frameworks"] if framework["id"] == "sasb"
+        )
+        cache_after_second = standards_service._get_standards_catalog_cached.cache_info()
+
+        self.assertEqual(first_sasb["scope_count"], 1)
+        self.assertEqual(second_sasb["scope_count"], 2)
+        self.assertEqual(
+            {scope["id"] for scope in second_sasb["groups"][0]["scopes"]},
+            {"Example Industry", "Second Industry"},
+        )
+        self.assertEqual(cache_after_second.misses, cache_after_first.misses + 1)
+
+    def test_directory_membership_change_invalidates_the_cached_catalog(self) -> None:
+        directory = self.data_root / "cdp_metrics"
+        self._write_json(directory / "climate.json", [])
+        signature_before = standards_service._catalog_signature(self.data_root)
+        first = get_standards_catalog(self.data_root)
+        cache_after_first = standards_service._get_standards_catalog_cached.cache_info()
+
+        self._write_json(directory / "water.json", [])
+        signature_after = standards_service._catalog_signature(self.data_root)
+        second = get_standards_catalog(self.data_root)
+        cache_after_second = standards_service._get_standards_catalog_cached.cache_info()
+
+        first_cdp = next(
+            framework for framework in first["frameworks"] if framework["id"] == "cdp"
+        )
+        second_cdp = next(
+            framework for framework in second["frameworks"] if framework["id"] == "cdp"
+        )
+        self.assertNotEqual(signature_after, signature_before)
+        self.assertEqual(first_cdp["scope_count"], 1)
+        self.assertEqual(second_cdp["scope_count"], 2)
+        self.assertEqual(cache_after_second.misses, cache_after_first.misses + 1)
+
+    def test_metric_json_change_is_reloaded_without_rebuilding_the_catalog(self) -> None:
+        self._write_sasb_scope([{"Metric": "Initial metric"}])
+        first = get_standard_metrics(
+            "sasb",
+            "Example Industry",
+            data_root=self.data_root,
+        )
+        unchanged = get_standard_metrics(
+            "sasb",
+            "Example Industry",
+            data_root=self.data_root,
+        )
+        catalog_before_update = standards_service._get_standards_catalog_cached.cache_info()
+        json_before_update = standards_service._read_json_cached.cache_info()
+
+        metric_path = self.data_root / "sasb_metrics" / "Example.json"
+        metric_signature_before = standards_service._path_signature(metric_path)
+        self._write_json(
+            metric_path,
+            [
+                {"Metric": "Updated metric with longer content"},
+                {"Metric": "Second updated metric"},
+            ],
+        )
+        metric_signature_after = standards_service._path_signature(metric_path)
+        updated = get_standard_metrics(
+            "sasb",
+            "Example Industry",
+            data_root=self.data_root,
+        )
+        catalog_after_update = standards_service._get_standards_catalog_cached.cache_info()
+        json_after_update = standards_service._read_json_cached.cache_info()
+
+        self.assertEqual(first, unchanged)
+        self.assertNotEqual(metric_signature_after, metric_signature_before)
+        self.assertEqual(updated["total_metrics"], 2)
+        self.assertEqual(
+            [metric["name"] for metric in updated["metrics"]],
+            ["Updated metric with longer content", "Second updated metric"],
+        )
+        self.assertEqual(
+            catalog_after_update.misses,
+            catalog_before_update.misses,
+        )
+        self.assertEqual(json_after_update.misses, json_before_update.misses + 1)
 
     def test_legacy_sasb_manifest_without_groups_uses_the_single_group_fallback(self) -> None:
         self._write_sasb_scope([{"Metric": "Legacy metric", "Code": "LEGACY-1"}])
