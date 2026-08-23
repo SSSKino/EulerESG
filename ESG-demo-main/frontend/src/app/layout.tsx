@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AntdRegistry as AntdStyleRegistry } from "@ant-design/nextjs-registry";
 import "./globals.css";
 import HtmlLangSync from "@/i18n/HtmlLangSync";
 
@@ -19,7 +20,9 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="antialiased">
         <HtmlLangSync />
-        <div id="root-layout">{children}</div>
+        <AntdStyleRegistry>
+          <div id="root-layout">{children}</div>
+        </AntdStyleRegistry>
       </body>
     </html>
   );

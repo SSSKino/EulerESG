@@ -934,7 +934,11 @@ class RetrievalNoiseControlTests(unittest.TestCase):
             return []
 
         retriever._search_linked_pages = fake_linked_search
-        result = retriever.retrieve_for_metric(report, metric)
+        with patch.dict(
+            os.environ,
+            {"REPORT_EXACT_CODE_DATA_SHORT_CIRCUIT": "false"},
+        ):
+            result = retriever.retrieve_for_metric(report, metric)
 
         self.assertEqual(captured_triggers, [engagement_row.segment_id])
         self.assertNotIn(adjacent_row.segment_id, captured_triggers)
@@ -991,7 +995,7 @@ class RetrievalNoiseControlTests(unittest.TestCase):
             {item.segment_id for item in results},
         )
 
-    def test_exact_code_data_survives_linked_second_pass_and_reranker(self):
+    def test_verified_unique_exact_code_row_skips_qwen_rerank(self):
         code = "TC-SI-330a.2"
         metric_name = "Employee engagement as a percentage"
         metric = _metric("employee-engagement", code, metric_name, "Percentage (%)")
@@ -1037,24 +1041,19 @@ class RetrievalNoiseControlTests(unittest.TestCase):
         object.__setattr__(config, "use_semantic_retrieval", False)
         object.__setattr__(config, "use_reranker", True)
         retriever = DualChannelRetriever(config)
-        retriever.keyword_retriever.search_exact_alias = lambda *args, **kwargs: []
-        retriever.keyword_retriever.search_bm25 = lambda *args, **kwargs: []
-        linked_result = RetrievalResult(
-            segment_id=linked_noise.segment_id,
-            content=linked_noise.content,
-            page_number=linked_noise.page_number,
-            score=0.95,
-            retrieval_type="linked_page+bm25",
-            metric_id=metric.metric_id,
-            link_source_page=108,
-            link_target_page=86,
+        retriever.keyword_retriever.search_exact_alias = Mock(
+            side_effect=AssertionError("exact-alias search must be skipped")
         )
-        retriever._search_linked_pages = lambda *args, **kwargs: [linked_result]
-        retriever.semantic_retriever.rerank_candidates = (
-            lambda candidates, *args, **kwargs: [
-                item for item in candidates if item.segment_id != row.segment_id
-            ]
+        retriever.keyword_retriever.search_bm25 = Mock(
+            side_effect=AssertionError("BM25 search must be skipped")
         )
+        retriever._search_linked_pages = Mock(
+            side_effect=AssertionError("linked-page search must be skipped")
+        )
+        rerank = Mock(
+            side_effect=AssertionError("verified exact-Code data must skip Qwen")
+        )
+        retriever.semantic_retriever.rerank_candidates = rerank
 
         result = retriever.retrieve_for_metric(report, metric)
 
@@ -1063,9 +1062,14 @@ class RetrievalNoiseControlTests(unittest.TestCase):
             "protected_exact_code_data",
             result.combined_results[0].retrieval_type,
         )
-        self.assertIn(linked_noise.segment_id, {
-            item.segment_id for item in result.combined_results
-        })
+        self.assertIn(
+            "pre_rerank_exact_code_data",
+            result.combined_results[0].retrieval_type,
+        )
+        self.assertEqual(result.rerank_pool_k, 0)
+        self.assertEqual(result.target_k, len(result.combined_results))
+        self.assertEqual(result.qualified_total, len(result.combined_results))
+        rerank.assert_not_called()
 
         llm_create = Mock(
             side_effect=AssertionError("protected exact-code data must bypass the LLM")
@@ -1085,6 +1089,133 @@ class RetrievalNoiseControlTests(unittest.TestCase):
         self.assertIn(row.segment_id, analysis.evidence_segments)
         self.assertIn(value_cell.segment_id, analysis.evidence_segments)
         llm_create.assert_not_called()
+
+    def test_shared_code_exact_row_still_calls_qwen_rerank(self):
+        code = "TC-SI-330a.3"
+        metric = _metric(
+            "TC-SI-330a.3.03",
+            code,
+            "Percentage of (1) gender representation for (c) technical employees",
+            "Percentage (%)",
+        )
+        row = _table_segment(
+            "technical-row",
+            "table_row",
+            f"Global female representation - Technical roles | FY2024: 25% | SASB {code}",
+            page=86,
+            row_index=3,
+            row_header="Global female representation - Technical roles",
+        )
+        value_cell = _table_segment(
+            "technical-value",
+            "table_cell",
+            "FY2024: 25%",
+            page=86,
+            row_index=3,
+            col_index=1,
+            row_header="Global female representation - Technical roles",
+            col_header="FY2024",
+            value_text="25%",
+        )
+        code_cell = _table_segment(
+            "technical-code",
+            "table_cell",
+            f"SASB {code}",
+            page=86,
+            row_index=3,
+            col_index=2,
+            row_header="Global female representation - Technical roles",
+            col_header="Reference indices",
+            value_text=f"SASB {code}",
+        )
+        report = _report([row, value_cell, code_cell])
+        config = ProcessingConfig(top_k=10)
+        object.__setattr__(config, "use_metric_retrieval_corpus", False)
+        object.__setattr__(config, "use_semantic_retrieval", False)
+        object.__setattr__(config, "use_reranker", True)
+        retriever = DualChannelRetriever(config)
+        retriever.keyword_retriever.search_exact_alias = lambda *args, **kwargs: []
+        retriever.keyword_retriever.search_bm25 = lambda *args, **kwargs: []
+        rerank = Mock(side_effect=lambda candidates, *_args, **_kwargs: list(candidates))
+        retriever.semantic_retriever.rerank_candidates = rerank
+
+        result = retriever.retrieve_for_metric(report, metric)
+
+        rerank.assert_called_once()
+        self.assertGreater(result.rerank_pool_k, 0)
+        self.assertFalse(
+            any(
+                "pre_rerank_exact_code_data" in item.retrieval_type
+                for item in result.combined_results
+            )
+        )
+
+    def test_reviewed_or_conflicted_exact_row_still_calls_qwen_rerank(self):
+        code = "TC-SI-330a.2"
+        metric = _metric(
+            "employee-engagement",
+            code,
+            "Employee engagement as a percentage",
+            "Percentage (%)",
+        )
+        for field, value in (
+            ("review_status", "needs_review"),
+            ("conflicts", [{"field": "value"}]),
+        ):
+            with self.subTest(field=field):
+                row = _table_segment(
+                    f"engagement-row-{field}",
+                    "table_row",
+                    f"Employee engagement as a percentage | FY2024: 87% | SASB {code}",
+                    page=108,
+                    row_index=6,
+                    row_header="Employee engagement as a percentage",
+                )
+                value_cell = _table_segment(
+                    f"engagement-value-{field}",
+                    "table_cell",
+                    "FY2024: 87%",
+                    page=108,
+                    row_index=6,
+                    col_index=1,
+                    row_header="Employee engagement as a percentage",
+                    col_header="FY2024",
+                    value_text="87%",
+                )
+                value_cell.structured_data[field] = value
+                code_cell = _table_segment(
+                    f"engagement-code-{field}",
+                    "table_cell",
+                    f"SASB {code}",
+                    page=108,
+                    row_index=6,
+                    col_index=2,
+                    row_header="Employee engagement as a percentage",
+                    col_header="Reference indices",
+                    value_text=f"SASB {code}",
+                )
+                report = _report([row, value_cell, code_cell])
+                config = ProcessingConfig(top_k=10)
+                object.__setattr__(config, "use_metric_retrieval_corpus", False)
+                object.__setattr__(config, "use_semantic_retrieval", False)
+                object.__setattr__(config, "use_reranker", True)
+                retriever = DualChannelRetriever(config)
+                retriever.keyword_retriever.search_exact_alias = lambda *args, **kwargs: []
+                retriever.keyword_retriever.search_bm25 = lambda *args, **kwargs: []
+                rerank = Mock(
+                    side_effect=lambda candidates, *_args, **_kwargs: list(candidates)
+                )
+                retriever.semantic_retriever.rerank_candidates = rerank
+
+                result = retriever.retrieve_for_metric(report, metric)
+
+                rerank.assert_called_once()
+                self.assertFalse(
+                    any(
+                        "pre_rerank_exact_code_data" in item.retrieval_type
+                        for item in result.combined_results
+                    )
+                )
 
     def test_linked_pages_run_normal_semantic_retrieval_before_link_attention(self):
         metric = self._metric_with_topic()
@@ -1360,6 +1491,191 @@ class RetrievalNoiseControlTests(unittest.TestCase):
 class DirectDisclosureTests(unittest.TestCase):
     def setUp(self):
         self.engine = object.__new__(DisclosureInferenceEngine)
+
+    def _analyze_all_other_employee_category(
+        self,
+        evidence_segments: list[TextSegment],
+    ):
+        code = "TC-SI-330a.3"
+        metric_name = (
+            "Percentage of (2) diversity group representation for "
+            "(d) all other employees"
+        )
+        metric = _metric(f"{code}.08", code, metric_name, "Percentage (%)")
+        retrieval = MetricRetrievalResult(
+            metric_id=metric.metric_id,
+            metric_name=metric_name,
+            metric_code=code,
+            combined_results=[
+                RetrievalResult(
+                    segment_id=segment.segment_id,
+                    content=segment.content,
+                    page_number=segment.page_number,
+                    score=0.99 - (index * 0.01),
+                    retrieval_type="rrf:linked_page_category",
+                    metric_id=metric.metric_id,
+                )
+                for index, segment in enumerate(evidence_segments)
+            ],
+            total_matches=len(evidence_segments),
+        )
+        response_payload = {
+            "metric_hit": True,
+            "disclosure_status": "fully_disclosed",
+            "has_disclosure": True,
+            "disclosure_quality": "high",
+            "value_status": "ambiguous",
+            "value": None,
+            "raw_value": None,
+            "raw_unit": "%",
+            "reasoning": "The report provides the requested employee representation distribution.",
+            "page": 90,
+            "evidence_segment_id": evidence_segments[0].segment_id,
+            "evidence_quote": "Non-technical roles: Asian 9.7%; Hispanic or Latino 11.0%.",
+            "specific_data_found": "FY2024 race/ethnicity distribution",
+            "year_values": [],
+            "derived_calculation": None,
+            "improvement_suggestions": [],
+        }
+        llm_create = Mock(
+            return_value=SimpleNamespace(
+                choices=[
+                    SimpleNamespace(
+                        message=SimpleNamespace(content=json.dumps(response_payload))
+                    )
+                ]
+            )
+        )
+        self.engine.config = ProcessingConfig()
+        self.engine.llm_client = SimpleNamespace(
+            chat=SimpleNamespace(completions=SimpleNamespace(create=llm_create))
+        )
+
+        analysis = self.engine._analyze_single_metric(
+            retrieval,
+            _report(evidence_segments),
+            metric,
+        )
+        return analysis, llm_create
+
+    def test_all_other_non_technical_proxy_downgrades_llm_full_to_partial(self):
+        proxy = TextSegment(
+            segment_id="nontechnical-distribution",
+            content=(
+                "U.S. race/ethnicity representation | Non-technical roles | "
+                "FY2024: Asian 9.7%; Hispanic or Latino 11.0%"
+            ),
+            page_number=90,
+            position_y=2,
+            segment_type="table",
+        )
+        # A SASB index row can repeat the exact framework label but does not
+        # prove that the linked report category has the same employee boundary.
+        source_index = TextSegment(
+            segment_id="sasb-index-all-other",
+            content=(
+                "TC-SI-330a.3 | Percentage of diversity group representation "
+                "for all other employees | Page 90"
+            ),
+            page_number=82,
+            position_y=1,
+            segment_type="table_row",
+        )
+
+        analysis, llm_create = self._analyze_all_other_employee_category(
+            [proxy, source_index]
+        )
+
+        self.assertEqual(analysis.disclosure_status.value, "partially_disclosed")
+        self.assertEqual(analysis.value, "n/a")
+        self.assertEqual(analysis.page, 90)
+        self.assertIn("category boundary is not exact", analysis.reasoning)
+        self.assertTrue(analysis.improvement_suggestions)
+        llm_create.assert_called_once()
+
+    def test_explicit_non_technical_all_other_equivalence_preserves_llm_full(self):
+        explicit_equivalence = TextSegment(
+            segment_id="defined-all-other-distribution",
+            content=(
+                "For this report, Non-technical roles is the label for all other "
+                "employees and means employees not classified as executive "
+                "management, non-executive management, or technical employees. "
+                "FY2024: Asian 9.7%; Hispanic or Latino 11.0%."
+            ),
+            page_number=90,
+            position_y=1,
+            segment_type="table",
+        )
+
+        analysis, llm_create = self._analyze_all_other_employee_category(
+            [explicit_equivalence]
+        )
+
+        self.assertEqual(analysis.disclosure_status.value, "fully_disclosed")
+        self.assertEqual(analysis.value, "n/a")
+        llm_create.assert_called_once()
+
+    def test_reviewed_or_conflicted_row_cannot_take_direct_disclosure_shortcut(self):
+        code = "TC-SI-330a.2"
+        metric = _metric(
+            "employee-engagement",
+            code,
+            "Employee engagement as a percentage",
+            "Percentage (%)",
+        )
+        for field, value in (
+            ("review_status", "needs_review"),
+            ("conflicts", [{"field": "value"}]),
+        ):
+            with self.subTest(field=field):
+                row = _table_segment(
+                    f"direct-row-{field}",
+                    "table_row",
+                    f"Employee engagement as a percentage | FY2024: 87% | SASB {code}",
+                    page=108,
+                    row_index=6,
+                    row_header="Employee engagement as a percentage",
+                )
+                value_cell = _table_segment(
+                    f"direct-value-{field}",
+                    "table_cell",
+                    "FY2024: 87%",
+                    page=108,
+                    row_index=6,
+                    col_index=1,
+                    row_header="Employee engagement as a percentage",
+                    col_header="FY2024",
+                    value_text="87%",
+                )
+                value_cell.structured_data[field] = value
+                code_cell = _table_segment(
+                    f"direct-code-{field}",
+                    "table_cell",
+                    f"SASB {code}",
+                    page=108,
+                    row_index=6,
+                    col_index=2,
+                    row_header="Employee engagement as a percentage",
+                    col_header="Reference indices",
+                    value_text=f"SASB {code}",
+                )
+                report = _report([row, value_cell, code_cell])
+                retrieval = MetricRetrievalResult(
+                    metric_id=metric.metric_id,
+                    metric_name=metric.metric_name,
+                    metric_code=code,
+                    combined_results=[],
+                )
+
+                analysis = self.engine._direct_code_data_disclosure_analysis(
+                    retrieval,
+                    report,
+                    metric,
+                    [{"segment_id": row.segment_id, "page_number": 108, "score": 1.0}],
+                    [row.segment_id],
+                )
+
+                self.assertIsNone(analysis)
 
     def test_structured_year_label_and_scaled_unit_override_visible_header(self):
         row = _table_segment(
@@ -2704,6 +3020,31 @@ class MetricProfileTests(unittest.TestCase):
             [f"{metric_code}.{index:02d}" for index in range(1, 9)],
         )
         self.assertNotIn("Percentage of (1) gender", expected_names)
+
+        for profile in (
+            item
+            for item in profiles
+            if "all other employees" in item["metric"].lower()
+        ):
+            self.assertFalse(
+                any(
+                    "non-technical" in str(alias).lower()
+                    for alias in profile.get("aliases", [])
+                ),
+                "Non-technical roles is a retrieval proxy, not an exact identity alias",
+            )
+            self.assertTrue(
+                any(
+                    "non-technical" in str(term).lower()
+                    for term in profile.get("bm25_terms", [])
+                )
+            )
+            self.assertTrue(
+                any(
+                    "non-technical" in str(term).lower()
+                    for term in profile.get("anchor_terms", [])
+                )
+            )
 
         load_all_metric_profiles.cache_clear()
         build_profile_index.cache_clear()

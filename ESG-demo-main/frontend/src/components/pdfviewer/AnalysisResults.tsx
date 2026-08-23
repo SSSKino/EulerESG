@@ -17,7 +17,9 @@ export type AnalysisDataItem = {
   topic?: string;
   type?: string;
   value?: string | number | null;
+  value_status?: string | null;
   page?: string | number | null;
+  evidenceTarget?: EvidencePageTarget | null;
   context?: string | null;
   definition?: string | null;
   visualEvidence?: {
@@ -40,12 +42,18 @@ export type AnalysisDataItem = {
   } | null;
 };
 
+export type EvidencePageTarget = {
+  page: number;
+  fileId?: string;
+  reportName?: string;
+};
+
 type AnalysisErrorCode = "no_file" | "no_analysis" | "load_failed";
 
 interface AnalysisResultsProps {
   fileId?: string;
   scopeKey?: string;
-  onPageNavigate?: (page: number) => void;
+  onPageNavigate?: (target: EvidencePageTarget) => void;
   /**
    * Controls whether the detailed results table is rendered.
    * The summary section is always shown.
@@ -87,16 +95,43 @@ const VisualEvidencePreview: React.FC<{ fileId: string; assetId: string; alt?: s
 
 const normalizePage = (page: string | number | null | undefined): number | null => {
   if (page === null || page === undefined) return null;
-  if (typeof page === "number") return Number.isFinite(page) ? page : null;
+  if (typeof page === "number") {
+    return Number.isInteger(page) && page > 0 ? page : null;
+  }
   const s = String(page).trim();
   if (!s) return null;
-  // Accept formats: "12", "12, 13", "12-13", "p. 12"
-  const firstToken = s.split(",")[0].trim();
-  const rangeFirst = firstToken.split("-")[0].trim();
-  const m = rangeFirst.match(/\d+/);
+  // Accept explicit page forms without scraping unrelated values such as FY2024.
+  const m = s.match(
+    /^(?:(?:p(?:age)?\.?)\s*[:#]?\s*)?(\d+)(?:\s*[,\-\u2013\u2014]\s*\d+)*$/i,
+  );
   if (!m) return null;
-  const n = parseInt(m[0], 10);
-  return Number.isFinite(n) ? n : null;
+  const n = parseInt(m[1], 10);
+  return Number.isInteger(n) && n > 0 ? n : null;
+};
+
+const resolveEvidenceTarget = (
+  item: any,
+  rawPage: unknown,
+): EvidencePageTarget | null => {
+  const page = normalizePage(rawPage as string | number | null | undefined);
+  if (page === null) return null;
+
+  const evidenceSources = Array.isArray(item?.evidence_sources)
+    ? item.evidence_sources.filter(
+        (source: unknown) => source && typeof source === "object",
+      )
+    : [];
+  const source = evidenceSources.find(
+    (candidate: any) => normalizePage(candidate?.data_page) === page,
+  ) || evidenceSources.find(
+    (candidate: any) => (
+      candidate?.data_page == null
+      && normalizePage(candidate?.target_page) === page
+    ),
+  );
+  const fileId = String(source?.source_report_id || "").trim() || undefined;
+  const reportName = String(source?.source_report_name || "").trim() || undefined;
+  return { page, fileId, reportName };
 };
 
 const EMPTY_VALUE_TOKENS = new Set(["", "-", "—", "n/a", "na", "null", "none", "not specified", "not available"]);
@@ -125,6 +160,18 @@ const formatDisplayValue = (value: unknown): string | null => {
   }
   const s = String(value).trim();
   return isEmptyValue(s) ? null : s;
+};
+
+export const getEmptyQuantitativeValueTranslationKey = (
+  valueStatus: unknown,
+): "analysis.summary.multipleValues" | "analysis.summary.notSpecified" => {
+  const normalized = String(valueStatus ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+  return normalized === "ambiguous"
+    ? "analysis.summary.multipleValues"
+    : "analysis.summary.notSpecified";
 };
 
 // Extract readable context text from various backend schemas.
@@ -199,7 +246,7 @@ const pickValue = (...vals: any[]) => {
   return null;
 };
 
-const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
+export const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
   (assessment?.metric_analyses || [])
     .filter((item: any) => {
       const id =
@@ -260,6 +307,7 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
       const tableEvidence = (item?.evidence_sources || []).find(
         (source: any) => source && typeof source === "object" && source.review_status
       ) || null;
+      const evidenceTarget = resolveEvidenceTarget(item, page);
 
       return {
         metric_id,
@@ -274,7 +322,13 @@ const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
         topic: pickValue(item?.topic, item?.Topic) ?? "",
         type: pickValue(item?.type, item?.Type) ?? "",
         value: value ?? null,
+        value_status: pickValue(
+          item?.value_status,
+          item?.valueStatus,
+          item?.["Value Status"],
+        ),
         page: page ?? null,
+        evidenceTarget,
         context: extractContextText(contextRaw) || null,
         definition:
           typeof (item?.definition ?? item?.Definition) === "string"
@@ -528,7 +582,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           if (status === "fully_disclosed") {
             displayValue = isDiscussionAndAnalysis
               ? reasoningText || t("analysis.noAnalysisText")
-              : formattedValue || t("analysis.summary.notSpecified");
+              : formattedValue
+                || t(getEmptyQuantitativeValueTranslationKey(record.value_status));
           } else {
             displayValue = reasoningText || t("analysis.noAnalysisText");
           }
@@ -583,7 +638,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 
           const pageText = !isEmptyValue(record.page) ? String(record.page) : "";
           const pageNumber = normalizePage(record.page);
-          const pageClickable = pageNumber !== null && !!onPageNavigate;
+          const evidenceTarget = record.evidenceTarget
+            || (pageNumber !== null ? { page: pageNumber } : null);
+          const pageClickable = evidenceTarget !== null && !!onPageNavigate;
           const pageLabel = pageNumber !== null ? String(pageNumber) : pageText;
 
           return (
@@ -610,8 +667,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
                     }
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (pageClickable && pageNumber !== null) {
-                        onPageNavigate?.(pageNumber);
+                      if (pageClickable && evidenceTarget !== null) {
+                        onPageNavigate?.(evidenceTarget);
                       }
                     }}
                     title={pageClickable ? t("analysis.jumpToPage") : undefined}
@@ -688,7 +745,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
             : t("analysis.industryAnalysis")}
         </h2>
         <Alert
-          message={t("common.error")}
+          title={t("common.error")}
           description={errorMessage}
           type="error"
           showIcon

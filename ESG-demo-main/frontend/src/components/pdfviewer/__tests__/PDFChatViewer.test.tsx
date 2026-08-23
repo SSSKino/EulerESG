@@ -92,7 +92,12 @@ vi.mock("react-pdf", async () => {
       } else {
         const numPages = source.includes("ten-pages") ? 10 : 116;
         const pdfDocument = {
-          getPage: vi.fn(async (pageNumber: number) => mockPdfPage(pageNumber)),
+          getPage: vi.fn(async (pageNumber: number) => {
+            if (source.includes("navigation-race") && pageNumber === 20) {
+              await new Promise((resolve) => window.setTimeout(resolve, 40));
+            }
+            return mockPdfPage(pageNumber);
+          }),
           numPages,
         };
         queueMicrotask(() => {
@@ -380,6 +385,74 @@ describe("PDFChatViewer continuous rendering", () => {
     await waitFor(() => {
       expect(renderedPageNumbers()).toContain(1);
     });
+  });
+
+  it("uses scroll-container coordinates instead of document-relative offsetTop", async () => {
+    const view = render(
+      <PDFChatViewer
+        fileUrl="report-116.pdf"
+        targetPage={5}
+        targetPageNonce={1}
+      />,
+    );
+    await expectDocumentReady(116);
+
+    const container = screen.getByTestId("pdf-scroll-container");
+    const slot = pageSlot(5);
+    expect(slot).not.toBeNull();
+    container.scrollTop = 250;
+    vi.spyOn(container, "getBoundingClientRect").mockReturnValue({
+      top: 500,
+    } as DOMRect);
+    vi.spyOn(slot!, "getBoundingClientRect").mockReturnValue({
+      top: 4314,
+    } as DOMRect);
+    Object.defineProperty(slot!, "offsetTop", {
+      configurable: true,
+      value: 9000,
+    });
+
+    const scrollTo = vi.mocked(HTMLElement.prototype.scrollTo);
+    scrollTo.mockClear();
+    view.rerender(
+      <PDFChatViewer
+        fileUrl="report-116.pdf"
+        targetPage={5}
+        targetPageNonce={2}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(scrollTo).toHaveBeenLastCalledWith({
+        top: 4056,
+        behavior: "auto",
+      });
+    });
+  });
+
+  it("keeps the latest page when an older navigation request finishes later", async () => {
+    const view = render(
+      <PDFChatViewer
+        fileUrl="navigation-race.pdf"
+        targetPage={20}
+        targetPageNonce={1}
+      />,
+    );
+    await expectDocumentReady(116);
+
+    view.rerender(
+      <PDFChatViewer
+        fileUrl="navigation-race.pdf"
+        targetPage={30}
+        targetPageNonce={2}
+      />,
+    );
+    await expectCurrentPage(30, 116);
+
+    await act(async () => {
+      await new Promise((resolve) => window.setTimeout(resolve, 70));
+    });
+    await expectCurrentPage(30, 116);
   });
 
   it("commits direct page input on Enter and clamps it to the document", async () => {

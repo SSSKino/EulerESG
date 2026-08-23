@@ -160,10 +160,10 @@ const ComplianceSummaryDrawer: React.FC<ComplianceSummaryDrawerProps> = ({
         </div>
       }
       placement="right"
-      width="min(760px, 96vw)"
+      size="min(760px, 96vw)"
       open={open}
       onClose={onClose}
-      destroyOnClose={false}
+      destroyOnHidden={false}
       extra={
         <button
           type="button"

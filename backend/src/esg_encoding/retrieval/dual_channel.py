@@ -26,7 +26,14 @@ from .metric_corpus import (
     resolve_metric_retrieval_corpus,
     subset_metric_retrieval_corpus,
 )
-from .metric_profile import build_metric_retrieval_profile
+from .metric_profile import (
+    build_metric_retrieval_profile,
+    build_profile_index,
+    compact_metric_text,
+    content_contains_alias,
+    find_metric_profile,
+    normalize_metric_text,
+)
 from .semantic import SemanticRetriever
 
 
@@ -70,6 +77,46 @@ class DualChannelRetriever:
             bm25_results: List[RetrievalResult] = []
             if getattr(self.config, "use_keyword_retrieval", True):
                 exact_code_results = self.keyword_retriever.search_exact_code(report_content, metric, profile)
+            protected_exact_code_results = self._protected_exact_code_data_results(
+                report_content,
+                exact_code_results,
+                profile,
+            )
+            pre_rerank_results = self._pre_rerank_exact_code_data_results(
+                report_content,
+                metric,
+                profile,
+                protected_exact_code_results,
+            )
+            if pre_rerank_results:
+                keyword_elapsed = time.perf_counter() - keyword_started
+                metric_id = str(getattr(metric, "metric_id", profile.metric_id) or "")
+                result_count = len(pre_rerank_results)
+                self._dynamic_window_by_metric[metric_id] = {
+                    "qualified_total": result_count,
+                    "rerank_pool_k": 0,
+                    "target_k": result_count,
+                }
+                logger.info(
+                    "Pre-rerank exact-Code data shortcut "
+                    f"metric={metric_id or metric_name} rows={result_count}; "
+                    "skipped exact-alias, BM25, linked-page, semantic, and Qwen rerank; "
+                    f"elapsed={time.perf_counter() - retrieval_started:.2f}s"
+                )
+                return MetricRetrievalResult(
+                    metric_id=metric_id,
+                    metric_name=getattr(metric, "metric_name", profile.metric_name),
+                    metric_code=getattr(metric, "metric_code", profile.metric_code),
+                    keyword_results=exact_code_results,
+                    semantic_results=[],
+                    combined_results=pre_rerank_results,
+                    total_matches=result_count,
+                    qualified_total=result_count,
+                    rerank_pool_k=0,
+                    target_k=result_count,
+                )
+
+            if getattr(self.config, "use_keyword_retrieval", True):
                 exact_alias_results = self.keyword_retriever.search_exact_alias(report_content, metric, profile)
                 bm25_results = self.keyword_retriever.search_bm25(report_content, metric, profile)
             keyword_elapsed = time.perf_counter() - keyword_started
@@ -82,12 +129,6 @@ class DualChannelRetriever:
                 exact_code_results,
                 exact_alias_results,
             )
-            protected_exact_code_results = self._protected_exact_code_data_results(
-                report_content,
-                exact_code_results,
-                profile,
-            )
-
             linked_started = time.perf_counter()
             linked_page_results = self._search_linked_pages(
                 report_content,
@@ -292,6 +333,319 @@ class DualChannelRetriever:
             if segment_type and segment_type != "table":
                 scoped_aliases.append(result)
         return scoped_aliases or alias_values
+
+    @staticmethod
+    def _segment_field(segment, *names: str):
+        """Read a non-empty segment field from attrs or structured metadata."""
+        data = getattr(segment, "structured_data", None)
+        data = data if isinstance(data, dict) else {}
+        for name in names:
+            value = getattr(segment, name, None)
+            if value is not None and str(value).strip().lower() not in {
+                "",
+                "none",
+                "null",
+                "nan",
+            }:
+                return value
+        for name in names:
+            value = data.get(name)
+            if value is not None and str(value).strip().lower() not in {
+                "",
+                "none",
+                "null",
+                "nan",
+            }:
+                return value
+        return None
+
+    @classmethod
+    def _clean_non_reference_numeric_text(cls, content: object, profile) -> str:
+        """Remove framework/reference numbers before direct-data validation."""
+        cleaned = str(content or "")
+        for pattern in getattr(profile, "exact_code_patterns", None) or []:
+            cleaned = pattern.sub(" ", cleaned)
+        cleaned = re.sub(
+            r"\b(?:(?:FY|CY)\s*)?(?:19|20)\d{2}\b",
+            " ",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
+        cleaned = re.sub(
+            r"\b(?:page|p\.|row|column|col|reference|index)\s*[:#-]?\s*\d+\b",
+            " ",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
+        return cleaned
+
+    @classmethod
+    def _non_reference_numeric_tokens(cls, content: object, profile) -> set[str]:
+        cleaned = cls._clean_non_reference_numeric_text(content, profile)
+        return {
+            re.sub(r"\s+", "", match.group(0)).replace(",", "")
+            for match in re.finditer(
+                r"(?<![A-Za-z])[-+]?\d[\d,]*(?:\.\d+)?(?:\s*%)?",
+                cleaned,
+            )
+        }
+
+    @staticmethod
+    def _row_has_unresolved_structure(row_segments: Sequence[object]) -> bool:
+        """True when any cell in a candidate row still requires review."""
+        for segment in row_segments:
+            data = getattr(segment, "structured_data", None)
+            data = data if isinstance(data, dict) else {}
+            review_status = str(
+                getattr(segment, "review_status", None)
+                or data.get("review_status")
+                or ""
+            ).strip().lower()
+            conflicts = getattr(segment, "conflicts", None) or data.get("conflicts") or []
+            quality_reasons = (
+                getattr(segment, "quality_reasons", None)
+                or data.get("quality_reasons")
+                or []
+            )
+            if review_status == "needs_review" or bool(conflicts):
+                return True
+            if any(
+                "ambiguous" in str(reason or "").lower()
+                or "conflict" in str(reason or "").lower()
+                for reason in quality_reasons
+            ):
+                return True
+        return False
+
+    @classmethod
+    def _row_value_tokens(cls, row_segments: Sequence[object], profile) -> set[str]:
+        """Return numeric values from real data cells, excluding index/code cells."""
+        tokens: set[str] = set()
+        rejected_headers = (
+            "reference",
+            "index",
+            "code",
+            "sasb",
+            "gri",
+            "page",
+            "location",
+            "link",
+            "unit",
+        )
+        for segment in row_segments:
+            if str(getattr(segment, "segment_type", "") or "").lower() != "table_cell":
+                continue
+            header = str(
+                cls._segment_field(segment, "col_header", "column_header") or ""
+            ).strip().lower()
+            if any(marker in header for marker in rejected_headers):
+                continue
+            value_text = cls._segment_field(
+                segment,
+                "value_text",
+                "cell_value",
+                "raw_value",
+                "numeric_value",
+                "amount",
+                "figure",
+                "data",
+                "extracted_value",
+            )
+            source_text = (
+                value_text
+                if value_text is not None
+                else getattr(segment, "content", "")
+            )
+            tokens.update(cls._non_reference_numeric_tokens(source_text, profile))
+        return tokens
+
+    @staticmethod
+    def _profile_identity_aliases(profile) -> List[str]:
+        blocked = {
+            normalize_metric_text(getattr(profile, "metric_code", "")),
+            normalize_metric_text(getattr(profile, "topic", "")),
+            normalize_metric_text(getattr(profile, "unit", "")),
+        }
+        aliases: List[str] = []
+        seen = set()
+        for raw in [
+            getattr(profile, "metric_name", ""),
+            getattr(profile, "canonical_label", ""),
+            *(getattr(profile, "aliases", None) or []),
+        ]:
+            value = re.sub(r"\s+", " ", str(raw or "")).strip()
+            normalized = normalize_metric_text(value)
+            if not normalized or normalized in blocked or normalized in seen:
+                continue
+            seen.add(normalized)
+            aliases.append(value)
+        return aliases
+
+    @staticmethod
+    def _profile_code_is_unique(profile) -> bool:
+        code = str(getattr(profile, "metric_code", "") or "").strip()
+        if not code:
+            return False
+        try:
+            index = build_profile_index()
+        except Exception:
+            return False
+        matches = []
+        seen = set()
+        for key in (code.lower(), compact_metric_text(code).lower()):
+            for candidate in index["by_code"].get(key, []):
+                identity = (
+                    str(getattr(candidate, "metric_id", "") or ""),
+                    str(getattr(candidate, "metric_name", "") or ""),
+                )
+                if identity in seen:
+                    continue
+                seen.add(identity)
+                matches.append(candidate)
+        return len(matches) == 1
+
+    @staticmethod
+    def _row_has_expected_unit(row_text: str, profile) -> bool:
+        expected_units = list(getattr(profile, "expected_units", None) or [])
+        if not expected_units:
+            return True
+        lowered = str(row_text or "").lower()
+        if "%" in lowered and any("%" in str(unit or "") for unit in expected_units):
+            return True
+        return any(
+            content_contains_alias(row_text, str(unit or ""))
+            for unit in expected_units
+            if len(normalize_metric_text(unit)) >= 3
+        )
+
+    def _pre_rerank_exact_code_data_results(
+        self,
+        report_content: ReportContent,
+        metric: ESGMetric,
+        profile,
+        protected_results: Sequence[RetrievalResult],
+    ) -> List[RetrievalResult]:
+        """Return one strictly verified exact-Code row that can bypass Qwen.
+
+        This first version is intentionally conservative. It accepts only a
+        unique generated metric code and one conflict-free table row with one
+        real numeric data value. Ambiguous/multi-value cases continue through
+        the existing multi-channel retrieval and neural reranker.
+        """
+        if not self._env_enabled("REPORT_EXACT_CODE_DATA_SHORT_CIRCUIT", True):
+            return []
+        if not protected_results or find_metric_profile(metric) is None:
+            return []
+        if not self._profile_code_is_unique(profile):
+            return []
+        if (
+            getattr(profile, "output_shape", "") in {"breakdown", "table"}
+            and getattr(profile, "variable_dimensions", None)
+        ):
+            return []
+        if getattr(profile, "requires_dimension_labels", False):
+            return []
+
+        segments = list(report_content.document_content.segments or [])
+        by_id = {
+            str(getattr(segment, "segment_id", "") or ""): segment
+            for segment in segments
+        }
+        by_row: Dict[tuple[str, int], List[object]] = {}
+        for segment in segments:
+            row_key = self._row_key(segment)
+            if row_key is not None:
+                by_row.setdefault(row_key, []).append(segment)
+
+        candidates_by_row: Dict[tuple[str, int], List[RetrievalResult]] = {}
+        for result in protected_results:
+            segment = by_id.get(str(getattr(result, "segment_id", "") or ""))
+            row_key = self._row_key(segment) if segment is not None else None
+            if row_key is not None:
+                candidates_by_row.setdefault(row_key, []).append(result)
+        if len(candidates_by_row) != 1:
+            return []
+
+        row_key, row_results = next(iter(candidates_by_row.items()))
+        row_segments = by_row.get(row_key, [])
+        if not row_segments or self._row_has_unresolved_structure(row_segments):
+            return []
+
+        row_text = "\n".join(
+            str(value or "")
+            for segment in row_segments
+            for value in (
+                getattr(segment, "content", ""),
+                self._segment_field(segment, "row_header"),
+                self._segment_field(segment, "col_header", "column_header"),
+                self._segment_field(segment, "value_text", "cell_value", "value"),
+                self._segment_field(segment, "unit", "cell_unit", "raw_unit"),
+            )
+            if str(value or "").strip()
+        )
+        if not any(
+            pattern.search(row_text)
+            for pattern in (getattr(profile, "exact_code_patterns", None) or [])
+        ):
+            return []
+        if not any(
+            content_contains_alias(row_text, alias)
+            for alias in self._profile_identity_aliases(profile)
+        ):
+            return []
+        if len(self._row_value_tokens(row_segments, profile)) != 1:
+            return []
+        if bool((getattr(profile, "evidence_hints", None) or {}).get("requires_unit", False)):
+            if not self._row_has_expected_unit(row_text, profile):
+                return []
+
+        target_year = None
+        for raw_year in (
+            getattr(metric, "target_year", None),
+            getattr(metric, "reporting_year", None),
+            getattr(metric, "year", None),
+            getattr(self.config, "target_year", None),
+            os.getenv("REPORT_TARGET_YEAR"),
+        ):
+            try:
+                candidate_year = int(raw_year)
+            except (TypeError, ValueError):
+                continue
+            if 1900 <= candidate_year <= 2100:
+                target_year = candidate_year
+                break
+        if target_year is not None and not re.search(
+            rf"(?<!\d){target_year}(?!\d)",
+            row_text,
+        ):
+            return []
+
+        marked: List[RetrievalResult] = []
+        seen_ids = set()
+        for result in row_results:
+            if result.segment_id in seen_ids:
+                continue
+            seen_ids.add(result.segment_id)
+            retrieval_type = str(result.retrieval_type or "")
+            for label in (
+                "real_data_evidence",
+                "protected_exact_code_data",
+                "pre_rerank_exact_code_data",
+            ):
+                if label not in retrieval_type:
+                    retrieval_type += f"+{label}"
+            score_breakdown = dict(result.score_breakdown or {})
+            score_breakdown["pre_rerank_exact_code_data"] = 1.0
+            marked.append(
+                result.model_copy(
+                    update={
+                        "retrieval_type": retrieval_type,
+                        "score_breakdown": score_breakdown,
+                    }
+                )
+            )
+        marked.sort(key=lambda item: float(item.score or 0.0), reverse=True)
+        return marked
 
     @classmethod
     def _protected_exact_code_data_results(

@@ -372,17 +372,21 @@ export default function DisclosureCompletenessComparison(props: {
 
   useEffect(() => {
     if (!openingFile) return;
+    const fileId = openingFile.fileId;
+    let progress = 0;
     setOpeningProgress(0);
-    void apiService.prefetchAssessmentByFile(openingFile.fileId, undefined, false);
+    void apiService.prefetchAssessmentByFile(fileId, undefined, false);
     const timer = window.setInterval(() => {
-      setOpeningProgress((prev) => {
-        if (prev >= 100) {
-          window.clearInterval(timer);
-          router.push(`/dashboard/chat?file_id=${encodeURIComponent(openingFile.fileId)}`);
-          return 100;
-        }
-        return Math.min(100, prev + 16);
-      });
+      progress = Math.min(100, progress + 16);
+      setOpeningProgress(progress);
+      if (progress < 100) return;
+
+      window.clearInterval(timer);
+      // Release the modal mask before starting navigation. If client-side
+      // routing is interrupted or rejected, a stale loading mask must not
+      // leave the comparison page permanently unable to receive clicks.
+      setOpeningFile(null);
+      router.push(`/dashboard/chat?file_id=${encodeURIComponent(fileId)}`);
     }, 180);
     return () => window.clearInterval(timer);
   }, [openingFile, router]);
@@ -585,7 +589,7 @@ export default function DisclosureCompletenessComparison(props: {
 
   return (
     <div className="space-y-4">
-      <Modal open={!!openingFile} footer={null} closable={false} maskClosable={false} centered>
+      <Modal open={!!openingFile} footer={null} closable={false} mask={{ closable: false }} centered>
         <div className="py-3">
           <div className="text-base font-semibold text-slate-900 mb-4">{openingFile?.label}</div>
           <Progress percent={openingProgress} status="active" />
@@ -594,7 +598,7 @@ export default function DisclosureCompletenessComparison(props: {
 
       {anyError ? (
         <Alert
-          message={t("crossAnalysis.disclosure.someReportsFailedTitle")}
+          title={t("crossAnalysis.disclosure.someReportsFailedTitle")}
           description={t("crossAnalysis.disclosure.someReportsFailedDesc")}
           type="warning"
           showIcon
@@ -608,15 +612,15 @@ export default function DisclosureCompletenessComparison(props: {
             <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.summary.not")}</div>
             <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.status.partial")}</div>
             <div className="text-xl font-semibold text-slate-800 text-center">{t("analysis.summary.disclosed")}</div>
-            <div className="text-xl flex justify-end">
+            <div className="flex justify-end">
               <Select
                 value={sortMode}
                 onChange={(value) => setSortMode(value)}
-                size="middle"
-                bordered={false}
+                size="medium"
+                variant="borderless"
                 suffixIcon={null}
                 className="w-full text-center [&_.ant-select-selection-item]:text-center"
-                style={{ width: '100%', fontSize: '40px' }}
+                style={{ width: "100%", fontSize: 14 }}
                 options={[
                   { value: "default", label: "Default" },
                   { value: "report_asc", label: "Report A-Z" },

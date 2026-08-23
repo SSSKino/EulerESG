@@ -4,18 +4,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AntdRegistry } from "@/lib/antd";
 
-vi.mock("@ant-design/cssinjs", async () => {
-  const React = await import("react");
-  return {
-    createCache: () => ({}),
-    StyleProvider: ({ children }: PropsWithChildren) =>
-      React.createElement(React.Fragment, null, children),
-  };
-});
-
 vi.mock("antd", async () => {
   const React = await import("react");
   return {
+    App: ({ children }: PropsWithChildren) =>
+      React.createElement(React.Fragment, null, children),
     ConfigProvider: ({ children }: PropsWithChildren) =>
       React.createElement(React.Fragment, null, children),
   };

@@ -109,17 +109,26 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
       {status ? (
         <>
           {/* 系统总体状态 */}
-          <Descriptions size="small" column={1} bordered>
-            <Descriptions.Item label={t("statusPanel.systemStatus")}>
-              <Space>
-                {getStatusIcon(status.status === "operational")}
-                <Badge 
-                  status={status.status === "operational" ? "success" : "error"} 
-                  text={status.status.toUpperCase()} 
-                />
-              </Space>
-            </Descriptions.Item>
-          </Descriptions>
+          <Descriptions
+            size="small"
+            column={1}
+            bordered
+            items={[
+              {
+                key: "system-status",
+                label: t("statusPanel.systemStatus"),
+                children: (
+                  <Space>
+                    {getStatusIcon(status.status === "operational")}
+                    <Badge
+                      status={status.status === "operational" ? "success" : "error"}
+                      text={status.status.toUpperCase()}
+                    />
+                  </Space>
+                ),
+              },
+            ]}
+          />
 
           <Divider />
 
@@ -128,32 +137,53 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
             <h4 style={{ marginBottom: 12 }}>
               <DatabaseOutlined /> {t("statusPanel.componentsStatus")}
             </h4>
-            <Descriptions size="small" column={2} bordered>
-              <Descriptions.Item label={t("statusPanel.reportLoaded")}>
-                <Space>
-                  {getStatusIcon(status.components.report_loaded)}
-                  {getStatusBadge(status.components.report_loaded)}
-                </Space>
-              </Descriptions.Item>
-              <Descriptions.Item label={t("statusPanel.metricsLoaded")}>
-                <Space>
-                  {getStatusIcon(status.components.metrics_loaded)}
-                  {getStatusBadge(status.components.metrics_loaded)}
-                </Space>
-              </Descriptions.Item>
-              <Descriptions.Item label={t("statusPanel.assessmentAvailable")}>
-                <Space>
-                  {getStatusIcon(status.components.assessment_available)}
-                  {getStatusBadge(status.components.assessment_available)}
-                </Space>
-              </Descriptions.Item>
-              <Descriptions.Item label={t("statusPanel.llmConfigured")}>
-                <Space>
-                  {getStatusIcon(status.components.llm_configured)}
-                  {getStatusBadge(status.components.llm_configured)}
-                </Space>
-              </Descriptions.Item>
-            </Descriptions>
+            <Descriptions
+              size="small"
+              column={2}
+              bordered
+              items={[
+                {
+                  key: "report-loaded",
+                  label: t("statusPanel.reportLoaded"),
+                  children: (
+                    <Space>
+                      {getStatusIcon(status.components.report_loaded)}
+                      {getStatusBadge(status.components.report_loaded)}
+                    </Space>
+                  ),
+                },
+                {
+                  key: "metrics-loaded",
+                  label: t("statusPanel.metricsLoaded"),
+                  children: (
+                    <Space>
+                      {getStatusIcon(status.components.metrics_loaded)}
+                      {getStatusBadge(status.components.metrics_loaded)}
+                    </Space>
+                  ),
+                },
+                {
+                  key: "assessment-available",
+                  label: t("statusPanel.assessmentAvailable"),
+                  children: (
+                    <Space>
+                      {getStatusIcon(status.components.assessment_available)}
+                      {getStatusBadge(status.components.assessment_available)}
+                    </Space>
+                  ),
+                },
+                {
+                  key: "llm-configured",
+                  label: t("statusPanel.llmConfigured"),
+                  children: (
+                    <Space>
+                      {getStatusIcon(status.components.llm_configured)}
+                      {getStatusBadge(status.components.llm_configured)}
+                    </Space>
+                  ),
+                },
+              ]}
+            />
           </div>
 
           {/* 报告信息 */}
@@ -162,14 +192,25 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
               <h4 style={{ marginBottom: 12 }}>
                 <FileTextOutlined /> {t("statusPanel.reportInformation")}
               </h4>
-              <Descriptions size="small" column={1} bordered>
-                <Descriptions.Item label={t("statusPanel.documentId")}>
-                  <code>{status.report_info.document_id}</code>
-                </Descriptions.Item>
-                <Descriptions.Item label={t("statusPanel.segmentsCount")}>
-                  <Badge count={status.report_info.segments_count} showZero color="blue" />
-                </Descriptions.Item>
-              </Descriptions>
+              <Descriptions
+                size="small"
+                column={1}
+                bordered
+                items={[
+                  {
+                    key: "document-id",
+                    label: t("statusPanel.documentId"),
+                    children: <code>{status.report_info.document_id}</code>,
+                  },
+                  {
+                    key: "segments-count",
+                    label: t("statusPanel.segmentsCount"),
+                    children: (
+                      <Badge count={status.report_info.segments_count} showZero color="blue" />
+                    ),
+                  },
+                ]}
+              />
             </div>
           )}
 
@@ -179,14 +220,25 @@ const SystemStatusMonitor: React.FC<SystemStatusMonitorProps> = ({ open, onClose
               <h4 style={{ marginBottom: 12 }}>
                 <BarChartOutlined /> {t("statusPanel.metricsInformation")}
               </h4>
-              <Descriptions size="small" column={1} bordered>
-                <Descriptions.Item label={t("statusPanel.collectionId")}>
-                  <code>{status.metrics_info.collection_id}</code>
-                </Descriptions.Item>
-                <Descriptions.Item label={t("statusPanel.metricsCount")}>
-                  <Badge count={status.metrics_info.metrics_count} showZero color="green" />
-                </Descriptions.Item>
-              </Descriptions>
+              <Descriptions
+                size="small"
+                column={1}
+                bordered
+                items={[
+                  {
+                    key: "collection-id",
+                    label: t("statusPanel.collectionId"),
+                    children: <code>{status.metrics_info.collection_id}</code>,
+                  },
+                  {
+                    key: "metrics-count",
+                    label: t("statusPanel.metricsCount"),
+                    children: (
+                      <Badge count={status.metrics_info.metrics_count} showZero color="green" />
+                    ),
+                  },
+                ]}
+              />
             </div>
           )}
         </>

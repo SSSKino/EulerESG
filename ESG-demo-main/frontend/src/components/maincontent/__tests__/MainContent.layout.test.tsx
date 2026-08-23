@@ -35,6 +35,16 @@ vi.mock("antd", async () => {
     );
 
   return {
+    App: {
+      useApp: () => ({
+        message: {
+          destroy: vi.fn(),
+          error: vi.fn(),
+          open: vi.fn(),
+          success: vi.fn(),
+        },
+      }),
+    },
     Form: {
       useForm: () => [
         {
@@ -49,12 +59,6 @@ vi.mock("antd", async () => {
     Upload: {
       Dragger,
       LIST_IGNORE: Symbol("LIST_IGNORE"),
-    },
-    message: {
-      destroy: vi.fn(),
-      error: vi.fn(),
-      open: vi.fn(),
-      success: vi.fn(),
     },
   };
 });

@@ -105,7 +105,7 @@ export default function DashboardReportSelector({
           : selectedReportKeys.length !== 1,
       }}
       width={1100}
-      destroyOnClose
+      destroyOnHidden
     >
       <Table<File>
         className="dashboard-file-table"

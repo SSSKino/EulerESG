@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card, Button, Spin, Alert, message } from "antd";
+import { Alert, App, Button, Card, Spin } from "antd";
 import { FileTextOutlined } from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -19,6 +19,7 @@ type ChatMessage = { text: string; isUser: boolean };
 
 const ComplianceAnalysis: React.FC<ComplianceAnalysisProps> = ({ analysisFile, onAnalysisComplete }) => {
   const { t, lang } = useT();
+  const { message } = App.useApp();
 
   const [loading, setLoading] = React.useState(false);
   const [markdownContent, setMarkdownContent] = React.useState<string | null>(null);
@@ -144,7 +145,7 @@ const ComplianceAnalysis: React.FC<ComplianceAnalysisProps> = ({ analysisFile, o
   return (
     <div style={{ padding: "16px" }}>
       <Alert
-        message={t("compliance.loadedAlertTitle")}
+        title={t("compliance.loadedAlertTitle")}
         description={
           reportFile
             ? t("compliance.displayingReport", { reportFile })

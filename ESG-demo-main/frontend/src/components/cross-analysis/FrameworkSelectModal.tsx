@@ -136,18 +136,19 @@ export default function FrameworkSelectModal({
           <Select
             placeholder={t("upload.selectIndustry")}
             disabled={!isSASBSelected}
+            options={industryOptions.map((industry) => ({
+              value: industry,
+              label:
+                industry === SASB_OTHER_INDUSTRY_KEY
+                  ? t("upload.sasbIndustryOther")
+                  : industry,
+            }))}
             onChange={(value) => {
               const v = safeTrim(value);
               setSelectedIndustry(v);
               form.setFieldsValue({ semiIndustry: undefined } as any);
             }}
-          >
-            {industryOptions.map((ind) => (
-              <Select.Option key={ind} value={ind}>
-                {ind === SASB_OTHER_INDUSTRY_KEY ? t("upload.sasbIndustryOther") : ind}
-              </Select.Option>
-            ))}
-          </Select>
+          />
         </Form.Item>
 
         <Form.Item
@@ -166,19 +167,18 @@ export default function FrameworkSelectModal({
             placeholder={isCDPSelected ? t("upload.selectCdpTopic") : t("upload.selectSubIndustry")}
             disabled={isTopicOnlyFramework ? false : !isSASBSelected || !selectedIndustry}
             allowClear={isTopicOnlyFramework}
-          >
-            {isCDPSelected
-              ? CDP_TOPIC_OPTIONS.map((o) => (
-                  <Select.Option key={o.slug} value={o.slug}>
-                    {o.label}
-                  </Select.Option>
-                ))
-              : semiIndustryOptions.map((semi) => (
-                  <Select.Option key={semi} value={semi}>
-                    {semi}
-                  </Select.Option>
-                ))}
-          </Select>
+            options={
+              isCDPSelected
+                ? CDP_TOPIC_OPTIONS.map((option) => ({
+                    value: option.slug,
+                    label: option.label,
+                  }))
+                : semiIndustryOptions.map((semiIndustry) => ({
+                    value: semiIndustry,
+                    label: semiIndustry,
+                  }))
+            }
+          />
         </Form.Item>
       </Form>
     </Modal>

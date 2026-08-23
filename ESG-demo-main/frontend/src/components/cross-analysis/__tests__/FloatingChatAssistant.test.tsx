@@ -8,19 +8,27 @@ const apiMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("antd", () => ({
-  Drawer: ({ children, open }: { children: React.ReactNode; open?: boolean }) => (
-    <div data-testid="assistant-drawer" data-open={String(Boolean(open))}>
-      {children}
-    </div>
-  ),
-  message: { error: vi.fn() },
+  App: {
+    useApp: () => ({ message: { error: vi.fn() } }),
+  },
 }));
 
 vi.mock("@/components/pdfviewer/ChatInterface", () => ({
-  default: ({ onSendMessage }: { onSendMessage: (message: string) => Promise<void> }) => (
-    <button type="button" onClick={() => void onSendMessage("test question")}>
-      Send test question
-    </button>
+  default: ({
+    onClose,
+    onSendMessage,
+  }: {
+    onClose?: () => void;
+    onSendMessage: (message: string) => Promise<void>;
+  }) => (
+    <div>
+      <button type="button" onClick={() => void onSendMessage("test question")}>
+        Send test question
+      </button>
+      <button type="button" onClick={onClose}>
+        Close test assistant
+      </button>
+    </div>
   ),
 }));
 
@@ -69,6 +77,7 @@ describe("FloatingChatAssistant", () => {
     render(<FloatingChatAssistant />);
 
     const launcher = screen.getByRole("button", { name: "AI Assistant" });
+    const panel = screen.getByTestId("floating-ai-assistant");
     expect(launcher).toHaveTextContent("AI Assistant");
     expect(launcher).toHaveClass(
       "dashboard-chat-launcher",
@@ -76,7 +85,94 @@ describe("FloatingChatAssistant", () => {
       "fixed",
     );
     expect(launcher).toHaveAttribute("data-draggable-assistant", "true");
+    expect(launcher).toHaveAttribute("aria-controls", "floating-ai-assistant");
+    expect(launcher).toHaveAttribute("aria-expanded", "false");
     expect(launcher).not.toHaveClass("right-6", "bottom-20");
+    expect(panel).toHaveAttribute("aria-hidden", "true");
+    expect(panel).toHaveAttribute("aria-modal", "false");
+    expect(panel).toHaveClass(
+      "dashboard-chat-panel",
+      "fixed",
+      "invisible",
+      "pointer-events-none",
+    );
+  });
+
+  it("opens and closes a non-modal floating panel without a drawer or page mask", () => {
+    render(<FloatingChatAssistant />);
+
+    const launcher = screen.getByRole("button", { name: "AI Assistant" });
+    const panel = screen.getByTestId("floating-ai-assistant");
+
+    expect(document.querySelector(".ant-drawer")).not.toBeInTheDocument();
+    expect(document.querySelector(".ant-drawer-mask")).not.toBeInTheDocument();
+    expect(
+      document.querySelector('[data-slot="sheet-overlay"]'),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(launcher);
+    expect(launcher).toHaveAttribute("aria-expanded", "true");
+    expect(panel).toHaveAttribute("aria-hidden", "false");
+    expect(panel).toHaveAttribute("aria-modal", "false");
+    expect(panel).toHaveClass("visible", "opacity-100");
+    expect(panel).not.toHaveClass("invisible", "pointer-events-none");
+    expect(screen.getByRole("dialog", { name: "chat.aiAssistant" })).toBe(panel);
+
+    fireEvent.click(launcher);
+    expect(launcher).toHaveAttribute("aria-expanded", "false");
+    expect(panel).toHaveAttribute("aria-hidden", "true");
+    expect(panel).toHaveClass("invisible", "pointer-events-none", "opacity-0");
+
+    fireEvent.click(launcher);
+    fireEvent.click(screen.getByRole("button", { name: "Close test assistant" }));
+    expect(panel).toHaveAttribute("aria-hidden", "true");
+
+    fireEvent.click(launcher);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(launcher).toHaveAttribute("aria-expanded", "false");
+    expect(panel).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("anchors the compact panel to the launcher and clamps it inside the viewport", () => {
+    vi.spyOn(window, "innerWidth", "get").mockReturnValue(360);
+    vi.spyOn(window, "innerHeight", "get").mockReturnValue(640);
+    render(<FloatingChatAssistant />);
+
+    const launcher = screen.getByRole("button", { name: "AI Assistant" });
+    const panel = screen.getByTestId("floating-ai-assistant");
+    vi.spyOn(launcher, "getBoundingClientRect").mockReturnValue({
+      bottom: 610,
+      height: 40,
+      left: 310,
+      right: 350,
+      top: 570,
+      width: 40,
+      x: 310,
+      y: 570,
+      toJSON: () => ({}),
+    });
+
+    fireEvent.click(launcher);
+
+    expect(panel).toHaveAttribute("data-placement", "top");
+    expect(panel).toHaveStyle({
+      bottom: "auto",
+      height: "435px",
+      left: "12px",
+      right: "auto",
+      top: "123px",
+      transformOrigin: "bottom center",
+      width: "336px",
+    });
+
+    const left = Number.parseFloat(panel.style.left);
+    const top = Number.parseFloat(panel.style.top);
+    const width = Number.parseFloat(panel.style.width);
+    const height = Number.parseFloat(panel.style.height);
+    expect(left).toBeGreaterThanOrEqual(12);
+    expect(top).toBeGreaterThanOrEqual(12);
+    expect(left + width).toBeLessThanOrEqual(360 - 12);
+    expect(top + height).toBeLessThanOrEqual(640 - 12);
   });
 
   it("drags within the viewport without treating the release as an open click", () => {
@@ -126,15 +222,15 @@ describe("FloatingChatAssistant", () => {
     expect(launcher).toHaveAttribute("data-dragging", "false");
 
     fireEvent.click(launcher, { detail: 1 });
-    expect(screen.getByTestId("assistant-drawer")).toHaveAttribute(
-      "data-open",
-      "false",
+    expect(screen.getByTestId("floating-ai-assistant")).toHaveAttribute(
+      "aria-hidden",
+      "true",
     );
 
     fireEvent.click(launcher);
-    expect(screen.getByTestId("assistant-drawer")).toHaveAttribute(
-      "data-open",
-      "true",
+    expect(screen.getByTestId("floating-ai-assistant")).toHaveAttribute(
+      "aria-hidden",
+      "false",
     );
     expect(launcher).toHaveStyle({ left: "632px", top: "8px" });
   });
@@ -142,6 +238,7 @@ describe("FloatingChatAssistant", () => {
   it("uses generic mode on the homepage and preserves the server chat session", async () => {
     render(<FloatingChatAssistant includeContext={false} />);
 
+    fireEvent.click(screen.getByRole("button", { name: "AI Assistant" }));
     const send = screen.getByRole("button", { name: "Send test question" });
     fireEvent.click(send);
     await waitFor(() => expect(apiMocks.sendMessage).toHaveBeenCalledTimes(1));

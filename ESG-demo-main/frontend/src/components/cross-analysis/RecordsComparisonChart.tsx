@@ -168,14 +168,14 @@ export default function RecordsComparisonChart({
 
   if (selectedReportIds.length < 2) {
     return (
-      <Card className="rounded-2xl" bodyStyle={{ padding: 14 }}>
+      <Card className="rounded-2xl" styles={{ body: { padding: 14 } }}>
         <Empty description={t("files.selectAtLeastTwoReports")} />
       </Card>
     );
   }
 
   return (
-    <Card className="rounded-2xl" bodyStyle={{ padding: 14 }}>
+    <Card className="rounded-2xl" styles={{ body: { padding: 14 } }}>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="text-sm font-semibold text-slate-900">{t("crossAnalysis.comparisonChartTitle")}</div>
         <div className="flex flex-wrap items-center gap-2">

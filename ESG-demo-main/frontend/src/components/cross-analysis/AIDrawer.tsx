@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Input, message } from "antd";
+import { App as AntdApp, Input } from "antd";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Sparkles, X } from "lucide-react";
@@ -29,6 +29,7 @@ export default function AIDrawer({
   topic: string;
 }) {
   const { t } = useT();
+  const { message } = AntdApp.useApp();
 
   const scopeKey = useMemo(() => stableHash(ids.join(",")), [ids]);
   const storageKey = useMemo(() => `cross_chat_${scopeKey}`, [scopeKey]);

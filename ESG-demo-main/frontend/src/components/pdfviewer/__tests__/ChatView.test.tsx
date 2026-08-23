@@ -1,21 +1,59 @@
 import React, { useState } from "react";
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import ChatView from "../ChatView";
 
 vi.mock("next/dynamic", () => ({
   default: () =>
-    function MockPdfViewer() {
-      return <div data-testid="pdf-viewer" />;
+    function MockPdfViewer({
+      fileUrl,
+      targetPage,
+      targetPageNonce,
+    }: {
+      fileUrl: string;
+      targetPage: number;
+      targetPageNonce: number;
+    }) {
+      return (
+        <div
+          data-file-url={fileUrl}
+          data-target-page={targetPage}
+          data-target-page-nonce={targetPageNonce}
+          data-testid="pdf-viewer"
+        />
+      );
     },
 }));
 
 vi.mock("../AnalysisResults", () => ({
-  default: ({ headerAction }: { headerAction?: React.ReactNode }) => (
+  default: ({
+    headerAction,
+    onPageNavigate,
+  }: {
+    headerAction?: React.ReactNode;
+    onPageNavigate?: (target: {
+      page: number;
+      fileId?: string;
+      reportName?: string;
+    }) => void;
+  }) => (
     <div data-testid="analysis-results">
       <div data-testid="analysis-report-heading">{headerAction}</div>
+      <button type="button" onClick={() => onPageNavigate?.({ page: 77 })}>
+        jump-page-77
+      </button>
+      <button
+        type="button"
+        onClick={() => onPageNavigate?.({
+          page: 9,
+          fileId: "report-b",
+          reportName: "Report B.pdf",
+        })}
+      >
+        jump-source-report
+      </button>
     </div>
   ),
 }));
@@ -109,5 +147,53 @@ describe("ChatView floating assistant", () => {
 
     fireEvent.keyDown(window, { key: "Escape" });
     expect(panel).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("does not carry a page jump into a different report", async () => {
+    const view = render(
+      <ChatView
+        activeFile={null}
+        fileId="report-a"
+        messages={[]}
+        onSendMessage={vi.fn()}
+        onClearChat={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "jump-page-77" }));
+    expect(screen.getByTestId("pdf-viewer")).toHaveAttribute("data-target-page", "77");
+
+    view.rerender(
+      <ChatView
+        activeFile={null}
+        fileId="report-b"
+        messages={[]}
+        onSendMessage={vi.fn()}
+        onClearChat={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("pdf-viewer")).toHaveAttribute(
+        "data-file-url",
+        "/api/files/report-b/pdf",
+      );
+      expect(screen.getByTestId("pdf-viewer")).toHaveAttribute("data-target-page", "1");
+      expect(screen.getByTestId("pdf-viewer")).toHaveAttribute("data-target-page-nonce", "0");
+    });
+  });
+
+  it("opens evidence in its source report instead of the currently viewed PDF", () => {
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+    renderChatView();
+
+    fireEvent.click(screen.getByRole("button", { name: "jump-source-report" }));
+
+    expect(open).toHaveBeenCalledWith(
+      "/cross-analysis/evidence?file_id=report-b&page=9&name=Report+B.pdf",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    open.mockRestore();
   });
 });

@@ -1758,6 +1758,16 @@ def _compact_assessment_payload(payload: dict) -> dict:
         "year_selection_status",
     )
     evidence_fields = (
+        "source_type",
+        "data_page",
+        "segment_id",
+        "source_report_id",
+        "source_report_name",
+        "source_report_year",
+        "link_source_page",
+        "target_page",
+        "link_source_segment_id",
+        "anchor_text",
         "asset_id",
         "evidence_type",
         "caption",

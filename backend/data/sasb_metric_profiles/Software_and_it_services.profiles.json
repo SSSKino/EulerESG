@@ -4325,9 +4325,7 @@
         "Percent of (1) gender representation for (d) all other employees",
         "TC-SI-330a.3 Percentage of (1) gender representation for (d) all other employees",
         "Female representation in all other employees",
-        "Global female representation",
-        "Global female representation - Non-technical roles",
-        "Female representation - Non-technical roles"
+        "Global female representation"
       ],
       "bm25_terms": [
         "TC-SI-330a.3",
@@ -5222,9 +5220,7 @@
         "Percent of (2) diversity group representation for (d) all other employees",
         "TC-SI-330a.3 Percentage of (2) diversity group representation for (d) all other employees",
         "Race/ethnicity representation in all other employees",
-        "U.S. race/ethnicity representation",
-        "U.S. race/ethnicity representation - Non-technical roles",
-        "Race/ethnicity representation - Non-technical roles"
+        "U.S. race/ethnicity representation"
       ],
       "bm25_terms": [
         "TC-SI-330a.3",

@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# npm has one active registry at a time. Try each registry explicitly so a
-# transient connection failure does not abort the whole Docker build.
+# npm accepts one registry per invocation, so try registries in an explicit
+# order instead of repeating registry= entries in .npmrc.
 set -u
 
 DEFAULT_NPM_REGISTRIES="
@@ -40,8 +40,8 @@ for registry in $registry_candidates; do
     while [ "$attempt" -le "$attempts_per_registry" ]; do
         echo "[npm-ci] Trying registry ${registry} (attempt ${attempt}/${attempts_per_registry})"
 
-        # package-lock.json was generated from npmjs. Replace only that host so
-        # future third-party tarball URLs are never rewritten accidentally.
+        # package-lock.json was generated from npmjs. Rewrite only the npmjs
+        # host so unrelated third-party tarball URLs are never redirected.
         if npm ci \
             --no-audit \
             --no-fund \

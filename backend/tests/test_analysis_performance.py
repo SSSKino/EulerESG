@@ -560,6 +560,14 @@ class CompactAssessmentPayloadTests(unittest.TestCase):
                             "asset_id": "asset-1",
                             "caption": "Engagement chart",
                             "confidence": 0.9,
+                            "source_type": "linked_page",
+                            "data_page": 108,
+                            "link_source_page": 102,
+                            "target_page": 107,
+                            "segment_id": "segment-108",
+                            "source_report_id": "source-report-1",
+                            "source_report_name": "Source report.pdf",
+                            "source_report_year": 2024,
                             "private_debug_payload": "drop-me",
                         },
                         {
@@ -586,6 +594,11 @@ class CompactAssessmentPayloadTests(unittest.TestCase):
         self.assertNotIn("year_values", metric)
         self.assertNotIn("Value", metric)
         self.assertNotIn("private_debug_payload", metric["evidence_sources"][0])
+        self.assertEqual(metric["evidence_sources"][0]["data_page"], 108)
+        self.assertEqual(metric["evidence_sources"][0]["link_source_page"], 102)
+        self.assertEqual(metric["evidence_sources"][0]["target_page"], 107)
+        self.assertEqual(metric["evidence_sources"][0]["segment_id"], "segment-108")
+        self.assertEqual(metric["evidence_sources"][0]["source_report_id"], "source-report-1")
         self.assertEqual(len(metric["evidence_sources"][1]["conflicts"]), 2)
 
 

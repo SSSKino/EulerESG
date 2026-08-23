@@ -1,7 +1,7 @@
 // app/dashboard/chat/page.tsx
 "use client";
 import React, { Suspense, useEffect, useMemo, useState } from "react";
-import { message } from "antd";
+import { App as AntdApp } from "antd";
 import { useSearchParams } from "next/navigation";
 import ChatView from "@/components/pdfviewer/ChatView";
 import { useFileStore } from "@/store/useFileStore";
@@ -16,6 +16,7 @@ interface Message {
 
 function ChatPageContent() {
   const { t } = useT();
+  const { message } = AntdApp.useApp();
   const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Message[]>(() => [
     { text: t("chat.welcomeMessage"), isUser: false },

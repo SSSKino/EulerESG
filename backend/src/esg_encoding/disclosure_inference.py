@@ -944,6 +944,44 @@ class DisclosureInferenceEngine:
         )
         return evidence_text, numeric_candidates
 
+    def _table_row_has_unresolved_structure(
+        self,
+        report_content: ReportContent,
+        segment,
+    ) -> bool:
+        """Prevent deterministic disclosure from trusting conflicted table rows."""
+        row_key = self._get_table_row_scope_key(segment)
+        related = (
+            self._get_report_segment_cache(report_content)["table_rows"].get(
+                row_key,
+                [],
+            )
+            if row_key != (None, None)
+            else [segment]
+        )
+        for item in related or [segment]:
+            data = self._segment_structured_data_dict(item)
+            review_status = str(
+                getattr(item, "review_status", None)
+                or data.get("review_status")
+                or ""
+            ).strip().lower()
+            conflicts = getattr(item, "conflicts", None) or data.get("conflicts") or []
+            quality_reasons = (
+                getattr(item, "quality_reasons", None)
+                or data.get("quality_reasons")
+                or []
+            )
+            if review_status == "needs_review" or bool(conflicts):
+                return True
+            if any(
+                "ambiguous" in str(reason or "").lower()
+                or "conflict" in str(reason or "").lower()
+                for reason in quality_reasons
+            ):
+                return True
+        return False
+
     def _direct_code_data_disclosure_analysis(
         self,
         retrieval_result: MetricRetrievalResult,
@@ -994,6 +1032,8 @@ class DisclosureInferenceEngine:
             except Exception:
                 segment = None
             if segment is None:
+                continue
+            if self._table_row_has_unresolved_structure(report_content, segment):
                 continue
 
             evidence_text, numeric_candidates = self._direct_evidence_bundle_for_segment(
@@ -1420,6 +1460,124 @@ class DisclosureInferenceEngine:
             compact_metadata.append(first_meta)
         return compact_segments, compact_metadata
 
+    @staticmethod
+    def _all_other_employee_category_is_only_proxy(
+        metric_name: object,
+        evidence_segments: Sequence[object],
+    ) -> bool:
+        """Detect a non-technical proxy for the narrower SASB employee category.
+
+        ``Non-technical roles`` can include executive or non-executive management,
+        while SASB ``all other employees`` excludes those groups as well as
+        technical employees.  Retrieval should still keep the proxy evidence, but
+        it cannot support a fully-disclosed result unless the report supplies an
+        exact all-other value or explicitly defines the two categories as equal.
+        """
+        target = str(metric_name or "").replace("\u2013", "-").replace("\u2014", "-")
+        all_other_pattern = re.compile(
+            r"\ball[\s-]+other[\s-]+employees?\b",
+            re.IGNORECASE,
+        )
+        if (
+            not all_other_pattern.search(target)
+            or not re.search(r"\brepresentation\b", target, re.IGNORECASE)
+        ):
+            return False
+
+        normalized_segments = [
+            re.sub(
+                r"\s+",
+                " ",
+                str(value or "")
+                .replace("\u2010", "-")
+                .replace("\u2011", "-")
+                .replace("\u2012", "-")
+                .replace("\u2013", "-")
+                .replace("\u2014", "-")
+                .lower(),
+            ).strip()
+            for value in evidence_segments or []
+            if str(value or "").strip()
+        ]
+        non_technical_pattern = re.compile(
+            r"\bnon[\s-]*technical[\s-]+(?:roles?|employees?|workforce)\b",
+            re.IGNORECASE,
+        )
+        if not any(
+            non_technical_pattern.search(value) for value in normalized_segments
+        ):
+            return False
+
+        # An actual all-other row with a reported percentage is exact evidence.
+        # Merely seeing the framework label in a SASB index/link source is not.
+        reported_percent_pattern = re.compile(
+            r"(?<![\w.])[-+]?(?:\d[\d,]*)(?:\.\d+)?\s*%"
+        )
+        for value in normalized_segments:
+            for exact_match in all_other_pattern.finditer(value):
+                following = value[exact_match.end(): exact_match.end() + 500]
+                reported_value = reported_percent_pattern.search(following)
+                proxy_label = non_technical_pattern.search(following)
+                if reported_value and (
+                    proxy_label is None or reported_value.start() < proxy_label.start()
+                ):
+                    return False
+
+        joined = "\n".join(normalized_segments)
+        non_technical_label = r"non[\s-]*technical[\s-]+(?:roles?|employees?)"
+        all_other_label = r"all[\s-]+other[\s-]+employees?"
+        forward_relation = re.compile(
+            rf"\b{non_technical_label}\b.{{0,180}}\b(?:"
+            r"means?|refers?\s+to|is\s+(?:the\s+)?(?:reporting\s+)?label\s+for|"
+            r"are\s+(?:the\s+)?(?:reporting\s+)?label\s+for|"
+            r"is\s+defined\s+as|are\s+defined\s+as|equivalent\s+to|"
+            r"same\s+as|corresponds?\s+to|maps?\s+to"
+            rf")\b.{{0,180}}\b{all_other_label}\b",
+            re.IGNORECASE,
+        )
+        reverse_relation = re.compile(
+            rf"\b{all_other_label}\b.{{0,180}}\b(?:"
+            r"means?|refers?\s+to|is\s+(?:reported|labelled|labeled)\s+as|"
+            r"are\s+(?:reported|labelled|labeled)\s+as|"
+            r"is\s+defined\s+as|are\s+defined\s+as|equivalent\s+to|"
+            r"same\s+as|corresponds?\s+to|maps?\s+to"
+            rf")\b.{{0,180}}\b{non_technical_label}\b",
+            re.IGNORECASE,
+        )
+        if forward_relation.search(joined) or reverse_relation.search(joined):
+            return False
+
+        # Also accept the framework boundary stated by definition even when the
+        # report does not repeat the literal phrase "all other employees".
+        exclusion_cue_pattern = re.compile(
+            r"\b(?:not\s+classified\s+as|outside|exclud(?:e|es|ed|ing)|"
+            r"except(?:\s+for)?|other\s+than|neither)\b",
+            re.IGNORECASE,
+        )
+        non_executive_pattern = re.compile(
+            r"\bnon[\s-]*executive\s+management\b",
+            re.IGNORECASE,
+        )
+        for value in normalized_segments:
+            if (
+                not non_technical_pattern.search(value)
+                or not exclusion_cue_pattern.search(value)
+            ):
+                continue
+            without_non_executive = non_executive_pattern.sub(" ", value)
+            without_non_technical = non_technical_pattern.sub(" ", value)
+            if (
+                re.search(r"\bexecutive\s+management\b", without_non_executive)
+                and non_executive_pattern.search(value)
+                and re.search(
+                    r"\btechnical\s+(?:employees?|roles?)\b",
+                    without_non_technical,
+                )
+            ):
+                return False
+
+        return True
+
     def _analyze_single_metric(
         self, 
         retrieval_result: MetricRetrievalResult,
@@ -1438,6 +1596,7 @@ class DisclosureInferenceEngine:
         """
         # Get relevant segment content and tag information
         relevant_segments = []
+        category_boundary_segments = []
         evidence_segment_ids = []
         segment_metadata = []
         metric_profile = self._resolve_metric_profile(metric, retrieval_result)
@@ -1468,6 +1627,7 @@ class DisclosureInferenceEngine:
                 segment_id=result.segment_id,
                 fallback_content=getattr(result, "content", None),
             )
+            category_boundary_content = content
 
             link_source_context = None
             link_source_segment_id = getattr(result, "link_source_segment_id", None)
@@ -1483,6 +1643,7 @@ class DisclosureInferenceEngine:
                 if getattr(result, "link_target_page", None) is None:
                     content = self._truncate_segment_text(content, max_evidence_chars)
                 relevant_segments.append(content)
+                category_boundary_segments.append(category_boundary_content or content)
                 evidence_segment_ids.append(result.segment_id)
 
                 table_id, row_index = self._get_table_row_key(segment) if segment is not None else (None, None)
@@ -1652,7 +1813,7 @@ class DisclosureInferenceEngine:
             system_prompt_json = """
 You are a professional ESG/SASB disclosure assessment expert.
 You must directly decide the final disclosure_status as exactly one of: fully_disclosed, partially_disclosed, not_disclosed.
-The disclosure_status field is final. Python will only read/map this field and will not reclassify it from metric_hit, has_disclosure, disclosure_quality, value_status, units, or numeric values.
+The disclosure_status field is the final model classification. Python will not infer a different status from metric_hit, has_disclosure, disclosure_quality, value_status, units, or numeric values; it may only reject a fully_disclosed result through a narrow deterministic employee-category boundary check.
 
 Assessment principles:
 - Use only the provided metric information and retrieved report segments.
@@ -1755,9 +1916,9 @@ Assessment principles:
             # Read LLM final status / value / page / context
             # -----------------------------
             # IMPORTANT:
-            # disclosure_status is decided by the prompt/LLM directly. Python only maps
-            # that field to the internal enum and does not reclassify from
-            # metric_hit/has_disclosure/disclosure_quality/value_status/units/numbers.
+            # disclosure_status is normally decided by the prompt/LLM directly.
+            # Python does not infer it from auxiliary response fields, but applies
+            # narrow deterministic evidence-boundary validation below.
             try:
                 disclosure_status = self._map_llm_disclosure_status(llm_result)
             except ValueError as exc:
@@ -1768,6 +1929,67 @@ Assessment principles:
                     metric_name=retrieval_result.metric_name,
                     error_type="invalid_llm_response",
                 ) from exc
+
+            metric_name_for_boundary = (
+                getattr(metric, "metric_name", None)
+                if metric is not None
+                else None
+            ) or retrieval_result.metric_name
+            category_boundary_evidence = category_boundary_segments
+            raw_boundary_page = llm_result.get("page")
+            try:
+                boundary_page_match = re.search(r"\d+", str(raw_boundary_page))
+                boundary_page = (
+                    int(boundary_page_match.group(0))
+                    if boundary_page_match is not None
+                    else None
+                )
+            except (TypeError, ValueError):
+                boundary_page = None
+            if boundary_page is not None:
+                page_local_evidence = [
+                    evidence
+                    for evidence, metadata in zip(
+                        category_boundary_segments,
+                        segment_metadata,
+                    )
+                    if metadata.get("page_number") == boundary_page
+                ]
+                if page_local_evidence:
+                    category_boundary_evidence = page_local_evidence
+            if (
+                disclosure_status == DisclosureStatus.FULLY_DISCLOSED
+                and self._all_other_employee_category_is_only_proxy(
+                    metric_name_for_boundary,
+                    category_boundary_evidence,
+                )
+            ):
+                disclosure_status = DisclosureStatus.PARTIALLY_DISCLOSED
+                llm_result["reasoning"] = (
+                    "The report provides representation data for its "
+                    "'Non-technical roles' category, which is relevant proxy "
+                    "evidence. However, the evidence does not define that category "
+                    "as SASB 'all other employees' (employees outside executive "
+                    "management, non-executive management, and technical employees). "
+                    "Because the employee-category boundary is not exact, the metric "
+                    "is partially disclosed."
+                )
+                boundary_suggestion = (
+                    "Define how 'Non-technical roles' maps to SASB 'all other "
+                    "employees', or report the representation distribution for the "
+                    "SASB category directly."
+                )
+                suggestions = llm_result.get("improvement_suggestions")
+                suggestions = list(suggestions) if isinstance(suggestions, list) else []
+                if boundary_suggestion not in suggestions:
+                    suggestions.insert(0, boundary_suggestion)
+                llm_result["improvement_suggestions"] = suggestions
+                logger.info(
+                    "Adjusted disclosure status to partially_disclosed for metric "
+                    f"{retrieval_result.metric_id}: report category "
+                    "'Non-technical roles' is not explicitly equivalent to SASB "
+                    "'all other employees'."
+                )
 
             llm_value_status = _normalize_value_status(llm_result.get("value_status"))
             preserve_ambiguous_value = llm_value_status == "ambiguous"
@@ -3812,7 +4034,7 @@ Core assessment principles:
 1) Respond ONLY with a JSON object. No markdown and no backticks.
 1a) The Mandatory Metric Profile Extraction Rules above are executable constraints. Apply the shared-Code component rule, rejected value sources, year rules, variable dimensions, required labels, and sibling warnings before selecting a value or status. They override generic same-Code shortcuts below when stricter.
 2) The final "disclosure_status" must be exactly one of: "fully_disclosed", "partially_disclosed", "not_disclosed".
-3) Python will not derive or correct the status later. Your "disclosure_status" is the final classification.
+3) Python will not derive or broadly correct the status later. Your "disclosure_status" is the final model classification, subject only to a narrow deterministic employee-category boundary check that prevents a proxy category from being treated as an exact category.
 4) The current Metric Name is the metric being assessed. If the framework definition contains multiple components under the same SASB code, do not require components that are not part of the current Metric Name.
 5) Assess the current metric itself, not the broader topic and not all sibling sub-items under the same SASB code.
 6) Treat the metric definition/guidance as interpretive context, not as a clause-by-clause checklist. It helps identify the metric core, denominator, required split, and measurement basis. Do not require every note, example, auxiliary detail, or technical-protocol phrase unless it materially changes the current metric itself.

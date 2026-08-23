@@ -78,7 +78,7 @@ export default function TopicComparisonCharts({
 
   if (!charts.length) {
     return (
-      <Card className="rounded-2xl" bodyStyle={{ padding: 16 }}>
+      <Card className="rounded-2xl" styles={{ body: { padding: 16 } }}>
         <Empty description={t("crossAnalysis.noComparableChartData")} />
       </Card>
     );
@@ -147,7 +147,7 @@ export default function TopicComparisonCharts({
               <Card
                 key={`${c.topic}__${c.unit || ""}`}
                 className="rounded-2xl min-w-0"
-                bodyStyle={{ padding: 14 }}
+                styles={{ body: { padding: 14 } }}
               >
                 <div className="min-w-0">
                   <div className="text-sm font-semibold text-slate-900 break-words">

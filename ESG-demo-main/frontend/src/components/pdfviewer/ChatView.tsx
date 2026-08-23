@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import AnalysisResults from "./AnalysisResults";
-import type { AnalysisDataItem } from "./AnalysisResults";
+import type { AnalysisDataItem, EvidencePageTarget } from "./AnalysisResults";
 import ChatInterface from "./ChatInterface";
 import ComplianceSummaryDrawer from "./ComplianceSummaryDrawer";
 import { ChevronDown, ChevronUp, FileText, MessageCircle, X } from "lucide-react";
@@ -59,6 +59,12 @@ interface Message {
   isUser: boolean;
 }
 
+type PageNavigation = {
+  documentKey: string;
+  nonce: number;
+  page: number;
+};
+
 interface ChatViewProps {
   activeFile: FileData | null;
   fileId?: string;
@@ -86,12 +92,13 @@ const ChatView: React.FC<ChatViewProps> = ({
     draggableRef: assistantButtonRef,
   } = useDraggableFloating<HTMLButtonElement>();
 
-  const [targetPage, setTargetPage] = useState<number | undefined>(undefined);
-  // Used to force a new navigation request even if the user clicks the same
-  // page number repeatedly.
-  const [targetPageNonce, setTargetPageNonce] = useState<number>(0);
   const effectiveFileId = fileId || activeFile?.file_id;
   const effectiveScopeKey = scopeKey || activeFile?.analysis_scope_key;
+  const documentKey = `${effectiveFileId || ""}::${effectiveScopeKey || ""}`;
+  const [pageNavigation, setPageNavigation] = useState<PageNavigation | null>(null);
+  const activePageNavigation = pageNavigation?.documentKey === documentKey
+    ? pageNavigation
+    : null;
 
   useEffect(() => {
     setAnalysisMetrics([]);
@@ -118,10 +125,26 @@ const ChatView: React.FC<ChatViewProps> = ({
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [assistantOpen, closeAssistant]);
 
-  const navigateToPage = useCallback((page: number) => {
-    setTargetPage(page);
-    setTargetPageNonce((n) => n + 1);
-  }, []);
+  const navigateToPage = useCallback((target: EvidencePageTarget) => {
+    if (target.fileId && target.fileId !== effectiveFileId) {
+      const params = new URLSearchParams({
+        file_id: target.fileId,
+        page: String(target.page),
+      });
+      if (target.reportName) params.set("name", target.reportName);
+      window.open(
+        `/cross-analysis/evidence?${params.toString()}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+      return;
+    }
+    setPageNavigation((previous) => ({
+      documentKey,
+      nonce: (previous?.nonce || 0) + 1,
+      page: target.page,
+    }));
+  }, [documentKey, effectiveFileId]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -185,8 +208,8 @@ const ChatView: React.FC<ChatViewProps> = ({
             <div className="overflow-hidden rounded-lg h-[70vh] min-h-[600px]">
               <MemoizedPDFReportViewer
                 fileUrl={`${API_BASE_URL}/api/files/${effectiveFileId}/pdf`}
-                targetPage={targetPage || 1}
-                targetPageNonce={targetPageNonce}
+                targetPage={activePageNavigation?.page || 1}
+                targetPageNonce={activePageNavigation?.nonce || 0}
                 height="100%"
                 defaultZoom={1}
               />
@@ -221,7 +244,7 @@ const ChatView: React.FC<ChatViewProps> = ({
             onClearChat={onClearChat}
             onClose={closeAssistant}
             onReferenceClick={(page) => {
-              navigateToPage(page);
+              navigateToPage({ page });
               closeAssistant();
             }}
           />

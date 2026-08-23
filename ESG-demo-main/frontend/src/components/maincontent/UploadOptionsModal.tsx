@@ -40,7 +40,7 @@ const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
       okText={t("common.ok")}
       cancelText={t("common.cancel")}
       confirmLoading={confirmLoading}
-      maskClosable={!confirmLoading}
+      mask={{ closable: !confirmLoading }}
     >
       <FileInfoForm
         form={form}

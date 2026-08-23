@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RefCallback } from "react";
 import { BarChart3, Check, HelpCircle, House, Languages, LibraryBig, ListChecks, LogOut, PanelLeftClose, PanelLeftOpen, Repeat2, Settings, ShieldCheck, Star } from "lucide-react";
-import { message } from "antd";
+import { App as AntdApp } from "antd";
 import EulerLogo from "@/assets/Euler-Img.svg";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -46,9 +46,22 @@ type DashboardSidebarProps = {
 export default function DashboardSidebar({
   crossAnalysisNavigationSlotRef,
 }: DashboardSidebarProps = {}) {
+  const { message } = AntdApp.useApp();
   const router = useRouter();
   const pathname = usePathname() || "";
   const searchParams = useSearchParams();
+  const crossAnalysisIdsParam = searchParams.get("ids") || "";
+  const crossAnalysisSelectedReportIds = useMemo(
+    () => [
+      ...new Set(
+        crossAnalysisIdsParam
+          .split(",")
+          .map((fileId) => fileId.trim())
+          .filter(Boolean),
+      ),
+    ],
+    [crossAnalysisIdsParam],
+  );
   const clearFiles = useFileStore((state) => state.clearFiles);
   const files = useFileStore((state) => state.files);
   const { lang, setLang } = useAppLang();
@@ -202,6 +215,25 @@ export default function DashboardSidebar({
   const isDisclosureCompleteness =
     isCrossAnalysisRoute && (searchParams.get("view") || "").trim().toLowerCase() === "disclosure";
   const isCrossAnalysis = isCrossAnalysisRoute && !isDisclosureCompleteness;
+  const handleDisclosureCompletenessClick = () => {
+    if (!isCrossAnalysisRoute || crossAnalysisSelectedReportIds.length < 2) {
+      openReportSelector("disclosure");
+      return;
+    }
+
+    // The active Cross Analysis URL is the source of truth for its selected
+    // reports. Reuse it directly instead of asking the user to select the same
+    // reports again when switching to Disclosure Completeness.
+    void apiService.getCrossAnalysisReports(crossAnalysisSelectedReportIds).catch(() => undefined);
+    crossAnalysisSelectedReportIds.forEach((fileId) => {
+      apiService.prefetchAssessmentByFile(fileId);
+    });
+    setSelectorMode(null);
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("ids", crossAnalysisSelectedReportIds.join(","));
+    next.set("view", "disclosure");
+    router.push(`${pathname}?${next.toString()}`);
+  };
   const isFavourite = pathname.startsWith("/dashboard/favourite");
   const isStandardsLibrary = pathname.startsWith("/dashboard/standards-library");
   const navigationClass = (active: boolean) =>
@@ -310,7 +342,7 @@ export default function DashboardSidebar({
           <button
             type="button"
             data-testid="disclosure-completeness-nav"
-            onClick={() => openReportSelector("disclosure")}
+            onClick={handleDisclosureCompletenessClick}
             onFocus={() => prefetchReportFlow("disclosure")}
             onMouseEnter={() => prefetchReportFlow("disclosure")}
             aria-label={t("crossAnalysis.disclosureCompleteness")}

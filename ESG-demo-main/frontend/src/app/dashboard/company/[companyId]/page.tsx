@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Select, Space, Spin, Table, Tag, Typography, message } from "antd";
+import { App as AntdApp, Button, Select, Space, Spin, Table, Tag, Typography } from "antd";
 import { ArrowLeftOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useParams, useRouter } from "next/navigation";
 import { apiService } from "@/lib/api";
@@ -20,6 +20,7 @@ export default function CompanyAssessmentPage() {
   const params = useParams<{ companyId: string }>();
   const router = useRouter();
   const { lang } = useT();
+  const { message } = AntdApp.useApp();
   const zh = lang === "zh";
   const companyId = decodeURIComponent(String(params?.companyId || ""));
   const [company, setCompany] = useState<any>(null);
@@ -44,7 +45,7 @@ export default function CompanyAssessmentPage() {
     } finally {
       setLoading(false);
     }
-  }, [companyId, zh]);
+  }, [companyId, message, zh]);
 
   useEffect(() => {
     void load();

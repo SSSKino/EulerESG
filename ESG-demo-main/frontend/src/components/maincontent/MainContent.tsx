@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Form, message, Progress } from "antd";
+import { App as AntdApp, Form, Progress } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useFileStore } from "@/store/useFileStore";
 import type { ReportCatalogMode } from "@/store/useFileStore";
@@ -71,6 +71,7 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
   const { t } = useT();
+  const { message } = AntdApp.useApp();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUploadFiles, setSelectedUploadFiles] = useState<UploadFile[]>([]);

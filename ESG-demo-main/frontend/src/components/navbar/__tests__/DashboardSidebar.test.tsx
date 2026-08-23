@@ -74,9 +74,13 @@ vi.mock("@/components/ui/dropdown-menu", async () => {
 vi.mock("antd", async () => {
   const React = await import("react");
   return {
-    message: {
-      info: vi.fn(),
-      warning: vi.fn(),
+    App: {
+      useApp: () => ({
+        message: {
+          info: vi.fn(),
+          warning: vi.fn(),
+        },
+      }),
     },
     Modal: ({ children, onOk, open, title }: any) =>
       open
@@ -301,6 +305,30 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     expect(url.searchParams.get("view")).toBe("disclosure");
   });
 
+  it("uses the reports already selected in Cross Analysis without reopening the selector", () => {
+    mocks.pathname = "/cross-analysis";
+    mocks.search =
+      "ids=report-a%2Creport-b&primary=Environment&secondary=Energy&framework=SASB&industry=Software%20%26%20IT%20Services&semiIndustry=Application%20Software";
+
+    render(<DashboardSidebar />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Disclosure Completeness" }),
+    );
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(mocks.push).toHaveBeenCalledTimes(1);
+
+    const target = String(mocks.push.mock.calls[0]?.[0]);
+    const url = new URL(target, "http://localhost");
+    expect(url.pathname).toBe("/cross-analysis");
+    expect(url.searchParams.get("ids")).toBe("report-a,report-b");
+    expect(url.searchParams.get("view")).toBe("disclosure");
+    expect(url.searchParams.get("framework")).toBe("SASB");
+    expect(url.searchParams.get("industry")).toBe("Software & IT Services");
+    expect(url.searchParams.get("semiIndustry")).toBe("Application Software");
+  });
+
   it("marks only the Disclosure child current while retaining its Cross Analysis parent relationship", () => {
     mocks.pathname = "/cross-analysis";
     mocks.search = "view=disclosure";
@@ -450,6 +478,7 @@ describe("DashboardSidebar Standards Library", () => {
 describe("DashboardSidebar cross-analysis navigation directory", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.getCrossAnalysisReports.mockResolvedValue({ reports: [] });
     mocks.pathname = "/cross-analysis";
     mocks.search = "ids=report-a%2Creport-b&primary=Environment";
     window.localStorage.clear();
@@ -533,6 +562,10 @@ describe("DashboardSidebar cross-analysis navigation directory", () => {
         { name: "Disclosure Completeness" },
       ),
     );
-    expect(screen.getByRole("dialog")).toBeVisible();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    const target = String(mocks.push.mock.calls[0]?.[0]);
+    const url = new URL(target, "http://localhost");
+    expect(url.searchParams.get("ids")).toBe("report-a,report-b");
+    expect(url.searchParams.get("view")).toBe("disclosure");
   });
 });

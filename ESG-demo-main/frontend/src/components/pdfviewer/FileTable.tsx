@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Button, Dropdown, Modal, Space, Tag, Tooltip, message } from "antd";
+import { App, Table, Button, Dropdown, Modal, Space, Tag, Tooltip } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import {
   BarChartOutlined,
@@ -71,6 +71,7 @@ const FileTable: React.FC<FileTableProps> = ({
   emptyText,
 }) => {
   const { t, lang } = useT();
+  const { message, modal } = App.useApp();
   const router = useRouter();
 
   const files = useFileStore((state) => state.files);
@@ -189,7 +190,7 @@ const FileTable: React.FC<FileTableProps> = ({
     const fileId = file.file_id;
     if (!fileId || reanalyzingIds.has(fileId)) return;
 
-    Modal.confirm({
+    modal.confirm({
       title: lang === "zh" ? "重新分析报告" : "Re-analyze report",
       content:
         lang === "zh"
@@ -662,7 +663,7 @@ const FileTable: React.FC<FileTableProps> = ({
         okButtonProps={{ danger: true }}
         confirmLoading={deleting}
         closable={!deleting}
-        maskClosable={!deleting}
+        mask={{ closable: !deleting }}
         keyboard={!deleting}
         onOk={() => void handleDeleteConfirm()}
         onCancel={() => {

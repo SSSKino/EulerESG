@@ -762,7 +762,7 @@ const handleSelectTertiary = useCallback(
             open={true}
             title={t("crossAnalysis.title")}
             closable={false}
-            maskClosable={false}
+            mask={{ closable: false }}
             footer={
               <Button type="primary" onClick={() => router.push("/dashboard")}>
                 {t("common.back")}

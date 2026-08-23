@@ -112,8 +112,19 @@ vi.mock("antd", async () => {
       open ? React.createElement("div", null, children) : null,
     { confirm: vi.fn() },
   );
+  const message = {
+    error: vi.fn(),
+    info: vi.fn(),
+    loading: vi.fn(),
+    success: vi.fn(),
+    warning: vi.fn(),
+  };
+  const modal = { confirm: vi.fn() };
 
   return {
+    App: {
+      useApp: () => ({ message, modal }),
+    },
     Button,
     Dropdown: ({ children, menu }: PropsWithChildren<{ menu: any }>) =>
       React.createElement(
@@ -152,13 +163,6 @@ vi.mock("antd", async () => {
     },
     Tag: Wrapper,
     Tooltip: Wrapper,
-    message: {
-      error: vi.fn(),
-      info: vi.fn(),
-      loading: vi.fn(),
-      success: vi.fn(),
-      warning: vi.fn(),
-    },
   };
 });
 

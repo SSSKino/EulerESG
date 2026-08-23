@@ -110,6 +110,20 @@ const samePageSet = (left: Set<number>, right: Set<number>) => {
   return true;
 };
 
+const elementTopInScrollContainer = (
+  container: HTMLElement,
+  element: HTMLElement,
+) => {
+  const containerRect = container.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+  return (
+    container.scrollTop
+    + elementRect.top
+    - containerRect.top
+    - container.clientTop
+  );
+};
+
 export default function PDFChatViewer({
   fileUrl,
   targetPage = 1,
@@ -137,6 +151,7 @@ export default function PDFChatViewer({
   const pendingAnchorRef = useRef<ScrollAnchor | null>(null);
   const documentRef = useRef<any>(null);
   const documentGenerationRef = useRef(0);
+  const navigationRequestRef = useRef(0);
   const pageSizesRef = useRef<Record<number, PageSize>>({});
   const pointerDragRef = useRef<PointerDrag | null>(null);
 
@@ -151,7 +166,8 @@ export default function PDFChatViewer({
     const slot = slotRefs.current.get(page);
     if (!container || !slot || slot.offsetHeight <= 0) return null;
 
-    const offsetWithinPage = container.scrollTop - slot.offsetTop;
+    const slotTop = elementTopInScrollContainer(container, slot);
+    const offsetWithinPage = container.scrollTop - slotTop;
     return {
       page,
       offsetRatio: Math.min(1, Math.max(0, offsetWithinPage / slot.offsetHeight)),
@@ -167,7 +183,8 @@ export default function PDFChatViewer({
 
     container.scrollTop = Math.max(
       0,
-      slot.offsetTop + slot.offsetHeight * anchor.offsetRatio,
+      elementTopInScrollContainer(container, slot)
+        + slot.offsetHeight * anchor.offsetRatio,
     );
     pendingAnchorRef.current = null;
   }, [containerWidth, pageSizes, zoom]);
@@ -376,6 +393,7 @@ export default function PDFChatViewer({
       const page = normalisePage(requestedPage, numPages);
       if (!page) return;
 
+      const navigationRequest = ++navigationRequestRef.current;
       const generation = documentGenerationRef.current;
       const pdfDocument = documentRef.current;
       if (!pageSizesRef.current[page] && pdfDocument?.getPage) {
@@ -390,18 +408,26 @@ export default function PDFChatViewer({
         }
       }
 
-      if (generation !== documentGenerationRef.current) return;
+      if (
+        generation !== documentGenerationRef.current
+        || navigationRequest !== navigationRequestRef.current
+      ) return;
       currentPageRef.current = page;
       setCurrentPage(page);
       setPageDraft(page);
       setRenderedPages(pageWindow(page, numPages));
 
       window.requestAnimationFrame(() => {
+        if (navigationRequest !== navigationRequestRef.current) return;
         window.requestAnimationFrame(() => {
+          if (navigationRequest !== navigationRequestRef.current) return;
           const container = containerRef.current;
           const slot = slotRefs.current.get(page);
           if (!container || !slot) return;
-          container.scrollTo({ top: Math.max(0, slot.offsetTop - 8), behavior: "auto" });
+          container.scrollTo({
+            top: Math.max(0, elementTopInScrollContainer(container, slot) - 8),
+            behavior: "auto",
+          });
         });
       });
     },
@@ -415,6 +441,7 @@ export default function PDFChatViewer({
 
   useEffect(() => {
     documentGenerationRef.current += 1;
+    navigationRequestRef.current += 1;
     documentRef.current = null;
     visibleAreasRef.current.clear();
     pendingAnchorRef.current = null;

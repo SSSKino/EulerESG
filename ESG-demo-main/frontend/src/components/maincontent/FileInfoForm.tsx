@@ -196,7 +196,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
       }}
     >
       <Form.Item label={t("upload.fileInformation")}>
-        <Space direction="vertical" style={{ width: "100%" }}>
+        <Space orientation="vertical" style={{ width: "100%" }}>
           <p>
             {t("upload.selectedCount")}: {selectedUploadFiles.length}
           </p>
@@ -246,7 +246,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
           )}
 
           <Form.Item label={t("upload.reportYears") }>
-            <Space direction="vertical" style={{ width: "100%" }}>
+            <Space orientation="vertical" style={{ width: "100%" }}>
               {selectedUploadFiles.map((file, index) => (
                 <div key={file.uid} className="grid grid-cols-[minmax(0,1fr)_120px] items-center gap-3">
                   <span className="truncate text-sm text-gray-700" title={file.name}>{file.name}</span>
@@ -294,19 +294,20 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
           >
             <Select
               placeholder={t("upload.selectIndustry")}
+              options={Object.keys(industries).map((industry) => ({
+                value: industry,
+                label:
+                  industry === SASB_OTHER_INDUSTRY_KEY
+                    ? t("upload.sasbIndustryOther")
+                    : industry,
+              }))}
               onChange={(value) => {
                 onIndustryChange(value);
                 form.setFieldsValue({ semiIndustry: undefined });
               }}
               disabled={scopeLocked}
               style={{ width: "100%" }}
-            >
-              {Object.keys(industries).map((industry) => (
-                <Select.Option key={industry} value={industry}>
-                  {industry === SASB_OTHER_INDUSTRY_KEY ? t("upload.sasbIndustryOther") : industry}
-                </Select.Option>
-              ))}
-            </Select>
+            />
           </Form.Item>
           <Form.Item
             name="semiIndustry"
@@ -328,14 +329,15 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
               placeholder={t("upload.selectSubIndustry")}
               disabled={!selectedIndustry || scopeLocked}
               style={{ width: "100%" }}
-            >
-              {selectedIndustry &&
-                industries[selectedIndustry].map((semiIndustry) => (
-                  <Select.Option key={semiIndustry} value={semiIndustry}>
-                    {semiIndustry}
-                  </Select.Option>
-                ))}
-            </Select>
+              options={
+                selectedIndustry
+                  ? industries[selectedIndustry].map((semiIndustry) => ({
+                      value: semiIndustry,
+                      label: semiIndustry,
+                    }))
+                  : []
+              }
+            />
           </Form.Item>
         </Card>
       )}
