@@ -18,6 +18,60 @@ import threading
 import numpy as np
 
 from .models import ReportContent, TextSegment
+from .retrieval.metric_corpus import (
+    METRIC_CORPUS_SCHEMA_VERSION,
+    MetricRetrievalCorpus,
+)
+
+
+def _canonical_segments_digest(segments: List[TextSegment]) -> str:
+    """Stable disk identity for the canonical evidence used by metric sidecars."""
+    digest = hashlib.sha256()
+    for segment in segments:
+        structured = getattr(segment, "structured_data", None)
+        structured = structured if isinstance(structured, dict) else {}
+        payload = {
+            "segment_id": str(getattr(segment, "segment_id", "") or ""),
+            "content": str(getattr(segment, "content", "") or ""),
+            "page_number": int(getattr(segment, "page_number", 0) or 0),
+            "position_y": getattr(segment, "position_y", None),
+            "position_x": getattr(segment, "position_x", None),
+            "segment_type": str(getattr(segment, "segment_type", "") or ""),
+            "source_table_id": str(
+                getattr(segment, "source_table_id", None)
+                or structured.get("source_table_id")
+                or structured.get("table_id")
+                or ""
+            ),
+            "row_header": getattr(segment, "row_header", None),
+            "col_header": getattr(segment, "col_header", None),
+            "value_text": getattr(segment, "value_text", None),
+            "unit": getattr(segment, "unit", None),
+            "header_path": list(getattr(segment, "header_path", None) or []),
+            "rowspan": getattr(segment, "rowspan", None),
+            "colspan": getattr(segment, "colspan", None),
+            "parse_pass": getattr(segment, "parse_pass", None),
+            "review_status": getattr(segment, "review_status", None),
+            "conflicts": list(getattr(segment, "conflicts", None) or []),
+            "row_index": structured.get("row_index", structured.get("row_idx")),
+            "col_index": structured.get("col_index", structured.get("column_index")),
+            "structured_data": structured,
+        }
+        digest.update(
+            json.dumps(
+                payload,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                default=str,
+            ).encode("utf-8")
+        )
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+
+def _ordered_ids_digest(values: List[str]) -> str:
+    return hashlib.sha256("\n".join(values).encode("utf-8")).hexdigest()
 
 
 def _safe_pdf_page_count_from_bytes(pdf_bytes: bytes) -> Optional[int]:
@@ -552,6 +606,314 @@ class FileManager:
     # Embeddings / Segments artifacts
     # =============================
 
+    def _metric_manifest_path(self, file_id: str) -> Path:
+        safe_file_id = str(file_id or "").strip()
+        if (
+            not safe_file_id
+            or Path(safe_file_id).name != safe_file_id
+            or safe_file_id in {".", ".."}
+        ):
+            raise ValueError("Invalid report file ID for metric artifacts")
+        return self.embeddings_outputs / f"{safe_file_id}_metric_retrieval_manifest.json"
+
+    @staticmethod
+    def _atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
+        temp_path = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+        try:
+            with open(temp_path, "w", encoding="utf-8") as handle:
+                json.dump(payload, handle, ensure_ascii=False, indent=2)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temp_path, path)
+        finally:
+            try:
+                temp_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+
+    def save_metric_retrieval_artifacts(
+        self,
+        file_id: str,
+        corpus: MetricRetrievalCorpus,
+        source_segments: List[TextSegment],
+    ) -> Dict[str, str]:
+        """Atomically publish an optional structure-preserving metric corpus."""
+        self.embeddings_outputs.mkdir(parents=True, exist_ok=True)
+        manifest_path = self._metric_manifest_path(file_id)
+        views = list(corpus.retrieval_views or [])
+        view_ids = [view.view_id for view in views]
+        matrix = np.asarray(
+            getattr(corpus, "_embedding_matrix", None),
+            dtype=np.float32,
+        )
+        embedded_ids = [
+            str(value)
+            for value in (getattr(corpus, "_embedding_view_ids", None) or [])
+        ]
+        if (
+            matrix.ndim != 2
+            or matrix.shape[0] != len(views)
+            or embedded_ids != view_ids
+            or len(view_ids) != len(set(view_ids))
+            or not np.isfinite(matrix).all()
+        ):
+            raise ValueError(
+                "Metric retrieval corpus and embedding rows must match exactly"
+            )
+
+        canonical_ids = [str(segment.segment_id) for segment in source_segments]
+        if corpus.source_segment_ids != canonical_ids:
+            raise ValueError(
+                "Metric retrieval corpus does not match canonical report segments"
+            )
+
+        generation = uuid.uuid4().hex
+        corpus_path = self.embeddings_outputs / (
+            f"{file_id}_metric_retrieval_{generation}.json"
+        )
+        embeddings_path = self.embeddings_outputs / (
+            f"{file_id}_metric_retrieval_{generation}.npz"
+        )
+        old_manifest: Dict[str, Any] = {}
+        if manifest_path.exists():
+            try:
+                old_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except Exception:
+                old_manifest = {}
+
+        try:
+            self._atomic_write_json(
+                corpus_path,
+                (
+                    corpus.model_dump(mode="json")
+                    if hasattr(corpus, "model_dump")
+                    else corpus.dict()
+                ),
+            )
+            temp_npz = embeddings_path.with_name(
+                f".{embeddings_path.name}.{uuid.uuid4().hex}.tmp"
+            )
+            try:
+                max_id_length = max([len(value) for value in view_ids] or [1])
+                with open(temp_npz, "wb") as handle:
+                    np.savez_compressed(
+                        handle,
+                        embeddings=np.ascontiguousarray(matrix, dtype=np.float32),
+                        view_ids=np.asarray(
+                            view_ids,
+                            dtype=f"<U{max_id_length}",
+                        ),
+                    )
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                os.replace(temp_npz, embeddings_path)
+            finally:
+                try:
+                    temp_npz.unlink(missing_ok=True)
+                except Exception:
+                    pass
+
+            manifest = {
+                "schema_version": METRIC_CORPUS_SCHEMA_VERSION,
+                "generation": generation,
+                "file_id": str(file_id),
+                "document_id": corpus.document_id,
+                "canonical_segment_digest": _canonical_segments_digest(
+                    source_segments
+                ),
+                "corpus_signature": corpus.corpus_signature,
+                "chunker_version": corpus.chunker_version,
+                "chunker_config": (
+                    corpus.config.model_dump(mode="json")
+                    if hasattr(corpus.config, "model_dump")
+                    else corpus.config.dict()
+                ),
+                "embedding_model": str(
+                    getattr(corpus, "_embedding_model", "") or ""
+                ),
+                "embedding_dim": int(matrix.shape[1]) if matrix.ndim == 2 else 0,
+                "embedding_dtype": str(matrix.dtype),
+                "embeddings_normalized": bool(
+                    getattr(corpus, "_embeddings_normalized", True)
+                ),
+                "evidence_block_count": len(corpus.evidence_blocks),
+                "retrieval_view_count": len(views),
+                "embedding_row_count": int(matrix.shape[0]),
+                "view_ids_digest": _ordered_ids_digest(view_ids),
+                "corpus_file": corpus_path.name,
+                "embeddings_file": embeddings_path.name,
+                "saved_at": datetime.now().isoformat(),
+            }
+            # The manifest is the generation commit marker and is published last.
+            self._atomic_write_json(manifest_path, manifest)
+        except Exception:
+            try:
+                corpus_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+            try:
+                embeddings_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+            raise
+
+        # Best-effort cleanup of the previously committed generation only after
+        # the new manifest is visible.
+        for key in ("corpus_file", "embeddings_file"):
+            old_name = str(old_manifest.get(key) or "").strip()
+            old_path = self.embeddings_outputs / old_name if old_name else None
+            if (
+                old_path is not None
+                and old_path.parent.resolve() == self.embeddings_outputs.resolve()
+                and old_path.name.startswith(f"{file_id}_metric_retrieval_")
+                and old_path != corpus_path
+                and old_path != embeddings_path
+            ):
+                try:
+                    old_path.unlink(missing_ok=True)
+                except Exception:
+                    pass
+
+        return {
+            "metric_retrieval_manifest_path": str(manifest_path),
+            "metric_retrieval_corpus_path": str(corpus_path),
+            "metric_retrieval_embeddings_path": str(embeddings_path),
+        }
+
+    def load_metric_retrieval_artifacts(
+        self,
+        file_id: str,
+        source_segments: List[TextSegment],
+        expected_model: Optional[str] = None,
+    ) -> Optional[MetricRetrievalCorpus]:
+        """Load and strictly validate a metric sidecar without affecting v1."""
+        manifest_path = self._metric_manifest_path(file_id)
+        if not manifest_path.exists():
+            return None
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if str(manifest.get("schema_version")) != METRIC_CORPUS_SCHEMA_VERSION:
+                raise ValueError("Unsupported metric corpus schema")
+            if manifest.get("canonical_segment_digest") != _canonical_segments_digest(
+                source_segments
+            ):
+                raise ValueError("Metric corpus canonical segment digest mismatch")
+            stored_model = str(manifest.get("embedding_model") or "")
+            if expected_model and stored_model and stored_model != str(expected_model):
+                raise ValueError("Metric corpus embedding model mismatch")
+
+            corpus_name = str(manifest.get("corpus_file") or "")
+            embeddings_name = str(manifest.get("embeddings_file") or "")
+            corpus_path = self.embeddings_outputs / corpus_name
+            embeddings_path = self.embeddings_outputs / embeddings_name
+            for path in (corpus_path, embeddings_path):
+                if (
+                    not path.name
+                    or path.parent.resolve() != self.embeddings_outputs.resolve()
+                    or not path.name.startswith(f"{file_id}_metric_retrieval_")
+                    or not path.exists()
+                ):
+                    raise ValueError("Metric corpus manifest references an invalid payload")
+
+            corpus_json = corpus_path.read_text(encoding="utf-8")
+            corpus = (
+                MetricRetrievalCorpus.model_validate_json(corpus_json)
+                if hasattr(MetricRetrievalCorpus, "model_validate_json")
+                else MetricRetrievalCorpus.parse_raw(corpus_json)
+            )
+            if corpus.corpus_signature != str(manifest.get("corpus_signature") or ""):
+                raise ValueError("Metric corpus signature mismatch")
+            canonical_ids = [str(segment.segment_id) for segment in source_segments]
+            if corpus.source_segment_ids != canonical_ids:
+                raise ValueError("Metric corpus source segment order mismatch")
+
+            with np.load(embeddings_path, allow_pickle=False) as payload:
+                matrix = np.asarray(payload["embeddings"], dtype=np.float32)
+                view_ids = [str(value) for value in payload["view_ids"].tolist()]
+            expected_ids = [view.view_id for view in corpus.retrieval_views]
+            if (
+                matrix.ndim != 2
+                or matrix.shape[0] != len(expected_ids)
+                or view_ids != expected_ids
+                or _ordered_ids_digest(view_ids)
+                != str(manifest.get("view_ids_digest") or "")
+                or int(manifest.get("embedding_row_count") or -1)
+                != matrix.shape[0]
+                or int(manifest.get("embedding_dim") or -1)
+                != matrix.shape[1]
+                or not np.isfinite(matrix).all()
+            ):
+                raise ValueError("Metric corpus embedding rows are inconsistent")
+
+            object.__setattr__(
+                corpus,
+                "_embedding_matrix",
+                np.ascontiguousarray(matrix, dtype=np.float32),
+            )
+            object.__setattr__(corpus, "_embedding_view_ids", view_ids)
+            object.__setattr__(corpus, "_embedding_model", stored_model)
+            object.__setattr__(
+                corpus,
+                "_embeddings_normalized",
+                bool(manifest.get("embeddings_normalized", True)),
+            )
+            return corpus
+        except Exception as error:
+            logger.warning(
+                f"Failed to load optional metric retrieval corpus for {file_id}: {error}"
+            )
+            return None
+
+    def delete_report_artifacts(self, file_id: str) -> List[str]:
+        """Delete canonical and metric sidecars for exactly one report ID."""
+        manifest_path = self._metric_manifest_path(file_id)
+        targets = {
+            self.embeddings_outputs / f"{file_id}_segments.json",
+            self.embeddings_outputs / f"{file_id}_embeddings.npz",
+            self.embeddings_outputs / f"{file_id}_embeddings_meta.json",
+            manifest_path,
+        }
+        if manifest_path.exists():
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                for key in ("corpus_file", "embeddings_file"):
+                    name = str(manifest.get(key) or "").strip()
+                    if name:
+                        targets.add(self.embeddings_outputs / name)
+            except Exception:
+                pass
+        targets.update(
+            self.embeddings_outputs.glob(f"{file_id}_metric_retrieval_*.json")
+        )
+        targets.update(
+            self.embeddings_outputs.glob(f"{file_id}_metric_retrieval_*.npz")
+        )
+
+        root = self.embeddings_outputs.resolve()
+        removed: List[str] = []
+        for path in targets:
+            try:
+                resolved = path.resolve()
+            except Exception:
+                continue
+            if resolved.parent != root:
+                continue
+            allowed = (
+                resolved.name
+                in {
+                    f"{file_id}_segments.json",
+                    f"{file_id}_embeddings.npz",
+                    f"{file_id}_embeddings_meta.json",
+                    f"{file_id}_metric_retrieval_manifest.json",
+                }
+                or resolved.name.startswith(f"{file_id}_metric_retrieval_")
+            )
+            if not allowed or not resolved.exists() or not resolved.is_file():
+                continue
+            resolved.unlink()
+            removed.append(resolved.name)
+        return sorted(set(removed))
+
     def save_report_artifacts(self, file_id: str, report_content: ReportContent) -> Dict[str, str]:
         """Persist segments + embeddings for fast chat retrieval.
 
@@ -614,6 +976,9 @@ class FileManager:
         meta = {
             "file_id": file_id,
             "document_id": report_content.document_id,
+            "content_revision": int(
+                getattr(report_content.document_content, "content_revision", 1) or 1
+            ),
             "embedding_dim": int(emb_matrix.shape[1]) if emb_matrix.ndim == 2 and emb_matrix.size else 0,
             "segment_count": int(len(segments)),
             "embedding_count": int(len(seg_ids)),
@@ -621,13 +986,42 @@ class FileManager:
         }
         meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
-        # 4) Update file metadata (best-effort)
+        # 4) Optional metric-retrieval sidecar. The canonical v1 artifacts above
+        # are already complete; a sidecar failure must never invalidate them.
+        metric_paths: Dict[str, str] = {}
+        metric_corpus = getattr(report_content, "_metric_retrieval_corpus", None)
+        if isinstance(metric_corpus, MetricRetrievalCorpus):
+            try:
+                metric_paths = self.save_metric_retrieval_artifacts(
+                    file_id,
+                    metric_corpus,
+                    list(segments),
+                )
+            except Exception as error:
+                logger.warning(
+                    f"Failed to persist optional metric retrieval artifacts for {file_id}: {error}"
+                )
+        else:
+            # A fresh canonical generation must not keep pointing at an older,
+            # potentially incompatible metric generation.
+            try:
+                self._metric_manifest_path(file_id).unlink(missing_ok=True)
+            except Exception:
+                pass
+
+        # 5) Update file metadata (best-effort)
         try:
             if file_id in self.metadata.get("files", {}):
                 info = self.metadata["files"][file_id]
                 info["segments_path"] = str(segments_path)
                 info["embeddings_path"] = str(emb_path)
                 info["embeddings_meta_path"] = str(meta_path)
+                if metric_paths:
+                    info.update(metric_paths)
+                else:
+                    info.pop("metric_retrieval_manifest_path", None)
+                    info.pop("metric_retrieval_corpus_path", None)
+                    info.pop("metric_retrieval_embeddings_path", None)
                 self._save_metadata()
         except Exception as e:
             logger.warning(f"Failed to update file metadata with artifact paths for {file_id}: {e}")
@@ -636,9 +1030,16 @@ class FileManager:
             "segments_path": str(segments_path),
             "embeddings_path": str(emb_path),
             "embeddings_meta_path": str(meta_path),
+            **metric_paths,
         }
 
-    def load_report_artifacts(self, file_id: str) -> Optional[Dict[str, Any]]:
+    def load_report_artifacts(
+        self,
+        file_id: str,
+        *,
+        include_metric_corpus: bool = False,
+        expected_embedding_model: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
         """Load persisted segments + embeddings.
 
         Returns None if artifacts are missing.
@@ -647,6 +1048,7 @@ class FileManager:
         info = self.metadata.get("files", {}).get(file_id, {})
         seg_path = Path(info.get("segments_path")) if info.get("segments_path") else (self.embeddings_outputs / f"{file_id}_segments.json")
         emb_path = Path(info.get("embeddings_path")) if info.get("embeddings_path") else (self.embeddings_outputs / f"{file_id}_embeddings.npz")
+        meta_path = Path(info.get("embeddings_meta_path")) if info.get("embeddings_meta_path") else (self.embeddings_outputs / f"{file_id}_embeddings_meta.json")
 
         if not seg_path.exists() or not emb_path.exists():
             return None
@@ -690,13 +1092,35 @@ class FileManager:
             seg_ids = data.get("segment_ids")
             seg_ids = [str(x) for x in (seg_ids.tolist() if seg_ids is not None else [])]
 
-            return {
+            content_revision = 1
+            if meta_path.exists():
+                try:
+                    artifact_meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                    content_revision = max(
+                        1,
+                        int(artifact_meta.get("content_revision", 1) or 1),
+                    )
+                except Exception:
+                    content_revision = 1
+
+            result = {
                 "segments": segments,
                 "embedding_matrix": emb_matrix,
                 "embedding_segment_ids": seg_ids,
+                "content_revision": content_revision,
                 "segments_path": str(seg_path),
                 "embeddings_path": str(emb_path),
             }
+            if include_metric_corpus:
+                metric_corpus = self.load_metric_retrieval_artifacts(
+                    file_id,
+                    segments,
+                    expected_model=expected_embedding_model,
+                )
+                result["metric_retrieval_corpus"] = metric_corpus
+                if metric_corpus is not None:
+                    result["content_revision"] = metric_corpus.content_revision
+            return result
         except Exception as e:
             logger.warning(f"Failed to load report artifacts for {file_id}: {e}")
             return None
@@ -840,6 +1264,15 @@ class FileManager:
                     except Exception as e:
                         logger.error(f"清理文件失败: {e}")
                 
+                if str(file_info.get("file_type") or "").lower() == "report":
+                    try:
+                        self.delete_report_artifacts(str(file_id))
+                    except Exception as artifact_error:
+                        logger.warning(
+                            "Failed to clean report retrieval artifacts for "
+                            f"{file_id}: {artifact_error}"
+                        )
+
                 files_to_remove.append(file_id)
         
         # 从元数据中移除

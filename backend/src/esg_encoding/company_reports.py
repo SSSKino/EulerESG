@@ -10,6 +10,12 @@ import numpy as np
 
 from .file_manager import file_manager
 from .models import DocumentContent, ReportContent, TextSegment
+from .retrieval.metric_corpus import (
+    MetricRetrievalCorpus,
+    combine_metric_retrieval_corpora,
+    metric_embeddings,
+    namespace_metric_retrieval_corpus,
+)
 
 
 def _safe_year(value: Any) -> int | None:
@@ -78,14 +84,31 @@ def build_company_report_content(
     embedding_segments: List[TextSegment] = []
     embedding_rows: List[np.ndarray] = []
     source_reports: List[Dict[str, Any]] = []
+    metric_corpora: List[MetricRetrievalCorpus] = []
+    complete_metric_corpus = True
+    content_revisions: List[int] = []
 
     for file_id in requested_ids:
         file_info = file_manager.metadata.get("files", {}).get(file_id)
         if not isinstance(file_info, dict):
             raise ValueError(f"Report metadata is missing for {file_id}")
-        artifacts = file_manager.load_report_artifacts(file_id)
+        try:
+            artifacts = file_manager.load_report_artifacts(
+                file_id,
+                include_metric_corpus=True,
+            )
+        except TypeError:
+            # Compatibility with lightweight test/extension doubles that still
+            # implement the historical one-argument loader.
+            artifacts = file_manager.load_report_artifacts(file_id)
         if not artifacts:
             raise ValueError(f"Report artifacts are missing for {file_id}")
+        try:
+            content_revisions.append(
+                max(1, int(artifacts.get("content_revision", 1) or 1))
+            )
+        except (TypeError, ValueError):
+            content_revisions.append(1)
 
         report_name = str(file_info.get("original_name") or file_id)
         report_year = _safe_year(file_info.get("report_year"))
@@ -97,6 +120,18 @@ def build_company_report_content(
                 "page_count": file_info.get("page_count"),
             }
         )
+        source_metric_corpus = artifacts.get("metric_retrieval_corpus")
+        if isinstance(source_metric_corpus, MetricRetrievalCorpus):
+            metric_corpora.append(
+                namespace_metric_retrieval_corpus(
+                    source_metric_corpus,
+                    file_id,
+                    source_report_name=report_name,
+                    source_report_year=report_year,
+                )
+            )
+        else:
+            complete_metric_corpus = False
 
         copied_by_original_id: Dict[str, TextSegment] = {}
         for segment in artifacts.get("segments") or []:
@@ -137,6 +172,7 @@ def build_company_report_content(
         document_id=company_id,
         file_path=f"company:{company_id}",
         segments=all_segments,
+        content_revision=max(content_revisions or [1]),
         markdown_content=markdown,
         created_at=datetime.now(),
     )
@@ -151,6 +187,22 @@ def build_company_report_content(
         "_semantic_retrieval_embedding_cache",
         (embedding_segments, embedding_matrix),
     )
+    if complete_metric_corpus and len(metric_corpora) == len(requested_ids):
+        combined_metric_corpus = combine_metric_retrieval_corpora(
+            metric_corpora,
+            document_id=company_id,
+        )
+        if (
+            combined_metric_corpus is not None
+            and metric_embeddings(combined_metric_corpus) is not None
+            and combined_metric_corpus.source_segment_ids
+            == [segment.segment_id for segment in all_segments]
+        ):
+            object.__setattr__(
+                report,
+                "_metric_retrieval_corpus",
+                combined_metric_corpus,
+            )
     object.__setattr__(report, "_company_source_reports", source_reports)
     return report, source_reports
 

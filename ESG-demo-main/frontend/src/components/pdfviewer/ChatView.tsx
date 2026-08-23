@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import AnalysisResults from "./AnalysisResults";
 import type { AnalysisDataItem } from "./AnalysisResults";
@@ -7,6 +7,7 @@ import ComplianceSummaryDrawer from "./ComplianceSummaryDrawer";
 import { ChevronDown, ChevronUp, FileText, MessageCircle, X } from "lucide-react";
 import { useT } from "@/i18n/useT";
 import type { File as FileData } from "@/store/useFileStore";
+import { useDraggableFloating } from "@/hooks/useDraggableFloating";
 
 interface CollapsibleSectionProps {
   title: string;
@@ -80,7 +81,10 @@ const ChatView: React.FC<ChatViewProps> = ({
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [analysisMetrics, setAnalysisMetrics] = useState<AnalysisDataItem[]>([]);
   const [showAnalysisTable, setShowAnalysisTable] = useState<boolean>(true);
-  const assistantButtonRef = useRef<HTMLButtonElement>(null);
+  const {
+    draggableProps: assistantDragProps,
+    draggableRef: assistantButtonRef,
+  } = useDraggableFloating<HTMLButtonElement>();
 
   const [targetPage, setTargetPage] = useState<number | undefined>(undefined);
   // Used to force a new navigation request even if the user clicks the same
@@ -102,7 +106,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   const closeAssistant = useCallback(() => {
     setAssistantOpen(false);
     window.requestAnimationFrame(() => assistantButtonRef.current?.focus());
-  }, []);
+  }, [assistantButtonRef]);
 
   useEffect(() => {
     if (!assistantOpen) return;
@@ -227,19 +231,21 @@ const ChatView: React.FC<ChatViewProps> = ({
       <button
         ref={assistantButtonRef}
         type="button"
+        {...assistantDragProps}
         onClick={() => {
           setSummaryOpen(false);
           setAssistantOpen((open) => !open);
         }}
-        className={`dashboard-chat-launcher fixed z-[51] flex h-12 items-center gap-2 rounded-full px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 ${
+        className={`dashboard-chat-launcher draggable-assistant-launcher fixed z-[51] flex h-12 items-center gap-2 rounded-full px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 ${
           assistantOpen ? "bg-slate-800 hover:bg-slate-700" : "bg-[#2274BC] hover:bg-[#1b63a3]"
         }`}
         aria-label={assistantOpen ? t("common.close") : "AI Assistant"}
         aria-controls="compliance-ai-assistant"
         aria-expanded={assistantOpen}
+        title={t("chat.dragAssistantHint")}
       >
         {assistantOpen ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
-        <span className="text-sm font-medium">
+        <span className="dashboard-chat-launcher-label text-sm font-medium">
           {assistantOpen ? t("common.close") : "AI Assistant"}
         </span>
       </button>

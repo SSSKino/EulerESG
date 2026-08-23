@@ -86,20 +86,55 @@
   --background-end-rgb: 255, 255, 255;
 }
 
-/* Floating assistants stay at the lower-left edge of the main content while
-   following the dashboard sidebar's expanded/collapsed width. */
+/* Floating assistants start in the sidebar's lower-left corner, directly
+   above the user entry. The sidebar width still positions the open panel. */
 [data-dashboard-shell] {
   --dashboard-sidebar-width: 260px;
+  --dashboard-user-entry-height: 4.25rem;
 }
 
 [data-dashboard-shell]:has(> aside[data-collapsed="true"]) {
   --dashboard-sidebar-width: 60px;
+  --dashboard-user-entry-height: 4rem;
 }
 
 .dashboard-chat-launcher {
   right: auto;
-  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
-  left: calc(var(--dashboard-sidebar-width, 0px) + 1.5rem);
+  bottom: calc(
+    var(--dashboard-user-entry-height, 4.25rem) + 0.75rem +
+      env(safe-area-inset-bottom, 0px)
+  );
+  left: 1.5rem;
+}
+
+/* Keep the collapsed sidebar compact: the accessible label remains on the
+   button, while the visible launcher aligns with the user avatar below it. */
+[data-dashboard-shell]:has(> aside[data-collapsed="true"])
+  .dashboard-chat-launcher {
+  left: 0.375rem;
+  width: 3rem;
+  justify-content: center;
+  gap: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+[data-dashboard-shell]:has(> aside[data-collapsed="true"])
+  .dashboard-chat-launcher-label {
+  display: none;
+}
+
+.draggable-assistant-launcher {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.draggable-assistant-launcher[data-dragging="true"] {
+  cursor: grabbing;
+  transform: none !important;
+  transition: none !important;
+  will-change: left, top;
 }
 
 .dashboard-chat-panel {

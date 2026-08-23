@@ -131,6 +131,38 @@ class RetrievalResult(BaseModel):
     retrieval_type: str = Field(..., description="Retrieval type (keyword/semantic)")
     matched_keywords: List[str] = Field(default_factory=list, description="Matched keywords")
     metric_id: str = Field(..., description="Related metric ID")
+    evidence_block_id: Optional[str] = Field(
+        default=None,
+        description="Stable complete evidence-block identifier used for retrieval grouping",
+    )
+    retrieval_view_id: Optional[str] = Field(
+        default=None,
+        description="Internal retrieval-view identifier that produced this hit",
+    )
+    source_segment_ids: List[str] = Field(
+        default_factory=list,
+        description="Canonical report segments belonging to the complete evidence block",
+    )
+    matched_content: Optional[str] = Field(
+        default=None,
+        description="Precise retrieval view text used for ranking and highlighting",
+    )
+    evidence_block_content: Optional[str] = Field(
+        default=None,
+        description="Untruncated complete paragraph, list, table, or visual evidence block",
+    )
+    matched_row_index: Optional[int] = Field(
+        default=None,
+        description="Matched table row when the retrieval view is row-scoped",
+    )
+    matched_column_indexes: List[int] = Field(
+        default_factory=list,
+        description="Matched table columns when a wide-row view is column-scoped",
+    )
+    score_breakdown: Dict[str, float] = Field(
+        default_factory=dict,
+        description="Optional per-stage retrieval scores for diagnostics",
+    )
     link_source_page: Optional[int] = Field(default=None, description="Page containing an internal PDF link")
     link_target_page: Optional[int] = Field(default=None, description="Internal PDF page followed for this result")
     link_anchor_text: Optional[str] = Field(default=None, description="Visible PDF link anchor text")
@@ -223,6 +255,11 @@ class DocumentContent(BaseModel):
     file_path: str = Field(..., description="File path")
     segments: List[TextSegment] = Field(..., description="Text segments list")
     markdown_content: str = Field(..., description="Complete markdown format content")
+    content_revision: int = Field(
+        default=1,
+        ge=1,
+        description="Explicit retrieval-corpus revision; bump after in-place segment edits",
+    )
     created_at: datetime = Field(default_factory=datetime.now, description="Creation time")
 
 
@@ -273,6 +310,12 @@ class ProcessingConfig(BaseModel):
     # Retrieval configuration
     top_k: int = Field(default=10, description="Number of retrieval results")
     similarity_threshold: float = Field(default=0.3, description="Similarity threshold")
+    use_metric_retrieval_corpus: bool = Field(
+        default=True,
+        description=(
+            "Use structure-preserving paragraph/table views for report metric retrieval"
+        ),
+    )
     target_year: Optional[int] = Field(
         default=None,
         ge=1900,

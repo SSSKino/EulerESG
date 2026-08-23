@@ -6,6 +6,7 @@ import { MessageCircle } from "lucide-react";
 import ChatInterface from "@/components/pdfviewer/ChatInterface";
 import { apiService, type ChatResponse } from "@/lib/api";
 import { useT } from "@/i18n/useT";
+import { useDraggableFloating } from "@/hooks/useDraggableFloating";
 
 interface Message {
   text: string;
@@ -25,6 +26,8 @@ export default function FloatingChatAssistant({
   const [messages, setMessages] = useState<Message[]>(() => [
     { text: t("chat.welcomeMessage"), isUser: false },
   ]);
+  const { draggableProps, draggableRef } =
+    useDraggableFloating<HTMLButtonElement>();
 
   const handleSendMessage = useCallback(
     async (userMessage: string) => {
@@ -68,13 +71,18 @@ export default function FloatingChatAssistant({
   return (
     <>
       <button
+        ref={draggableRef}
         type="button"
+        {...draggableProps}
         onClick={() => setOpen(true)}
-        className="dashboard-chat-launcher fixed z-[51] flex items-center gap-2 rounded-full bg-slate-700 px-4 py-3 text-white shadow-lg transition hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+        className="dashboard-chat-launcher draggable-assistant-launcher fixed z-[51] flex items-center gap-2 rounded-full bg-slate-700 px-4 py-3 text-white shadow-lg transition-[transform,background-color,box-shadow] hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
         aria-label="AI Assistant"
+        title={t("chat.dragAssistantHint")}
       >
         <MessageCircle className="h-5 w-5" />
-        <span className="text-sm font-medium">AI Assistant</span>
+        <span className="dashboard-chat-launcher-label text-sm font-medium">
+          AI Assistant
+        </span>
       </button>
 
       <Drawer

@@ -21,6 +21,11 @@ from ..models import table_row_scope_key
 from .scoring import *  # noqa: F401,F403
 from .fusion import exact_metric_rerank, rrf_fuse
 from .keyword import KeywordRetriever
+from .metric_corpus import (
+    metric_embeddings,
+    resolve_metric_retrieval_corpus,
+    subset_metric_retrieval_corpus,
+)
 from .metric_profile import build_metric_retrieval_profile
 from .semantic import SemanticRetriever
 
@@ -50,6 +55,14 @@ class DualChannelRetriever:
             metric_name = getattr(metric, "metric_name", "") or getattr(metric, "metric_id", "")
             logger.info(f"Starting metric-centric retrieval for metric {metric_name}")
             profile = build_metric_retrieval_profile(metric, semantic_expansion)
+            if getattr(self.config, "use_metric_retrieval_corpus", True):
+                try:
+                    resolve_metric_retrieval_corpus(report_content)
+                except Exception as corpus_error:
+                    logger.warning(
+                        "Structure-preserving metric corpus unavailable; "
+                        f"using canonical retrieval: {corpus_error}"
+                    )
 
             keyword_started = time.perf_counter()
             exact_code_results: List[RetrievalResult] = []
@@ -734,6 +747,50 @@ class DualChannelRetriever:
         target_report = report_content.model_copy(
             update={"document_content": target_document, "embeddings": target_embeddings}
         )
+        target_metric_corpus = None
+        parent_metric_corpus = getattr(
+            report_content,
+            "_metric_retrieval_corpus",
+            None,
+        )
+        if parent_metric_corpus is not None:
+            try:
+                target_metric_corpus = subset_metric_retrieval_corpus(
+                    parent_metric_corpus,
+                    target_ids,
+                )
+                if target_metric_corpus is not None:
+                    object.__setattr__(
+                        target_report,
+                        "_metric_retrieval_corpus",
+                        target_metric_corpus,
+                    )
+            except Exception as corpus_error:
+                logger.warning(
+                    "Failed to subset metric corpus for linked pages; "
+                    f"using canonical page corpus: {corpus_error}"
+                )
+                target_metric_corpus = None
+        # New reports keep only a native matrix, so slice it directly for the
+        # linked-page sub-report instead of requiring legacy SegmentEmbedding
+        # objects to exist.
+        native_matrix = getattr(report_content, "_embedding_matrix", None)
+        native_ids = list(getattr(report_content, "_embedding_segment_ids", None) or [])
+        target_native_ids: List[str] = []
+        if (
+            native_matrix is not None
+            and getattr(native_matrix, "ndim", 0) == 2
+            and len(native_ids) == native_matrix.shape[0]
+        ):
+            native_indexes = [
+                index
+                for index, segment_id in enumerate(native_ids)
+                if str(segment_id) in target_ids
+            ]
+            if native_indexes:
+                target_native_ids = [str(native_ids[index]) for index in native_indexes]
+                object.__setattr__(target_report, "_embedding_matrix", native_matrix[native_indexes])
+                object.__setattr__(target_report, "_embedding_segment_ids", target_native_ids)
         target_embedding_cache = None
         parent_embedding_cache = getattr(
             report_content,
@@ -765,7 +822,15 @@ class DualChannelRetriever:
         if (
             getattr(self.config, "use_semantic_retrieval", True)
             and profile.dense_query
-            and (target_embeddings or target_embedding_cache is not None)
+            and (
+                target_embeddings
+                or target_native_ids
+                or target_embedding_cache is not None
+                or (
+                    target_metric_corpus is not None
+                    and metric_embeddings(target_metric_corpus) is not None
+                )
+            )
         ):
             candidates.extend(
                 self.semantic_retriever.search_by_semantic(
@@ -872,22 +937,28 @@ class DualChannelRetriever:
                 if category_adjustment >= 0.10
                 else "linked_page"
             )
+            score_breakdown = dict(candidate.score_breakdown or {})
+            score_breakdown[linked_kind] = linked_score
             linked_results.append(
-                RetrievalResult(
-                    segment_id=candidate.segment_id,
-                    content=candidate.content,
-                    page_number=target_page,
-                    score=linked_score,
-                    retrieval_type=f"{linked_kind}+{candidate.retrieval_type}",
-                    matched_keywords=matched[:18],
-                    metric_id=candidate.metric_id,
-                    link_source_page=int(link_meta.get("source_page") or 0) or None,
-                    link_target_page=int(link_meta.get("root_target_page") or target_page),
-                    link_anchor_text=anchor_text or None,
-                    link_source_segment_id=str(link_meta.get("source_segment_id") or "") or None,
-                    source_report_id=source_report_id,
-                    source_report_name=source_report_name,
-                    source_report_year=source_report_year,
+                candidate.model_copy(
+                    update={
+                        "page_number": target_page,
+                        "score": linked_score,
+                        "retrieval_type": f"{linked_kind}+{candidate.retrieval_type}",
+                        "matched_keywords": matched[:18],
+                        "link_source_page": int(link_meta.get("source_page") or 0) or None,
+                        "link_target_page": int(
+                            link_meta.get("root_target_page") or target_page
+                        ),
+                        "link_anchor_text": anchor_text or None,
+                        "link_source_segment_id": (
+                            str(link_meta.get("source_segment_id") or "") or None
+                        ),
+                        "source_report_id": source_report_id,
+                        "source_report_name": source_report_name,
+                        "source_report_year": source_report_year,
+                        "score_breakdown": score_breakdown,
+                    }
                 )
             )
         linked_results.sort(key=lambda item: item.score, reverse=True)
@@ -1206,7 +1277,15 @@ class DualChannelRetriever:
         fused = rrf_fuse(channel_results)
         if metric is not None and report_content is not None:
             anchors = profile.anchor_terms if profile is not None else _extract_metric_anchor_terms(metric)
-            fused.extend(_synthesize_qualitative_clusters(report_content, metric, fused, anchors))
+            if getattr(report_content, "_metric_retrieval_corpus", None) is None:
+                fused.extend(
+                    _synthesize_qualitative_clusters(
+                        report_content,
+                        metric,
+                        fused,
+                        anchors,
+                    )
+                )
             deduped: Dict[str, RetrievalResult] = {}
             for result in fused:
                 current = deduped.get(result.segment_id)
@@ -1269,7 +1348,15 @@ class DualChannelRetriever:
         """Retrieve evidence for all metrics in a collection."""
         results: List[MetricRetrievalResult] = []
         expansions_map = {exp.metric_id: exp for exp in metric_collection.semantic_expansions}
-        for metric in metric_collection.metrics:
+        metrics = list(metric_collection.metrics)
+        if getattr(self.config, "use_semantic_retrieval", True):
+            self.semantic_retriever.prepare_metric_queries(
+                [
+                    (metric, expansions_map.get(metric.metric_id))
+                    for metric in metrics
+                ]
+            )
+        for metric in metrics:
             logger.info(f"Retrieving metric: {metric.metric_name}")
             results.append(
                 self.retrieve_for_metric(

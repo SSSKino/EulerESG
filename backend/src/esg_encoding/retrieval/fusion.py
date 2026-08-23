@@ -130,34 +130,24 @@ def rrf_fuse(
         priority = float(bucket["priority"])
         source_score = float(bucket["best_source_score"])
         fused_score = _clamp_score(0.50 * normalized_rrf + 0.35 * priority + 0.15 * source_score)
+        score_breakdown = dict(getattr(base, "score_breakdown", None) or {})
+        score_breakdown["rrf"] = fused_score
         fused.append(
-            RetrievalResult(
-                segment_id=segment_id,
-                content=base.content,
-                page_number=base.page_number,
-                score=fused_score,
-                retrieval_type="rrf:" + "+".join(channels),
-                matched_keywords=_merge_keywords(bucket["keywords"]),  # type: ignore[arg-type]
-                metric_id=base.metric_id,
-                link_source_page=bucket["link_source_page"],
-                link_target_page=bucket["link_target_page"],
-                link_anchor_text=bucket["link_anchor_text"],
-                link_source_segment_id=bucket["link_source_segment_id"],
-                evidence_type=base.evidence_type,
-                asset_id=base.asset_id,
-                asset_url=base.asset_url,
-                bbox=base.bbox,
-                caption=base.caption,
-                confidence=base.confidence,
-                chart_data=base.chart_data,
-                structure_confidence=base.structure_confidence,
-                ocr_confidence=base.ocr_confidence,
-                header_path=base.header_path,
-                rowspan=base.rowspan,
-                colspan=base.colspan,
-                parse_pass=base.parse_pass,
-                review_status=base.review_status,
-                conflicts=base.conflicts,
+            base.model_copy(
+                update={
+                    "segment_id": segment_id,
+                    "score": fused_score,
+                    "retrieval_type": "rrf:" + "+".join(channels),
+                    "matched_keywords": _merge_keywords(bucket["keywords"]),  # type: ignore[arg-type]
+                    "link_source_page": bucket["link_source_page"] or base.link_source_page,
+                    "link_target_page": bucket["link_target_page"] or base.link_target_page,
+                    "link_anchor_text": bucket["link_anchor_text"] or base.link_anchor_text,
+                    "link_source_segment_id": (
+                        bucket["link_source_segment_id"]
+                        or base.link_source_segment_id
+                    ),
+                    "score_breakdown": score_breakdown,
+                }
             )
         )
     fused.sort(key=lambda item: item.score, reverse=True)
@@ -189,7 +179,9 @@ def exact_metric_rerank(
 
     reranked: List[RetrievalResult] = []
     for result in fused_results:
-        content = result.content or ""
+        # Rank against the precise internal retrieval view while preserving the
+        # complete canonical evidence block on the public result.
+        content = result.matched_content or result.content or ""
         lowered = _normalize_text_for_match(content)
         segment = segment_lookup.get(result.segment_id)
         direct = 0.0
@@ -246,19 +238,20 @@ def exact_metric_rerank(
             direct -= 0.08
 
         final_score = _clamp_score(0.50 * float(result.score or 0.0) + 0.50 * _clamp_score(direct))
+        score_breakdown = dict(getattr(result, "score_breakdown", None) or {})
+        score_breakdown["exact_metric_rerank"] = final_score
         reranked.append(
-            RetrievalResult(
-                segment_id=result.segment_id,
-                content=result.content,
-                page_number=result.page_number,
-                score=final_score,
-                retrieval_type=(result.retrieval_type + "+exact_metric_rerank") if "exact_metric_rerank" not in result.retrieval_type else result.retrieval_type,
-                matched_keywords=_merge_keywords([matched]),
-                metric_id=result.metric_id,
-                link_source_page=getattr(result, "link_source_page", None),
-                link_target_page=getattr(result, "link_target_page", None),
-                link_anchor_text=getattr(result, "link_anchor_text", None),
-                link_source_segment_id=getattr(result, "link_source_segment_id", None),
+            result.model_copy(
+                update={
+                    "score": final_score,
+                    "retrieval_type": (
+                        result.retrieval_type + "+exact_metric_rerank"
+                        if "exact_metric_rerank" not in result.retrieval_type
+                        else result.retrieval_type
+                    ),
+                    "matched_keywords": _merge_keywords([matched]),
+                    "score_breakdown": score_breakdown,
+                }
             )
         )
 

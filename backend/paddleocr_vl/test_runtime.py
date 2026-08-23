@@ -33,6 +33,8 @@ class _FakeRedis:
     def __init__(self) -> None:
         self.hashes = {}
         self.queue_length = 0
+        self.lists = {}
+        self.sorted_sets = {}
 
     def hset(self, key, mapping):
         self.hashes.setdefault(key, {}).update(mapping)
@@ -43,6 +45,9 @@ class _FakeRedis:
     def hget(self, key, field):
         return self.hashes.get(key, {}).get(field)
 
+    def hdel(self, key, field):
+        return int(self.hashes.get(key, {}).pop(field, None) is not None)
+
     def hincrby(self, key, field, amount):
         current = int(self.hashes.setdefault(key, {}).get(field, 0))
         self.hashes[key][field] = str(current + amount)
@@ -50,8 +55,116 @@ class _FakeRedis:
     def expire(self, key, ttl):  # noqa: ARG002
         return True
 
-    def llen(self, key):  # noqa: ARG002
-        return self.queue_length
+    def llen(self, key):
+        if key in self.lists:
+            return len(self.lists[key])
+        return self.queue_length if key == "paddleocr:parse" else 0
+
+    def lpush(self, key, value):
+        self.lists.setdefault(key, []).insert(0, value)
+        return len(self.lists[key])
+
+    def rpush(self, key, value):
+        self.lists.setdefault(key, []).append(value)
+        return len(self.lists[key])
+
+    def lrange(self, key, start, end):
+        values = self.lists.get(key, [])
+        if end == -1:
+            end = len(values) - 1
+        return list(values[start : end + 1])
+
+    def lrem(self, key, count, value):
+        values = self.lists.setdefault(key, [])
+        removed = 0
+        kept = []
+        for item in values:
+            if item == value and (count == 0 or removed < count):
+                removed += 1
+            else:
+                kept.append(item)
+        self.lists[key] = kept
+        return removed
+
+    def zadd(self, key, mapping, nx=False):
+        values = self.sorted_sets.setdefault(key, {})
+        added = 0
+        for member, score in mapping.items():
+            if nx and member in values:
+                continue
+            if member not in values:
+                added += 1
+            values[member] = float(score)
+        return added
+
+    def zscore(self, key, member):
+        return self.sorted_sets.get(key, {}).get(member)
+
+    def zrem(self, key, member):
+        return int(self.sorted_sets.get(key, {}).pop(member, None) is not None)
+
+    def zrangebyscore(self, key, minimum, maximum):
+        lower = float("-inf") if minimum == "-inf" else float(minimum)
+        upper = float("inf") if maximum == "+inf" else float(maximum)
+        return [
+            member
+            for member, score in sorted(
+                self.sorted_sets.get(key, {}).items(), key=lambda item: item[1]
+            )
+            if lower <= score <= upper
+        ]
+
+    def zcount(self, key, minimum, maximum):
+        return len(self.zrangebyscore(key, minimum, maximum))
+
+    def execute_command(self, command, source, destination, src, dest, timeout):  # noqa: ARG002
+        self.assert_command = (command, src, dest)
+        if command != "BLMOVE" or src != "LEFT" or dest != "RIGHT":
+            raise AssertionError("unexpected queue command")
+        source_values = self.lists.setdefault(source, [])
+        if not source_values:
+            return None
+        value = source_values.pop(0)
+        self.lists.setdefault(destination, []).append(value)
+        return value
+
+    def eval(self, script, number_of_keys, *values):
+        keys = values[:number_of_keys]
+        args = values[number_of_keys:]
+        marker = script.strip().splitlines()[0]
+        if marker == "-- ACK_PROCESSING_PAYLOAD":
+            processing, leases, owners = keys
+            payload = args[0]
+            removed = self.lrem(processing, 1, payload)
+            self.zrem(leases, payload)
+            self.hdel(owners, payload)
+            return removed
+        if marker == "-- REQUEUE_PROCESSING_PAYLOAD":
+            if "ARGV[3]" in script:
+                raise AssertionError("model-error requeue script must be unconditional")
+            processing, queue, leases, owners = keys
+            payload = args[0]
+            removed = self.lrem(processing, 1, payload)
+            if removed:
+                self.lpush(queue, payload)
+            self.zrem(leases, payload)
+            self.hdel(owners, payload)
+            return removed
+        if marker == "-- RECOVER_EXPIRED_PAYLOAD":
+            if "ARGV[3] == 'requeue'" not in script:
+                raise AssertionError("expired recovery script must honor terminal discard")
+            processing, queue, leases, owners = keys
+            payload, now, action = args
+            score = self.zscore(leases, payload)
+            if score is None or score > float(now):
+                return 0
+            removed = self.lrem(processing, 1, payload)
+            if removed and action == "requeue":
+                self.lpush(queue, payload)
+            self.zrem(leases, payload)
+            self.hdel(owners, payload)
+            return removed
+        raise AssertionError(f"unexpected script: {marker}")
 
 
 class PaddleRuntimeTests(unittest.TestCase):
@@ -146,6 +259,194 @@ class PaddleRuntimeTests(unittest.TestCase):
                 redis,
                 worker_id="worker-1",
                 queue_name="paddleocr:parse",
+                last_request_id="",
+            )
+
+        self.assertEqual(request_id, "")
+        release.assert_not_called()
+
+    def test_fifo_claim_moves_payload_to_durable_processing_list(self) -> None:
+        redis = _FakeRedis()
+        redis.rpush("paddleocr:parse", "first")
+        redis.rpush("paddleocr:parse", "second")
+
+        claimed = worker._claim_payload(
+            redis,
+            "paddleocr:parse",
+            "paddleocr:parse:processing",
+            timeout=1,
+        )
+
+        self.assertEqual(claimed, "first")
+        self.assertEqual(redis.lists["paddleocr:parse"], ["second"])
+        self.assertEqual(redis.lists["paddleocr:parse:processing"], ["first"])
+        self.assertEqual(redis.assert_command, ("BLMOVE", "LEFT", "RIGHT"))
+
+    def test_ack_removes_processing_payload_and_lease_metadata(self) -> None:
+        redis = _FakeRedis()
+        processing = "paddleocr:parse:processing"
+        payload = '{"job_id":"job-ack","unit_index":1}'
+        redis.rpush(processing, payload)
+
+        with patch.dict(os.environ, {"PADDLEOCR_PROCESSING_LEASE_SECONDS": "120"}):
+            worker._renew_processing_lease(
+                redis,
+                worker_id="worker-ack",
+                queue_name="paddleocr:parse",
+                processing_queue_name=processing,
+                payload_raw=payload,
+                payload={"job_id": "job-ack", "unit_index": 1},
+            )
+        acknowledged = worker._ack_claimed_payload(
+            redis,
+            processing_queue_name=processing,
+            payload_raw=payload,
+        )
+
+        self.assertTrue(acknowledged)
+        self.assertEqual(redis.lists[processing], [])
+        self.assertIsNone(redis.zscore(f"{processing}:leases", payload))
+        self.assertNotIn(payload, redis.hashes[f"{processing}:owners"])
+        heartbeat = redis.hashes["paddleocr:worker:worker-ack"]
+        self.assertEqual(heartbeat["status"], "processing")
+        self.assertEqual(heartbeat["job_id"], "job-ack")
+
+    def test_expired_processing_payload_is_requeued_but_active_lease_is_not(self) -> None:
+        redis = _FakeRedis()
+        queue = "paddleocr:parse"
+        processing = f"{queue}:processing"
+        expired = '{"job_id":"expired"}'
+        active = '{"job_id":"active"}'
+        redis.rpush(processing, expired)
+        redis.rpush(processing, active)
+        redis.zadd(f"{processing}:leases", {expired: 99.0, active: 201.0})
+        redis.hset(f"{processing}:owners", mapping={expired: "old", active: "live"})
+
+        recovered = worker._recover_expired_processing(
+            redis,
+            queue_name=queue,
+            processing_queue_name=processing,
+            now=100.0,
+        )
+
+        self.assertEqual(recovered, 1)
+        self.assertEqual(redis.lists[queue], [expired])
+        self.assertEqual(redis.lists[processing], [active])
+        self.assertIsNone(redis.zscore(f"{processing}:leases", expired))
+        self.assertEqual(redis.zscore(f"{processing}:leases", active), 201.0)
+
+    def test_unleased_processing_payload_gets_grace_before_recovery(self) -> None:
+        redis = _FakeRedis()
+        queue = "paddleocr:parse"
+        processing = f"{queue}:processing"
+        orphan = '{"job_id":"claim-window"}'
+        redis.rpush(processing, orphan)
+
+        with patch.dict(os.environ, {"PADDLEOCR_PROCESSING_LEASE_SECONDS": "120"}):
+            recovered = worker._recover_expired_processing(
+                redis,
+                queue_name=queue,
+                processing_queue_name=processing,
+                now=100.0,
+            )
+
+        self.assertEqual(recovered, 0)
+        self.assertEqual(redis.lists[processing], [orphan])
+        self.assertEqual(redis.zscore(f"{processing}:leases", orphan), 220.0)
+
+        recovered_after_grace = worker._recover_expired_processing(
+            redis,
+            queue_name=queue,
+            processing_queue_name=processing,
+            now=221.0,
+        )
+        self.assertEqual(recovered_after_grace, 1)
+        self.assertEqual(redis.lists[processing], [])
+        self.assertEqual(redis.lists[queue], [orphan])
+
+    def test_expired_terminal_batch_is_acked_without_reexecution(self) -> None:
+        redis = _FakeRedis()
+        queue = "paddleocr:parse"
+        processing = f"{queue}:processing"
+        payload = json.dumps(
+            {
+                "task_type": "page_batch",
+                "job_id": "job-result-written",
+                "unit_index": 2,
+            },
+            separators=(",", ":"),
+        )
+        redis.rpush(processing, payload)
+        redis.zadd(f"{processing}:leases", {payload: 99.0})
+        redis.hset(
+            "paddleocr:task:job-result-written:batch:0002",
+            mapping={"status": "success"},
+        )
+
+        recovered = worker._recover_expired_processing(
+            redis,
+            queue_name=queue,
+            processing_queue_name=processing,
+            now=100.0,
+        )
+
+        self.assertEqual(recovered, 1)
+        self.assertEqual(redis.lists[processing], [])
+        self.assertEqual(redis.lists.get(queue, []), [])
+        self.assertIsNone(redis.zscore(f"{processing}:leases", payload))
+
+    def test_model_error_requeue_is_atomic_and_prioritized(self) -> None:
+        redis = _FakeRedis()
+        queue = "paddleocr:parse"
+        processing = f"{queue}:processing"
+        payload = '{"job_id":"retry"}'
+        redis.rpush(queue, "later")
+        redis.rpush(processing, payload)
+        redis.zadd(f"{processing}:leases", {payload: 200.0})
+        redis.hset(f"{processing}:owners", mapping={payload: "worker"})
+
+        requeued = worker._requeue_claimed_payload(
+            redis,
+            queue_name=queue,
+            processing_queue_name=processing,
+            payload_raw=payload,
+        )
+
+        self.assertTrue(requeued)
+        self.assertEqual(redis.lists[queue], [payload, "later"])
+        self.assertEqual(redis.lists[processing], [])
+        self.assertIsNone(redis.zscore(f"{processing}:leases", payload))
+
+    def test_document_release_waits_for_processing_payload_without_lease(self) -> None:
+        redis = _FakeRedis()
+        processing = "paddleocr:parse:processing"
+        redis.hashes["paddleocr:control:release"] = {"request_id": "release-3"}
+        redis.rpush(processing, "active-payload")
+
+        with patch.object(worker, "release_pipeline") as release:
+            request_id = worker._maybe_release_requested(
+                redis,
+                worker_id="worker-1",
+                queue_name="paddleocr:parse",
+                processing_queue_name=processing,
+                last_request_id="",
+            )
+
+        self.assertEqual(request_id, "")
+        release.assert_not_called()
+
+    def test_document_release_waits_for_active_lease_without_list_item(self) -> None:
+        redis = _FakeRedis()
+        processing = "paddleocr:parse:processing"
+        redis.hashes["paddleocr:control:release"] = {"request_id": "release-4"}
+        redis.zadd(f"{processing}:leases", {"claim-window": 9_999_999_999.0})
+
+        with patch.object(worker, "release_pipeline") as release:
+            request_id = worker._maybe_release_requested(
+                redis,
+                worker_id="worker-1",
+                queue_name="paddleocr:parse",
+                processing_queue_name=processing,
                 last_request_id="",
             )
 

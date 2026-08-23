@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import time
 import re
-from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 from collections import OrderedDict
 from dataclasses import replace
@@ -24,7 +23,7 @@ from loguru import logger
 from ...shared_embedding_model import encode_query_texts
 
 from ...models import ProcessingConfig
-from .settings import HippoRAGSettings
+from .settings import HippoRAGSettings, versioned_hipporag_cache_root
 from .retriever import HippoRAGRetriever
 
 
@@ -200,23 +199,22 @@ def enable_hipporag(chatbot, config: ProcessingConfig) -> None:
     settings = HippoRAGSettings()
 
     # Version the cache path by key indexing params so config changes trigger re-index.
-    cache_root = Path(settings.cache_root)
+    cache_root = versioned_hipporag_cache_root(settings)
+    settings = replace(settings, cache_root=cache_root)
     try:
-        suffix = (
-            f"{settings.embedding_model_name.replace('/', '_')}"
-            f"__docs{settings.max_docs_to_index}"
-            f"__chars{settings.target_chars_per_doc}"
-        )
-        cache_root = Path(settings.cache_root) / suffix
         cache_root.mkdir(parents=True, exist_ok=True)
-        settings = replace(settings, cache_root=cache_root)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning(f"[HippoRAG] cache directory is not writable: {exc}")
 
     # Create retriever wrapper
     retriever = HippoRAGRetriever(settings=settings, config=config)
 
-    # Attach for debug/introspection
+    # Canonical integration attributes used by upload/pre-analysis hooks.
+    chatbot._hipporag_settings = settings
+    chatbot._hipporag_cache_root = cache_root
+    chatbot._hipporag_retriever = retriever
+
+    # Keep the original aliases for compatibility with existing integrations.
     chatbot._hippo_settings = settings
     chatbot._hippo_cache_root = cache_root
     chatbot._hippo_retriever = retriever

@@ -14,8 +14,13 @@ from .shared_embedding_model import get_shared_embedding_model
 from .gpu_model_lifecycle import backend_lazy_load_enabled
 from .embedding_settings import get_configured_embedding_model_name
 
-from .models import TextSegment, SegmentEmbedding, DocumentContent, ReportContent, ProcessingConfig
+from .models import TextSegment, DocumentContent, ReportContent, ProcessingConfig
 from .exceptions import ContentEmbeddingError
+from .retrieval.metric_corpus import (
+    MetricRetrievalCorpus,
+    attach_metric_embeddings,
+    build_metric_retrieval_corpus,
+)
 
 
 class ContentEmbedder:
@@ -67,7 +72,7 @@ class ContentEmbedder:
         
         Args:
             document_content: 文档内容
-            
+
         Returns:
             包含嵌入的报告内容
         """
@@ -81,33 +86,84 @@ class ContentEmbedder:
             # 批量生成嵌入
             embeddings = self._generate_embeddings(texts)
             
-            # 创建嵌入对象
-            segment_embeddings = []
-            for i, segment in enumerate(document_content.segments):
-                embedding = SegmentEmbedding(
-                    segment_id=segment.segment_id,
-                    embedding=embeddings[i].tolist()
+            # Keep one native float32 representation. Building one Python
+            # float list per row duplicates the matrix and dominates memory on
+            # large reports.
+            contiguous = np.ascontiguousarray(embeddings, dtype=np.float32)
+            if contiguous.ndim != 2 or contiguous.shape[0] != len(document_content.segments):
+                raise ContentEmbeddingError(
+                    "Embedding model returned an invalid document matrix: "
+                    f"segments={len(document_content.segments)}, shape={contiguous.shape}"
                 )
-                segment_embeddings.append(embedding)
-            
-            # 创建报告内容
+
             report_content = ReportContent(
                 document_id=document_content.document_id,
                 document_content=document_content,
-                embeddings=segment_embeddings
+                # Kept empty for legacy model compatibility. New reports use
+                # the attached matrix and persist it directly as NPZ.
+                embeddings=[],
             )
-            # Keep the contiguous matrix produced by the model. Persistence and
-            # semantic retrieval can consume it directly instead of rebuilding it
-            # from thousands of Python float objects.
-            contiguous = np.ascontiguousarray(embeddings, dtype=np.float32)
             object.__setattr__(report_content, "_embedding_matrix", contiguous)
             object.__setattr__(report_content, "_embedding_segment_ids", [s.segment_id for s in document_content.segments])
-            
-            self.logger.info(f"嵌入生成完成: {len(segment_embeddings)} 个向量")
+
+            # Metric assessment uses a structure-preserving side corpus. Keep
+            # it independent from the canonical one-row-per-segment matrix used
+            # by chat and persisted report validation.
+            metric_enabled = str(
+                os.getenv("REPORT_METRIC_CORPUS_ENABLED", "1") or "1"
+            ).strip().lower() in {"1", "true", "yes", "y", "on"}
+            if metric_enabled:
+                try:
+                    metric_corpus = build_metric_retrieval_corpus(document_content)
+                    self.embed_metric_corpus(metric_corpus)
+                    object.__setattr__(
+                        report_content,
+                        "_metric_retrieval_corpus",
+                        metric_corpus,
+                    )
+                except Exception as metric_error:
+                    self.logger.warning(
+                        "Metric retrieval corpus generation failed; "
+                        f"using canonical fallback: {metric_error}"
+                    )
+
+            self.logger.info(f"嵌入生成完成: {contiguous.shape[0]} 个向量")
             return report_content
             
         except Exception as e:
             raise ContentEmbeddingError(f"嵌入生成失败: {e}")
+
+    def embed_metric_corpus(
+        self,
+        corpus: MetricRetrievalCorpus,
+    ) -> MetricRetrievalCorpus:
+        """Embed retrieval views without altering canonical report embeddings."""
+        views = list(corpus.retrieval_views or [])
+        if not views:
+            matrix = np.zeros((0, 0), dtype=np.float32)
+        else:
+            matrix = np.ascontiguousarray(
+                self._generate_embeddings([view.index_text for view in views]),
+                dtype=np.float32,
+            )
+            if matrix.ndim != 2 or matrix.shape[0] != len(views):
+                raise ContentEmbeddingError(
+                    "Embedding model returned an invalid metric retrieval matrix: "
+                    f"views={len(views)}, shape={matrix.shape}"
+                )
+            if not np.isfinite(matrix).all():
+                raise ContentEmbeddingError(
+                    "Metric retrieval embeddings contain non-finite values"
+                )
+
+        return attach_metric_embeddings(
+            corpus,
+            matrix,
+            embedding_model=str(
+                getattr(self.config, "embedding_model", "") or ""
+            ),
+            normalized=True,
+        )
     
     def _generate_embeddings(self, texts: List[str]):
         """
@@ -152,23 +208,35 @@ class ContentEmbedder:
             model = self._ensure_model()
             query_embedding = model.encode([query_text], normalize_embeddings=True)[0]
             
-            # 计算相似度
-            similarities = []
-            
-            for embedding_obj in report_content.embeddings:
-                # 计算余弦相似度
-                embedding = torch.tensor(embedding_obj.embedding)
-                similarity = torch.cosine_similarity(
-                    torch.tensor(query_embedding).unsqueeze(0),
-                    embedding.unsqueeze(0)
-                ).item()
-                
-                similarities.append((embedding_obj.segment_id, similarity))
-            
-            # 按相似度排序
-            similarities.sort(key=lambda x: x[1], reverse=True)
-            
-            return similarities[:top_k]
+            matrix = getattr(report_content, "_embedding_matrix", None)
+            segment_ids = getattr(report_content, "_embedding_segment_ids", None)
+            if not (
+                isinstance(matrix, np.ndarray)
+                and matrix.ndim == 2
+                and segment_ids is not None
+                and len(segment_ids) == matrix.shape[0]
+            ):
+                legacy = list(report_content.embeddings or [])
+                segment_ids = [item.segment_id for item in legacy]
+                matrix = (
+                    np.asarray([item.embedding for item in legacy], dtype=np.float32)
+                    if legacy
+                    else np.zeros((0, 0), dtype=np.float32)
+                )
+            matrix = np.asarray(matrix, dtype=np.float32)
+            if matrix.ndim != 2 or matrix.shape[0] == 0:
+                return []
+            query = np.asarray(query_embedding, dtype=np.float32).reshape(-1)
+            if matrix.shape[1] != query.shape[0]:
+                raise ContentEmbeddingError(
+                    "Query and document embedding dimensions do not match: "
+                    f"query={query.shape[0]}, document={matrix.shape[1]}"
+                )
+            denominators = np.linalg.norm(matrix, axis=1) * max(float(np.linalg.norm(query)), 1e-12)
+            scores = (matrix @ query) / np.maximum(denominators, 1e-12)
+            limit = min(max(0, int(top_k)), len(segment_ids))
+            indexes = np.argsort(-scores, kind="stable")[:limit]
+            return [(str(segment_ids[index]), float(scores[index])) for index in indexes]
             
         except Exception as e:
             raise ContentEmbeddingError(f"相似度计算失败: {e}")

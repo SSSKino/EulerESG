@@ -35,8 +35,14 @@ def warm_hipporag_after_upload(
     if report_content is None:
         return
 
-    retriever = getattr(chatbot, "_hipporag_retriever", None)
-    settings = getattr(chatbot, "_hipporag_settings", None)
+    retriever = (
+        getattr(chatbot, "_hipporag_retriever", None)
+        or getattr(chatbot, "_hippo_retriever", None)
+    )
+    settings = (
+        getattr(chatbot, "_hipporag_settings", None)
+        or getattr(chatbot, "_hippo_settings", None)
+    )
 
     if retriever is None or settings is None:
         # HippoRAG not enabled / not patched
@@ -47,13 +53,15 @@ def warm_hipporag_after_upload(
 
     try:
         # Non-blocking: background thread
-        retriever.schedule_index(
+        scheduled = retriever.schedule_index(
             file_id=report_content.document_id,
             report_content=report_content,
         )
-        logger.info(
-            f"[HippoRAG] upload warm scheduled file_id={report_content.document_id}"
-        )
+        if scheduled:
+            logger.info(
+                f"[HippoRAG] upload warm scheduled "
+                f"file_id={report_content.document_id}"
+            )
     except Exception as e:
         # Never fail upload because of HippoRAG
         logger.warning(f"[HippoRAG] upload warm failed (ignored): {e}")

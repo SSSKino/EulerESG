@@ -18,10 +18,15 @@ Put this file at:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from importlib.metadata import PackageNotFoundError, version
 import os
 from pathlib import Path
+import re
 
-from ...embedding_settings import get_configured_embedding_model_name, get_configured_rerank_model_name, get_configured_rerank_model_dtype
+from ...embedding_settings import (
+    get_configured_rerank_model_dtype,
+    get_configured_rerank_model_name,
+)
 
 
 def _backend_dir() -> Path:
@@ -63,12 +68,57 @@ def _env_optional(name: str) -> str | None:
     return value or None
 
 
+def hipporag_package_version() -> str:
+    """Return the installed HippoRAG version for cache compatibility."""
+    try:
+        return version("hipporag")
+    except PackageNotFoundError:
+        return "unavailable"
+
+
+def resolve_hipporag_embedding_model_name(settings: object) -> str:
+    """Resolve a model backend supported by the pinned HippoRAG 2.x API."""
+    configured = str(getattr(settings, "embedding_model_name", "") or "").strip()
+    lower = configured.lower()
+    supported_markers = (
+        "gritlm",
+        "contriever",
+        "text-embedding",
+        "cohere",
+    )
+    if configured and any(marker in lower for marker in supported_markers):
+        return configured
+    return str(
+        getattr(settings, "fallback_embedding_model_name", "facebook/contriever")
+        or "facebook/contriever"
+    ).strip()
+
+
+def versioned_hipporag_cache_root(settings: object) -> Path:
+    """Return one cache namespace for Chat and Cross Analysis."""
+    model_name = resolve_hipporag_embedding_model_name(settings)
+    safe_model = re.sub(r"[^A-Za-z0-9._-]+", "_", model_name).strip("_")
+    safe_version = re.sub(
+        r"[^A-Za-z0-9._-]+",
+        "_",
+        hipporag_package_version(),
+    ).strip("_")
+    suffix = (
+        f"schema2__hipporag-{safe_version or 'unknown'}"
+        f"__{safe_model or 'embedding'}"
+        f"__docs{int(getattr(settings, 'max_docs_to_index', 0) or 0)}"
+        f"__chars{int(getattr(settings, 'target_chars_per_doc', 0) or 0)}"
+    )
+    cache_root = Path(getattr(settings, "cache_root"))
+    return cache_root if cache_root.name == suffix else cache_root / suffix
+
+
 @dataclass(frozen=True)
 class HippoRAGSettings:
     """Tunable knobs for HippoRAG + hybrid retrieval."""
 
     # ========= 主开关 =========
-    enabled: bool = True
+    enabled: bool = field(default_factory=lambda: _env_bool("HIPPO_ENABLED", True))
 
     # ========= 向量召回（整篇召回靠它） =========
     # 候选池大小（越大召回越稳，但后续 rerank/加分也会更慢；一般 200 很均衡）
@@ -112,7 +162,15 @@ class HippoRAGSettings:
 
     # 这里默认用 Facebook 的 Contriever（MSMARCO 版本），不使用 NVIDIA embedding。
 
-    embedding_model_name: str = field(default_factory=get_configured_embedding_model_name)
+    # HippoRAG 2.0.0a4 does not accept arbitrary application embedding models.
+    # Keep its graph embeddings on a separately configurable supported backend.
+    embedding_model_name: str = field(
+        default_factory=lambda: os.getenv(
+            "HIPPO_EMBEDDING_MODEL",
+            "facebook/contriever",
+        ).strip()
+        or "facebook/contriever"
+    )
 
 
     # 当 HippoRAG 对 embedding_model_name 校验更严格时，用这个兜底再试一次。
@@ -148,5 +206,10 @@ class HippoRAGSettings:
 
     # ========= 存储与行为 =========
     cache_root: Path = _backend_dir() / "outputs" / "hipporag_cache"
+    max_cached_indexes: int = field(
+        default_factory=lambda: _env_int("HIPPO_MAX_CACHED_INDEXES", 1)
+    )
     force_reindex: bool = False
-    warm_index_in_background: bool = False
+    warm_index_in_background: bool = field(
+        default_factory=lambda: _env_bool("HIPPO_WARM_INDEX_IN_BACKGROUND", True)
+    )

@@ -18,8 +18,11 @@ Requires
 from __future__ import annotations
 
 import json
+import inspect
+import math
 import os
 import re
+import shutil
 import threading
 import time
 from dataclasses import dataclass
@@ -29,9 +32,13 @@ from typing import Any, Dict, List, Optional
 
 from loguru import logger
 
+from ...content_revision import document_content_revision
 from ...models import ProcessingConfig, ReportContent
-from .settings import HippoRAGSettings
-import math
+from .settings import (
+    HippoRAGSettings,
+    hipporag_package_version,
+    resolve_hipporag_embedding_model_name,
+)
 
 
 # Segment-id markers embedded into docs during indexing.
@@ -42,6 +49,21 @@ _SEG_IDS_RE2 = re.compile(r"Segment IDs:\s*([^\n\r]+)", re.IGNORECASE)
 _SEG_ID_BRACKET_RE = re.compile(r"\[\s*([^\]\s]+)\s*-\s*Page\s*[^\]]*\]", re.IGNORECASE)
 # Fallback: common ID token pattern (e.g., P001_S023)
 _SEG_ID_TOKEN_RE = re.compile(r"\bP\d{1,4}_S\d{1,4}\b")
+
+_HIPPO_RUNTIME_LOCK = threading.RLock()
+_INDEX_LOCKS_GUARD = threading.Lock()
+_INDEX_LOCKS: Dict[str, threading.RLock] = {}
+
+
+def _index_lock_for_path(path: Path) -> threading.RLock:
+    key = str(Path(path).resolve())
+    with _INDEX_LOCKS_GUARD:
+        lock = _INDEX_LOCKS.get(key)
+        if lock is None:
+            lock = threading.RLock()
+            _INDEX_LOCKS[key] = lock
+        return lock
+
 
 def _parse_segment_ids_from_text(text: str) -> List[str]:
     """Extract segment IDs from a retrieved text blob (best-effort)."""
@@ -117,21 +139,38 @@ def _hash_docs(docs: List[str], settings_sig: str) -> str:
     for d in docs:
         b = d.encode("utf-8", errors="ignore")
         h.update(len(b).to_bytes(8, "little", signed=False))
-        h.update(b[:512])
-        h.update(b[-512:])
+        h.update(b)
     return h.hexdigest()
+
+
+def _configuration_identity(value: object) -> Optional[str]:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    return blake2b(text.encode("utf-8"), digest_size=8).hexdigest()
 
 
 def _settings_signature(settings: HippoRAGSettings, config: ProcessingConfig) -> str:
     # Anything that changes the index should be in this signature.
     return json.dumps(
         {
-            "embedding_model": settings.embedding_model_name,
+            "integration_schema": 2,
+            "hipporag_version": hipporag_package_version(),
+            "embedding_model": resolve_hipporag_embedding_model_name(settings),
+            "embedding_endpoint": _configuration_identity(
+                settings.embedding_base_url
+            ),
             "pack": settings.pack_segments,
             "target_chars": settings.target_chars_per_doc,
             "max_docs": settings.max_docs_to_index,
             "min_seg_chars": settings.min_chars_per_segment,
             "llm_model": settings.llm_model_name or config.llm_model,
+            "llm_endpoint": _configuration_identity(
+                settings.llm_base_url or config.llm_base_url
+            ),
+            "extra_kwargs": _configuration_identity(
+                os.getenv("HIPPO_EXTRA_KWARGS_JSON")
+            ),
         },
         sort_keys=True,
         ensure_ascii=False,
@@ -212,25 +251,70 @@ def _one_segment_per_doc(report_content: ReportContent, settings: HippoRAGSettin
     return docs
 
 
-def _extract_text_blobs(obj: Any) -> List[str]:
-    """Best-effort extraction of retrieved doc texts from HippoRAG outputs."""
+def _extract_text_blobs(obj: Any, _seen: Optional[set[int]] = None) -> List[str]:
+    """Best-effort extraction of retrieved document text.
+
+    HippoRAG 2.x returns ``QuerySolution`` objects whose retrieved source
+    documents live in ``solution.docs``.  Older/local variants may instead
+    return dictionaries, tuples, or text-bearing document objects.
+    """
     if obj is None:
         return []
     if isinstance(obj, str):
         return [obj]
+    if isinstance(obj, bytes):
+        return [obj.decode("utf-8", errors="ignore")]
+
+    if _seen is None:
+        _seen = set()
+    identity = id(obj)
+    if identity in _seen:
+        return []
+    _seen.add(identity)
+
+    collection_fields = (
+        "retrieved_docs",
+        "docs",
+        "documents",
+        "passages",
+        "contexts",
+        "results",
+        "retrieval_results",
+    )
+    text_fields = ("text", "content", "page_content")
+
     if isinstance(obj, dict):
-        for k in ("retrieved_docs", "docs", "passages", "contexts", "results", "retrieval_results"):
-            if k in obj:
-                return _extract_text_blobs(obj[k])
-        if "text" in obj and isinstance(obj["text"], str):
-            return [obj["text"]]
-        if "content" in obj and isinstance(obj["content"], str):
-            return [obj["content"]]
+        out: List[str] = []
+        for field in text_fields:
+            if field in obj:
+                out.extend(_extract_text_blobs(obj[field], _seen))
+        for field in collection_fields:
+            if field in obj:
+                out.extend(_extract_text_blobs(obj[field], _seen))
+        if out:
+            return out
         return [json.dumps(obj, ensure_ascii=False)]
-    if isinstance(obj, list):
+    if isinstance(obj, (list, tuple, set)):
         out: List[str] = []
         for x in obj:
-            out.extend(_extract_text_blobs(x))
+            out.extend(_extract_text_blobs(x, _seen))
+        return out
+
+    # QuerySolution and common document wrappers expose data as attributes.
+    out: List[str] = []
+    for field in text_fields:
+        try:
+            value = getattr(obj, field)
+        except (AttributeError, TypeError, ValueError):
+            continue
+        out.extend(_extract_text_blobs(value, _seen))
+    for field in collection_fields:
+        try:
+            value = getattr(obj, field)
+        except (AttributeError, TypeError, ValueError):
+            continue
+        out.extend(_extract_text_blobs(value, _seen))
+    if out:
         return out
     return [str(obj)]
 
@@ -250,9 +334,11 @@ class HippoRAGRetriever:
         self.config = config
         self.settings = settings or HippoRAGSettings()
         self._rag_cache: Dict[str, Any] = {}
+        self._rag_cache_guard = threading.RLock()
         self._docmap_cache: Dict[str, Dict[str, List[str]]] = {}  # file_id -> doc_idx(str) -> [segment_ids]
-        self._locks: Dict[str, threading.Lock] = {}
         self._indexing: Dict[str, bool] = {}
+        self._indexing_guard = threading.Lock()
+        self._validated_revisions: Dict[str, tuple[str, int, int]] = {}
         self._stats: Dict[str, int] = {
             "hipporag_calls": 0,     # 走 HippoRAG 的次数
             "base_calls": 0,         # fallback 到 BaseRAG 的次数（由 patch 增加）
@@ -263,15 +349,14 @@ class HippoRAGRetriever:
         return bool(self.settings.enabled)
 
     def is_indexing(self, file_id: str) -> bool:
-        return bool(self._indexing.get(file_id))
+        with self._indexing_guard:
+            return bool(self._indexing.get(file_id))
 
-    def _lock_for(self, file_id: str) -> threading.Lock:
-        if file_id not in self._locks:
-            self._locks[file_id] = threading.Lock()
-        return self._locks[file_id]
+    def _lock_for(self, file_id: str) -> threading.RLock:
+        return _index_lock_for_path(self._save_dir(file_id))
 
     def _save_dir(self, file_id: str) -> Path:
-        return Path(self.settings.cache_root) / str(file_id)
+        return self._safe_cache_target(file_id)
 
 
     def _docmap_path(self, save_dir: Path) -> Path:
@@ -369,6 +454,7 @@ class HippoRAGRetriever:
             )
         except Exception as e:
             logger.warning(f"[HippoRAG] write meta failed: {e}")
+            raise
 
     def _import_hipporag(self):
         try:
@@ -377,22 +463,66 @@ class HippoRAGRetriever:
         except Exception as e:
             raise RuntimeError("HippoRAG is not installed. Run: pip install hipporag") from e
 
+    def _runtime_embedding_model_name(self, model_name: Optional[str] = None) -> str:
+        """Prefer the preflight-validated local snapshot for HF embeddings."""
+        configured = str(
+            model_name or resolve_hipporag_embedding_model_name(self.settings)
+        ).strip()
+        if not configured:
+            return "facebook/contriever"
+
+        configured_path = Path(configured)
+        if configured_path.exists():
+            return str(configured_path.resolve())
+
+        # model_preflight stores snapshots directly below HF_HOME. Transformers
+        # normally searches HF_HOME/hub when given only a repository ID, so pass
+        # the resolved snapshot path to HippoRAG to guarantee offline reuse.
+        if not self.settings.embedding_base_url:
+            try:
+                from ...shared_embedding_model import prefer_local_model
+
+                local_ref = prefer_local_model(
+                    configured,
+                    hf_home=os.getenv("HF_HOME", "/root/.cache/huggingface"),
+                )
+                if local_ref.local_path:
+                    return str(Path(local_ref.local_path).resolve())
+            except Exception as exc:
+                logger.debug(
+                    f"[HippoRAG] local embedding snapshot lookup failed for "
+                    f"'{configured}': {exc}"
+                )
+        return configured
+
     def _init_rag(self, save_dir: Path):
         HippoRAG = self._import_hipporag()
 
         llm_model_name = self.settings.llm_model_name or self.config.llm_model
         llm_base_url = self.settings.llm_base_url or (self.config.llm_base_url or None)
-        llm_api_key = self.settings.llm_api_key or (self.config.llm_api_key or None)
 
         kwargs: Dict[str, Any] = {
             "save_dir": str(save_dir),
             "llm_model_name": llm_model_name,
-            "embedding_model_name": self.settings.embedding_model_name,
+            "embedding_model_name": self._runtime_embedding_model_name(),
         }
-        # 用户要求：不要使用 NVIDIA / NV-Embed 作为 HippoRAG 的 embedding。
-        if isinstance(kwargs.get("embedding_model_name"), str) and kwargs["embedding_model_name"].lower().startswith("nvidia/"):
-            logger.warning("[HippoRAG] embedding_model_name 指向 NVIDIA 模型，已自动切换为 fallback_embedding_model_name。")
-            kwargs["embedding_model_name"] = getattr(self.settings, "fallback_embedding_model_name", "facebook/contriever")
+        # Keep HippoRAG graph embeddings on the configured non-NVIDIA fallback.
+        if (
+            isinstance(kwargs.get("embedding_model_name"), str)
+            and "nvidia" in kwargs["embedding_model_name"].lower()
+        ):
+            fallback = getattr(
+                self.settings,
+                "fallback_embedding_model_name",
+                "facebook/contriever",
+            )
+            logger.warning(
+                "[HippoRAG] NVIDIA embedding configured; switching to the "
+                f"supported fallback '{fallback}'."
+            )
+            kwargs["embedding_model_name"] = self._runtime_embedding_model_name(
+                fallback
+            )
         if llm_base_url:
             kwargs["llm_base_url"] = llm_base_url
         if self.settings.embedding_base_url:
@@ -413,12 +543,167 @@ class HippoRAGRetriever:
             except Exception as e:
                 logger.warning(f"[HippoRAG] invalid HIPPO_EXTRA_KWARGS_JSON: {e}")
 
-        env = {
+        env = self._runtime_env()
+        return kwargs, env, HippoRAG
+
+    def _runtime_env(self) -> Dict[str, Optional[str]]:
+        llm_base_url = self.settings.llm_base_url or (
+            self.config.llm_base_url or None
+        )
+        llm_api_key = self.settings.llm_api_key or (
+            self.config.llm_api_key or None
+        )
+        return {
             "OPENAI_API_KEY": llm_api_key,
             "OPENAI_BASE_URL": llm_base_url,
             "OPENAI_API_BASE": llm_base_url,
         }
-        return kwargs, env, HippoRAG
+
+    def _create_rag(self, save_dir: Path):
+        """Create one HippoRAG instance through a version-compatible path."""
+        kwargs, env, HippoRAG = self._init_rag(save_dir)
+        try:
+            parameters = inspect.signature(HippoRAG.__init__).parameters.values()
+            accepts_extra = any(
+                parameter.kind is inspect.Parameter.VAR_KEYWORD
+                for parameter in parameters
+            )
+            if not accepts_extra:
+                supported = {
+                    parameter.name
+                    for parameter in parameters
+                    if parameter.name != "self"
+                }
+                rejected = sorted(set(kwargs) - supported)
+                if rejected:
+                    logger.warning(
+                        f"[HippoRAG] ignoring unsupported init options: {rejected}"
+                    )
+                    kwargs = {
+                        key: value for key, value in kwargs.items() if key in supported
+                    }
+        except (TypeError, ValueError):
+            # Some extension-backed callables do not expose a Python signature.
+            pass
+
+        with _HIPPO_RUNTIME_LOCK, _temporary_env(env):
+            try:
+                return HippoRAG(**kwargs)
+            except TypeError as exc:
+                safe_names = {
+                    "save_dir",
+                    "llm_model_name",
+                    "llm_base_url",
+                    "embedding_model_name",
+                    "embedding_base_url",
+                    "azure_endpoint",
+                    "azure_embedding_endpoint",
+                }
+                retry_kwargs = {
+                    key: value for key, value in kwargs.items() if key in safe_names
+                }
+                if retry_kwargs == kwargs:
+                    raise
+                logger.warning(
+                    f"[HippoRAG] init options rejected ({exc}); retrying "
+                    "with the version-safe option set"
+                )
+                return HippoRAG(**retry_kwargs)
+            except (AssertionError, ValueError) as exc:
+                if "unknown embedding model" not in str(exc).lower():
+                    raise
+                fallback = str(
+                    self.settings.fallback_embedding_model_name
+                    or "facebook/contriever"
+                )
+                logger.warning(
+                    f"[HippoRAG] unsupported embedding backend "
+                    f"'{kwargs.get('embedding_model_name')}'; using '{fallback}'"
+                )
+                retry_kwargs = dict(kwargs)
+                retry_kwargs["embedding_model_name"] = (
+                    self._runtime_embedding_model_name(fallback)
+                )
+                return HippoRAG(**retry_kwargs)
+
+    @staticmethod
+    def _meta_matches(
+        meta: Optional[_IndexMeta],
+        *,
+        fingerprint: str,
+        doc_count: int,
+        settings_sig: str,
+        ready_path: Path,
+        force_reindex: bool,
+    ) -> bool:
+        return bool(
+            not force_reindex
+            and meta is not None
+            and meta.fingerprint == fingerprint
+            and meta.doc_count == doc_count
+            and meta.settings_sig == settings_sig
+            and ready_path.exists()
+        )
+
+    def _remember_validated_report(
+        self,
+        file_id: str,
+        report_content: ReportContent,
+    ) -> None:
+        with self._rag_cache_guard:
+            self._validated_revisions[file_id] = document_content_revision(
+                report_content
+            )
+
+    def _report_is_validated(
+        self,
+        file_id: str,
+        report_content: ReportContent,
+    ) -> bool:
+        with self._rag_cache_guard:
+            if self.settings.force_reindex or file_id not in self._rag_cache:
+                return False
+            return self._validated_revisions.get(
+                file_id
+            ) == document_content_revision(report_content)
+
+    def _get_cached_rag(self, file_id: str):
+        with self._rag_cache_guard:
+            rag = self._rag_cache.pop(file_id, None)
+            if rag is not None:
+                # Dict insertion order acts as a small LRU.
+                self._rag_cache[file_id] = rag
+            return rag
+
+    def _cache_rag(self, file_id: str, rag: Any) -> None:
+        with self._rag_cache_guard:
+            self._rag_cache.pop(file_id, None)
+            self._rag_cache[file_id] = rag
+            limit = max(1, int(self.settings.max_cached_indexes))
+            while len(self._rag_cache) > limit:
+                oldest_file_id = next(iter(self._rag_cache))
+                if oldest_file_id == file_id and len(self._rag_cache) > 1:
+                    oldest_file_id = next(
+                        key for key in self._rag_cache if key != file_id
+                    )
+                self._rag_cache.pop(oldest_file_id, None)
+                self._validated_revisions.pop(oldest_file_id, None)
+
+    def _drop_cached_rag(self, file_id: str) -> None:
+        with self._rag_cache_guard:
+            self._rag_cache.pop(file_id, None)
+            self._validated_revisions.pop(file_id, None)
+
+    def _safe_cache_target(self, file_id: str) -> Path:
+        root = Path(self.settings.cache_root).resolve()
+        target = (root / str(file_id)).resolve()
+        try:
+            relative = target.relative_to(root)
+        except ValueError as exc:
+            raise ValueError("HippoRAG file_id resolves outside the cache root") from exc
+        if target == root or not relative.parts:
+            raise ValueError("HippoRAG file_id must identify a cache child directory")
+        return target
 
     def _build_docs(self, report_content: ReportContent) -> List[str]:
         if not report_content or not getattr(report_content, "document_content", None):
@@ -428,127 +713,89 @@ class HippoRAGRetriever:
         return _one_segment_per_doc(report_content, self.settings)
 
     def ensure_index(self, file_id: str, report_content: ReportContent) -> bool:
-        """Ensure an index exists on disk for this file_id."""
+        """Ensure a validated, clean index exists for ``report_content``."""
         if not self.is_enabled():
             return False
+
+        if self._report_is_validated(file_id, report_content):
+            return True
 
         docs = self._build_docs(report_content)
         if not docs:
             return False
 
         save_dir = self._save_dir(file_id)
-        _safe_mkdir(save_dir)
-
-        # Persist a mapping from HippoRAG doc index -> segment_id(s) so we can
-        # recover segment IDs even if HippoRAG returns doc IDs rather than raw text.
         docmap: Dict[str, List[str]] = {}
         for i, d in enumerate(docs):
             segs = _parse_segment_ids_from_text(d)
             if segs:
                 docmap[str(i)] = segs
-        self._docmap_cache[file_id] = docmap
-        self._write_docmap(save_dir, docmap)
 
         settings_sig = _settings_signature(self.settings, self.config)
         fingerprint = _hash_docs(docs, settings_sig)
-        meta = self._load_meta(save_dir)
-
-        # A "ready" marker prevents treating half-built cache dirs as valid.
-        # We only short-circuit if both the meta matches AND the marker exists.
         ready_path = save_dir / ".ready"
-
-        if (
-            not self.settings.force_reindex
-            and meta
-            and meta.fingerprint == fingerprint
-            and meta.doc_count == len(docs)
-            and meta.settings_sig == settings_sig
-            and ready_path.exists()
-        ):
-            if file_id not in self._rag_cache:
-                try:
-                    kwargs, env, HippoRAG = self._init_rag(save_dir)
-                    with _temporary_env(env):
-                        try:
-                            try:
-                                self._rag_cache[file_id] = HippoRAG(**kwargs)
-                            except TypeError as te:
-                                # Extra kwargs (e.g. HIPPO_EXTRA_KWARGS_JSON) might not be supported by
-                                # the installed HippoRAG version. Retry with a minimal safe subset.
-                                logger.warning(f"[HippoRAG] init kwargs rejected ({te}); retrying with minimal kwargs")
-                                minimal = {k: kwargs[k] for k in ("save_dir", "llm_model_name", "embedding_model_name") if k in kwargs}
-                                for opt in ("llm_base_url", "llm_api_key", "embedding_base_url", "embedding_api_key"):
-                                    if opt in kwargs:
-                                        minimal[opt] = kwargs[opt]
-                                self._rag_cache[file_id] = HippoRAG(**minimal)
-                        except AssertionError as e:
-                            # HippoRAG v2.x asserts if `embedding_model_name` is not one of its
-                            # supported local embedding backends. If the user configured a HuggingFace
-                            # model id (e.g., "BAAI/bge-m3") without providing an OpenAI-compatible
-                            # embedding_base_url, fall back to the upstream default.
-                            msg = str(e)
-                            if "Unknown embedding model name" in msg:
-                                logger.warning(
-                                    f"[HippoRAG] {msg}. Falling back embedding_model_name='{getattr(self.settings, 'fallback_embedding_model_name', 'facebook/contriever')}'."
-                                )
-                                kwargs = dict(kwargs)
-                                kwargs["embedding_model_name"] = getattr(self.settings, "fallback_embedding_model_name", "facebook/contriever")
-                                self._rag_cache[file_id] = HippoRAG(**kwargs)
-                            else:
-                                raise
-                except Exception as e:
-                    logger.warning(f"[HippoRAG] init existing index failed: {e}")
-                    return False
-            return True
-
         lock = self._lock_for(file_id)
         with lock:
             meta = self._load_meta(save_dir)
-            if (
-                not self.settings.force_reindex
-                and meta
-                and meta.fingerprint == fingerprint
-                and meta.doc_count == len(docs)
-                and meta.settings_sig == settings_sig
-                and ready_path.exists()
+            if self._meta_matches(
+                meta,
+                fingerprint=fingerprint,
+                doc_count=len(docs),
+                settings_sig=settings_sig,
+                ready_path=ready_path,
+                force_reindex=self.settings.force_reindex,
             ):
+                try:
+                    if self._get_cached_rag(file_id) is None:
+                        self._cache_rag(file_id, self._create_rag(save_dir))
+                except Exception as exc:
+                    logger.warning(
+                        f"[HippoRAG] existing index initialization failed for "
+                        f"file_id={file_id}: {exc}"
+                    )
+                    return False
+                self._docmap_cache[file_id] = docmap
+                if not self._docmap_path(save_dir).exists():
+                    self._write_docmap(save_dir, docmap)
+                self._remember_validated_report(file_id, report_content)
                 return True
 
-            # We are (re)building the index. Remove stale ready marker first so
-            # a half-built cache isn't treated as valid by concurrent requests.
+            # HippoRAG's index() is incremental. Build in a fresh directory so
+            # removed or revised evidence can never survive a re-index.
+            stale_dir: Optional[Path] = None
             try:
-                ready_path.unlink()
-            except FileNotFoundError:
-                pass
+                if save_dir.exists():
+                    stale_dir = save_dir.with_name(
+                        f"{save_dir.name}.stale-{os.getpid()}-{time.time_ns()}"
+                    )
+                    save_dir.rename(stale_dir)
+                _safe_mkdir(save_dir)
+            except Exception:
+                logger.exception(
+                    f"[HippoRAG] cache preparation failed for file_id={file_id}"
+                )
+                try:
+                    if (
+                        stale_dir is not None
+                        and stale_dir.exists()
+                        and not save_dir.exists()
+                    ):
+                        stale_dir.rename(save_dir)
+                except Exception as rollback_exc:
+                    logger.error(
+                        f"[HippoRAG] cache preparation rollback failed for "
+                        f"file_id={file_id}: {rollback_exc}"
+                    )
+                return False
+            self._drop_cached_rag(file_id)
+            self._docmap_cache.pop(file_id, None)
+            self._write_docmap(save_dir, docmap)
 
             try:
-                kwargs, env, HippoRAG = self._init_rag(save_dir)
-                with _temporary_env(env):
-                    try:
-                        try:
-                            rag = HippoRAG(**kwargs)
-                        except TypeError as te:
-                            logger.warning(f"[HippoRAG] init kwargs rejected ({te}); retrying with minimal kwargs")
-                            minimal = {k: kwargs[k] for k in ("save_dir", "llm_model_name", "embedding_model_name") if k in kwargs}
-                            for opt in ("llm_base_url", "llm_api_key", "embedding_base_url", "embedding_api_key"):
-                                if opt in kwargs:
-                                    minimal[opt] = kwargs[opt]
-                            rag = HippoRAG(**minimal)
-                    except AssertionError as e:
-                        msg = str(e)
-                        if "Unknown embedding model name" in msg:
-                            logger.warning(
-                                f"[HippoRAG] {msg}. Falling back embedding_model_name='{getattr(self.settings, 'fallback_embedding_model_name', 'facebook/contriever')}'."
-                            )
-                            kwargs = dict(kwargs)
-                            kwargs["embedding_model_name"] = getattr(self.settings, "fallback_embedding_model_name", "facebook/contriever")
-                            rag = HippoRAG(**kwargs)
-                        else:
-                            raise
+                rag = self._create_rag(save_dir)
+                with _HIPPO_RUNTIME_LOCK, _temporary_env(self._runtime_env()):
                     logger.info(f"[HippoRAG] indexing file_id={file_id} docs={len(docs)}")
                     rag.index(docs)
-                    self._rag_cache[file_id] = rag
-                    self._stats["index_builds"] += 1
 
                 self._write_meta(
                     save_dir,
@@ -559,73 +806,130 @@ class HippoRAGRetriever:
                         settings_sig=settings_sig,
                     ),
                 )
-                # Marker file to avoid treating partially built cache dirs as valid.
-                try:
-                    ready_path.write_text(_now_iso(), encoding="utf-8")
-                except Exception as e:
-                    logger.warning(f"[HippoRAG] failed to write ready marker: {e}")
+                ready_path.write_text(_now_iso(), encoding="utf-8")
+                self._cache_rag(file_id, rag)
+                self._docmap_cache[file_id] = docmap
+                self._remember_validated_report(file_id, report_content)
+                self._stats["index_builds"] += 1
+
+                if stale_dir is not None and stale_dir.exists():
+                    try:
+                        shutil.rmtree(stale_dir)
+                    except Exception as cleanup_exc:
+                        logger.warning(
+                            f"[HippoRAG] stale cache cleanup deferred: {cleanup_exc}"
+                        )
                 return True
-            except Exception as e:
+            except Exception:
                 # Keep full traceback - the typical failure here is inside HippoRAG OpenIE/NER
                 # parsing (e.g., entities returned as dict -> unhashable), or LLM config.
                 logger.exception(f"[HippoRAG] indexing failed (fallback to keyword). file_id={file_id}")
+                self._drop_cached_rag(file_id)
+                self._docmap_cache.pop(file_id, None)
                 try:
-                    ready_path.unlink(missing_ok=True)
-                except Exception:
-                    pass
+                    if save_dir.exists():
+                        shutil.rmtree(save_dir)
+                    if stale_dir is not None and stale_dir.exists():
+                        stale_dir.rename(save_dir)
+                except Exception as rollback_exc:
+                    logger.error(
+                        f"[HippoRAG] cache rollback failed for file_id={file_id}: "
+                        f"{rollback_exc}"
+                    )
                 return False
 
-    def schedule_index(self, file_id: str, report_content: ReportContent) -> None:
-        """Optionally warm-index in a background thread (non-blocking)."""
+    def schedule_index(self, file_id: str, report_content: ReportContent) -> bool:
+        """Warm-index in a background thread and report whether it was queued."""
         if not self.is_enabled() or not self.settings.warm_index_in_background:
-            return
-        if self._indexing.get(file_id):
-            return
+            return False
+        with self._indexing_guard:
+            if self._indexing.get(file_id):
+                return False
+            # Set before starting the worker so duplicate schedules cannot race.
+            self._indexing[file_id] = True
 
         def _worker():
             try:
-                self._indexing[file_id] = True
                 self.ensure_index(file_id, report_content)
             finally:
+                with self._indexing_guard:
+                    self._indexing[file_id] = False
+
+        try:
+            t = threading.Thread(
+                target=_worker,
+                daemon=True,
+                name=f"hipporag-index-{file_id}",
+            )
+            t.start()
+            return True
+        except Exception:
+            with self._indexing_guard:
                 self._indexing[file_id] = False
+            raise
 
-        t = threading.Thread(target=_worker, daemon=True)
-        t.start()
+    def retrieve_segment_ids(
+        self,
+        file_id: str,
+        report_content: ReportContent,
+        query: str,
+        top_k: Optional[int] = None,
+    ) -> List[str]:
+        """Retrieve segment IDs for a query, returning ``[]`` on failure.
 
-    def retrieve_segment_ids(self, file_id: str, report_content: ReportContent, query: str) -> List[str]:
-        """Retrieve segment IDs for the current query. Return [] on failure -> fallback."""
+        ``top_k`` lets callers such as Cross Analysis request a wider candidate
+        pool.  Chat callers that omit it retain the configured context limit.
+        """
         if not self.is_enabled():
             return []
 
-        if self._indexing.get(file_id):
+        default_retrieve_limit = max(1, int(self.settings.top_k_docs))
+        default_result_limit = max(
+            1,
+            int(self.settings.max_segment_ids_for_context),
+        )
+        if top_k is None:
+            retrieve_limit = default_retrieve_limit
+            result_limit = default_result_limit
+        else:
+            try:
+                requested_limit = max(1, int(top_k))
+            except (TypeError, ValueError):
+                requested_limit = default_result_limit
+            candidate_cap = max(1, int(self.settings.max_union_candidates))
+            result_limit = min(requested_limit, candidate_cap)
+            retrieve_limit = result_limit
+
+        with self._indexing_guard:
+            indexing = bool(self._indexing.get(file_id))
+        if indexing:
             return []
 
-        save_dir = self._save_dir(file_id)
-        meta = self._load_meta(save_dir)
-        ready_path = save_dir / ".ready"
-        if not meta or self.settings.force_reindex or not ready_path.exists():
-            ok = self.ensure_index(file_id, report_content)
-            if not ok:
+        try:
+            if not self.ensure_index(file_id, report_content):
                 return []
+            save_dir = self._save_dir(file_id)
+        except Exception as exc:
+            logger.warning(
+                f"[HippoRAG] index validation failed for file_id={file_id}: {exc}"
+            )
+            return []
 
-        rag = self._rag_cache.get(file_id)
+        rag = self._get_cached_rag(file_id)
         if rag is None:
-            try:
-                kwargs, env, HippoRAG = self._init_rag(save_dir)
-                with _temporary_env(env):
-                    rag = HippoRAG(**kwargs)
-                self._rag_cache[file_id] = rag
-            except Exception:
-                return []
-
-        llm_base_url = self.settings.llm_base_url or (self.config.llm_base_url or None)
-        llm_api_key = self.settings.llm_api_key or (self.config.llm_api_key or None)
-        env = {"OPENAI_API_KEY": llm_api_key, "OPENAI_BASE_URL": llm_base_url, "OPENAI_API_BASE": llm_base_url}
+            logger.warning(
+                f"[HippoRAG] validated index has no runtime instance for "
+                f"file_id={file_id}"
+            )
+            return []
 
         try:
             self._stats["hipporag_calls"] += 1
-            with _temporary_env(env):
-                raw = rag.retrieve(queries=[query], num_to_retrieve=int(self.settings.top_k_docs))
+            with _HIPPO_RUNTIME_LOCK, _temporary_env(self._runtime_env()):
+                raw = rag.retrieve(
+                    queries=[query],
+                    num_to_retrieve=retrieve_limit,
+                )
 
             texts = _extract_text_blobs(raw)
 
@@ -639,7 +943,7 @@ class HippoRAGRetriever:
                         continue
                     seen.add(sid)
                     ids.append(sid)
-                    if len(ids) >= int(self.settings.max_segment_ids_for_context):
+                    if len(ids) >= result_limit:
                         return ids
 
             if ids:
@@ -675,7 +979,7 @@ class HippoRAGRetriever:
                         continue
                     seen.add(sid)
                     ids.append(sid)
-                    if len(ids) >= int(self.settings.max_segment_ids_for_context):
+                    if len(ids) >= result_limit:
                         return ids
 
             if ids:
@@ -695,8 +999,6 @@ class HippoRAGRetriever:
             tprev = " | ".join([(t or "")[:120].replace("\n", " ") for t in (texts or [])[:3]])
             logger.info(f"[HippoRAG] empty results after parse. raw_type={type(raw).__name__} keys={keys} texts_preview='{tprev}' raw_preview='{preview}'")
             return []
-
-            return ids
         except Exception as e:
             logger.warning(f"[HippoRAG] retrieve failed (fallback). Error: {e}")
             return []
@@ -716,7 +1018,11 @@ class HippoRAGRetriever:
                 last_index_time = meta.created_at or None
                 doc_count = int(meta.doc_count or 0)
                 # 有 meta + doc_count>0 + 当前不在 indexing => ready
-                ready = (doc_count > 0) and (not indexing)
+                ready = (
+                    doc_count > 0
+                    and (save_dir / ".ready").exists()
+                    and not indexing
+                )
 
         return {
             "enabled": enabled,

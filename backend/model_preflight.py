@@ -13,6 +13,10 @@ from esg_encoding.embedding_settings import (
     get_configured_rerank_model_name,
 )
 from esg_encoding.shared_embedding_model import prefer_local_model
+from esg_encoding.retrieval.hipporag.settings import (
+    HippoRAGSettings,
+    resolve_hipporag_embedding_model_name,
+)
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -72,6 +76,14 @@ def main() -> int:
         get_configured_embedding_model_name(),
         get_configured_rerank_model_name(),
     }
+    hippo_settings = HippoRAGSettings()
+    if hippo_settings.enabled:
+        hippo_model = resolve_hipporag_embedding_model_name(hippo_settings)
+        if any(
+            marker in hippo_model.lower()
+            for marker in ("contriever", "gritlm", "nv-embed-v2")
+        ):
+            model_ids.add(hippo_model)
     for repo_id in sorted(model_ids):
         _ensure_model(repo_id, hf_home, allow_online)
     print("[BackendModelPreflight] all required models are ready", flush=True)

@@ -13,6 +13,7 @@ from datetime import datetime
 import openai
 from loguru import logger
 
+from .content_revision import document_content_revision
 from .models import (
     ProcessingConfig, 
     MetricRetrievalResult,
@@ -135,6 +136,15 @@ _DEFAULT_REJECT_VALUE_SOURCES = {
     "row_or_column_number",
     "standalone_year",
 }
+
+_TABLE_SEMANTIC_YEAR_BLOCKERS = {
+    "ambiguous_year_scope",
+    "conflicting_year_scope",
+}
+_TABLE_SEMANTIC_UNIT_BLOCKERS = {"ambiguous_unit_scope"}
+_TABLE_SEMANTIC_VALUE_BLOCKERS = (
+    _TABLE_SEMANTIC_YEAR_BLOCKERS | _TABLE_SEMANTIC_UNIT_BLOCKERS
+)
 
 
 def _positive_env_int(name: str, default: int, *, minimum: int = 1, maximum: Optional[int] = None) -> int:
@@ -852,6 +862,8 @@ class DisclosureInferenceEngine:
         candidate: Dict[str, Any],
         profile: Optional[MetricRetrievalProfile],
     ) -> bool:
+        if candidate.get("blocking_semantic_quality_reasons"):
+            return False
         if profile is None:
             return True
         if (
@@ -2306,7 +2318,7 @@ Assessment principles:
 
     def _get_report_segment_cache(self, report_content: ReportContent) -> Dict[str, Any]:
         segments = report_content.document_content.segments
-        signature = (id(segments), len(segments))
+        signature = document_content_revision(report_content)
         cached = getattr(report_content, "_disclosure_segment_cache", None)
         if isinstance(cached, dict) and cached.get("signature") == signature:
             return cached
@@ -2380,6 +2392,18 @@ Assessment principles:
             except Exception:
                 return {}
         return {}
+
+    def _segment_table_semantic_quality_reasons(self, segment) -> set[str]:
+        raw_reasons = self._segment_structured_data_dict(segment).get(
+            "quality_reasons"
+        ) or []
+        if isinstance(raw_reasons, str):
+            raw_reasons = [raw_reasons]
+        return {
+            str(reason).strip().lower()
+            for reason in raw_reasons
+            if str(reason).strip().lower() in _TABLE_SEMANTIC_VALUE_BLOCKERS
+        }
 
     def _segment_id_table_parts(self, segment) -> Tuple[Optional[str], Optional[int], Optional[int]]:
         """Best-effort parser for segment IDs like P003_T001_R006_C002."""
@@ -2608,18 +2632,63 @@ Assessment principles:
                 self._get_segment_field(segment, "row_header"),
                 220,
             )
-            local_years = self._extract_years_from_text(
-                " ".join(part for part in [col_header, str(preferred_value or "")] if part)
+            blocking_reasons = self._segment_table_semantic_quality_reasons(
+                segment
             )
-            if not local_years:
-                content_years = self._extract_years_from_text(getattr(segment, "content", ""))
-                if len(content_years) == 1:
-                    local_years = content_years
+            year_blocked = bool(
+                blocking_reasons & _TABLE_SEMANTIC_YEAR_BLOCKERS
+            )
+            unit_blocked = bool(
+                blocking_reasons & _TABLE_SEMANTIC_UNIT_BLOCKERS
+            )
+            explicit_year = (
+                None
+                if year_blocked
+                else self._get_segment_field(segment, "year")
+            )
+            try:
+                parsed_explicit_year = (
+                    int(explicit_year) if explicit_year is not None else None
+                )
+            except (TypeError, ValueError):
+                parsed_explicit_year = None
+            if year_blocked:
+                local_years = []
+            elif (
+                parsed_explicit_year is not None
+                and 1900 <= parsed_explicit_year <= 2100
+            ):
+                local_years = [parsed_explicit_year]
+            else:
+                local_years = self._extract_years_from_text(
+                    " ".join(
+                        part
+                        for part in [col_header, str(preferred_value or "")]
+                        if part
+                    )
+                )
+                if not local_years:
+                    content_years = self._extract_years_from_text(
+                        getattr(segment, "content", "")
+                    )
+                    if len(content_years) == 1:
+                        local_years = content_years
             candidate_year = local_years[0] if len(local_years) == 1 else None
-            explicit_unit = self._format_short_metadata_value(
-                self._get_segment_field(segment, "unit", "cell_unit", "raw_unit"),
+            source_year_label = self._format_short_metadata_value(
+                self._get_segment_field(segment, "source_year_label"),
                 80,
-            ) or None
+            )
+            explicit_unit = None
+            if not unit_blocked:
+                explicit_unit = self._format_short_metadata_value(
+                    self._get_segment_field(
+                        segment,
+                        "unit",
+                        "cell_unit",
+                        "raw_unit",
+                    ),
+                    80,
+                ) or None
             dimension_labels: Dict[str, str] = {}
             if metric_profile is not None and metric_profile.variable_dimensions and row_header:
                 dimension_labels[metric_profile.variable_dimensions[0]] = row_header
@@ -2628,7 +2697,11 @@ Assessment principles:
                     {
                         "segment": segment,
                         "value": mention["value"],
-                        "unit": mention.get("unit") or explicit_unit,
+                        "unit": (
+                            None
+                            if unit_blocked
+                            else (mention.get("unit") or explicit_unit)
+                        ),
                         "description": mention.get("description") or str(source_text),
                         "year": candidate_year,
                         "page": getattr(segment, "page_number", None),
@@ -2636,8 +2709,15 @@ Assessment principles:
                         "label": row_header or col_header or None,
                         "row_label": row_header or None,
                         "column_label": col_header or None,
-                        "source_year_label": col_header if candidate_year is not None else None,
+                        "source_year_label": (
+                            source_year_label or col_header
+                            if candidate_year is not None
+                            else None
+                        ),
                         "dimensions": dimension_labels,
+                        "blocking_semantic_quality_reasons": sorted(
+                            blocking_reasons
+                        ),
                     }
                 )
         return candidates
@@ -3300,6 +3380,11 @@ Assessment principles:
                     year_candidates = content_years
             cell_year = max(year_candidates) if year_candidates else None
             numeric_candidate = self._extract_numeric_from_cell_text(value_text or content)
+            if self._segment_table_semantic_quality_reasons(seg):
+                # Keep the cell in row context for the LLM/reviewer, but never
+                # turn an explicitly ambiguous/conflicting semantic cell back
+                # into a deterministic scalar shortcut.
+                numeric_candidate = None
             if cell_year is not None and numeric_candidate is not None:
                 annual_descriptions.setdefault(cell_year, cell_line)
                 if latest_year is None or cell_year > latest_year:
@@ -3378,6 +3463,38 @@ Assessment principles:
         unit = self._format_short_metadata_value(self._get_segment_field(segment, "unit", "cell_unit", "raw_unit"), 120)
         if unit:
             hint_lines.append(f"- Cell Unit: {unit}")
+
+        reporting_year = self._get_segment_field(segment, "year")
+        source_year_label = self._format_short_metadata_value(
+            self._get_segment_field(segment, "source_year_label"),
+            80,
+        )
+        if reporting_year is not None:
+            year_text = str(reporting_year)
+            if source_year_label:
+                year_text += f" ({source_year_label})"
+            hint_lines.append(f"- Reporting Year: {year_text}")
+
+        unit_multiplier = self._get_segment_field(segment, "unit_multiplier")
+        unit_scope = self._format_short_metadata_value(
+            self._get_segment_field(segment, "unit_scope"),
+            80,
+        )
+        if unit_multiplier is not None:
+            multiplier_text = str(unit_multiplier)
+            if unit_scope:
+                multiplier_text += f" ({unit_scope})"
+            hint_lines.append(f"- Unit Multiplier: {multiplier_text}")
+
+        header_path = getattr(segment, "header_path", None)
+        if not header_path:
+            header_path = self._segment_structured_data_dict(segment).get("header_path")
+        if isinstance(header_path, (list, tuple)):
+            rendered_header_path = " > ".join(
+                str(item).strip() for item in header_path if str(item).strip()
+            )
+            if rendered_header_path:
+                hint_lines.append(f"- Header Path: {rendered_header_path}")
 
         structured_data = getattr(segment, "structured_data", None)
         if structured_data:

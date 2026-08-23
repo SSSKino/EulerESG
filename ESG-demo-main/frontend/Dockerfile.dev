@@ -4,10 +4,12 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY .npmrc ./
+COPY scripts/npm-ci-with-registry-fallback.sh /usr/local/bin/npm-ci-with-registry-fallback
 
-RUN npm ci --no-audit --no-fund
+RUN --mount=type=cache,target=/root/.npm \
+    sh /usr/local/bin/npm-ci-with-registry-fallback
 
 EXPOSE 3001
 ENV NEXT_TELEMETRY_DISABLED=1
 
-CMD ["sh","-lc","if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci --no-audit --no-fund; fi; npm run dev -- -p 3001 -H 0.0.0.0"]
+CMD ["sh","-lc","expected_lock=$(sha256sum package-lock.json | awk '{print $1}'); installed_lock=$(cat node_modules/.euleresg-package-lock.sha256 2>/dev/null || true); if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ] || [ \"$expected_lock\" != \"$installed_lock\" ]; then sh /usr/local/bin/npm-ci-with-registry-fallback; fi; exec npm run dev -- -p 3001 -H 0.0.0.0"]

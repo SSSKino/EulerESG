@@ -5,11 +5,13 @@ from fastapi import Header, Query
 from fastapi.responses import StreamingResponse
 import shutil
 import tempfile
+import time
 
 import numpy as np
 
 from ..auth.service import get_user_id_from_authorization
 from ..gpu_model_lifecycle import with_backend_model_task
+from ..retrieval.hipporag.hooks import warm_hipporag_after_upload
 from .report_jobs import (
     TERMINAL_STATUSES,
     create_report_job,
@@ -22,6 +24,8 @@ from .report_jobs import (
 
 
 _report_reanalysis_lock = threading.RLock()
+_progress_metadata_flush_lock = threading.RLock()
+_progress_metadata_last_flush: Dict[str, float] = {}
 
 
 def _runtime_resource_snapshot() -> dict:
@@ -53,17 +57,157 @@ def _emit_upload_progress(progress_cb, stage: str, message: str, progress: Optio
         logger.debug(f"Upload progress callback skipped: {exc}")
 
 
-def _patch_file_metadata(file_id: str, **updates) -> None:
-    """Best-effort metadata patch for dashboard polling and refresh."""
+def _file_metadata_job_matches(
+    file_id: str,
+    expected_job_id: Optional[str],
+    *,
+    job_id_field: str = "processing_job_id",
+) -> bool:
+    """Read the current ownership token at a durable-output boundary."""
+    if expected_job_id is None:
+        return True
     try:
-        finfo = file_manager.metadata.get("files", {}).get(file_id)
-        if isinstance(finfo, dict):
-            # ``None`` is meaningful for terminal transitions: it clears a
-            # stale job id or error left by an earlier/retried run.
-            finfo.update(updates)
-            file_manager._save_metadata()
+        with file_manager._metadata_lock:
+            finfo = file_manager.metadata.get("files", {}).get(file_id)
+            return bool(
+                isinstance(finfo, dict)
+                and str(finfo.get(job_id_field) or "") == str(expected_job_id)
+            )
+    except Exception as exc:
+        logger.debug(f"File metadata job check skipped for {file_id}: {exc}")
+        return False
+
+
+def _patch_file_metadata(
+    file_id: str,
+    *,
+    expected_job_id: Optional[str] = None,
+    job_id_field: str = "processing_job_id",
+    **updates,
+) -> bool:
+    """Atomically patch metadata only when the owning job token is current."""
+    persisted = False
+    try:
+        # Keep the same lock order as the debounced progress helper so durable
+        # metadata and its debounce bookkeeping form one transaction.
+        with _progress_metadata_flush_lock:
+            with file_manager._metadata_lock:
+                finfo = file_manager.metadata.get("files", {}).get(file_id)
+                if not isinstance(finfo, dict):
+                    return False
+                if (
+                    expected_job_id is not None
+                    and str(finfo.get(job_id_field) or "") != str(expected_job_id)
+                ):
+                    return False
+                # ``None`` is meaningful for terminal transitions: it clears a
+                # stale job id or error left by an earlier/retried run.
+                finfo.update(updates)
+                file_manager._save_metadata()
+                persisted = True
+            if persisted:
+                _progress_metadata_last_flush.pop(file_id, None)
     except Exception as exc:
         logger.debug(f"File metadata patch skipped for {file_id}: {exc}")
+    return persisted
+
+
+def _finalize_report_file_metadata(
+    file_id: str,
+    *,
+    destination_status: str,
+    expected_job_id: Optional[str] = None,
+    job_id_field: str = "processing_job_id",
+    **updates,
+) -> bool:
+    """Move and finalize a report without a stale job crossing the token check."""
+    finalized = False
+    try:
+        with _progress_metadata_flush_lock:
+            with file_manager._metadata_lock:
+                finfo = file_manager.metadata.get("files", {}).get(file_id)
+                if not isinstance(finfo, dict):
+                    return False
+                if (
+                    expected_job_id is not None
+                    and str(finfo.get(job_id_field) or "") != str(expected_job_id)
+                ):
+                    return False
+                # FileManager uses an RLock, so keeping this outer lock fences
+                # both its path/status mutation and our terminal fields.
+                if not file_manager.move_report_file(file_id, destination_status):
+                    return False
+                finfo = file_manager.metadata.get("files", {}).get(file_id)
+                if not isinstance(finfo, dict):
+                    return False
+                finfo.update(updates)
+                file_manager._save_metadata()
+                finalized = True
+            _progress_metadata_last_flush.pop(file_id, None)
+    except Exception as exc:
+        logger.debug(f"Report finalization skipped for {file_id}: {exc}")
+    return finalized
+
+
+def _progress_metadata_flush_seconds() -> float:
+    """Return the durable progress-write interval (bounded for operability)."""
+    try:
+        return min(
+            60.0,
+            max(
+                1.0,
+                float(os.getenv("REPORT_PROGRESS_METADATA_FLUSH_SECONDS", "12") or "12"),
+            ),
+        )
+    except (TypeError, ValueError):
+        return 12.0
+
+
+def _patch_progress_file_metadata(
+    file_id: str,
+    *,
+    force: bool = False,
+    expected_job_id: Optional[str] = None,
+    job_id_field: str = "processing_job_id",
+    **updates,
+) -> None:
+    """Update progress in memory and debounce expensive full metadata writes.
+
+    Dashboard reads in this process still observe every progress event. The
+    complete JSON document is persisted at most once per configured interval;
+    callers force terminal transitions so completion/failure is never delayed.
+    """
+    if not file_id:
+        return
+    now = time.monotonic()
+    try:
+        with _progress_metadata_flush_lock:
+            last_flush = _progress_metadata_last_flush.get(file_id)
+            should_flush = (
+                force
+                or last_flush is None
+                or now - last_flush >= _progress_metadata_flush_seconds()
+            )
+            with file_manager._metadata_lock:
+                finfo = file_manager.metadata.get("files", {}).get(file_id)
+                if not isinstance(finfo, dict):
+                    return
+                # A previous job may still emit a delayed callback after a retry
+                # has installed a new job token (or after a terminal transition
+                # cleared it). Never let that stale event overwrite current state.
+                if (
+                    expected_job_id is not None
+                    and str(finfo.get(job_id_field) or "") != str(expected_job_id)
+                ):
+                    return
+                finfo.update(updates)
+                if should_flush:
+                    file_manager._save_metadata()
+                    _progress_metadata_last_flush[file_id] = now
+            if force:
+                _progress_metadata_last_flush.pop(file_id, None)
+    except Exception as exc:
+        logger.debug(f"Progress metadata patch skipped for {file_id}: {exc}")
 
 
 def _ocr_progress_metadata_updates(extra: Optional[dict]) -> dict:
@@ -151,7 +295,10 @@ def _load_validated_report_artifacts(file_id: str) -> dict:
     persisted NumPy matrix, is therefore a conflict that requires a full
     reprocess instead of an implicit OCR/embedding fallback.
     """
-    artifacts = file_manager.load_report_artifacts(file_id)
+    artifacts = file_manager.load_report_artifacts(
+        file_id,
+        include_metric_corpus=True,
+    )
     if not artifacts:
         raise _report_artifact_conflict(
             "Persisted report segments and embeddings are unavailable; reprocess the report first."
@@ -197,6 +344,7 @@ def _report_content_from_artifacts(file_info: dict, artifacts: dict) -> ReportCo
         document_id=file_id,
         file_path=str(file_info.get("file_path") or ""),
         segments=segments,
+        content_revision=max(1, int(artifacts.get("content_revision", 1) or 1)),
         markdown_content="\n\n".join(
             str(getattr(segment, "content", "") or "") for segment in segments
         ),
@@ -214,6 +362,13 @@ def _report_content_from_artifacts(file_info: dict, artifacts: dict) -> ReportCo
         "_embedding_segment_ids",
         list(artifacts["embedding_segment_ids"]),
     )
+    metric_corpus = artifacts.get("metric_retrieval_corpus")
+    if metric_corpus is not None:
+        object.__setattr__(
+            report_content,
+            "_metric_retrieval_corpus",
+            metric_corpus,
+        )
     return report_content
 
 
@@ -456,12 +611,17 @@ def _commit_staged_assessment_files(
 
 
 @with_backend_model_task("reanalyze_report")
-def _sync_reanalyze_report_body(file_info: dict, progress_cb=None) -> dict:
+def _sync_reanalyze_report_body(
+    file_info: dict,
+    progress_cb=None,
+    expected_job_id: Optional[str] = None,
+) -> dict:
     """Run retrieval + disclosure using persisted segments/embeddings only."""
     started = time.perf_counter()
     file_id = str(file_info.get("file_id") or "")
     artifacts = _load_validated_report_artifacts(file_id)
     report_content = _report_content_from_artifacts(file_info, artifacts)
+    metric_sidecar_persisted = artifacts.get("metric_retrieval_corpus") is not None
     fw, scopes = _reanalysis_scopes(file_info)
     _emit_upload_progress(
         progress_cb,
@@ -527,6 +687,29 @@ def _sync_reanalyze_report_body(file_info: dict, progress_cb=None) -> dict:
             retrieval_results = retrieve_metric_collection(
                 report_content, metrics, config=config
             )
+            if not metric_sidecar_persisted:
+                metric_corpus = getattr(
+                    report_content,
+                    "_metric_retrieval_corpus",
+                    None,
+                )
+                if metric_corpus is not None and getattr(
+                    metric_corpus,
+                    "_embedding_matrix",
+                    None,
+                ) is not None:
+                    try:
+                        file_manager.save_metric_retrieval_artifacts(
+                            file_id,
+                            metric_corpus,
+                            list(report_content.document_content.segments),
+                        )
+                        metric_sidecar_persisted = True
+                    except Exception as metric_persist_error:
+                        logger.warning(
+                            "Failed to persist lazily built metric retrieval "
+                            f"corpus for {file_id}: {metric_persist_error}"
+                        )
             analysis_started = time.perf_counter()
             assessment = disclosure_engine.analyze_compliance(
                 retrieval_results,
@@ -595,6 +778,14 @@ def _sync_reanalyze_report_body(file_info: dict, progress_cb=None) -> dict:
             90,
             file_id=file_id,
         )
+        if not _file_metadata_job_matches(
+            file_id,
+            expected_job_id,
+            job_id_field="reanalysis_job_id",
+        ):
+            raise RuntimeError(
+                "Report reanalysis job was superseded before assessment commit."
+            )
         _commit_staged_assessment_files(staged_files)
 
     # Global state is updated only after the durable bundle is committed.
@@ -664,6 +855,7 @@ def _sync_upload_report_body(
     user_id: int,
     pre_saved_file_info: Optional[dict] = None,
     progress_cb=None,
+    expected_job_id: Optional[str] = None,
 ) -> dict:
     """PDF encode + assessment off the event loop (keeps /api/files responsive)."""
     pipeline_started = time.perf_counter()
@@ -690,7 +882,14 @@ def _sync_upload_report_body(
             logger.info(f"File saved at: {file_info['file_path']}")
             _emit_upload_progress(progress_cb, "file_saved", "File saved. Starting processing.", 5, file_id=file_info.get("file_id"))
 
-        _patch_file_metadata(file_info["file_id"], status="processing", processing_stage="processing", processing_progress=5)
+        if not _patch_file_metadata(
+            file_info["file_id"],
+            expected_job_id=expected_job_id,
+            status="processing",
+            processing_stage="processing",
+            processing_progress=5,
+        ):
+            raise RuntimeError("Report processing job was superseded before it started.")
 
         # Process PDF
         logger.info("Starting PDF processing...")
@@ -727,6 +926,12 @@ def _sync_upload_report_body(
         # Persist segments + embeddings for fast chat retrieval after restart.
         # (This is crucial for "load previous embeddings" requirement.)
         persist_started = time.perf_counter()
+        if not _file_metadata_job_matches(
+            file_info["file_id"], expected_job_id
+        ):
+            raise RuntimeError(
+                "Report processing job was superseded before artifact persistence."
+            )
         try:
             file_manager.save_report_artifacts(file_info["file_id"], report_content)
         except Exception as e:
@@ -803,15 +1008,6 @@ def _sync_upload_report_body(
         elif fw in ("CDP", "TCFD"):
             system_components["current_semi_industry"] = p0["semiIndustry"]
 
-        # Pre-build HippoRAG index once per document (not per scope).
-        try:
-            with _chatbot_ops_lock:
-                retriever = getattr(system_components["chatbot"], "_hipporag_retriever", None)
-                if retriever and getattr(retriever, "is_enabled", lambda: False)():
-                    retriever.ensure_index(report_content.document_id, report_content)
-        except Exception as e:
-            logger.warning(f"HippoRAG pre-index failed for {file_info['file_id']}: {e}")
-
         dual_retriever = system_components["dual_retriever"]
         disclosure_engine = system_components["disclosure_engine"]
         json_report_dir = Path(file_manager.compliance_outputs)
@@ -824,15 +1020,14 @@ def _sync_upload_report_body(
         last_report_path_str = ""
         expected_scope_keys = [s[0] for s in scopes_list]
 
-        try:
-            finfo_early = file_manager.metadata.get("files", {}).get(file_info["file_id"])
-            if isinstance(finfo_early, dict):
-                finfo_early["scope_slugs_json"] = json.dumps(
-                    expected_scope_keys, ensure_ascii=False
-                )
-                file_manager._save_metadata()
-        except Exception as e:
-            logger.warning(f"Early scope_slugs_json patch failed: {e}")
+        if not _patch_file_metadata(
+            file_info["file_id"],
+            expected_job_id=expected_job_id,
+            scope_slugs_json=json.dumps(expected_scope_keys, ensure_ascii=False),
+        ):
+            raise RuntimeError(
+                "Report processing job was superseded before assessment started."
+            )
 
         _write_compliance_manifest(
             json_report_dir,
@@ -906,6 +1101,13 @@ def _sync_upload_report_body(
                     f"{analysis_elapsed:.2f}s"
                 )
                 last_assessment = assessment
+
+                if not _file_metadata_job_matches(
+                    file_info["file_id"], expected_job_id
+                ):
+                    raise RuntimeError(
+                        "Report processing job was superseded before assessment output."
+                    )
 
                 compliance_report = disclosure_engine.generate_compliance_report(assessment)
                 md_stem = _sanitize_compliance_filename_part(f"{sanitized_part}")
@@ -1010,38 +1212,53 @@ def _sync_upload_report_body(
             if last_assessment:
                 with _chatbot_ops_lock:
                     system_components["chatbot"].load_context(report_content, last_assessment)
+            warm_hipporag_after_upload(
+                system_components["chatbot"],
+                report_content,
+            )
 
-            # Persist primary scope on file record for listings / cross-analysis defaults
-            try:
-                finfo = file_manager.metadata.get("files", {}).get(file_info["file_id"])
-                if isinstance(finfo, dict):
-                    finfo["scope_slugs_json"] = json.dumps([s[0] for s in scopes_list], ensure_ascii=False)
-                    if fw == "GRI":
-                        finfo["gri_topic"] = scopes_list[0][0]
-                        finfo["gri_sector"] = scopes_list[0][1]["griSector"]
-                        finfo["semi_industry"] = None
-                    elif fw == "SASB":
-                        finfo["semi_industry"] = scopes_list[0][0]
-                    elif fw in ("CDP", "TCFD"):
-                        finfo["semi_industry"] = scopes_list[0][0]
-                    file_manager._save_metadata()
-            except Exception as e:
-                logger.warning(f"Failed to patch file metadata with multi-scope info: {e}")
+            # Persist primary scope on file record for listings / cross-analysis defaults.
+            scope_updates = {
+                "scope_slugs_json": json.dumps(
+                    [s[0] for s in scopes_list], ensure_ascii=False
+                )
+            }
+            if fw == "GRI":
+                scope_updates.update(
+                    gri_topic=scopes_list[0][0],
+                    gri_sector=scopes_list[0][1]["griSector"],
+                    semi_industry=None,
+                )
+            elif fw in ("SASB", "CDP", "TCFD"):
+                scope_updates["semi_industry"] = scopes_list[0][0]
+            if not _patch_file_metadata(
+                file_info["file_id"],
+                expected_job_id=expected_job_id,
+                **scope_updates,
+            ):
+                raise RuntimeError(
+                    "Report processing job was superseded before finalization."
+                )
 
-            file_manager.move_report_file(file_info["file_id"], "processed")
             if last_assessment:
                 logger.info(
                     f"Complete processing chain finished ({len(scopes_list)} scope(s)). "
                     f"Last score: {last_assessment.overall_compliance_score:.2%}"
                 )
-            _patch_file_metadata(
+            finalized = _finalize_report_file_metadata(
                 file_info["file_id"],
+                destination_status="processed",
+                expected_job_id=expected_job_id,
                 status="processed",
                 processing_job_id=None,
                 processing_stage="completed",
                 processing_progress=100,
                 processing_error=None,
             )
+            if not finalized:
+                raise RuntimeError(
+                    "Could not move and finalize the processed report for the current job."
+                )
             _emit_upload_progress(progress_cb, "completed", "Report processing completed.", 100, file_id=file_info.get("file_id"))
 
             performance["total_seconds"] = round(time.perf_counter() - pipeline_started, 3)
@@ -1064,6 +1281,12 @@ def _sync_upload_report_body(
             }
 
         except Exception as assessment_error:
+            if not _file_metadata_job_matches(
+                file_info["file_id"], expected_job_id
+            ):
+                raise RuntimeError(
+                    "Report processing job was superseded during assessment."
+                ) from assessment_error
             error_str = str(assessment_error)
             logger.error(f"Error in assessment processing: {assessment_error}")
 
@@ -1080,7 +1303,10 @@ def _sync_upload_report_body(
 
             is_llm_error = "403" in error_str or "AccessDenied" in error_str or "Unpurchased" in error_str or "LLM" in error_str
 
-            file_manager.move_report_file(file_info["file_id"], "processed")
+            warm_hipporag_after_upload(
+                system_components["chatbot"],
+                report_content,
+            )
 
             error_message = "Report processed but assessment failed"
             if is_llm_error:
@@ -1089,14 +1315,20 @@ def _sync_upload_report_body(
                     "确保使用可访问的模型（如 'qwen-plus' 或 'qwen-turbo'）。"
                 )
 
-            _patch_file_metadata(
+            finalized = _finalize_report_file_metadata(
                 file_info["file_id"],
+                destination_status="processed",
+                expected_job_id=expected_job_id,
                 status="processed",
                 processing_job_id=None,
                 processing_stage="partial_success",
                 processing_progress=100,
                 processing_error=str(assessment_error)[:1000],
             )
+            if not finalized:
+                raise RuntimeError(
+                    "Could not move and finalize the partially processed report for the current job."
+                ) from assessment_error
             _emit_upload_progress(progress_cb, "partial_success", error_message, 100, file_id=file_info.get("file_id"), error=str(assessment_error))
 
             return {
@@ -1113,15 +1345,21 @@ def _sync_upload_report_body(
         logger.error(f"Error processing report: {e}")
         # If processing fails, move to failed directory
         if 'file_info' in locals():
-            file_manager.move_report_file(file_info["file_id"], "failed")
-            _patch_file_metadata(
+            finalized = _finalize_report_file_metadata(
                 file_info["file_id"],
+                destination_status="failed",
+                expected_job_id=expected_job_id,
                 status="failed",
                 processing_job_id=None,
                 processing_stage="failed",
                 processing_progress=100,
                 processing_error=str(e)[:1000],
             )
+            if not finalized:
+                logger.warning(
+                    "Could not move/finalize failed report for the current job: file_id={}",
+                    file_info["file_id"],
+                )
             _emit_upload_progress(progress_cb, "failed", f"Report processing failed: {e}", 100, file_id=file_info.get("file_id"), error=str(e))
         raise
 
@@ -1158,8 +1396,10 @@ def _run_report_processing_job(
                 job_id=job_id,
                 extra=extra,
             )
-            _patch_file_metadata(
+            _patch_progress_file_metadata(
                 file_info["file_id"],
+                force=metadata_updates.get("status") in {"processed", "failed"},
+                expected_job_id=job_id,
                 **metadata_updates,
             )
 
@@ -1177,6 +1417,7 @@ def _run_report_processing_job(
             user_id,
             pre_saved_file_info=file_info,
             progress_cb=progress_cb,
+            expected_job_id=job_id,
         )
         final_status = str(result.get("status") or "success")
         update_report_job(
@@ -1220,8 +1461,10 @@ def _run_report_reanalysis_job(job_id: str, file_info: dict) -> None:
             message=message,
             extra=extra,
         )
-        _patch_file_metadata(
+        _patch_progress_file_metadata(
             file_id,
+            expected_job_id=job_id,
+            job_id_field="reanalysis_job_id",
             reanalysis_job_id=job_id,
             reanalysis_stage=stage,
             reanalysis_progress=progress,
@@ -1236,14 +1479,21 @@ def _run_report_reanalysis_job(job_id: str, file_info: dict) -> None:
             progress=1,
             message="Loading persisted report evidence.",
         )
-        _patch_file_metadata(
+        if not _patch_file_metadata(
             file_id,
+            expected_job_id=job_id,
+            job_id_field="reanalysis_job_id",
             reanalysis_job_id=job_id,
             reanalysis_stage="artifacts_loading",
             reanalysis_progress=1,
             reanalysis_error=None,
+        ):
+            raise RuntimeError("Report reanalysis job was superseded before it started.")
+        result = _sync_reanalyze_report_body(
+            file_info,
+            progress_cb=progress_cb,
+            expected_job_id=job_id,
         )
-        result = _sync_reanalyze_report_body(file_info, progress_cb=progress_cb)
         finfo = file_manager.metadata.get("files", {}).get(file_id)
         try:
             previous_version = (
@@ -1253,15 +1503,20 @@ def _run_report_reanalysis_job(job_id: str, file_info: dict) -> None:
             )
         except (TypeError, ValueError):
             previous_version = 0
-        _patch_file_metadata(
+        if not _patch_file_metadata(
             file_id,
+            expected_job_id=job_id,
+            job_id_field="reanalysis_job_id",
             reanalysis_job_id=None,
             reanalysis_stage="completed",
             reanalysis_progress=100,
             reanalysis_error=None,
             assessment_version=previous_version + 1,
             assessment_updated_at=datetime.now().isoformat(),
-        )
+        ):
+            raise RuntimeError(
+                "Report reanalysis job was superseded before finalization."
+            )
         update_report_job(
             job_id,
             status="success",
@@ -1275,6 +1530,8 @@ def _run_report_reanalysis_job(job_id: str, file_info: dict) -> None:
         logger.exception(f"Background report reanalysis failed: job_id={job_id}")
         _patch_file_metadata(
             file_id,
+            expected_job_id=job_id,
+            job_id_field="reanalysis_job_id",
             reanalysis_job_id=None,
             reanalysis_stage="failed",
             reanalysis_progress=100,
@@ -1304,38 +1561,44 @@ async def get_report_job_status(
     return {"status": "success", "job": job}
 
 
-async def reprocess_report(
-    file_id: str,
-    user_id: int = Depends(get_current_user),
-):
-    """Explicitly enqueue the current visual parser for an existing report."""
+def _reprocess_report_locked(file_id: str, user_id: int) -> dict:
+    """Check both job types and install a processing token under one lock."""
     file_info = file_manager.get_file_info(file_id, user_id=user_id)
     if not file_info or file_info.get("file_type") != "report":
         raise HTTPException(status_code=404, detail="Report not found or access denied")
     source = Path(str(file_info.get("file_path") or ""))
     if not source.is_file():
         raise HTTPException(status_code=404, detail="Report PDF is missing")
+    for job_field in ("processing_job_id", "reanalysis_job_id"):
+        active_job_id = str(file_info.get(job_field) or "").strip()
+        active_job = snapshot_report_job(active_job_id) if active_job_id else None
+        if active_job and str(active_job.get("status") or "") not in TERMINAL_STATUSES:
+            raise HTTPException(status_code=409, detail="Report is currently being processed")
+
     if str(file_info.get("status") or "").lower() == "processing":
         existing_job_id = str(file_info.get("processing_job_id") or "").strip()
-        if existing_job_id and snapshot_report_job(existing_job_id):
-            raise HTTPException(status_code=409, detail="Report is already being processed")
         _patch_file_metadata(
             file_id,
             status="failed",
+            processing_job_id=None,
             processing_stage="interrupted",
             processing_progress=100,
             processing_error="Processing was interrupted. A replacement job is being created.",
         )
 
     job = create_report_job(file_id=file_id, filename=source.name, user_id=user_id)
-    _patch_file_metadata(
+    if not _patch_file_metadata(
         file_id,
         status="processing",
         processing_job_id=job["job_id"],
         processing_stage="queued",
         processing_progress=0,
         processing_error=None,
-    )
+    ):
+        raise HTTPException(
+            status_code=500,
+            detail="Could not reserve the report processing job.",
+        )
     get_report_job_executor().submit(
         _run_report_processing_job,
         job["job_id"],
@@ -1357,6 +1620,15 @@ async def reprocess_report(
         "processing_status_url": f"/api/report-jobs/{job['job_id']}",
         "events_url": f"/api/report-jobs/{job['job_id']}/events",
     }
+
+
+async def reprocess_report(
+    file_id: str,
+    user_id: int = Depends(get_current_user),
+):
+    """Explicitly enqueue the current visual parser for an existing report."""
+    with _report_reanalysis_lock:
+        return _reprocess_report_locked(file_id, user_id)
 
 
 async def reanalyze_report(
@@ -1389,13 +1661,17 @@ async def reanalyze_report(
             filename=str(job_file_info.get("safe_filename") or job_file_info.get("original_name") or canonical_file_id),
             user_id=user_id,
         )
-        _patch_file_metadata(
+        if not _patch_file_metadata(
             canonical_file_id,
             reanalysis_job_id=job["job_id"],
             reanalysis_stage="queued",
             reanalysis_progress=0,
             reanalysis_error=None,
-        )
+        ):
+            raise HTTPException(
+                status_code=500,
+                detail="Could not reserve the report reanalysis job.",
+            )
         get_report_job_executor().submit(
             _run_report_reanalysis_job,
             job["job_id"],
@@ -1504,10 +1780,10 @@ async def upload_report(
 
     Note:
         Heavy work runs in a thread pool (`asyncio.to_thread`) so the event loop can still
-        serve GET /api/files and other requests while analysis runs. HippoRAG ``ensure_index`` and
-        final ``chatbot.load_context`` use ``_chatbot_ops_lock`` so opening Chat does not race
-        the shared ``ESGChatbot`` instance. Concurrent uploads still share global ``system_components``
-        (last write wins); use one analysis at a time for stable chat context.
+        serve GET /api/files and other requests while analysis runs. HippoRAG warm indexing is
+        queued in its own background worker; only final ``chatbot.load_context`` uses
+        ``_chatbot_ops_lock``. Concurrent uploads still share global ``system_components`` (last
+        write wins); use one analysis at a time for stable chat context.
     """
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")

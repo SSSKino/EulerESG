@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from esg_encoding.content_extractor import (
     ContentExtractor,
@@ -59,7 +59,7 @@ class PageBatchRangeTests(unittest.TestCase):
 
 
 class PaddleDocumentLifecycleTests(unittest.TestCase):
-    def test_queue_wrapper_wakes_before_ocr_and_releases_in_finally(self):
+    def test_queue_wrapper_defers_wake_to_fenced_submit_and_releases_in_finally(self):
         extractor = ContentExtractor()
         calls: list[str] = []
 
@@ -84,7 +84,7 @@ class PaddleDocumentLifecycleTests(unittest.TestCase):
             result = extractor._run_paddleocr_vl_page_batch_queue(Path("report.pdf"))
 
         self.assertEqual(result["status"], "success")
-        self.assertEqual(calls, ["wake", "run", "release"])
+        self.assertEqual(calls, ["run", "release"])
 
     def test_queue_wrapper_can_defer_release_until_report_repairs_finish(self):
         extractor = ContentExtractor()
@@ -112,7 +112,7 @@ class PaddleDocumentLifecycleTests(unittest.TestCase):
                 release_after_document=False,
             )
 
-        self.assertEqual(calls, ["wake", "run"])
+        self.assertEqual(calls, ["run"])
         release.assert_not_called()
         self.assertTrue(result["_paddle_lifecycle_job_id"].startswith("parse_"))
 
@@ -146,6 +146,88 @@ class PaddleDocumentLifecycleTests(unittest.TestCase):
         ), patch.object(extractor, "_sleep_paddleocr_vlm") as sleep:
             extractor._release_paddle_after_document("job-2")
         sleep.assert_called_once_with("job-2")
+
+    def test_vllm_does_not_sleep_while_a_worker_holds_a_processing_lease(self):
+        extractor = ContentExtractor()
+        client = MagicMock()
+        lifecycle_lock = MagicMock()
+        lifecycle_lock.acquire.return_value = True
+        client.lock.return_value = lifecycle_lock
+        pipeline = MagicMock()
+        client.pipeline.return_value = pipeline
+        pipeline.llen.return_value = pipeline
+        pipeline.zcount.return_value = pipeline
+        pipeline.execute.return_value = [0, 1, 1]
+
+        with patch.dict(
+            os.environ,
+            {"PADDLEOCR_VLM_SLEEP_ENABLED": "true"},
+        ), patch.object(
+            extractor,
+            "_redis_client",
+            return_value=client,
+        ), patch.object(extractor, "_paddleocr_vlm_sleep_state") as sleep_state:
+            slept = extractor._sleep_paddleocr_vlm("job-active")
+
+        self.assertFalse(slept)
+        sleep_state.assert_not_called()
+        pipeline.llen.assert_any_call("paddleocr:parse")
+        pipeline.llen.assert_any_call("paddleocr:parse:processing")
+        pipeline.zcount.assert_called_once()
+        lifecycle_lock.acquire.assert_called_once_with(blocking=True)
+        lifecycle_lock.release.assert_called_once_with()
+
+    def test_wake_and_enqueue_share_one_lifecycle_lock(self):
+        extractor = ContentExtractor()
+        client = MagicMock()
+        lifecycle_lock = MagicMock()
+        events: list[str] = []
+        lifecycle_lock.acquire.side_effect = lambda **_kwargs: events.append("acquire") or True
+        lifecycle_lock.release.side_effect = lambda: events.append("release")
+        client.lock.return_value = lifecycle_lock
+        client.rpush.side_effect = lambda *_args, **_kwargs: events.append("rpush")
+        entries = [("batch-key", {"status": "queued"}, {"job_id": "job-1"})]
+
+        with patch.object(
+            extractor,
+            "_wake_paddleocr_vlm",
+            side_effect=lambda: events.append("wake"),
+        ), patch.object(
+            extractor,
+            "_redis_hash_set",
+            side_effect=lambda *_args, **_kwargs: events.append("hash"),
+        ):
+            extractor._submit_paddleocr_queue_entries(
+                client,
+                "paddleocr:parse",
+                entries,
+            )
+
+        self.assertEqual(events, ["acquire", "wake", "hash", "rpush", "release"])
+
+    def test_lifecycle_lock_ttl_covers_configured_api_timeout(self):
+        extractor = ContentExtractor()
+        client = MagicMock()
+        lifecycle_lock = MagicMock()
+        lifecycle_lock.acquire.return_value = True
+        client.lock.return_value = lifecycle_lock
+
+        with patch.dict(
+            os.environ,
+            {
+                "PADDLEOCR_VLM_WAKE_TIMEOUT_SECONDS": "600",
+                "PADDLEOCR_VLM_SLEEP_TIMEOUT_SECONDS": "120",
+                "PADDLEOCR_VLM_LIFECYCLE_LOCK_TIMEOUT_SECONDS": "30",
+            },
+        ):
+            lock = extractor._acquire_paddleocr_lifecycle_lock(client)
+
+        self.assertIs(lock, lifecycle_lock)
+        self.assertGreaterEqual(client.lock.call_args.kwargs["timeout"], 1320)
+        self.assertGreaterEqual(
+            client.lock.call_args.kwargs["blocking_timeout"],
+            client.lock.call_args.kwargs["timeout"],
+        )
 
 
 class PyMuPdfSplitTests(unittest.TestCase):

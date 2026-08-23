@@ -61,7 +61,7 @@ ESG-demo-main/frontend/next-env.d.ts
 # 上传的文件（如果包含敏感数据）
 
 # 生成的报告和输出
-backend/outputs/*
+backend/outputos/*
 outputs/
 uploads
 

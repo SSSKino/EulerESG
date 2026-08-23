@@ -5,11 +5,13 @@ import threading
 import time
 from types import MethodType, SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import numpy as np
 
 from esg_encoding.disclosure_inference import DisclosureInferenceEngine
+from esg_encoding.content_embedder import ContentEmbedder
+from esg_encoding.content_revision import bump_document_content_revision
 from esg_encoding.models import (
     DocumentContent,
     ProcessingConfig,
@@ -25,6 +27,7 @@ from esg_encoding.retrieval.evidence_retriever import retrieve_metric_collection
 from esg_encoding.services.common import (
     _apply_assessment_year_selection,
     _compact_assessment_payload,
+    _create_enhanced_knowledge_base,
     _prepare_metrics_for_retrieval,
 )
 
@@ -260,6 +263,91 @@ class RetrievalCacheTests(unittest.TestCase):
         self.assertEqual(calls, 3)
         self.assertIs(first[1], second[1])
 
+        # In-place OCR/table correction keeps both list identity and length.
+        # The content revision must still invalidate the tokenized corpus.
+        segments[0].content = "Water disclosure changed in place"
+        bump_document_content_revision(report)
+        third = retriever._get_bm25_corpus(report)
+        self.assertEqual(calls, 6)
+        self.assertIsNot(second[1], third[1])
+        self.assertIn("water", third[1][0])
+
+    def test_same_document_id_and_revision_do_not_share_keyword_cache(self):
+        first_report = _report(
+            [TextSegment(segment_id="a", content="Energy", page_number=1, position_y=0)]
+        )
+        second_report = _report(
+            [TextSegment(segment_id="b", content="Water", page_number=1, position_y=0)]
+        )
+        retriever = KeywordRetriever(ProcessingConfig())
+        first = retriever._get_bm25_corpus(first_report)
+        # Simulate a copied private cache on a newly loaded object with the
+        # same stable document ID and revision.
+        object.__setattr__(
+            second_report,
+            "_keyword_bm25_cache",
+            getattr(first_report, "_keyword_bm25_cache"),
+        )
+
+        second = retriever._get_bm25_corpus(second_report)
+
+        self.assertIsNot(first[1], second[1])
+        self.assertEqual(second[0][0].segment_id, "b")
+        self.assertIn("water", second[1][0])
+
+    def test_disclosure_segment_cache_invalidates_after_in_place_edit(self):
+        segment = TextSegment(
+            segment_id="before",
+            content="Original evidence",
+            page_number=1,
+            position_y=0,
+        )
+        report = _report([segment])
+        engine = object.__new__(DisclosureInferenceEngine)
+        first = engine._get_report_segment_cache(report)
+        second = engine._get_report_segment_cache(report)
+        self.assertIs(first, second)
+
+        segment.segment_id = "after"
+        segment.content = "Corrected evidence"
+        bump_document_content_revision(report)
+        third = engine._get_report_segment_cache(report)
+        self.assertIsNot(second, third)
+        self.assertNotIn("before", third["by_id"])
+        self.assertIs(third["by_id"]["after"], segment)
+
+    def test_metric_dense_queries_are_encoded_as_one_batch(self):
+        retriever = self._semantic_retriever()
+        segment = self._semantic_segment()
+        report = _report([segment])
+        object.__setattr__(
+            report,
+            "_embedding_matrix",
+            np.asarray([[1.0, 0.0]], dtype=np.float32),
+        )
+        object.__setattr__(report, "_embedding_segment_ids", [segment.segment_id])
+        pairs = [(_metric(index), None) for index in range(1, 4)]
+
+        def encode(_model, texts, **_kwargs):
+            return np.asarray([[1.0, 0.0] for _ in texts], dtype=np.float32)
+
+        with patch(
+            "esg_encoding.retrieval.semantic.encode_query_texts",
+            side_effect=encode,
+        ) as mocked_encode:
+            retriever.prepare_metric_queries(pairs)
+            for metric, expansion in pairs:
+                results = retriever.search_by_semantic(
+                    report,
+                    metric,
+                    expansion,
+                    apply_reranker=False,
+                )
+                self.assertEqual(results[0].segment_id, segment.segment_id)
+
+        self.assertEqual(mocked_encode.call_count, 1)
+        self.assertEqual(len(mocked_encode.call_args.args[1]), 3)
+
     def test_metric_results_are_reused_across_scopes_with_same_identity(self):
         report = _report([TextSegment(segment_id="s1", content="Energy", page_number=1, position_y=0)])
         collection = SimpleNamespace(metrics=[_metric(1)], semantic_expansions=[])
@@ -280,6 +368,77 @@ class RetrievalCacheTests(unittest.TestCase):
             second = retrieve_metric_collection(report, collection, ProcessingConfig())
         self.assertEqual(calls, 1)
         self.assertIs(first[0], second[0])
+
+        report.document_content.segments[0].content = "Water changed in place"
+        bump_document_content_revision(report)
+        with patch("esg_encoding.retrieval.evidence_retriever.enrich_document_with_pdf_links"), patch.object(
+            __import__("esg_encoding.retrieval.dual_channel", fromlist=["DualChannelRetriever"]).DualChannelRetriever,
+            "retrieve_for_metric",
+            fake_retrieve,
+        ):
+            third = retrieve_metric_collection(report, collection, ProcessingConfig())
+        self.assertEqual(calls, 2)
+        self.assertIs(third[0], expected)
+
+
+class ContentEmbedderMatrixTests(unittest.TestCase):
+    def test_new_document_keeps_only_native_matrix(self):
+        document = DocumentContent(
+            document_id="matrix-report",
+            file_path="matrix-report.pdf",
+            segments=[
+                TextSegment(segment_id="s1", content="One", page_number=1, position_y=0),
+                TextSegment(segment_id="s2", content="Two", page_number=1, position_y=1),
+            ],
+            markdown_content="",
+        )
+        embedder = object.__new__(ContentEmbedder)
+        embedder.config = ProcessingConfig()
+        embedder.logger = Mock()
+        embedder.model = SimpleNamespace(
+            encode=lambda texts, **_kwargs: np.asarray(
+                [[1.0, 0.0], [0.0, 1.0]][: len(texts)], dtype=np.float32
+            )
+        )
+
+        report = embedder.embed_document(document)
+
+        self.assertEqual(report.embeddings, [])
+        matrix = getattr(report, "_embedding_matrix")
+        self.assertEqual(matrix.shape, (2, 2))
+        self.assertEqual(matrix.dtype, np.float32)
+        self.assertEqual(getattr(report, "_embedding_segment_ids"), ["s1", "s2"])
+        self.assertEqual(
+            [item[0] for item in embedder.compute_similarity("query", report, top_k=2)],
+            ["s1", "s2"],
+        )
+
+    def test_enhanced_chat_content_retains_native_report_matrix(self):
+        segment = TextSegment(
+            segment_id="report-segment",
+            content="Report evidence",
+            page_number=1,
+            position_y=0,
+        )
+        report = _report([segment])
+        matrix = np.asarray([[1.0, 0.0]], dtype=np.float32)
+        object.__setattr__(report, "_embedding_matrix", matrix)
+        object.__setattr__(report, "_embedding_segment_ids", [segment.segment_id])
+        assessment = SimpleNamespace(
+            report_id="report-1",
+            total_metrics_analyzed=0,
+            overall_compliance_score=0.0,
+            disclosure_summary={},
+            metric_analyses=[],
+        )
+
+        enhanced = _create_enhanced_knowledge_base(assessment, report)
+
+        self.assertIs(getattr(enhanced, "_embedding_matrix"), matrix)
+        self.assertEqual(
+            getattr(enhanced, "_embedding_segment_ids"),
+            [segment.segment_id],
+        )
 
 
 class MetricPreparationTests(unittest.TestCase):

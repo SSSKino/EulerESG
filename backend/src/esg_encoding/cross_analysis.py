@@ -15,7 +15,10 @@ from loguru import logger
 from dataclasses import replace
 
 from .file_manager import file_manager
-from .retrieval.hipporag.settings import HippoRAGSettings
+from .retrieval.hipporag.settings import (
+    HippoRAGSettings,
+    versioned_hipporag_cache_root,
+)
 from .retrieval.hipporag.retriever import HippoRAGRetriever
 from .retrieval.reranker import rerank_segment_ids
 from .shared_embedding_model import encode_query_texts, get_shared_embedding_model
@@ -53,6 +56,12 @@ _hippo: Optional[HippoRAGRetriever] = None
 _hippo_settings: Optional[HippoRAGSettings] = None
 _proc_config: Optional[ProcessingConfig] = None
 _report_content_cache: Dict[str, ReportContent] = {}
+
+
+def set_hipporag_retriever(retriever: Optional[HippoRAGRetriever]) -> None:
+    """Inject the API runtime retriever so all retrieval surfaces share it."""
+    global _hippo
+    _hippo = retriever
 
 
 def _get_processing_config() -> ProcessingConfig:
@@ -276,6 +285,11 @@ def _effective_hippo_settings() -> HippoRAGSettings:
         enabled = os.getenv("HIPPO_ENABLED", "1").strip().lower() in ("1", "true", "yes", "y")
         settings = replace(settings, enabled=enabled)
 
+    settings = replace(
+        settings,
+        cache_root=versioned_hipporag_cache_root(settings),
+    )
+
     # Reranker device safety: default settings uses cuda:0, but many envs are CPU-only.
     dev = getattr(settings, "rerank_device", "cpu")
     if dev.startswith("cuda"):
@@ -309,6 +323,38 @@ def _get_hippo() -> Optional[HippoRAGRetriever]:
         logger.warning(f"[CrossAnalysis] HippoRAG init failed, will fallback to vector retrieval. err={e}")
         _hippo = None
         return None
+
+
+@dataclass(frozen=True)
+class _CrossRerankResult:
+    idx: int
+    score: float
+
+
+def rerank(
+    *,
+    query: str,
+    snippets: List[str],
+    top_k: int,
+) -> List[_CrossRerankResult]:
+    """Adapt the shared segment reranker to Cross Analysis snippet indices."""
+    if not snippets or top_k <= 0:
+        return []
+    settings = replace(
+        _effective_hippo_settings(),
+        rerank_top_k=min(len(snippets), max(1, int(top_k))),
+    )
+    scored = [(str(index), 0.0) for index in range(len(snippets))]
+    ranked = rerank_segment_ids(
+        query=query,
+        scored=scored,
+        get_passage=lambda raw_index: snippets[int(raw_index)],
+        settings=settings,
+    )
+    return [
+        _CrossRerankResult(idx=int(raw_index), score=float(score))
+        for raw_index, score in ranked[:top_k]
+    ]
 
 
 def _get_report_content(file_id: str) -> ReportContent:
@@ -921,8 +967,16 @@ def topn_segments(
         try:
             report_content = _get_report_content(file_id)
             top_h = int(os.getenv('CROSS_HIPPO_TOPN', '140') or '140')
-            hippo_ids = hippo.retrieve_segment_ids(report_content, query=qtext, top_k=top_h) or []
-        except Exception:
+            hippo_ids = hippo.retrieve_segment_ids(
+                file_id,
+                report_content,
+                query=qtext,
+                top_k=top_h,
+            ) or []
+        except Exception as exc:
+            logger.warning(
+                f"[CrossAnalysis] HippoRAG retrieval failed for {file_id}: {exc}"
+            )
             hippo_ids = []
 
     # Add Hippo results with strict gate to reduce pollution

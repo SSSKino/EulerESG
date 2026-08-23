@@ -15,11 +15,14 @@ from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from loguru import logger
-from dotenv import load_dotenv
 import time
 import threading
 import asyncio
 import hashlib
+
+from ..environment import load_backend_environment
+
+load_backend_environment()
 
 from ..models import (
     ProcessingConfig,
@@ -83,9 +86,6 @@ from ..chat.chatbot import ESGChatbot
 from ..retrieval.hipporag.patch import enable_hipporag
 from ..file_manager import file_manager
 from ..excel_exporter import ExcelExporter
-
-# Load environment variables (load early to ensure CORS config can read from .env)
-load_dotenv()
 
 # Global variables to store system components
 system_components = {
@@ -1211,6 +1211,22 @@ def _load_specific_report_context(file_id: str):
                             document_content=document_content,
                             embeddings=getattr(embedded_report, "embeddings", []),
                         )
+                        embedded_matrix = getattr(embedded_report, "_embedding_matrix", None)
+                        embedded_ids = getattr(embedded_report, "_embedding_segment_ids", None)
+                        if embedded_matrix is not None and embedded_ids is not None:
+                            object.__setattr__(tmp_report, "_embedding_matrix", embedded_matrix)
+                            object.__setattr__(tmp_report, "_embedding_segment_ids", embedded_ids)
+                        metric_corpus = getattr(
+                            embedded_report,
+                            "_metric_retrieval_corpus",
+                            None,
+                        )
+                        if metric_corpus is not None:
+                            object.__setattr__(
+                                tmp_report,
+                                "_metric_retrieval_corpus",
+                                metric_corpus,
+                            )
                         file_manager.save_report_artifacts(file_id, tmp_report)
                         report_content_obj = tmp_report
                         # Also attach matrix cache for faster search
@@ -1485,6 +1501,23 @@ ESG合规评估总结:
                 document_content=document_content,
                 embeddings=report_content.embeddings if hasattr(report_content, 'embeddings') else []
             )
+            source_matrix = getattr(report_content, "_embedding_matrix", None)
+            source_embedding_ids = getattr(
+                report_content,
+                "_embedding_segment_ids",
+                None,
+            )
+            if source_matrix is not None and source_embedding_ids is not None:
+                # Assessment-only segments have no document embeddings. The
+                # chatbot filters this matrix by segment ID, so retaining the
+                # original report rows is both valid and avoids a legacy-list
+                # reconstruction (new reports intentionally keep that list empty).
+                object.__setattr__(enhanced_content, "_embedding_matrix", source_matrix)
+                object.__setattr__(
+                    enhanced_content,
+                    "_embedding_segment_ids",
+                    list(source_embedding_ids),
+                )
         else:
             # 只有评估数据，没有原始报告
             text_segments = []

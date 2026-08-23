@@ -1,12 +1,13 @@
 """System/status service functions."""
 
+from ..environment import load_backend_environment
 from .common import *  # noqa: F401,F403
 
 
 async def startup_event():
     """Initialize system components on startup"""
-    # Load environment variables from .env file
-    load_dotenv()
+    # Keep direct Uvicorn/IDE startup independent from the current directory.
+    load_backend_environment()
 
     # Recover disk space left by interrupted/OOM OCR jobs. This only touches
     # expired children of the dedicated work roots, never report-owned assets.
@@ -103,6 +104,11 @@ async def startup_event():
     # Enable HippoRAG augmentation (safe even if HippoRAG not installed; patched_search falls back)
     try:
         enable_hipporag(system_components["chatbot"], config)
+        from .. import cross_analysis as _ca
+
+        _ca.set_hipporag_retriever(
+            getattr(system_components["chatbot"], "_hipporag_retriever", None)
+        )
     except Exception as e:
         logger.warning(f"Failed to enable HippoRAG (will fallback to base retrieval): {e}")
     

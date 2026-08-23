@@ -171,11 +171,17 @@ class PdfLinkTests(unittest.TestCase):
 
             self.assertEqual(summary["internal"], 1)
             self.assertEqual(summary["external_ignored"], 1)
+            self.assertEqual(document.content_revision, 2)
             internal_links = internal.structured_data["pdf_links"]
             self.assertEqual(internal_links[0]["target_page"], 2)
             self.assertEqual(internal_links[0]["link_type"], "internal")
             external_links = external.structured_data["pdf_links"]
             self.assertEqual(external_links[0]["link_type"], "external_ignored")
+
+            # Current-version link metadata is idempotent and must not churn
+            # cache revisions on every retrieval call.
+            enrich_document_with_pdf_links(document)
+            self.assertEqual(document.content_revision, 2)
 
     def test_duplicate_link_anchors_are_attached_to_distinct_table_rows(self):
         try:
@@ -1354,6 +1360,149 @@ class RetrievalNoiseControlTests(unittest.TestCase):
 class DirectDisclosureTests(unittest.TestCase):
     def setUp(self):
         self.engine = object.__new__(DisclosureInferenceEngine)
+
+    def test_structured_year_label_and_scaled_unit_override_visible_header(self):
+        row = _table_segment(
+            "energy-row",
+            "table_row",
+            "Total energy consumed | visible header says FY2023 | value 2",
+            row_index=7,
+            row_header="Total energy consumed",
+        )
+        value = _table_segment(
+            "energy-value",
+            "table_cell",
+            "2",
+            row_index=7,
+            col_index=2,
+            row_header="Total energy consumed",
+            col_header="FY2023",
+            value_text="2",
+        )
+        value.structured_data.update(
+            {
+                "year": 2024,
+                "source_year_label": "FY24",
+                "unit": "million kWh",
+            }
+        )
+        report = _report([row, value])
+
+        candidates = self.engine._real_data_candidates_for_row(
+            report,
+            row,
+            code_candidates=[],
+        )
+
+        self.assertEqual(len(candidates), 1)
+        candidate = candidates[0]
+        self.assertEqual(candidate["value"], 2)
+        self.assertEqual(candidate["year"], 2024)
+        self.assertEqual(candidate["source_year_label"], "FY24")
+        self.assertEqual(candidate["unit"], "million kWh")
+
+        metric = _metric(
+            "energy-test",
+            "TEST-ENERGY-1",
+            "Total energy consumed",
+            "GJ",
+        )
+        year_values = self.engine._metric_year_values_from_candidates(
+            candidates,
+            metric,
+        )
+        self.assertEqual(len(year_values), 1)
+        self.assertEqual(year_values[0]["year"], 2024)
+        self.assertEqual(year_values[0]["source_year_label"], "FY24")
+        self.assertEqual(year_values[0]["raw_value"], 2)
+        self.assertEqual(year_values[0]["raw_unit"], "million kWh")
+        self.assertEqual(year_values[0]["value"], 7200)
+        self.assertEqual(year_values[0]["unit"], "GJ")
+
+    def test_semantic_scope_conflicts_are_not_reinferred_downstream(self):
+        metric = _metric(
+            "energy-test",
+            "TEST-ENERGY-1",
+            "Total energy consumed",
+            "GJ",
+        )
+        for reason in (
+            "conflicting_year_scope",
+            "ambiguous_year_scope",
+            "ambiguous_unit_scope",
+        ):
+            with self.subTest(reason=reason):
+                row = _table_segment(
+                    f"energy-row-{reason}",
+                    "table_row",
+                    "Total energy consumed | FY24 | 10 GJ",
+                    row_index=7,
+                    row_header="Total energy consumed",
+                )
+                value = _table_segment(
+                    f"energy-value-{reason}",
+                    "table_cell",
+                    "10 GJ",
+                    row_index=7,
+                    col_index=2,
+                    row_header="Total energy consumed",
+                    col_header="FY24",
+                    value_text="10 GJ",
+                )
+                for segment in (row, value):
+                    segment.structured_data["quality_reasons"] = [reason]
+                if reason == "ambiguous_unit_scope":
+                    value.structured_data.update(
+                        {
+                            "year": 2024,
+                            "source_year_label": "FY24",
+                        }
+                    )
+                else:
+                    value.structured_data["unit"] = "GJ"
+                report = _report([row, value])
+
+                candidates = self.engine._real_data_candidates_for_row(
+                    report,
+                    row,
+                    code_candidates=[],
+                )
+
+                self.assertEqual(len(candidates), 1)
+                candidate = candidates[0]
+                self.assertIn(
+                    reason,
+                    candidate["blocking_semantic_quality_reasons"],
+                )
+                if reason in {
+                    "conflicting_year_scope",
+                    "ambiguous_year_scope",
+                }:
+                    self.assertIsNone(candidate["year"])
+                else:
+                    self.assertIsNone(candidate["unit"])
+                self.assertIsNone(
+                    self.engine._select_metric_numeric_candidate(
+                        report,
+                        row,
+                        metric,
+                        code_candidates=[],
+                    )
+                )
+                self.assertEqual(
+                    self.engine._metric_year_values_from_candidates(
+                        candidates,
+                        metric,
+                    ),
+                    [],
+                )
+                _context, latest_numeric, _unit, _description = (
+                    self.engine._build_table_row_aggregation_context(
+                        report,
+                        row,
+                    )
+                )
+                self.assertIsNone(latest_numeric)
 
     def _direct(self, code: str, value_text: str | None, metric_name: str = "Unrelated label", unit: str = ""):
         row = _table_segment(

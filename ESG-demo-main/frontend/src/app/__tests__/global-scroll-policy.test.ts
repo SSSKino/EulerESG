@@ -35,17 +35,23 @@ describe("global vertical scrolling policy", () => {
     );
   });
 
-  it("anchors floating assistants to the main content's lower-left corner", () => {
+  it("anchors floating assistants directly above the sidebar user entry", () => {
     expect(dashboardLayout).toContain("data-dashboard-shell");
     expect(crossAnalysisLayout).toContain("data-dashboard-shell");
     expect(globalsCss).toMatch(
-      /\[data-dashboard-shell\]\s*\{[^}]*--dashboard-sidebar-width:\s*260px;/,
+      /\[data-dashboard-shell\]\s*\{[^}]*--dashboard-sidebar-width:\s*260px;[^}]*--dashboard-user-entry-height:\s*4\.25rem;/,
     );
     expect(globalsCss).toMatch(
-      /aside\[data-collapsed="true"\][^}]*--dashboard-sidebar-width:\s*60px;/,
+      /aside\[data-collapsed="true"\][^}]*--dashboard-sidebar-width:\s*60px;[^}]*--dashboard-user-entry-height:\s*4rem;/,
     );
     expect(globalsCss).toMatch(
-      /\.dashboard-chat-launcher\s*\{[^}]*left:\s*calc\(var\(--dashboard-sidebar-width,\s*0px\)\s*\+\s*1\.5rem\);/,
+      /\.dashboard-chat-launcher\s*\{[^}]*bottom:\s*calc\([^}]*var\(--dashboard-user-entry-height,\s*4\.25rem\)[^}]*\+\s*0\.75rem[^}]*\);[^}]*left:\s*1\.5rem;/,
+    );
+    expect(globalsCss).toMatch(
+      /aside\[data-collapsed="true"\][^}]*\.dashboard-chat-launcher\s*\{[^}]*left:\s*0\.375rem;[^}]*width:\s*3rem;/,
+    );
+    expect(globalsCss).toMatch(
+      /aside\[data-collapsed="true"\][^}]*\.dashboard-chat-launcher-label\s*\{[^}]*display:\s*none;/,
     );
   });
 });

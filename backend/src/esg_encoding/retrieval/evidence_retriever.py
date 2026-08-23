@@ -15,8 +15,10 @@ from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
 
 from ..content_extractor import enrich_document_with_pdf_links
+from ..content_revision import document_content_revision
 from ..models import ProcessingConfig, ReportContent
 from .dual_channel import DualChannelRetriever
+from .metric_corpus import metric_embeddings, resolve_metric_retrieval_corpus
 from .metric_profile import (
     MetricRetrievalProfile,
     best_alias_matches,
@@ -26,6 +28,21 @@ from .metric_profile import (
     profile_to_metric_like,
     tokenize_metric_text,
 )
+
+
+def _has_semantic_corpus(report_content: ReportContent) -> bool:
+    metric_corpus = getattr(report_content, "_metric_retrieval_corpus", None)
+    if metric_corpus is not None and metric_embeddings(metric_corpus) is not None:
+        return True
+    matrix = getattr(report_content, "_embedding_matrix", None)
+    if getattr(matrix, "ndim", 0) == 2 and int(matrix.shape[0]) > 0:
+        return True
+    semantic_cache = getattr(report_content, "_semantic_retrieval_embedding_cache", None)
+    if isinstance(semantic_cache, tuple) and len(semantic_cache) >= 2:
+        cached_matrix = semantic_cache[-1]
+        if getattr(cached_matrix, "ndim", 0) == 2 and int(cached_matrix.shape[0]) > 0:
+            return True
+    return bool(report_content.embeddings)
 
 
 def _get_default_config(top_k: int) -> ProcessingConfig:
@@ -116,19 +133,55 @@ def retrieve_metric_collection(
         "embedding": os.getenv("EMBEDDING_MODEL", ""),
         "reranker": os.getenv("RERANK_MODEL", ""),
     }
-    results = []
+    revision = document_content_revision(report_content)
+    metric_corpus_signature = "legacy"
+    if getattr(config, "use_metric_retrieval_corpus", True):
+        try:
+            metric_corpus_signature = resolve_metric_retrieval_corpus(
+                report_content
+            ).corpus_signature
+        except Exception:
+            metric_corpus_signature = "legacy"
+    cached_revision = getattr(report_content, "_metric_retrieval_cache_revision", None)
+    if cached_revision != revision:
+        cache.clear()
+        object.__setattr__(
+            report_content,
+            "_metric_retrieval_cache_revision",
+            revision,
+        )
+    plans = []
     for metric in list(getattr(metric_collection, "metrics", None) or []):
         expansion = expansions.get(getattr(metric, "metric_id", ""))
         payload = {
             "document": report_content.document_id,
-            "segments": len(report_content.document_content.segments),
+            "document_revision": revision,
+            "metric_corpus_signature": metric_corpus_signature,
             "metric": metric.model_dump(mode="json") if hasattr(metric, "model_dump") else vars(metric),
             "expansion": expansion.model_dump(mode="json") if hasattr(expansion, "model_dump") else (vars(expansion) if expansion else None),
             "config": config_payload,
             "models": model_versions,
         }
         key = hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=True, default=str, separators=(",", ":")).encode()).hexdigest()
-        result = cache.get(key)
+        plans.append((metric, expansion, key, cache.get(key)))
+
+    # Encode all currently uncached dense metric queries in one model call.
+    # SemanticRetriever keeps the resulting rows by query text, so whole-report
+    # and linked-page searches for the same metric reuse the same vector.
+    uncached_pairs = [
+        (metric, expansion)
+        for metric, expansion, _key, result in plans
+        if result is None
+    ]
+    if (
+        getattr(config, "use_semantic_retrieval", True)
+        and uncached_pairs
+        and _has_semantic_corpus(report_content)
+    ):
+        retriever.semantic_retriever.prepare_metric_queries(uncached_pairs)
+
+    results = []
+    for metric, expansion, key, result in plans:
         if result is None:
             result = retriever.retrieve_for_metric(report_content, metric, expansion)
             cache[key] = result

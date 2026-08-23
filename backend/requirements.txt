@@ -1,0 +1,2 @@
+# Local/IDE dependency entry point. Keep versions aligned with the Docker backend.
+-r requirements.docker.txt

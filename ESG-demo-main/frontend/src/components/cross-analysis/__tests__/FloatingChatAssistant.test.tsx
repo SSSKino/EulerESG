@@ -8,7 +8,11 @@ const apiMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("antd", () => ({
-  Drawer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Drawer: ({ children, open }: { children: React.ReactNode; open?: boolean }) => (
+    <div data-testid="assistant-drawer" data-open={String(Boolean(open))}>
+      {children}
+    </div>
+  ),
   message: { error: vi.fn() },
 }));
 
@@ -28,6 +32,30 @@ vi.mock("@/i18n/useT", () => ({
   useT: () => ({ t: (key: string) => key }),
 }));
 
+type MockPointerEventInit = MouseEventInit & {
+  isPrimary?: boolean;
+  pointerId?: number;
+  pointerType?: string;
+};
+
+const dispatchPointerEvent = (
+  target: Node,
+  type: string,
+  init: MockPointerEventInit,
+) => {
+  const event = new MouseEvent(type, {
+    bubbles: true,
+    cancelable: true,
+    ...init,
+  });
+  Object.defineProperties(event, {
+    isPrimary: { configurable: true, value: init.isPrimary ?? true },
+    pointerId: { configurable: true, value: init.pointerId ?? 1 },
+    pointerType: { configurable: true, value: init.pointerType ?? "mouse" },
+  });
+  fireEvent(target, event);
+};
+
 describe("FloatingChatAssistant", () => {
   beforeEach(() => {
     apiMocks.sendMessage.mockReset();
@@ -42,8 +70,73 @@ describe("FloatingChatAssistant", () => {
 
     const launcher = screen.getByRole("button", { name: "AI Assistant" });
     expect(launcher).toHaveTextContent("AI Assistant");
-    expect(launcher).toHaveClass("dashboard-chat-launcher", "fixed");
+    expect(launcher).toHaveClass(
+      "dashboard-chat-launcher",
+      "draggable-assistant-launcher",
+      "fixed",
+    );
+    expect(launcher).toHaveAttribute("data-draggable-assistant", "true");
     expect(launcher).not.toHaveClass("right-6", "bottom-20");
+  });
+
+  it("drags within the viewport without treating the release as an open click", () => {
+    render(<FloatingChatAssistant />);
+
+    vi.spyOn(window, "innerWidth", "get").mockReturnValue(800);
+    vi.spyOn(window, "innerHeight", "get").mockReturnValue(600);
+
+    const launcher = screen.getByRole("button", { name: "AI Assistant" });
+    vi.spyOn(launcher, "getBoundingClientRect").mockReturnValue({
+      bottom: 548,
+      height: 48,
+      left: 24,
+      right: 184,
+      top: 500,
+      width: 160,
+      x: 24,
+      y: 500,
+      toJSON: () => ({}),
+    });
+
+    dispatchPointerEvent(launcher, "pointerdown", {
+      button: 0,
+      clientX: 50,
+      clientY: 520,
+      pointerId: 9,
+    });
+    dispatchPointerEvent(launcher, "pointermove", {
+      button: 0,
+      clientX: 760,
+      clientY: -100,
+      pointerId: 9,
+    });
+    dispatchPointerEvent(launcher, "pointerup", {
+      button: 0,
+      clientX: 760,
+      clientY: -100,
+      pointerId: 9,
+    });
+
+    expect(launcher).toHaveStyle({
+      bottom: "auto",
+      left: "632px",
+      right: "auto",
+      top: "8px",
+    });
+    expect(launcher).toHaveAttribute("data-dragging", "false");
+
+    fireEvent.click(launcher, { detail: 1 });
+    expect(screen.getByTestId("assistant-drawer")).toHaveAttribute(
+      "data-open",
+      "false",
+    );
+
+    fireEvent.click(launcher);
+    expect(screen.getByTestId("assistant-drawer")).toHaveAttribute(
+      "data-open",
+      "true",
+    );
+    expect(launcher).toHaveStyle({ left: "632px", top: "8px" });
   });
 
   it("uses generic mode on the homepage and preserves the server chat session", async () => {

@@ -23,6 +23,7 @@ from urllib.request import Request, urlopen
 
 from loguru import logger
 
+from .content_revision import bump_document_content_revision
 from .exceptions import ContentExtractionError
 from .models import DocumentContent, ProcessingConfig, TextSegment
 from .visual_assets import (
@@ -83,6 +84,15 @@ _TABLE_SECOND_PASS_CRITICAL_REASONS = frozenset(
         "missing_header",
         "year_value_count_mismatch",
         "structure_source_conflict",
+        "cell_geometry_alignment_mismatch",
+        "cell_bbox_count_mismatch",
+    }
+)
+_TABLE_NON_ACTIONABLE_REVIEW_REASONS = frozenset(
+    {
+        "ambiguous_unit_scope",
+        "conflicting_year_scope",
+        "ambiguous_year_scope",
     }
 )
 
@@ -169,6 +179,7 @@ def _is_meaningful_short_text(value: str) -> bool:
     patterns = (
         r"\b[A-Z]{2,8}-[A-Z]{2,8}-\d{3}[a-z]?\.\d\b",
         r"\b(?:19|20)\d{2}\b",
+        r"\b(?:FY|CY)\s*['\u2019]?\s*(?:\d{2}|(?:19|20)\d{2})\b",
         r"\b(?:scope|范围)\s*[123]\b",
         r"[-+]?\d+(?:[.,]\d+)?\s*%",
         r"[-+]?\d+(?:[.,]\d+)?\s*(?:tco2e|co2e|mwh|kwh|gj|mj|kg|mt|t|m3|m²|m2)\b",
@@ -886,6 +897,7 @@ def enrich_document_with_pdf_links(
 ) -> Dict[str, int]:
     """Attach internal-link topology to Paddle-derived segments without extracting PDF body text."""
     summary = {"links": 0, "internal": 0, "external_ignored": 0, "anchors_created": 0}
+    content_changed = False
     if not _env_bool("REPORT_LINK_RESOLUTION_ENABLED", True):
         return summary
 
@@ -937,8 +949,11 @@ def enrich_document_with_pdf_links(
                 and data.get("source") == "pymupdf_link_annotation"
             )
             if is_generated_anchor:
+                content_changed = True
                 continue
-            data.pop("pdf_links", None)
+            if "pdf_links" in data:
+                data.pop("pdf_links", None)
+                content_changed = True
             segment.structured_data = data
             repaired_segments.append(segment)
         document_content.segments = repaired_segments
@@ -1010,7 +1025,8 @@ def enrich_document_with_pdf_links(
 
         if attached_targets:
             for target in attached_targets:
-                _append_pdf_link(target, record)
+                if _append_pdf_link(target, record):
+                    content_changed = True
             continue
 
         if link_type != "internal" or record.get("navigation") or not anchor_key:
@@ -1036,10 +1052,13 @@ def enrich_document_with_pdf_links(
             structured_data={"source": "pymupdf_link_annotation", "pdf_links": [dict(record)]},
         )
         segments.append(anchor_segment)
+        content_changed = True
         normalised_content[id(anchor_segment)] = _normalise_link_text(anchor_segment.content)
         page_segments.setdefault(source_page, []).append(anchor_segment)
         summary["anchors_created"] += 1
 
+    if content_changed:
+        bump_document_content_revision(document_content)
     return summary
 
 
@@ -1065,50 +1084,110 @@ class _SimpleHTMLTableParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.rows: List[List[str]] = []
-        self._row: Optional[List[tuple[str, int, int, bool]]] = None
+        self._row: Optional[
+            List[tuple[str, int, int, bool, str, str, str]]
+        ] = None
         self._cell: Optional[List[str]] = None
         self._cell_rowspan = 1
         self._cell_colspan = 1
         self._in_cell = False
         self._active_rowspans: Dict[int, tuple[str, int]] = {}
         self.cells: List[Dict[str, Any]] = []
+        self.row_metadata: List[Dict[str, Any]] = []
         self._row_index = 0
         self._cell_is_header = False
+        self._cell_scope = ""
+        self._cell_tag = ""
+        self._section = ""
+        self._in_caption = False
+        self._caption_parts: List[str] = []
+        self.caption = ""
 
     def handle_starttag(self, tag: str, attrs) -> None:  # type: ignore[override]
         tag = tag.lower()
-        if tag == "tr":
+        if tag in {"thead", "tbody", "tfoot"}:
+            self._section = tag
+        elif tag == "caption":
+            self._in_caption = True
+            self._caption_parts = []
+        elif tag == "tr":
             self._row = []
         elif tag in {"td", "th"}:
             self._cell = []
             self._cell_rowspan = self._parse_span(attrs, "rowspan")
             self._cell_colspan = self._parse_span(attrs, "colspan")
             self._in_cell = True
-            self._cell_is_header = tag == "th"
+            attrs_map = {
+                str(name or "").strip().lower(): str(value or "").strip().lower()
+                for name, value in attrs
+            }
+            self._cell_scope = attrs_map.get("scope", "")
+            self._cell_tag = tag
+            self._cell_is_header = tag == "th" or self._section == "thead"
         elif tag == "br" and self._in_cell and self._cell is not None:
             self._cell.append(" ")
 
     def handle_data(self, data: str) -> None:  # type: ignore[override]
         if self._in_cell and self._cell is not None:
             self._cell.append(data)
+        elif self._in_caption:
+            self._caption_parts.append(data)
 
     def handle_endtag(self, tag: str) -> None:  # type: ignore[override]
         tag = tag.lower()
         if tag in {"td", "th"} and self._in_cell:
             text = re.sub(r"\s+", " ", unescape("".join(self._cell or []))).strip()
             if self._row is not None:
-                self._row.append((text, self._cell_rowspan, self._cell_colspan, self._cell_is_header))
+                self._row.append(
+                    (
+                        text,
+                        self._cell_rowspan,
+                        self._cell_colspan,
+                        self._cell_is_header,
+                        self._section,
+                        self._cell_scope,
+                        self._cell_tag,
+                    )
+                )
             self._cell = None
             self._cell_rowspan = 1
             self._cell_colspan = 1
             self._in_cell = False
+            self._cell_scope = ""
+            self._cell_tag = ""
         elif tag == "tr":
             if self._row is not None:
+                cells_start = len(self.cells)
                 expanded_row = self._expand_row(self._row)
                 if any(str(cell).strip() for cell in expanded_row):
                     self.rows.append(expanded_row)
+                    sections = {
+                        section
+                        for *_prefix, section, _scope, _tag in self._row
+                        if section
+                    }
+                    self.row_metadata.append(
+                        {
+                            "row_index": self._row_index,
+                            "section": next(iter(sections)) if len(sections) == 1 else "",
+                            "has_header_cells": any(cell[3] for cell in self._row),
+                            "has_data_cells": any(not cell[3] for cell in self._row),
+                        }
+                    )
                     self._row_index += 1
+                else:
+                    del self.cells[cells_start:]
             self._row = None
+        elif tag == "caption":
+            self.caption = re.sub(
+                r"\s+",
+                " ",
+                unescape("".join(self._caption_parts)),
+            ).strip()
+            self._caption_parts = []
+            self._in_caption = False
+        elif tag in {"thead", "tbody", "tfoot"}:
+            self._section = ""
 
     @staticmethod
     def _parse_span(attrs: Sequence[tuple[str, Optional[str]]], name: str) -> int:
@@ -1122,7 +1201,10 @@ class _SimpleHTMLTableParser(HTMLParser):
             return min(value, 1000) if value > 0 else 1
         return 1
 
-    def _expand_row(self, cells: Sequence[tuple[str, int, int, bool]]) -> List[str]:
+    def _expand_row(
+        self,
+        cells: Sequence[tuple[str, int, int, bool, str, str, str]],
+    ) -> List[str]:
         occupied = {
             column: text
             for column, (text, _remaining_rows) in self._active_rowspans.items()
@@ -1134,7 +1216,7 @@ class _SimpleHTMLTableParser(HTMLParser):
         }
 
         column = 0
-        for text, rowspan, colspan, is_header in cells:
+        for text, rowspan, colspan, is_header, section, scope, tag in cells:
             while any((column + offset) in occupied for offset in range(colspan)):
                 column += 1
 
@@ -1145,6 +1227,9 @@ class _SimpleHTMLTableParser(HTMLParser):
                 "rowspan": rowspan,
                 "colspan": colspan,
                 "is_header": is_header,
+                "section": section,
+                "scope": scope,
+                "tag": tag,
             })
             for offset in range(colspan):
                 target_column = column + offset
@@ -1462,6 +1547,90 @@ class ContentExtractor:
         client.hset(key, mapping=safe)
         client.expire(key, int(os.getenv("PADDLEOCR_TASK_RESULT_TTL", "86400") or "86400"))
 
+    def _acquire_paddleocr_lifecycle_lock(self, client):
+        """Fence VLM wake+enqueue against idle-check+sleep across backends."""
+        key = (
+            os.getenv(
+                "PADDLEOCR_VLM_LIFECYCLE_LOCK_KEY",
+                "paddleocr:control:vlm-lifecycle",
+            ).strip()
+            or "paddleocr:control:vlm-lifecycle"
+        )
+        try:
+            wake_timeout = max(
+                5.0,
+                float(os.getenv("PADDLEOCR_VLM_WAKE_TIMEOUT_SECONDS", "180") or "180"),
+            )
+            sleep_timeout = max(
+                5.0,
+                float(os.getenv("PADDLEOCR_VLM_SLEEP_TIMEOUT_SECONDS", "120") or "120"),
+            )
+            # Redis locks expire even while the holder is still working. Keep
+            # this lease longer than either lifecycle API call plus an enqueue
+            # margin so another producer/sleeper cannot enter mid-operation.
+            # Wake may spend one full timeout in POST /wake_up and another in
+            # the readiness polling loop (plus state/health probes).
+            minimum_lock_timeout = 2.0 * max(wake_timeout, sleep_timeout) + 120.0
+            lock_timeout = max(
+                30.0,
+                minimum_lock_timeout,
+                float(
+                    os.getenv(
+                        "PADDLEOCR_VLM_LIFECYCLE_LOCK_TIMEOUT_SECONDS",
+                        "360",
+                    )
+                    or "360"
+                ),
+            )
+            blocking_timeout = max(
+                5.0,
+                lock_timeout,
+                float(
+                    os.getenv(
+                        "PADDLEOCR_VLM_LIFECYCLE_LOCK_WAIT_SECONDS",
+                        "360",
+                    )
+                    or "360"
+                ),
+            )
+        except (TypeError, ValueError):
+            lock_timeout = blocking_timeout = 360.0
+        lock = client.lock(
+            key,
+            timeout=lock_timeout,
+            blocking_timeout=blocking_timeout,
+        )
+        if not lock.acquire(blocking=True):
+            raise ContentExtractionError(
+                "Timed out waiting for the PaddleOCR VLM lifecycle lock.",
+                file_path="",
+            )
+        return lock
+
+    def _release_paddleocr_lifecycle_lock(self, lock) -> None:
+        try:
+            lock.release()
+        except Exception as exc:
+            self.logger.warning(f"Failed to release PaddleOCR VLM lifecycle lock: {exc}")
+
+    def _submit_paddleocr_queue_entries(
+        self,
+        client,
+        queue_name: str,
+        entries: Sequence[Tuple[str, Dict[str, Any], Dict[str, Any]]],
+    ) -> None:
+        """Wake and enqueue as one lifecycle-fenced producer operation."""
+        lifecycle_lock = self._acquire_paddleocr_lifecycle_lock(client)
+        try:
+            # This is the sole producer wake point. PDF splitting happens
+            # before this lock and does not require the VLM to be resident.
+            self._wake_paddleocr_vlm()
+            for batch_key, batch_state, payload in entries:
+                self._redis_hash_set(client, batch_key, batch_state)
+                client.rpush(queue_name, json.dumps(payload, ensure_ascii=False))
+        finally:
+            self._release_paddleocr_lifecycle_lock(lifecycle_lock)
+
     @staticmethod
     def _paddleocr_vlm_control_base_url() -> str:
         raw = (
@@ -1626,12 +1795,40 @@ class ContentExtractor:
     def _sleep_paddleocr_vlm(self, job_id: str) -> bool:
         if not _env_bool("PADDLEOCR_VLM_SLEEP_ENABLED", False):
             return False
+        lifecycle_lock = None
         try:
             client = self._redis_client()
-            queue_name = os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse").strip()
-            if int(client.llen(queue_name) or 0) > 0:
+            lifecycle_lock = self._acquire_paddleocr_lifecycle_lock(client)
+            queue_name = (
+                os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse").strip()
+                or "paddleocr:parse"
+            )
+            processing_queue = (
+                os.getenv(
+                    "PADDLEOCR_PROCESSING_QUEUE_NAME",
+                    f"{queue_name}:processing",
+                ).strip()
+                or f"{queue_name}:processing"
+            )
+            lease_key = (
+                os.getenv(
+                    "PADDLEOCR_PROCESSING_LEASE_KEY",
+                    f"{processing_queue}:leases",
+                ).strip()
+                or f"{processing_queue}:leases"
+            )
+            pipe = client.pipeline()
+            pipe.llen(queue_name)
+            pipe.llen(processing_queue)
+            pipe.zcount(lease_key, time.time(), "+inf")
+            queued_count, processing_count, active_lease_count = [
+                int(value or 0) for value in pipe.execute()
+            ]
+            if queued_count or processing_count or active_lease_count:
                 self.logger.info(
-                    f"Keeping Paddle vLLM awake because OCR work remains queued: job={job_id}"
+                    "Keeping Paddle vLLM awake because OCR work remains active: "
+                    f"job={job_id}, queued={queued_count}, "
+                    f"processing={processing_count}, leases={active_lease_count}"
                 )
                 return False
 
@@ -1665,6 +1862,9 @@ class ContentExtractor:
             )
         except Exception as exc:
             self.logger.warning(f"Failed to sleep Paddle vLLM after job={job_id}: {exc}")
+        finally:
+            if lifecycle_lock is not None:
+                self._release_paddleocr_lifecycle_lock(lifecycle_lock)
         return False
 
     def _release_paddle_after_document(self, job_id: str) -> None:
@@ -1942,7 +2142,6 @@ class ContentExtractor:
             return result
 
         job_id = f"parse_{uuid.uuid4().hex}"
-        self._wake_paddleocr_vlm()
         completed = False
         try:
             if page_analysis is None and selected_page_numbers is None:
@@ -2044,7 +2243,10 @@ class ContentExtractor:
 
         client = self._redis_client()
 
-        queue_name = os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse").strip()
+        queue_name = (
+            os.getenv("PADDLEOCR_TASK_QUEUE_NAME", "paddleocr:parse").strip()
+            or "paddleocr:parse"
+        )
         key_prefix = os.getenv("PADDLEOCR_TASK_KEY_PREFIX", "paddleocr:task").strip()
         timeout_env = (
             "REPORT_TABLE_SECOND_PASS_TIMEOUT_SECONDS"
@@ -2230,6 +2432,7 @@ class ContentExtractor:
 
         queue_submit_started = time.perf_counter()
         ocr_queue_started = queue_submit_started
+        queue_entries: List[Tuple[str, Dict[str, Any], Dict[str, Any]]] = []
         for unit in units:
             unit_index = int(unit["unit_index"])
             batch_key = f"{task_key}:batch:{unit_index:04d}"
@@ -2253,30 +2456,32 @@ class ContentExtractor:
                 ),
                 "created_at": datetime.now().isoformat(),
             }
-            self._redis_hash_set(
-                client,
-                batch_key,
-                {
-                    "status": "queued",
-                    "stage": "queued",
-                    "job_id": job_id,
-                    "filename": source_path.name,
-                    "unit_index": unit_index,
-                    "total_units": total_units,
-                    "start_page": unit["start_page"],
-                    "end_page": unit["end_page"],
-                    "input_path": unit["input_path"],
-                    "ready_path": unit.get("ready_path", ""),
-                    "prediction_options": dict(unit.get("prediction_options") or {}),
-                    "parse_pass": max(1, int(parse_pass or 1)),
-                    "render_zoom": float(unit.get("render_zoom") or render_zoom or 1.0),
-                    "requested_render_zoom": float(
-                        unit.get("requested_render_zoom") or render_zoom or 1.0
-                    ),
-                    "created_at": datetime.now().isoformat(),
-                },
-            )
-            client.rpush(queue_name, json.dumps(payload, ensure_ascii=False))
+            batch_state = {
+                "status": "queued",
+                "stage": "queued",
+                "job_id": job_id,
+                "filename": source_path.name,
+                "unit_index": unit_index,
+                "total_units": total_units,
+                "start_page": unit["start_page"],
+                "end_page": unit["end_page"],
+                "input_path": unit["input_path"],
+                "ready_path": unit.get("ready_path", ""),
+                "prediction_options": dict(unit.get("prediction_options") or {}),
+                "parse_pass": max(1, int(parse_pass or 1)),
+                "render_zoom": float(unit.get("render_zoom") or render_zoom or 1.0),
+                "requested_render_zoom": float(
+                    unit.get("requested_render_zoom") or render_zoom or 1.0
+                ),
+                "created_at": datetime.now().isoformat(),
+            }
+            queue_entries.append((batch_key, batch_state, payload))
+
+        self._submit_paddleocr_queue_entries(
+            client,
+            queue_name,
+            queue_entries,
+        )
 
         queue_submit_seconds = time.perf_counter() - queue_submit_started
         self._redis_hash_set(
@@ -3065,6 +3270,12 @@ class ContentExtractor:
             if self._looks_like_markdown_table(block):
                 table_index += 1
                 table_id = f"{document_id}_table_{table_index:04d}"
+                _table_rows, _table_cells, table_quality = self._parse_table_details(
+                    block
+                )
+                table_header_model = dict(
+                    table_quality.get("header_model") or {}
+                )
                 seq += 1
                 segments.append(
                     TextSegment(
@@ -3075,12 +3286,47 @@ class ContentExtractor:
                         position_x=0.0,
                         segment_type="table",
                         source_table_id=table_id,
+                        structure_confidence=table_quality.get(
+                            "structure_confidence"
+                        ),
+                        ocr_confidence=table_quality.get("ocr_confidence"),
+                        parse_pass=1,
+                        review_status=table_quality.get("review_status"),
                         structured_data={
                             "source": "paddleocr_vl_markdown",
                             "parser": "paddleocr-vl",
                             "table_id": table_id,
                             "table_title": current_heading,
+                            "table_title_source": "section_heading",
                             "section_path": list(section_path),
+                            "semantic_schema_version": 1,
+                            "table_semantics_version": 2,
+                            "header_source": table_header_model.get("source"),
+                            "header_confirmed": bool(
+                                table_header_model.get("confirmed")
+                            ),
+                            "header_row_indices": list(
+                                table_header_model.get("header_row_indices")
+                                or []
+                            ),
+                            "header_paths": list(
+                                table_header_model.get("header_paths") or []
+                            ),
+                            "structure_confidence": table_quality.get(
+                                "structure_confidence"
+                            ),
+                            "ocr_confidence": table_quality.get(
+                                "ocr_confidence"
+                            ),
+                            "parse_pass": 1,
+                            "review_status": table_quality.get("review_status"),
+                            "quality_reasons": list(
+                                table_quality.get("reasons") or []
+                            ),
+                            "quality_notes": list(
+                                table_quality.get("notes") or []
+                            ),
+                            "conflicts": [],
                         },
                     )
                 )
@@ -3091,6 +3337,7 @@ class ContentExtractor:
                     table_id,
                     start_seq=seq,
                     table_title=current_heading,
+                    table_title_source="section_heading",
                     section_path=section_path,
                 )
                 if table_segments:
@@ -3221,6 +3468,792 @@ class ContentExtractor:
         widths = [len(row) for row in parsed if row]
         return bool(widths and max(widths) >= 2 and widths.count(widths[0]) >= 2)
 
+    @staticmethod
+    def _markdown_table_has_header_separator(table_text: str) -> bool:
+        """Return whether a pipe table explicitly marks its first row as a header."""
+        pipe_lines = [
+            line.strip()
+            for line in str(table_text or "").splitlines()
+            if line.strip() and "|" in line
+        ]
+        if len(pipe_lines) < 2:
+            return False
+        header_cells = [
+            cell.strip()
+            for cell in pipe_lines[0].strip("|").split("|")
+        ]
+        separator_cells = [
+            cell.strip()
+            for cell in pipe_lines[1].strip("|").split("|")
+        ]
+        return (
+            bool(header_cells)
+            and len(separator_cells) == len(header_cells)
+            and all(
+                bool(cell)
+                and bool(re.fullmatch(r":?-{2,}:?", cell.replace(" ", "")))
+                for cell in separator_cells
+            )
+        )
+
+    @staticmethod
+    def _extract_table_years(text: object) -> List[int]:
+        """Extract explicit FY/CY or four-digit years without scraping loose numbers."""
+        raw = re.sub(r"\s+", " ", unescape(str(text or ""))).strip()
+        if not raw:
+            return []
+        years: List[int] = []
+
+        def append_year(value: object, *, short: bool = False) -> None:
+            try:
+                year = int(value)
+            except (TypeError, ValueError):
+                return
+            if short:
+                year += 2000
+            if 1900 <= year <= 2100 and year not in years:
+                years.append(year)
+
+        occupied: List[Tuple[int, int]] = []
+        # Compact slash ranges normally denote one reporting period, whose
+        # reporting year is the period end. Keep `FY23 / FY24` as two distinct
+        # years: the repeated prefix deliberately prevents this range match.
+        period_pattern = re.compile(
+            r"(?i)\b(?:"
+            r"(?:(?:FY|CY)\s*['\u2019]?\s*)((?:19|20)?\d{2})"
+            r"|((?:19|20)\d{2})"
+            r")\s*/\s*((?:19|20)?\d{2})\b"
+        )
+        for match in period_pattern.finditer(raw):
+            start_text = match.group(1) or match.group(2) or ""
+            end_text = match.group(3) or ""
+            try:
+                start_year = (
+                    2000 + int(start_text)
+                    if len(start_text) == 2
+                    else int(start_text)
+                )
+                if len(end_text) == 2:
+                    end_year = (start_year // 100) * 100 + int(end_text)
+                    if end_year < start_year:
+                        end_year += 100
+                else:
+                    end_year = int(end_text)
+            except (TypeError, ValueError):
+                continue
+            append_year(end_year)
+            occupied.append(match.span())
+
+        for match in re.finditer(
+            r"(?i)\b(?:FY|CY)\s*['\u2019]?\s*((?:19|20)?\d{2})\b",
+            raw,
+        ):
+            if any(start <= match.start() and match.end() <= end for start, end in occupied):
+                continue
+            value = match.group(1)
+            append_year(value, short=len(value) == 2)
+            occupied.append(match.span())
+        for match in re.finditer(r"(?<!\d)((?:19|20)\d{2})(?!\d)", raw):
+            if any(start <= match.start() and match.end() <= end for start, end in occupied):
+                continue
+            append_year(match.group(1))
+        return years
+
+    def _build_table_header_model(
+        self,
+        rows: Sequence[Sequence[Any]],
+        physical_cells: Sequence[Dict[str, Any]],
+        *,
+        is_html: bool,
+        table_text: str,
+        row_metadata: Optional[Sequence[Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """Build a conservative column-header tree while preserving source row indexes."""
+        width = max((len(row) for row in rows), default=0)
+        cells_by_row: Dict[int, List[Dict[str, Any]]] = {}
+        for cell in physical_cells:
+            try:
+                row_index = int(cell.get("row_index"))
+            except (TypeError, ValueError):
+                continue
+            cells_by_row.setdefault(row_index, []).append(cell)
+        metadata_by_row = {
+            int(item.get("row_index")): dict(item)
+            for item in (row_metadata or [])
+            if item.get("row_index") is not None
+        }
+
+        header_rows: List[int] = []
+        source = "none"
+        confirmed = False
+        if rows and is_html:
+            thead_rows = [
+                index
+                for index in range(len(rows))
+                if str(metadata_by_row.get(index, {}).get("section") or "") == "thead"
+            ]
+            if thead_rows and thead_rows == list(range(0, max(thead_rows) + 1)):
+                header_rows = thead_rows
+                source = "html_thead"
+                confirmed = True
+            else:
+                for index in range(len(rows)):
+                    row_cells = [
+                        cell
+                        for cell in cells_by_row.get(index, [])
+                        if str(cell.get("text") or "").strip()
+                    ]
+                    is_column_header_row = bool(row_cells) and all(
+                        bool(cell.get("is_header"))
+                        and str(cell.get("scope") or "").lower()
+                        not in {"row", "rowgroup"}
+                        for cell in row_cells
+                    )
+                    if not is_column_header_row:
+                        break
+                    header_rows.append(index)
+                if header_rows:
+                    source = "html_th"
+                    confirmed = True
+        elif rows and self._markdown_table_has_header_separator(table_text):
+            header_rows = [0]
+            source = "markdown_separator"
+            confirmed = True
+
+        header_set = set(header_rows)
+        data_rows = [index for index in range(len(rows)) if index not in header_set]
+        header_paths: List[List[str]] = []
+        for column in range(width):
+            path: List[str] = []
+            for row_index in header_rows:
+                raw_value = rows[row_index][column] if column < len(rows[row_index]) else ""
+                value = re.sub(r"\s+", " ", unescape(str(raw_value or ""))).strip()
+                if not value:
+                    continue
+                if not path or value.casefold() != path[-1].casefold():
+                    path.append(value)
+            header_paths.append(path)
+
+        synthetic = not header_rows
+        headers = [
+            " > ".join(path) if path else f"Column {index + 1}"
+            for index, path in enumerate(header_paths)
+        ]
+        return {
+            "source": source,
+            "confirmed": confirmed,
+            "inferred": bool(header_rows and not confirmed),
+            "header_row_indices": header_rows,
+            "data_row_indices": data_rows,
+            "header_paths": header_paths,
+            "headers": headers,
+            "synthetic_headers": synthetic,
+        }
+
+    @staticmethod
+    def _clean_table_measurement_text(text: object) -> str:
+        value = unescape(str(text or ""))
+        value = value.replace("CO\u2082", "CO2").replace("co\u2082", "co2")
+        value = value.replace("m\u00b3", "m3").replace("\uff05", "%")
+        value = re.sub(r"_\{?2\}?", "2", value)
+        value = re.sub(r"\\(?:mathrm|text)\s*\{([^{}]*)\}", r"\1", value)
+        value = value.replace("$", " ").replace("{", " ").replace("}", " ")
+        return re.sub(r"\s+", " ", value).strip()
+
+    @staticmethod
+    def _table_scale_details(text: object) -> Optional[Tuple[str, float]]:
+        value = ContentExtractor._clean_table_measurement_text(text).casefold()
+        if not value:
+            return None
+        aliases = {
+            "thousand": ("thousand", 1_000.0),
+            "thousands": ("thousand", 1_000.0),
+            "million": ("million", 1_000_000.0),
+            "millions": ("million", 1_000_000.0),
+            "billion": ("billion", 1_000_000_000.0),
+            "billions": ("billion", 1_000_000_000.0),
+        }
+        if value in aliases:
+            return aliases[value]
+        match = re.search(
+            r"\b(?:figures|amounts|values|data|results)\s+"
+            r"(?:(?:are|shown|reported|expressed)\s+)?in\s+"
+            r"(thousands?|millions?|billions?)\b",
+            value,
+        )
+        return aliases.get(match.group(1)) if match else None
+
+    def _extract_table_unit_specs(self, text: object) -> List[Dict[str, Any]]:
+        """Extract high-confidence measurement units without selecting among conflicts."""
+        raw = self._clean_table_measurement_text(text)
+        if not raw:
+            return []
+        normalized = raw
+        replacements = [
+            (r"(?i)\bkg\s+(?:of\s+)?co2e\b", "kgCO2e"),
+            (r"(?i)\bkt\s+(?:of\s+)?co2e\b", "ktCO2e"),
+            (r"\bMt\s+(?:of\s+)?CO2e\b", "MtCO2e"),
+            (r"(?i)\bt\s+(?:of\s+)?co2e\b", "tCO2e"),
+            (
+                r"(?i)\bkilograms?\s+(?:of\s+)?co2(?:e|\s+equivalents?)\b",
+                "kgCO2e",
+            ),
+            (
+                r"(?i)\bkilotonnes?\s+(?:of\s+)?co2(?:e|\s+equivalents?)\b",
+                "ktCO2e",
+            ),
+            (
+                r"(?i)\b(?:metric\s+)?(?:tonnes?|tons?)\s+(?:of\s+)?"
+                r"co2(?:e|\s+equivalents?)\b",
+                "tCO2e",
+            ),
+            (r"\bMT\s+CO2e\b", "tCO2e"),
+            (r"(?i)\bmegawatt(?:-|\s*)hours?\b", "MWh"),
+            (r"(?i)\bkilowatt(?:-|\s*)hours?\b", "kWh"),
+            (r"(?i)\bgigawatt(?:-|\s*)hours?\b", "GWh"),
+            (r"(?i)\bterawatt(?:-|\s*)hours?\b", "TWh"),
+            (r"(?i)\bgigajoules?\b", "GJ"),
+            (r"(?i)\bterajoules?\b", "TJ"),
+            (r"(?i)\bpetajoules?\b", "PJ"),
+            (r"(?i)\bcubic\s+met(?:er|re)s?\b", "m3"),
+            (r"(?i)\bpercent(?:age)?\b", "%"),
+        ]
+        for pattern, replacement in replacements:
+            normalized = re.sub(pattern, replacement, normalized)
+
+        unit_atom_pattern = (
+            r"kgCO2e|ktCO2e|MtCO2e|tCO2e|CO2e|"
+            r"kWh|MWh|GWh|TWh|GJ|TJ|PJ|MMBtu|"
+            r"m3|kL|mL|L|metric\s+tons?|tonnes?|tons?|kg|"
+            r"USD|EUR|GBP|CNY|%"
+        )
+        scale_marker_pattern = (
+            r"thousands?|millions?|billions?|mn|bn|(?:['\u2019]\s*)?000s?"
+        )
+
+        def normalized_scale_word(value: object) -> str:
+            token = re.sub(
+                r"[\s'\u2019]",
+                "",
+                str(value or "").casefold(),
+            )
+            if token.startswith("000"):
+                return "thousand"
+            if token in {"mn", "million", "millions"}:
+                return "million"
+            if token in {"bn", "billion", "billions"}:
+                return "billion"
+            return "thousand"
+
+        # Normalize common accounting-style postfix/prefix scales into the
+        # canonical `million USD` form consumed below. This prevents `USD
+        # million`, `'000 tonnes`, or `GJ (000s)` from silently becoming x1.
+        postfix_scale_pattern = re.compile(
+            r"(?i)(?<![A-Za-z0-9])"
+            rf"({unit_atom_pattern})\s*(?:\(\s*)?"
+            rf"({scale_marker_pattern})(?:\s*\))?"
+            r"(?![A-Za-z0-9])"
+        )
+        normalized = postfix_scale_pattern.sub(
+            lambda match: (
+                f"{normalized_scale_word(match.group(2))} {match.group(1)}"
+            ),
+            normalized,
+        )
+        symbolic_prefix_pattern = re.compile(
+            r"(?i)(?<![A-Za-z0-9])"
+            rf"((?:['\u2019]\s*)?000s?|mn|bn)\s+"
+            rf"({unit_atom_pattern})(?![A-Za-z0-9])"
+        )
+        normalized = symbolic_prefix_pattern.sub(
+            lambda match: (
+                f"{normalized_scale_word(match.group(1))} {match.group(2)}"
+            ),
+            normalized,
+        )
+        unit_pattern = re.compile(
+            r"(?i)(?<![A-Za-z0-9])"
+            r"(?:(thousands?|millions?|billions?)\s+)?"
+            rf"({unit_atom_pattern})(?![A-Za-z0-9])"
+        )
+        denominator_atom_pattern = (
+            rf"{unit_atom_pattern}|employees?|FTEs?|revenue|sales|products?|units?"
+        )
+        compound_pattern = re.compile(
+            r"(?i)(?<![A-Za-z0-9])"
+            r"(?:(thousands?|millions?|billions?)\s+)?"
+            rf"({unit_atom_pattern})\s*(?:/|\bper\b)\s*"
+            rf"({denominator_atom_pattern})(?![A-Za-z0-9])"
+        )
+        canonical = {
+            "kgco2e": "kgCO2e",
+            "ktco2e": "ktCO2e",
+            "mtco2e": "MtCO2e",
+            "tco2e": "tCO2e",
+            "co2e": "CO2e",
+            "kwh": "kWh",
+            "mwh": "MWh",
+            "gwh": "GWh",
+            "twh": "TWh",
+            "gj": "GJ",
+            "tj": "TJ",
+            "pj": "PJ",
+            "mmbtu": "MMBtu",
+            "m3": "m3",
+            "kl": "kL",
+            "ml": "mL",
+            "l": "L",
+            "metric ton": "t",
+            "metric tons": "t",
+            "tonne": "t",
+            "tonnes": "t",
+            "ton": "t",
+            "tons": "t",
+            "kg": "kg",
+            "usd": "USD",
+            "eur": "EUR",
+            "gbp": "GBP",
+            "cny": "CNY",
+            "%": "%",
+        }
+        denominator_canonical = {
+            **canonical,
+            "employee": "employee",
+            "employees": "employee",
+            "fte": "FTE",
+            "ftes": "FTE",
+            "revenue": "revenue",
+            "sales": "revenue",
+            "product": "product",
+            "products": "product",
+            "unit": "unit",
+            "units": "unit",
+        }
+        scale_aliases = {
+            "thousand": ("thousand", 1_000.0),
+            "thousands": ("thousand", 1_000.0),
+            "million": ("million", 1_000_000.0),
+            "millions": ("million", 1_000_000.0),
+            "billion": ("billion", 1_000_000_000.0),
+            "billions": ("billion", 1_000_000_000.0),
+        }
+        specs: List[Dict[str, Any]] = []
+        seen = set()
+        compound_spans: List[Tuple[int, int]] = []
+        for match in compound_pattern.finditer(normalized):
+            numerator = canonical.get(str(match.group(2) or "").casefold())
+            denominator = denominator_canonical.get(
+                str(match.group(3) or "").casefold()
+            )
+            if not numerator or not denominator:
+                continue
+            scale_name, multiplier = scale_aliases.get(
+                str(match.group(1) or "").casefold(),
+                ("", 1.0),
+            )
+            base_unit = f"{numerator}/{denominator}"
+            key = (base_unit, multiplier, bool(scale_name))
+            if key not in seen:
+                seen.add(key)
+                specs.append(
+                    {
+                        "base_unit": base_unit,
+                        "multiplier": multiplier,
+                        "scale": scale_name or None,
+                        "scale_explicit": bool(scale_name),
+                        "source_text": raw,
+                    }
+                )
+            compound_spans.append(match.span())
+
+        connector_pattern = re.compile(
+            r"(?i)(?<![A-Za-z0-9])"
+            r"(?:(?:thousands?|millions?|billions?)\s+)?"
+            rf"(?:{unit_atom_pattern})\s*(?:/|\bper\b)"
+        )
+        for match in connector_pattern.finditer(normalized):
+            if any(
+                start <= match.start() and match.end() <= end
+                for start, end in compound_spans
+            ):
+                continue
+            specs.append(
+                {
+                    "base_unit": None,
+                    "multiplier": 1.0,
+                    "scale": None,
+                    "scale_explicit": False,
+                    "source_text": raw,
+                    "unsupported_compound": True,
+                }
+            )
+        for match in unit_pattern.finditer(normalized):
+            if any(
+                start <= match.start() and match.end() <= end
+                for start, end in compound_spans
+            ):
+                continue
+            scale_name, multiplier = scale_aliases.get(
+                str(match.group(1) or "").casefold(),
+                ("", 1.0),
+            )
+            base_unit = canonical.get(str(match.group(2) or "").casefold())
+            if not base_unit:
+                continue
+            key = (base_unit, multiplier, bool(scale_name))
+            if key in seen:
+                continue
+            seen.add(key)
+            specs.append(
+                {
+                    "base_unit": base_unit,
+                    "multiplier": multiplier,
+                    "scale": scale_name or None,
+                    "scale_explicit": bool(scale_name),
+                    "source_text": raw,
+                }
+            )
+        scale_only = self._table_scale_details(raw)
+        if scale_only and not any(spec.get("scale_explicit") for spec in specs):
+            specs.append(
+                {
+                    "base_unit": None,
+                    "multiplier": scale_only[1],
+                    "scale": scale_only[0],
+                    "scale_explicit": True,
+                    "source_text": raw,
+                }
+            )
+        return specs
+
+    def _extract_explicit_table_unit_specs(
+        self,
+        text: object,
+    ) -> List[Dict[str, Any]]:
+        """Read table-wide units only from an explicit declaration."""
+        raw = self._clean_table_measurement_text(text)
+        if not raw:
+            return []
+        explicit = bool(
+            re.search(
+                r"(?i)\b(?:units?|uom|unit\s+of\s+measure)\s*[:=\-]",
+                raw,
+            )
+            or re.search(
+                r"(?i)\b(?:figures|amounts|values|data|results)\s+"
+                r"(?:(?:are|shown|reported|expressed)\s+)?in\b",
+                raw,
+            )
+        )
+        if explicit:
+            return self._extract_table_unit_specs(raw)
+
+        parenthetical_specs = [
+            spec
+            for group in re.findall(r"[\(\[]([^\)\]]{1,120})[\)\]]", raw)
+            for spec in self._extract_table_unit_specs(
+                re.sub(r"(?i)^\s*in\s+", "", group).strip()
+            )
+        ]
+        return parenthetical_specs
+
+    @staticmethod
+    def _coalesce_table_unit_specs(
+        specs: Sequence[Dict[str, Any]],
+        scope: str,
+    ) -> Tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+        if not specs:
+            return None, None
+        if any(spec.get("unsupported_compound") for spec in specs):
+            return None, {
+                "scope": scope,
+                "candidates": [dict(spec) for spec in specs],
+            }
+        base_units = {
+            str(spec.get("base_unit"))
+            for spec in specs
+            if spec.get("base_unit")
+        }
+        base_variants = {
+            (
+                str(spec.get("base_unit")),
+                float(spec.get("multiplier") or 1.0),
+            )
+            for spec in specs
+            if spec.get("base_unit")
+        }
+        scale_only_multipliers = {
+            float(spec.get("multiplier") or 1.0)
+            for spec in specs
+            if not spec.get("base_unit") and spec.get("scale_explicit")
+        }
+        if (
+            len(base_units) > 1
+            or len(base_variants) > 1
+            or len(scale_only_multipliers) > 1
+        ):
+            return None, {
+                "scope": scope,
+                "candidates": [dict(spec) for spec in specs],
+            }
+        base_unit = next(iter(base_units), None)
+        base_multiplier = next(
+            (variant[1] for variant in base_variants),
+            1.0,
+        )
+        scale_only_multiplier = next(iter(scale_only_multipliers), None)
+        if (
+            scale_only_multiplier is not None
+            and base_multiplier != 1.0
+            and scale_only_multiplier != base_multiplier
+        ):
+            return None, {
+                "scope": scope,
+                "candidates": [dict(spec) for spec in specs],
+            }
+        multiplier = (
+            scale_only_multiplier
+            if scale_only_multiplier is not None
+            else base_multiplier
+        )
+        scale_name = next(
+            (
+                str(spec.get("scale"))
+                for spec in specs
+                if spec.get("scale_explicit")
+                and float(spec.get("multiplier") or 1.0) == multiplier
+                and spec.get("scale")
+            ),
+            None,
+        )
+        sources = list(
+            dict.fromkeys(
+                str(spec.get("source_text") or "").strip()
+                for spec in specs
+                if str(spec.get("source_text") or "").strip()
+            )
+        )
+        return {
+            "base_unit": base_unit,
+            "multiplier": multiplier,
+            "scale": scale_name,
+            "scale_explicit": bool(
+                scale_only_multiplier is not None
+                or any(spec.get("scale_explicit") for spec in specs)
+            ),
+            "scope": scope,
+            "sources": sources,
+        }, None
+
+    @staticmethod
+    def _render_table_unit(spec: Optional[Dict[str, Any]]) -> Optional[str]:
+        if not spec or not spec.get("base_unit"):
+            return None
+        scale = str(spec.get("scale") or "").strip()
+        return " ".join(
+            value
+            for value in (scale, str(spec.get("base_unit") or "").strip())
+            if value
+        )
+
+    def _resolve_table_cell_unit(
+        self,
+        *,
+        value_specs: Sequence[Dict[str, Any]],
+        row_specs: Sequence[Dict[str, Any]],
+        column_specs: Sequence[Dict[str, Any]],
+        table_specs: Sequence[Dict[str, Any]],
+        column_has_year: bool,
+    ) -> Tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+        column_scope = "year" if column_has_year else "column"
+        value, value_ambiguity = self._coalesce_table_unit_specs(
+            value_specs,
+            "cell",
+        )
+        if value_ambiguity is not None:
+            return None, value_ambiguity
+        # An inline unit belongs to the value itself. Lower-scope ambiguity must
+        # never erase that direct evidence or graft a table-level multiplier on it.
+        if value and value.get("base_unit"):
+            selected = dict(value)
+            selected.setdefault("multiplier", 1.0)
+            selected.setdefault("scale_explicit", False)
+            return selected, None
+
+        row, row_ambiguity = self._coalesce_table_unit_specs(row_specs, "row")
+        if row_ambiguity is not None:
+            return None, row_ambiguity
+        column, column_ambiguity = self._coalesce_table_unit_specs(
+            column_specs,
+            column_scope,
+        )
+
+        row_base = row.get("base_unit") if row else None
+        column_base = column.get("base_unit") if column else None
+        if column_ambiguity is not None and not row_base:
+            return None, column_ambiguity
+        if column_ambiguity is not None:
+            column = None
+            column_base = None
+
+        row_scale = (
+            float(row.get("multiplier") or 1.0)
+            if row and row.get("scale_explicit")
+            else None
+        )
+        column_scale = (
+            float(column.get("multiplier") or 1.0)
+            if column and column.get("scale_explicit")
+            else None
+        )
+        if row_base and column_base and row_base != column_base:
+            return None, {
+                "scope": "row_column",
+                "candidates": [dict(row), dict(column)],
+            }
+        if (
+            row_scale is not None
+            and column_scale is not None
+            and row_scale != column_scale
+        ):
+            return None, {
+                "scope": "row_column",
+                "candidates": [dict(row), dict(column)],
+            }
+
+        selected = dict(row or column or value or {})
+        selected["base_unit"] = row_base or column_base
+        if row_scale is not None:
+            selected.update(
+                multiplier=row_scale,
+                scale=row.get("scale") if row else None,
+                scale_explicit=True,
+                scope="row",
+            )
+        elif column_scale is not None:
+            selected.update(
+                multiplier=column_scale,
+                scale=column.get("scale") if column else None,
+                scale_explicit=True,
+                scope=column_scope,
+            )
+        elif value and value.get("scale_explicit"):
+            selected.update(
+                multiplier=float(value.get("multiplier") or 1.0),
+                scale=value.get("scale"),
+                scale_explicit=True,
+                scope="cell",
+            )
+
+        table, table_ambiguity = self._coalesce_table_unit_specs(
+            table_specs,
+            "table",
+        )
+        selected_base = selected.get("base_unit")
+        if not selected_base:
+            if table_ambiguity is not None:
+                return None, table_ambiguity
+            if table:
+                higher_scale = (
+                    dict(selected) if selected.get("scale_explicit") else None
+                )
+                selected = dict(table)
+                selected_base = selected.get("base_unit")
+                if higher_scale is not None:
+                    table_scale = (
+                        float(table.get("multiplier") or 1.0)
+                        if table.get("scale_explicit")
+                        else None
+                    )
+                    higher_multiplier = float(
+                        higher_scale.get("multiplier") or 1.0
+                    )
+                    if (
+                        table_scale is not None
+                        and table_scale != higher_multiplier
+                    ):
+                        return None, {
+                            "scope": "higher_table",
+                            "candidates": [higher_scale, dict(table)],
+                        }
+                    selected.update(
+                        multiplier=higher_multiplier,
+                        scale=higher_scale.get("scale"),
+                        scale_explicit=True,
+                        scope=higher_scale.get("scope") or "row",
+                    )
+        elif (
+            not selected.get("scale_explicit")
+            and table_ambiguity is None
+            and table
+            and table.get("scale_explicit")
+            and (
+                not table.get("base_unit")
+                or table.get("base_unit") == selected_base
+            )
+        ):
+            selected.update(
+                multiplier=float(table.get("multiplier") or 1.0),
+                scale=table.get("scale"),
+                scale_explicit=True,
+            )
+
+        used_candidates = [
+            candidate
+            for candidate in (value, row, column, table)
+            if candidate
+            and (
+                candidate is not table
+                or not selected_base
+                or not candidate.get("base_unit")
+                or candidate.get("base_unit") == selected_base
+            )
+        ]
+        selected["sources"] = list(
+            dict.fromkeys(
+                source
+                for candidate in used_candidates
+                for source in (candidate.get("sources") or [])
+            )
+        )
+        if not selected or (
+            not selected.get("base_unit") and not selected.get("scale_explicit")
+        ):
+            return None, None
+        selected.setdefault("multiplier", 1.0)
+        selected.setdefault("scale_explicit", False)
+        return selected, None
+
+    @staticmethod
+    def _normalized_table_header_leaf(header_path: Sequence[str], fallback: str) -> str:
+        value = str(header_path[-1] if header_path else fallback or "")
+        value = re.sub(r"[^a-z0-9]+", " ", value.casefold())
+        return re.sub(r"\s+", " ", value).strip()
+
+    @staticmethod
+    def _table_header_common_prefix(
+        first: Sequence[str],
+        second: Sequence[str],
+    ) -> int:
+        count = 0
+        for left, right in zip(first[:-1], second[:-1]):
+            if str(left).strip().casefold() != str(right).strip().casefold():
+                break
+            count += 1
+        return count
+
+    @staticmethod
+    def _table_cell_is_measurement_value(value: object) -> bool:
+        text = ContentExtractor._clean_table_measurement_text(value)
+        if not re.search(r"[-+]?\d", text):
+            return False
+        return not bool(
+            re.fullmatch(
+                r"(?i)(?:(?:FY|CY)\s*['\u2019]?\s*(?:19|20)?\d{2}|(?:19|20)\d{2})",
+                text,
+            )
+        )
+
     def _table_segments_from_markdown(
         self,
         table_md: str,
@@ -3230,17 +4263,195 @@ class ContentExtractor:
         *,
         start_seq: int = 0,
         table_title: str = "",
+        table_title_source: str = "",
         section_path: Optional[Sequence[str]] = None,
     ) -> List[TextSegment]:
         rows, physical_cells, quality = self._parse_table_details(table_md)
         if not rows:
             return []
 
-        headers = self._normalise_table_row(rows[0])
-        data_rows = rows[1:] if len(rows) > 1 else []
-        if not any(headers):
-            max_cols = max((len(r) for r in data_rows), default=0)
-            headers = [f"Column {i + 1}" for i in range(max_cols)]
+        header_model = dict(quality.get("header_model") or {})
+        headers = [str(value or "") for value in (header_model.get("headers") or [])]
+        header_paths = [
+            [str(value).strip() for value in path if str(value).strip()]
+            for path in (header_model.get("header_paths") or [])
+        ]
+        data_row_indices = [
+            int(index)
+            for index in (header_model.get("data_row_indices") or [])
+            if 0 <= int(index) < len(rows)
+        ]
+        width = max(
+            [len(headers), *(len(row) for row in rows)]
+            or [0]
+        )
+        if len(headers) < width:
+            headers.extend(f"Column {index + 1}" for index in range(len(headers), width))
+        if len(header_paths) < width:
+            header_paths.extend([] for _ in range(width - len(header_paths)))
+        physical_by_coord: Dict[Tuple[int, int], Dict[str, Any]] = {}
+        physical_by_row: Dict[int, List[Dict[str, Any]]] = {}
+        for cell in physical_cells:
+            try:
+                key = (int(cell.get("row_index")), int(cell.get("col_index")))
+            except (TypeError, ValueError):
+                continue
+            physical_by_coord[key] = cell
+            physical_by_row.setdefault(key[0], []).append(cell)
+
+        unit_header_aliases = {
+            "unit",
+            "units",
+            "uom",
+            "unit of measure",
+            "measurement unit",
+            "\u5355\u4f4d",
+            "\u8ba1\u91cf\u5355\u4f4d",
+        }
+        year_header_aliases = {
+            "year",
+            "fiscal year",
+            "calendar year",
+            "reporting year",
+            "reporting period",
+            "period",
+            "\u5e74\u4efd",
+            "\u62a5\u544a\u671f",
+        }
+        label_header_aliases = {
+            "metric",
+            "performance metric",
+            "indicator",
+            "line item",
+            "description",
+            "category",
+            "topic",
+            "name",
+            "label",
+            "scope",
+            "sasb code",
+            "gri code",
+            "reference",
+            "reference indices",
+        }
+        unit_columns = {
+            index
+            for index in range(width)
+            if self._normalized_table_header_leaf(
+                header_paths[index], headers[index]
+            )
+            in unit_header_aliases
+        }
+        year_columns = {
+            index
+            for index in range(width)
+            if self._normalized_table_header_leaf(
+                header_paths[index], headers[index]
+            )
+            in year_header_aliases
+        }
+
+        column_unit_specs: Dict[int, List[Dict[str, Any]]] = {}
+        column_year_bindings: Dict[int, Dict[str, Any]] = {}
+        column_year_ambiguities: Dict[int, List[int]] = {}
+        for index in range(width):
+            path = header_paths[index]
+            if path:
+                column_unit_specs[index] = self._extract_table_unit_specs(
+                    " | ".join(path)
+                )
+                for label in reversed(path):
+                    years = self._extract_table_years(label)
+                    if len(years) == 1:
+                        column_year_bindings[index] = {
+                            "year": years[0],
+                            "label": label,
+                            "scope": "column_header",
+                        }
+                        break
+                    if len(years) > 1:
+                        column_year_ambiguities[index] = years
+                        break
+
+        caption = str(quality.get("caption") or "").strip()
+        table_contexts = [
+            value
+            for value in (caption, table_title)
+            if str(value or "").strip()
+        ]
+        table_unit_specs = [
+            spec
+            for context in table_contexts
+            for spec in self._extract_explicit_table_unit_specs(context)
+        ]
+        table_scale = self._table_scale_details(table_md)
+        if table_scale and not any(
+            spec.get("scale_explicit") for spec in table_unit_specs
+        ):
+            table_unit_specs.append(
+                {
+                    "base_unit": None,
+                    "multiplier": table_scale[1],
+                    "scale": table_scale[0],
+                    "scale_explicit": True,
+                    "source_text": "table-level scale declaration",
+                }
+            )
+        table_year_candidates = list(
+            dict.fromkeys(
+                year
+                for context in table_contexts
+                for year in self._extract_table_years(context)
+            )
+        )
+
+        def scoped_entries_for_column(
+            entries: Sequence[Tuple[int, Sequence[str], Any]],
+            target_column: int,
+        ) -> List[Any]:
+            if not entries:
+                return []
+            if len(entries) == 1:
+                _entry_column, entry_path, value = entries[0]
+                normalized_entry_path = [
+                    str(item).strip() for item in entry_path if str(item).strip()
+                ]
+                # A top-level Year/Unit column describes the whole row. A
+                # declaration nested below a grouped header only applies to
+                # sibling columns in that same branch.
+                if (
+                    len(normalized_entry_path) <= 1
+                    or self._table_header_common_prefix(
+                        header_paths[target_column],
+                        normalized_entry_path,
+                    )
+                    > 0
+                ):
+                    return list(value) if isinstance(value, list) else [value]
+                return []
+            ranked = [
+                (
+                    self._table_header_common_prefix(
+                        header_paths[target_column],
+                        entry_path,
+                    ),
+                    entry_column,
+                    value,
+                )
+                for entry_column, entry_path, value in entries
+            ]
+            best_score = max(item[0] for item in ranked)
+            best = [item for item in ranked if item[0] == best_score]
+            if best_score > 0 and len(best) == 1:
+                value = best[0][2]
+                return list(value) if isinstance(value, list) else [value]
+            flattened: List[Any] = []
+            for _score, _column, value in best:
+                if isinstance(value, list):
+                    flattened.extend(value)
+                else:
+                    flattened.append(value)
+            return flattened
 
         segments: List[TextSegment] = []
         seq = start_seq
@@ -3250,57 +4461,313 @@ class ContentExtractor:
             "parse_pass": 1,
             "review_status": quality["review_status"],
             "quality_reasons": quality["reasons"],
+            "quality_notes": quality.get("notes") or [],
             "conflicts": [],
+            "semantic_schema_version": 1,
+            "table_semantics_version": 2,
+            "header_source": header_model.get("source"),
+            "header_confirmed": bool(header_model.get("confirmed")),
+            "header_row_indices": list(header_model.get("header_row_indices") or []),
         }
 
-        for r_idx, row in enumerate(data_rows, start=1):
-            row = self._normalise_table_row(row, width=max(len(headers), len(row)))
+        for r_idx in data_row_indices:
+            row = self._normalise_table_row(rows[r_idx], width=width)
+            row_unit_entries: List[Tuple[int, Sequence[str], List[Dict[str, Any]]]] = []
+            for unit_column in sorted(unit_columns):
+                specs = self._extract_table_unit_specs(row[unit_column])
+                if specs:
+                    row_unit_entries.append(
+                        (unit_column, header_paths[unit_column], specs)
+                    )
+            row_year_entries: List[Tuple[int, Sequence[str], Dict[str, Any]]] = []
+            for year_column in sorted(year_columns):
+                years = self._extract_table_years(row[year_column])
+                if years:
+                    row_year_entries.append(
+                        (
+                            year_column,
+                            header_paths[year_column],
+                            {
+                                "years": years,
+                                "label": row[year_column],
+                                "scope": "row_year",
+                            },
+                        )
+                    )
+
             seq += 1
-            row_header = self._infer_row_header(headers, row)
+            explicit_row_headers = [
+                str(cell.get("text") or "").strip()
+                for cell in sorted(
+                    physical_by_row.get(r_idx, []),
+                    key=lambda item: int(item.get("col_index") or 0),
+                )
+                if str(cell.get("text") or "").strip()
+                and (
+                    str(cell.get("scope") or "").lower() in {"row", "rowgroup"}
+                    or (
+                        bool(cell.get("is_header"))
+                        and r_idx not in set(header_model.get("header_row_indices") or [])
+                    )
+                )
+            ]
+            row_header_path = list(dict.fromkeys(explicit_row_headers))
+            row_header = (
+                " > ".join(row_header_path)
+                if row_header_path
+                else self._infer_row_header(headers, row)
+            )
+            if not row_header_path and row_header:
+                row_header_path = [row_header]
             row_text = self._format_table_row_context(headers, row, table_title=table_title, page=page)
             row_segment_id = f"{document_id}_p{page}_s{seq}"
-            segments.append(
-                TextSegment(
-                    segment_id=row_segment_id,
-                    content=row_text,
-                    page_number=page,
-                    position_y=float(seq),
-                    position_x=0.0,
-                    segment_type="table_row",
-                    source_table_id=table_id,
-                    row_header=row_header,
-                    structure_confidence=quality["structure_confidence"],
-                    ocr_confidence=quality["ocr_confidence"],
-                    parse_pass=1,
-                    review_status=quality["review_status"],
-                    structured_data={
-                        "source": "paddleocr_vl_table_parser",
-                        "parser": "paddleocr-vl",
-                        "table_id": table_id,
-                        "table_title": table_title,
-                        "row_index": r_idx,
-                        "row_header": row_header,
-                        "row_text": row_text,
-                        "column_headers": headers,
-                        "section_path": list(section_path or []),
-                        **common_quality,
-                    },
-                )
+            row_segment = TextSegment(
+                segment_id=row_segment_id,
+                content=row_text,
+                page_number=page,
+                position_y=float(seq),
+                position_x=0.0,
+                segment_type="table_row",
+                source_table_id=table_id,
+                row_header=row_header,
+                structure_confidence=quality["structure_confidence"],
+                ocr_confidence=quality["ocr_confidence"],
+                parse_pass=1,
+                review_status=quality["review_status"],
+                structured_data={
+                    "source": "paddleocr_vl_table_parser",
+                    "parser": "paddleocr-vl",
+                    "table_id": table_id,
+                    "table_title": table_title,
+                    "table_title_source": table_title_source,
+                    "row_index": r_idx,
+                    "row_header": row_header,
+                    "row_header_path": row_header_path,
+                    "row_text": row_text,
+                    "column_headers": headers,
+                    "header_paths": header_paths,
+                    "section_path": list(section_path or []),
+                    **common_quality,
+                },
             )
+            segments.append(row_segment)
+            row_semantic_reasons: List[str] = []
+
             for c_idx, value in enumerate(row):
                 if not str(value).strip():
                     continue
                 seq += 1
                 col_header = headers[c_idx] if c_idx < len(headers) else f"col_{c_idx + 1}"
-                physical = next((cell for cell in physical_cells if cell.get("row_index") == r_idx and cell.get("col_index") == c_idx), None) or {}
-                header_path = [str(headers[c_idx]).strip()] if c_idx < len(headers) and str(headers[c_idx]).strip() else []
+                physical = physical_by_coord.get((r_idx, c_idx), {})
+                header_path = list(header_paths[c_idx]) if c_idx < len(header_paths) else []
+                header_leaf = self._normalized_table_header_leaf(
+                    header_path,
+                    col_header,
+                )
+                explicit_row_label_cell = (
+                    str(physical.get("scope") or "").lower() in {"row", "rowgroup"}
+                    or (
+                        bool(physical.get("is_header"))
+                        and r_idx
+                        not in set(header_model.get("header_row_indices") or [])
+                    )
+                    or (
+                        bool(row_header)
+                        and str(value).strip().casefold()
+                        == str(row_header).strip().casefold()
+                    )
+                )
+                measurement_cell = (
+                    c_idx not in unit_columns
+                    and c_idx not in year_columns
+                    and header_leaf not in label_header_aliases
+                    and not explicit_row_label_cell
+                    and self._table_cell_is_measurement_value(value)
+                )
+                semantic_reasons: List[str] = []
+
+                year_binding: Optional[Dict[str, Any]] = None
+                if measurement_cell:
+                    year_scope_candidates: List[Dict[str, Any]] = []
+                    ambiguous_year_scope = False
+                    inline_years = self._extract_table_years(value)
+                    if len(inline_years) > 1:
+                        ambiguous_year_scope = True
+                    elif inline_years:
+                        year_scope_candidates.append(
+                            {
+                                "year": inline_years[0],
+                                "label": str(value).strip(),
+                                "scope": "cell",
+                            }
+                        )
+                    if c_idx in column_year_ambiguities:
+                        ambiguous_year_scope = True
+                    row_year_candidates = scoped_entries_for_column(
+                        row_year_entries,
+                        c_idx,
+                    )
+                    row_years = list(
+                        dict.fromkeys(
+                            year
+                            for candidate in row_year_candidates
+                            if isinstance(candidate, dict)
+                            for year in (candidate.get("years") or [])
+                        )
+                    )
+                    column_year = column_year_bindings.get(c_idx)
+                    if len(row_years) > 1:
+                        ambiguous_year_scope = True
+                    elif row_years:
+                        source = next(
+                            (
+                                candidate
+                                for candidate in row_year_candidates
+                                if isinstance(candidate, dict)
+                                and row_years[0] in (candidate.get("years") or [])
+                            ),
+                                {},
+                            )
+                        year_scope_candidates.append(
+                            {
+                                "year": row_years[0],
+                                "label": source.get("label"),
+                                "scope": "row_year",
+                            }
+                        )
+                    if column_year:
+                        year_scope_candidates.append(dict(column_year))
+                    # A caption/title year is only a fallback. A common title
+                    # such as "ESG Data 2023-2024" must not erase the exact
+                    # FY23/FY24 binding already supplied by a column header.
+                    if not year_scope_candidates:
+                        if len(table_year_candidates) == 1:
+                            year_scope_candidates.append(
+                                {
+                                    "year": table_year_candidates[0],
+                                    "label": next(
+                                        (
+                                            context
+                                            for context in table_contexts
+                                            if table_year_candidates[0]
+                                            in self._extract_table_years(context)
+                                        ),
+                                        str(table_year_candidates[0]),
+                                    ),
+                                    "scope": "table",
+                                }
+                            )
+                        elif len(table_year_candidates) > 1:
+                            ambiguous_year_scope = True
+
+                    scoped_years = list(
+                        dict.fromkeys(
+                            int(candidate["year"])
+                            for candidate in year_scope_candidates
+                        )
+                    )
+                    if ambiguous_year_scope:
+                        semantic_reasons.append("ambiguous_year_scope")
+                    elif len(scoped_years) > 1:
+                        semantic_reasons.append("conflicting_year_scope")
+                    elif year_scope_candidates:
+                        year_binding = dict(year_scope_candidates[0])
+
+                row_specs = scoped_entries_for_column(row_unit_entries, c_idx)
+                value_specs = (
+                    self._extract_table_unit_specs(value)
+                    if measurement_cell
+                    else []
+                )
+                unit_spec: Optional[Dict[str, Any]] = None
+                unit_ambiguity: Optional[Dict[str, Any]] = None
+                if measurement_cell:
+                    unit_spec, unit_ambiguity = self._resolve_table_cell_unit(
+                        value_specs=value_specs,
+                        row_specs=[
+                            spec for spec in row_specs if isinstance(spec, dict)
+                        ],
+                        column_specs=column_unit_specs.get(c_idx, []),
+                        table_specs=table_unit_specs,
+                        column_has_year=year_binding is not None
+                        and year_binding.get("scope") == "column_header",
+                    )
+                    if unit_ambiguity is not None:
+                        semantic_reasons.append("ambiguous_unit_scope")
+
+                semantic_reasons = list(dict.fromkeys(semantic_reasons))
+                cell_quality_reasons = list(
+                    dict.fromkeys(
+                        [*(quality.get("reasons") or []), *semantic_reasons]
+                    )
+                )
+                review_status = (
+                    "needs_review"
+                    if cell_quality_reasons
+                    else quality["review_status"]
+                )
                 cell_content_parts = []
                 if table_title:
                     cell_content_parts.append(f"[Table Title] {table_title}")
                 if headers:
                     cell_content_parts.append(f"[Column Headers] {' | '.join(headers)}")
+                if header_path:
+                    cell_content_parts.append(
+                        f"[Column Header Path] {' > '.join(header_path)}"
+                    )
                 cell_content_parts.append(f"[Row Context] {row_text}")
                 cell_content_parts.append(f"{col_header}: {value}")
+                cell_data: Dict[str, Any] = {
+                    "source": "paddleocr_vl_table_parser",
+                    "parser": "paddleocr-vl",
+                    "table_id": table_id,
+                    "table_title": table_title,
+                    "table_title_source": table_title_source,
+                    "row_index": r_idx,
+                    "col_index": c_idx,
+                    "row_header": row_header,
+                    "row_header_path": row_header_path,
+                    "col_header": col_header,
+                    "value_text": value,
+                    "column_headers": headers,
+                    "header_path": header_path,
+                    "section_path": list(section_path or []),
+                    "row_text": row_text,
+                    "row_segment_id": row_segment_id,
+                    "rowspan": int(physical.get("rowspan") or 1),
+                    "colspan": int(physical.get("colspan") or 1),
+                    "bbox": physical.get("bbox"),
+                    **common_quality,
+                    "review_status": review_status,
+                    "quality_reasons": cell_quality_reasons,
+                }
+                rendered_unit = self._render_table_unit(unit_spec)
+                if year_binding is not None and not any(
+                    reason in semantic_reasons
+                    for reason in {"ambiguous_year_scope", "conflicting_year_scope"}
+                ):
+                    cell_data.update(
+                        {
+                            "year": int(year_binding["year"]),
+                            "source_year_label": str(year_binding.get("label") or "").strip()
+                            or None,
+                            "year_scope": year_binding.get("scope"),
+                        }
+                    )
+                if unit_spec is not None and unit_ambiguity is None:
+                    cell_data.update(
+                        {
+                            "unit": rendered_unit,
+                            "raw_unit": rendered_unit,
+                            "unit_base": unit_spec.get("base_unit"),
+                            "unit_multiplier": float(unit_spec.get("multiplier") or 1.0),
+                            "unit_scope": unit_spec.get("scope"),
+                            "unit_sources": list(unit_spec.get("sources") or []),
+                        }
+                    )
+                elif unit_ambiguity is not None:
+                    cell_data["unit_candidates"] = unit_ambiguity.get("candidates") or []
+                    cell_data["unit_ambiguity_scope"] = unit_ambiguity.get("scope")
                 segments.append(
                     TextSegment(
                         segment_id=f"{document_id}_p{page}_s{seq}",
@@ -3313,35 +4780,33 @@ class ContentExtractor:
                         row_header=row_header,
                         col_header=col_header,
                         value_text=value,
+                        unit=rendered_unit if unit_ambiguity is None else None,
                         structure_confidence=quality["structure_confidence"],
                         ocr_confidence=quality["ocr_confidence"],
                         header_path=header_path,
                         rowspan=int(physical.get("rowspan") or 1),
                         colspan=int(physical.get("colspan") or 1),
                         parse_pass=1,
-                        review_status=quality["review_status"],
-                        structured_data={
-                            "source": "paddleocr_vl_table_parser",
-                            "parser": "paddleocr-vl",
-                            "table_id": table_id,
-                            "table_title": table_title,
-                            "row_index": r_idx,
-                            "col_index": c_idx,
-                            "row_header": row_header,
-                            "col_header": col_header,
-                            "value_text": value,
-                            "column_headers": headers,
-                            "section_path": list(section_path or []),
-                            "row_text": row_text,
-                            "row_segment_id": row_segment_id,
-                            "header_path": header_path,
-                            "rowspan": int(physical.get("rowspan") or 1),
-                            "colspan": int(physical.get("colspan") or 1),
-                            "bbox": physical.get("bbox"),
-                            **common_quality,
-                        },
+                        review_status=review_status,
+                        structured_data=cell_data,
                     )
                 )
+                row_semantic_reasons.extend(semantic_reasons)
+
+            if row_semantic_reasons:
+                row_data = dict(row_segment.structured_data or {})
+                row_reasons = list(
+                    dict.fromkeys(
+                        [
+                            *(row_data.get("quality_reasons") or []),
+                            *row_semantic_reasons,
+                        ]
+                    )
+                )
+                row_data["quality_reasons"] = row_reasons
+                row_data["review_status"] = "needs_review"
+                row_segment.review_status = "needs_review"
+                row_segment.structured_data = row_data
         return segments
 
     def _enrich_segments_from_native_layout(self, segments: List[TextSegment], analysis: Any) -> None:
@@ -3463,14 +4928,21 @@ class ContentExtractor:
                 )
                 segment.structured_data = data
 
-    def _enrich_table_segments_from_records(self, segments: List[TextSegment], records: List[Dict[str, Any]]) -> None:
+    def _enrich_table_segments_from_records(
+        self,
+        segments: List[TextSegment],
+        records: List[Dict[str, Any]],
+    ) -> Dict[str, set[Tuple[int, str]]]:
         """Bind Markdown tables to Paddle's structured records one-to-one.
 
         Paddle emits Markdown and JSON through separate serializers, so their
         ordering can diverge when a page contains nested figures or repeated
         tables.  Pairing merely by list index silently attaches the wrong
         geometry and confidence.  We instead require the same global page and
-        score text identity, bbox IoU (when available), and reading order.
+        score text identity and bbox IoU (when available).  A record is bound
+        only when the table and record select each other as a unique best match
+        with a non-zero safety margin.  Reading order is never identity evidence
+        when either bbox is unavailable.
         """
         table_segments = [
             segment
@@ -3487,6 +4959,31 @@ class ContentExtractor:
             except (TypeError, ValueError, OverflowError):
                 continue
             record_by_page.setdefault(page_number, []).append(record)
+
+        def record_key(record: Dict[str, Any], page: int) -> Tuple[int, str]:
+            record_id = str(record.get("table_id") or "").strip()
+            if not record_id:
+                identity = json.dumps(
+                    {
+                        "html": hashlib.sha256(
+                            str(record.get("pred_html") or "").encode("utf-8")
+                        ).hexdigest(),
+                        "bbox": record.get("bbox"),
+                        "reading_order": record.get("reading_order"),
+                    },
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    default=str,
+                )
+                record_id = "anonymous:" + hashlib.sha256(
+                    identity.encode("utf-8")
+                ).hexdigest()[:20]
+            return page, record_id
+
+        binding_summary: Dict[str, set[Tuple[int, str]]] = {
+            "matched_record_keys": set(),
+            "ambiguous_record_keys": set(),
+        }
 
         def safe_confidence(value: Any, fallback: float) -> float:
             try:
@@ -3528,6 +5025,11 @@ class ContentExtractor:
         ) -> Dict[tuple[int, int], List[float]]:
             raw_boxes = record.get("cell_box_list")
             if not isinstance(raw_boxes, list) or not raw_boxes or not raw_cells:
+                return {}
+            if len(raw_boxes) != len(raw_cells):
+                # Paddle boxes are positional. Once the physical-cell counts
+                # diverge (for example because an empty row was omitted), every
+                # later zip entry can point at the wrong cell.
                 return {}
             boxes: List[Optional[List[float]]] = []
             for raw_box in raw_boxes:
@@ -3619,7 +5121,41 @@ class ContentExtractor:
 
             parsed_tables = [self._parse_table_rows(segment.content) for segment in page_tables]
             parsed_records = [self._parse_table_rows(str(record.get("pred_html") or "")) for record in page_records]
+            table_families = {
+                str(table.source_table_id): [
+                    segment
+                    for segment in segments
+                    if segment.source_table_id == table.source_table_id
+                ]
+                for table in page_tables
+            }
+            record_families: List[List[TextSegment]] = []
+            for record_index, record in enumerate(page_records):
+                raw_html = str(record.get("pred_html") or "")
+                synthetic_table_id = f"record-match-p{page}-{record_index}"
+                family = [
+                    TextSegment(
+                        segment_id=f"{synthetic_table_id}-table",
+                        content=raw_html,
+                        page_number=page,
+                        position_y=0.0,
+                        segment_type="table",
+                        source_table_id=synthetic_table_id,
+                    )
+                ]
+                family.extend(
+                    self._table_segments_from_markdown(
+                        raw_html,
+                        synthetic_table_id,
+                        page,
+                        synthetic_table_id,
+                    )
+                )
+                record_families.append(family)
+
             candidates: List[tuple[float, float, float, int, int]] = []
+            plausible_record_indices: set[int] = set()
+            plausible_edges: set[Tuple[int, int]] = set()
             for table_index, table_segment in enumerate(page_tables):
                 table_bbox = _normalized_bbox((table_segment.structured_data or {}).get("bbox"))
                 for record_index, record in enumerate(page_records):
@@ -3635,30 +5171,257 @@ class ContentExtractor:
                     if table_bbox is not None and record_bbox is not None:
                         score = 0.65 * text_score + 0.30 * bbox_score + 0.05 * order_score
                     else:
-                        score = 0.90 * text_score + 0.10 * order_score
-                    # A same-page singleton is not an identity signal.  Keep a
-                    # minimum content/geometry gate so an unrelated structured
-                    # record cannot silently overwrite the only Markdown table.
-                    if score < 0.35 or (text_score < 0.18 and bbox_score < 0.10):
+                        score = text_score
+                    semantic_compatible = bool(
+                        table_family := table_families.get(
+                            str(table_segment.source_table_id or ""),
+                            [],
+                        )
+                    ) and self._second_pass_table_identity_compatible(
+                        table_family,
+                        record_families[record_index],
+                    )
+                    # Keep a wider ambiguity graph than the acceptance graph.
+                    # A record that visibly overlaps an existing page table but
+                    # misses a strict threshold must not be reinterpreted as an
+                    # unrelated JSON-only table and appended as a duplicate.
+                    if (
+                        semantic_compatible
+                        or text_score >= 0.45
+                        or (
+                            table_bbox is not None
+                            and record_bbox is not None
+                            and bbox_score >= 0.10
+                        )
+                    ):
+                        plausible_record_indices.add(record_index)
+                        plausible_edges.add((table_index, record_index))
+                    # Explicitly disjoint geometry always blocks binding, even
+                    # on singleton pages.  The plausible edge above is retained
+                    # so a text-identical but misplaced record is classified as
+                    # ambiguous instead of being appended as a JSON-only table.
+                    if (
+                        table_bbox is not None
+                        and record_bbox is not None
+                        and bbox_score < 0.10
+                    ):
+                        continue
+                    # A same-page singleton is not an identity signal. Keep a
+                    # minimum content/geometry gate and require compatible
+                    # header, year, unit and row-label axes before admitting an
+                    # edge to the global candidate graph.
+                    if score < 0.45 or (text_score < 0.35 and bbox_score < 0.20):
+                        continue
+                    if not semantic_compatible:
                         continue
                     candidates.append((score, text_score, bbox_score, table_index, record_index))
 
-            matched_tables: set[int] = set()
-            matched_records: set[int] = set()
+            try:
+                match_margin = float(
+                    os.getenv("REPORT_TABLE_SECOND_PASS_MATCH_MARGIN", "0.10")
+                    or "0.10"
+                )
+            except (TypeError, ValueError, OverflowError):
+                match_margin = 0.10
+            match_margin = max(0.10, min(0.50, match_margin))
+
+            edges_by_table: Dict[
+                int, List[tuple[float, float, float, int, int]]
+            ] = {}
+            edges_by_record: Dict[
+                int, List[tuple[float, float, float, int, int]]
+            ] = {}
+            for edge in candidates:
+                edges_by_table.setdefault(edge[3], []).append(edge)
+                edges_by_record.setdefault(edge[4], []).append(edge)
+
+            def unique_best(
+                edges: Sequence[tuple[float, float, float, int, int]],
+            ) -> Optional[Tuple[int, int]]:
+                ranked = sorted(edges, key=lambda item: item[0], reverse=True)
+                if not ranked:
+                    return None
+                if (
+                    len(ranked) > 1
+                    and float(ranked[0][0]) - float(ranked[1][0])
+                    < match_margin
+                ):
+                    return None
+                return ranked[0][3], ranked[0][4]
+
+            best_by_table = {
+                table_index: unique_best(edges)
+                for table_index, edges in edges_by_table.items()
+            }
+            best_by_record = {
+                record_index: unique_best(edges)
+                for record_index, edges in edges_by_record.items()
+            }
+            accepted_candidates = [
+                edge
+                for edge in candidates
+                if best_by_table.get(edge[3]) == (edge[3], edge[4])
+                and best_by_record.get(edge[4]) == (edge[3], edge[4])
+            ]
+
             matches: List[tuple[TextSegment, Dict[str, Any], float, float, float]] = []
-            for score, text_score, bbox_score, table_index, record_index in sorted(candidates, reverse=True):
-                if table_index in matched_tables or record_index in matched_records:
-                    continue
-                if score < 0.20:
-                    continue
-                matched_tables.add(table_index)
-                matched_records.add(record_index)
+            matched_record_indices: set[int] = set()
+            for score, text_score, bbox_score, table_index, record_index in sorted(
+                accepted_candidates,
+                reverse=True,
+            ):
+                matched_record_indices.add(record_index)
+                binding_summary["matched_record_keys"].add(
+                    record_key(page_records[record_index], page)
+                )
                 matches.append((page_tables[table_index], page_records[record_index], score, text_score, bbox_score))
+
+            ambiguous_record_indices = (
+                plausible_record_indices - matched_record_indices
+            )
+            for record_index in ambiguous_record_indices:
+                binding_summary["ambiguous_record_keys"].add(
+                    record_key(page_records[record_index], page)
+                )
+
+            # Preserve the ambiguity as actionable quality evidence without
+            # attaching any record provenance to a table that was not safely
+            # matched. This keeps the family eligible for a selective repair
+            # pass while preventing a false table_record_id association.
+            for table_index, record_index in plausible_edges:
+                if record_index not in ambiguous_record_indices:
+                    continue
+                table_segment = page_tables[table_index]
+                markdown_rows, _markdown_cells, markdown_quality = (
+                    self._parse_table_details(table_segment.content)
+                )
+                raw_rows, _raw_cells, raw_quality = self._parse_table_details(
+                    str(page_records[record_index].get("pred_html") or "")
+                )
+                markdown_header_rows = list(
+                    (markdown_quality.get("header_model") or {}).get(
+                        "header_row_indices"
+                    )
+                    or []
+                )
+                raw_header_rows = list(
+                    (raw_quality.get("header_model") or {}).get(
+                        "header_row_indices"
+                    )
+                    or []
+                )
+                row_shapes_match = [len(row) for row in raw_rows] == [
+                    len(row) for row in markdown_rows
+                ]
+                row_coordinates_match = (
+                    len(raw_rows) == len(markdown_rows)
+                    and all(
+                        _normalised_table_text([raw_row])
+                        == _normalised_table_text([markdown_row])
+                        for raw_row, markdown_row in zip(
+                            raw_rows,
+                            markdown_rows,
+                        )
+                    )
+                )
+                geometry_alignment_mismatch = not (
+                    raw_rows
+                    and markdown_rows
+                    and raw_header_rows == markdown_header_rows
+                    and row_shapes_match
+                    and row_coordinates_match
+                )
+                for related_segment in table_families.get(
+                    str(table_segment.source_table_id or ""),
+                    [],
+                ):
+                    data = dict(related_segment.structured_data or {})
+                    reasons = list(
+                        dict.fromkeys(
+                            [
+                                *(data.get("quality_reasons") or []),
+                                "structure_source_conflict",
+                                "ambiguous_table_record_match",
+                                *(
+                                    ["cell_geometry_alignment_mismatch"]
+                                    if geometry_alignment_mismatch
+                                    else []
+                                ),
+                            ]
+                        )
+                    )
+                    conflicts = [
+                        dict(conflict)
+                        for conflict in (
+                            related_segment.conflicts
+                            or data.get("conflicts")
+                            or []
+                        )
+                        if isinstance(conflict, dict)
+                    ]
+                    conflict = {
+                        "type": "ambiguous_table_record_match",
+                        "record_id": page_records[record_index].get("table_id"),
+                    }
+                    conflict_key = json.dumps(
+                        conflict,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        default=str,
+                    )
+                    if all(
+                        json.dumps(
+                            existing,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            default=str,
+                        )
+                        != conflict_key
+                        for existing in conflicts
+                    ):
+                        conflicts.append(conflict)
+                    if geometry_alignment_mismatch:
+                        alignment_conflict = {
+                            "type": "cell_geometry_alignment_mismatch",
+                            "markdown_header_rows": markdown_header_rows,
+                            "structured_header_rows": raw_header_rows,
+                            "row_shapes_match": row_shapes_match,
+                            "row_coordinates_match": row_coordinates_match,
+                        }
+                        alignment_key = json.dumps(
+                            alignment_conflict,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            default=str,
+                        )
+                        if all(
+                            json.dumps(
+                                existing,
+                                ensure_ascii=False,
+                                sort_keys=True,
+                                default=str,
+                            )
+                            != alignment_key
+                            for existing in conflicts
+                        ):
+                            conflicts.append(alignment_conflict)
+                    related_segment.review_status = "needs_review"
+                    related_segment.conflicts = conflicts
+                    data.update(
+                        {
+                            "review_status": "needs_review",
+                            "quality_reasons": reasons,
+                            "conflicts": conflicts,
+                        }
+                    )
+                    related_segment.structured_data = data
 
             for table_segment, record, match_score, text_score, bbox_score in matches:
                 raw_html = str(record.get("pred_html") or "")
                 raw_rows, raw_cells, raw_quality = self._parse_table_details(raw_html)
-                markdown_rows = self._parse_table_rows(table_segment.content)
+                markdown_rows, _markdown_cells, markdown_quality = (
+                    self._parse_table_details(table_segment.content)
+                )
                 structure_confidence = safe_confidence(record.get("structure_confidence"), raw_quality["structure_confidence"])
                 raw_ocr_confidence = record.get("ocr_confidence")
                 ocr_confidence = (
@@ -3689,6 +5452,67 @@ class ContentExtractor:
                         }
                     )
                     reasons.append("structure_source_conflict")
+
+                raw_header_rows = list(
+                    (raw_quality.get("header_model") or {}).get(
+                        "header_row_indices"
+                    )
+                    or []
+                )
+                markdown_header_rows = list(
+                    (markdown_quality.get("header_model") or {}).get(
+                        "header_row_indices"
+                    )
+                    or []
+                )
+                row_shapes_match = [len(row) for row in raw_rows] == [
+                    len(row) for row in markdown_rows
+                ]
+                row_coordinates_match = (
+                    len(raw_rows) == len(markdown_rows)
+                    and all(
+                        _normalised_table_text([raw_row])
+                        == _normalised_table_text([markdown_row])
+                        for raw_row, markdown_row in zip(
+                            raw_rows,
+                            markdown_rows,
+                        )
+                    )
+                )
+                coordinate_alignment_safe = bool(
+                    raw_rows
+                    and markdown_rows
+                    and raw_header_rows == markdown_header_rows
+                    and row_shapes_match
+                    and row_coordinates_match
+                )
+                if not coordinate_alignment_safe:
+                    conflicts.append(
+                        {
+                            "type": "cell_geometry_alignment_mismatch",
+                            "markdown_header_rows": markdown_header_rows,
+                            "structured_header_rows": raw_header_rows,
+                            "row_shapes_match": row_shapes_match,
+                            "row_coordinates_match": row_coordinates_match,
+                        }
+                    )
+                    reasons.append("cell_geometry_alignment_mismatch")
+
+                raw_box_list = record.get("cell_box_list")
+                cell_box_count_matches = not (
+                    isinstance(raw_box_list, list)
+                    and raw_box_list
+                    and len(raw_box_list) != len(raw_cells)
+                )
+                if not cell_box_count_matches:
+                    conflicts.append(
+                        {
+                            "type": "cell_bbox_count_mismatch",
+                            "cell_count": len(raw_cells),
+                            "bbox_count": len(raw_box_list),
+                        }
+                    )
+                    reasons.append("cell_bbox_count_mismatch")
                 reasons = list(dict.fromkeys(reasons))
                 review_status = (
                     "needs_review"
@@ -3700,7 +5524,11 @@ class ContentExtractor:
                     page_width=float(record.get("page_width") or 0.0),
                     page_height=float(record.get("page_height") or 0.0),
                 )
-                boxes_by_cell = cell_bbox_map(record, raw_cells)
+                boxes_by_cell = (
+                    cell_bbox_map(record, raw_cells)
+                    if coordinate_alignment_safe and cell_box_count_matches
+                    else {}
+                )
                 try:
                     record_parse_pass = max(1, int(record.get("parse_pass") or 1))
                 except (TypeError, ValueError, OverflowError):
@@ -3716,21 +5544,17 @@ class ContentExtractor:
                     for segment in segments
                     if segment.source_table_id == table_segment.source_table_id
                 ]
-                unit_by_row: Dict[int, str] = {}
-                for related_segment in related:
-                    if related_segment.segment_type != "table_cell":
-                        continue
-                    data = dict(related_segment.structured_data or {})
-                    header = str(data.get("col_header") or related_segment.col_header or "").casefold()
-                    if "unit" not in header and "单位" not in header:
-                        continue
-                    try:
-                        row_index = int(data.get("row_index"))
-                    except (TypeError, ValueError, OverflowError):
-                        continue
-                    unit_value = str(data.get("value_text") or related_segment.value_text or "").strip()
-                    if unit_value:
-                        unit_by_row[row_index] = unit_value
+                raw_cell_by_coord: Dict[Tuple[int, int], Dict[str, Any]] = {}
+                if coordinate_alignment_safe:
+                    for raw_cell in raw_cells:
+                        try:
+                            raw_key = (
+                                int(raw_cell.get("row_index")),
+                                int(raw_cell.get("col_index")),
+                            )
+                        except (TypeError, ValueError, OverflowError):
+                            continue
+                        raw_cell_by_coord[raw_key] = raw_cell
 
                 structured_html_sha256 = hashlib.sha256(raw_html.encode("utf-8")).hexdigest() if raw_html else None
                 provenance = {
@@ -3749,14 +5573,36 @@ class ContentExtractor:
                     "table_text_match_score": round(text_score, 4),
                     "table_bbox_iou": round(bbox_score, 4),
                 }
+                record_caption = str(record.get("caption") or "").strip()
+                record_summary = str(record.get("summary") or "").strip()
 
                 for related_segment in related:
                     related_segment.structure_confidence = structure_confidence
                     related_segment.ocr_confidence = ocr_confidence
                     related_segment.parse_pass = record_parse_pass
-                    related_segment.review_status = review_status
                     related_segment.conflicts = conflicts
                     data = dict(related_segment.structured_data or {})
+                    existing_reasons = [
+                        str(value).strip()
+                        for value in (data.get("quality_reasons") or [])
+                        if str(value).strip()
+                    ]
+                    merged_reasons = list(
+                        dict.fromkeys([*reasons, *existing_reasons])
+                    )
+                    previous_review_status = str(
+                        related_segment.review_status
+                        or data.get("review_status")
+                        or ""
+                    ).strip().lower()
+                    merged_review_status = (
+                        "needs_review"
+                        if merged_reasons
+                        or conflicts
+                        or previous_review_status == "needs_review"
+                        else review_status
+                    )
+                    related_segment.review_status = merged_review_status
                     try:
                         row_index = int(data.get("row_index")) if data.get("row_index") is not None else None
                     except (TypeError, ValueError, OverflowError):
@@ -3765,60 +5611,129 @@ class ContentExtractor:
                         col_index = int(data.get("col_index")) if data.get("col_index") is not None else None
                     except (TypeError, ValueError, OverflowError):
                         col_index = None
-                    segment_bbox = table_bbox
-                    if related_segment.segment_type == "table_row" and row_index is not None:
-                        segment_bbox = row_boxes.get(row_index) or table_bbox
-                    elif related_segment.segment_type == "table_cell" and row_index is not None and col_index is not None:
-                        segment_bbox = boxes_by_cell.get((row_index, col_index)) or row_boxes.get(row_index) or table_bbox
+                    segment_bbox = None
+                    if related_segment.segment_type == "table":
+                        segment_bbox = table_bbox
+                    elif (
+                        coordinate_alignment_safe
+                        and related_segment.segment_type == "table_row"
+                        and row_index is not None
+                    ):
+                        segment_bbox = row_boxes.get(row_index)
+                    elif (
+                        coordinate_alignment_safe
+                        and related_segment.segment_type == "table_cell"
+                        and row_index is not None
+                        and col_index is not None
+                    ):
+                        segment_bbox = boxes_by_cell.get((row_index, col_index))
 
                     data.update(
                         {
                             **provenance,
-                            "bbox": segment_bbox,
                             "structure_confidence": structure_confidence,
                             "ocr_confidence": ocr_confidence,
                             "parse_pass": record_parse_pass,
-                            "review_status": review_status,
-                            "quality_reasons": reasons,
-                            "quality_notes": quality_notes,
+                            "review_status": merged_review_status,
+                            "quality_reasons": merged_reasons,
+                            "quality_notes": list(
+                                dict.fromkeys(
+                                    [
+                                        *quality_notes,
+                                        *(data.get("quality_notes") or []),
+                                    ]
+                                )
+                            ),
                             "conflicts": conflicts,
                             "structured_html_sha256": structured_html_sha256,
                         }
                     )
+                    if table_bbox is not None:
+                        data["source_table_bbox"] = table_bbox
+                    if segment_bbox is not None:
+                        data["bbox"] = segment_bbox
+                    if record_caption:
+                        data["table_title"] = record_caption
+                        data["table_title_source"] = "structured_record_caption"
+                        data["caption"] = record_caption
+                    if record_summary:
+                        data["summary"] = record_summary
                     if related_segment.segment_type == "table":
                         data["structured_html"] = raw_html
                     if segment_bbox is not None:
                         related_segment.position_x = float(segment_bbox[0])
                         related_segment.position_y = float(segment_bbox[1])
                     if related_segment.segment_type == "table_cell":
-                        cell = next(
-                            (
-                                item
-                                for item in raw_cells
-                                if item.get("row_index") == row_index and item.get("col_index") == col_index
-                            ),
-                            None,
+                        cell = (
+                            raw_cell_by_coord.get((row_index, col_index))
+                            if row_index is not None and col_index is not None
+                            else None
                         )
                         if cell:
                             related_segment.rowspan = int(cell.get("rowspan") or 1)
                             related_segment.colspan = int(cell.get("colspan") or 1)
                             data["rowspan"] = related_segment.rowspan
                             data["colspan"] = related_segment.colspan
-                        header = str(data.get("col_header") or related_segment.col_header or "")
-                        year_match = re.search(r"\b((?:19|20)\d{2})\b", header)
-                        if year_match:
-                            data["year"] = int(year_match.group(1))
-                        if row_index is not None:
-                            inferred_unit = unit_by_row.get(row_index, "")
-                        else:
-                            inferred_unit = ""
-                        value_text = str(data.get("value_text") or related_segment.value_text or "")
-                        if not inferred_unit and "%" in value_text:
-                            inferred_unit = "%"
-                        if inferred_unit:
-                            related_segment.unit = related_segment.unit or inferred_unit
-                            data["unit"] = related_segment.unit
+                        year_fallback_blocked = any(
+                            reason
+                            in {
+                                "ambiguous_year_scope",
+                                "conflicting_year_scope",
+                            }
+                            for reason in merged_reasons
+                        )
+                        if data.get("year") is None and not year_fallback_blocked:
+                            header_path = list(
+                                data.get("header_path")
+                                or related_segment.header_path
+                                or []
+                            )
+                            header_labels = header_path or [
+                                str(
+                                    data.get("col_header")
+                                    or related_segment.col_header
+                                    or ""
+                                )
+                            ]
+                            for header_label in reversed(header_labels):
+                                years = self._extract_table_years(header_label)
+                                if len(years) == 1:
+                                    data["year"] = years[0]
+                                    data["source_year_label"] = header_label
+                                    data["year_scope"] = "column_header"
+                                    break
+                                if len(years) > 1:
+                                    break
+                        if not related_segment.unit and not data.get("unit"):
+                            value_text = str(
+                                data.get("value_text")
+                                or related_segment.value_text
+                                or ""
+                            )
+                            value_unit, ambiguity = self._coalesce_table_unit_specs(
+                                self._extract_table_unit_specs(value_text),
+                                "cell",
+                            )
+                            rendered_unit = self._render_table_unit(value_unit)
+                            if rendered_unit and ambiguity is None:
+                                related_segment.unit = rendered_unit
+                                data.update(
+                                    {
+                                        "unit": rendered_unit,
+                                        "raw_unit": rendered_unit,
+                                        "unit_base": value_unit.get("base_unit"),
+                                        "unit_multiplier": float(
+                                            value_unit.get("multiplier") or 1.0
+                                        ),
+                                        "unit_scope": "cell",
+                                        "unit_sources": list(
+                                            value_unit.get("sources") or []
+                                        ),
+                                    }
+                                )
                     related_segment.structured_data = data
+
+        return binding_summary
 
     def _materialize_unmatched_table_records(
         self,
@@ -3925,7 +5840,11 @@ class ContentExtractor:
                 reading_order = float(reading_order_value)
             except (TypeError, ValueError, OverflowError):
                 reading_order = float(len(segments) + added + 1)
-            table_title = str(record.get("caption") or record.get("summary") or "").strip()
+            # Only a parser-provided caption is independent table identity.
+            # A generated/general summary is useful context but is not strong
+            # enough evidence for automatic cross-page stitching.
+            table_title = str(record.get("caption") or "").strip()
+            table_summary = str(record.get("summary") or "").strip()
             family = [
                 TextSegment(
                     segment_id=table_segment_id,
@@ -3941,6 +5860,10 @@ class ContentExtractor:
                         "parser": "paddleocr-vl",
                         "table_id": table_id,
                         "table_title": table_title,
+                        "table_title_source": (
+                            "structured_record_caption" if table_title else ""
+                        ),
+                        "summary": table_summary or None,
                         "bbox": bbox,
                         "materialized_from_table_record": True,
                         "parse_pass": record_parse_pass,
@@ -3955,6 +5878,9 @@ class ContentExtractor:
                     table_id,
                     start_seq=100_000 + ordinal * 10_000,
                     table_title=table_title,
+                    table_title_source=(
+                        "structured_record_caption" if table_title else ""
+                    ),
                 )
             )
             self._enrich_table_segments_from_records(family, [record])
@@ -3965,6 +5891,226 @@ class ContentExtractor:
                 existing_fingerprints.add(record_fingerprint_key)
             added += 1
         return added
+
+    @staticmethod
+    def _normalise_table_projection_cell(value: object) -> str:
+        """Normalize a protected table cell without weakening numeric identity."""
+        text = unicodedata.normalize("NFKC", unescape(str(value or "")))
+        text = text.replace("\u00a0", " ").casefold().strip()
+        return re.sub(r"\s+", " ", text)
+
+    def _structured_table_preserves_projection(
+        self,
+        markdown_text: str,
+        structured_text: str,
+        *,
+        trusted_markdown_row_indices: Optional[Sequence[int]] = None,
+    ) -> bool:
+        """Return whether structured HTML safely contains the Markdown projection.
+
+        Coverage counts cannot establish table identity: an unrelated table can
+        always have more rows or cells.  A canonical structured record must
+        instead retain the confirmed Markdown header paths, every stable row
+        label, and every trusted Markdown data row in the same order. Trusted
+        cells are compared exactly after Unicode/case/whitespace normalization,
+        so years, units and values cannot silently change while authorizing a
+        replacement. Explicitly low-confidence rows retain their identity label
+        but may have their values corrected.
+        """
+        markdown_rows, _markdown_cells, markdown_quality = self._parse_table_details(
+            markdown_text
+        )
+        structured_rows, _structured_cells, structured_quality = (
+            self._parse_table_details(structured_text)
+        )
+        markdown_header = dict(markdown_quality.get("header_model") or {})
+        structured_header = dict(structured_quality.get("header_model") or {})
+        if not (
+            markdown_header.get("confirmed")
+            and structured_header.get("confirmed")
+        ):
+            return False
+
+        def normalized_paths(
+            model: Dict[str, Any],
+        ) -> Tuple[int, List[Tuple[int, Tuple[str, ...]]]]:
+            raw_paths = list(model.get("header_paths") or [])
+            paths: List[Tuple[int, Tuple[str, ...]]] = []
+            for physical_column, path in enumerate(raw_paths):
+                normalized = tuple(
+                    value
+                    for raw in path
+                    if (value := self._normalise_table_projection_cell(raw))
+                )
+                if normalized:
+                    paths.append((physical_column, normalized))
+            return len(raw_paths), paths
+
+        markdown_width, markdown_paths = normalized_paths(markdown_header)
+        structured_width, structured_paths = normalized_paths(structured_header)
+        if (
+            not markdown_paths
+            or not structured_paths
+            or len(markdown_paths) != markdown_width
+        ):
+            return False
+
+        # Map every old column to exactly one later new column.  Multiple
+        # identical destinations are ambiguous and therefore fail closed.
+        column_map: List[int] = []
+        next_column = 0
+        for _markdown_column, path in markdown_paths:
+            matches = [
+                physical_column
+                for physical_column, candidate_path in structured_paths
+                if physical_column >= next_column and candidate_path == path
+            ]
+            if len(matches) != 1:
+                return False
+            column_map.append(matches[0])
+            next_column = matches[0] + 1
+
+        markdown_data_indices = [
+            int(index)
+            for index in (markdown_header.get("data_row_indices") or [])
+            if 0 <= int(index) < len(markdown_rows)
+        ]
+        structured_data_indices = [
+            int(index)
+            for index in (structured_header.get("data_row_indices") or [])
+            if 0 <= int(index) < len(structured_rows)
+        ]
+
+        trusted_rows = (
+            None
+            if trusted_markdown_row_indices is None
+            else {int(index) for index in trusted_markdown_row_indices}
+        )
+        projection_rows: List[
+            Tuple[List[str], int, str, bool, Tuple[bool, ...]]
+        ] = []
+        markdown_headers = [
+            str(value or "") for value in (markdown_header.get("headers") or [])
+        ]
+
+        def mutable_measurement_column(
+            raw_value: object,
+            column_index: int,
+        ) -> bool:
+            value = self._clean_table_measurement_text(raw_value).strip()
+            if not self._table_cell_is_measurement_value(value):
+                return False
+            # A correction may change a measurement value, not a textual
+            # category that happens to contain digits (for example tCO2e).
+            if not re.match(
+                r"^[~≈<>]?[\s\(]*[-+]?(?:\d[\d,.]*|\.\d+)",
+                value,
+            ):
+                return False
+            header_path = markdown_paths[column_index][1]
+            header_text = " ".join(header_path)
+            # Use a positive measurement allowlist. Numeric dimensions such as
+            # Scope 1/2, quarter, tier, level, site or product code must never
+            # become mutable merely because their cell begins with a digit.
+            if self._extract_table_years(header_text):
+                return True
+            if re.search(
+                r"\b(?:scope|quarter|period|tier|level|site|location|facility|"
+                r"product|category|class|type|unit|code|reference|identifier|"
+                r"id|name|description|boundary|country|region|gender|group)\b",
+                header_text,
+            ):
+                return False
+            if "%" in header_text or re.search(
+                r"\b(?:measure(?:ment)?|value|amount|count|total|rate|"
+                r"percentage|percent|share|ratio|quantity|volume|consumption|"
+                r"emissions?|energy|water|waste|revenue|sales|cost|headcount|"
+                r"score|intensity)\b",
+                header_text,
+            ):
+                return True
+            return any(
+                spec.get("base_unit")
+                for spec in self._extract_table_unit_specs(header_text)
+            )
+
+        for row_index in markdown_data_indices:
+            raw_row = list(markdown_rows[row_index])
+            row_is_trusted = trusted_rows is None or row_index in trusted_rows
+            # No non-empty source row may disappear merely because it is hard
+            # to project. Trusted malformed rows fail closed; low-confidence
+            # rows must still supply a stable ordered label anchor.
+            if len(raw_row) != markdown_width:
+                return False
+            row = [self._normalise_table_projection_cell(value) for value in raw_row]
+            if not any(row):
+                continue
+            row_label = self._normalise_table_projection_cell(
+                self._infer_row_header(markdown_headers, raw_row)
+            )
+            if not row_label or not re.search(r"[^\W\d_]", row_label, re.UNICODE):
+                return False
+            label_columns = [
+                column_index
+                for column_index, value in enumerate(row)
+                if value == row_label
+            ]
+            if len(label_columns) != 1:
+                return False
+            label_column = label_columns[0]
+            projection_rows.append(
+                (
+                    row,
+                    column_map[label_column],
+                    row_label,
+                    row_is_trusted,
+                    tuple(
+                        mutable_measurement_column(raw_value, column_index)
+                        for column_index, raw_value in enumerate(raw_row)
+                    ),
+                )
+            )
+        if not projection_rows:
+            return False
+
+        candidate_rows: List[List[str]] = []
+        for row_index in structured_data_indices:
+            raw_row = list(structured_rows[row_index])
+            if len(raw_row) < structured_width:
+                continue
+            candidate_rows.append(
+                [self._normalise_table_projection_cell(value) for value in raw_row]
+            )
+
+        next_row = 0
+        for (
+            projected,
+            mapped_label_column,
+            projected_label,
+            is_trusted,
+            mutable_columns,
+        ) in projection_rows:
+            matched_row: Optional[int] = None
+            for candidate_index in range(next_row, len(candidate_rows)):
+                candidate = candidate_rows[candidate_index]
+                if candidate[mapped_label_column] != projected_label:
+                    continue
+                if not all(
+                    not projected[column_index]
+                    or (
+                        not is_trusted
+                        and mutable_columns[column_index]
+                    )
+                    or projected[column_index] == candidate[mapped_column]
+                    for column_index, mapped_column in enumerate(column_map)
+                ):
+                    continue
+                matched_row = candidate_index
+                break
+            if matched_row is None:
+                return False
+            next_row = matched_row + 1
+        return True
 
     def _prefer_structured_table_records(
         self,
@@ -3982,6 +6128,8 @@ class ContentExtractor:
         valid_records: List[Dict[str, Any]] = []
         valid_record_keys: set[Tuple[int, str]] = set()
         record_by_key: Dict[Tuple[int, str], Dict[str, Any]] = {}
+        record_fingerprint_by_key: Dict[Tuple[int, str], str] = {}
+        duplicate_record_keys: set[Tuple[int, str]] = set()
         for raw_record in records:
             record = dict(raw_record) if isinstance(raw_record, dict) else None
             if not isinstance(record, dict):
@@ -4019,13 +6167,123 @@ class ContentExtractor:
                 record["table_id"] = record_id
                 record["table_record_source"] = "synthetic_occurrence"
             key = (page, record_id)
+            record_fingerprint = hashlib.sha256(
+                json.dumps(
+                    {
+                        "html": raw_html,
+                        "bbox": _normalized_bbox(
+                            record.get("bbox"),
+                            page_width=float(record.get("page_width") or 0.0),
+                            page_height=float(record.get("page_height") or 0.0),
+                        ),
+                        "reading_order": record.get("reading_order"),
+                    },
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    default=str,
+                ).encode("utf-8")
+            ).hexdigest()
+            if key in record_fingerprint_by_key:
+                if record_fingerprint_by_key[key] != record_fingerprint:
+                    duplicate_record_keys.add(key)
+                # Exact duplicates are redundant; conflicting duplicates are
+                # removed below as an ambiguous identity. Neither case should
+                # create an additional candidate-graph node.
+                continue
             valid_record_keys.add(key)
             record_by_key[key] = record
+            record_fingerprint_by_key[key] = record_fingerprint
             valid_records.append(record)
+        if duplicate_record_keys:
+            valid_records = [
+                record
+                for record in valid_records
+                if (
+                    int(record.get("page_number") or 1),
+                    str(record.get("table_id") or "").strip(),
+                )
+                not in duplicate_record_keys
+            ]
+            for key in duplicate_record_keys:
+                valid_record_keys.discard(key)
+                record_by_key.pop(key, None)
         if not valid_records:
             return 0
 
-        self._enrich_table_segments_from_records(segments, valid_records)
+        try:
+            source_structure_threshold = float(
+                os.getenv("REPORT_TABLE_STRUCTURE_CONFIDENCE_THRESHOLD", "0.80")
+                or "0.80"
+            )
+            source_ocr_threshold = float(
+                os.getenv("REPORT_TABLE_OCR_CONFIDENCE_THRESHOLD", "0.75")
+                or "0.75"
+            )
+        except (TypeError, ValueError, OverflowError):
+            source_structure_threshold, source_ocr_threshold = 0.80, 0.75
+        trusted_rows_by_table: Dict[str, set[int]] = {}
+        source_rows_by_table: Dict[str, set[int]] = {}
+        for source_row in segments:
+            if (
+                source_row.segment_type != "table_row"
+                or not source_row.source_table_id
+            ):
+                continue
+            table_id = str(source_row.source_table_id)
+            trusted_rows_by_table.setdefault(table_id, set())
+            source_data = dict(source_row.structured_data or {})
+            try:
+                row_index = int(source_data.get("row_index"))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            source_rows_by_table.setdefault(table_id, set()).add(row_index)
+            reasons = {
+                str(value).strip()
+                for value in (source_data.get("quality_reasons") or [])
+                if str(value).strip()
+            }
+            review_status = str(
+                source_row.review_status
+                or source_data.get("review_status")
+                or ""
+            ).strip().lower()
+            structure_confidence = (
+                source_row.structure_confidence
+                if source_row.structure_confidence is not None
+                else source_data.get("structure_confidence")
+            )
+            ocr_confidence = (
+                source_row.ocr_confidence
+                if source_row.ocr_confidence is not None
+                else source_data.get("ocr_confidence")
+            )
+            try:
+                structure_is_trusted = (
+                    structure_confidence is not None
+                    and float(structure_confidence) >= source_structure_threshold
+                )
+                ocr_is_trusted = (
+                    ocr_confidence is None
+                    or float(ocr_confidence) >= source_ocr_threshold
+                )
+            except (TypeError, ValueError, OverflowError):
+                structure_is_trusted = False
+                ocr_is_trusted = False
+            if (
+                review_status != "needs_review"
+                and not reasons
+                and structure_is_trusted
+                and ocr_is_trusted
+            ):
+                trusted_rows_by_table[table_id].add(row_index)
+
+        binding_summary = self._enrich_table_segments_from_records(
+            segments,
+            valid_records,
+        )
+        ambiguous_record_keys = set(
+            binding_summary.get("ambiguous_record_keys") or set()
+        )
         context_by_record: Dict[Tuple[int, str], Dict[str, Any]] = {}
         replaced_table_ids: set[str] = set()
         matched_record_keys: set[Tuple[int, str]] = set()
@@ -4061,12 +6319,6 @@ class ContentExtractor:
 
                 markdown_coverage = _coverage(markdown_rows)
                 structured_coverage = _coverage(structured_rows)
-                source_similarity = SequenceMatcher(
-                    None,
-                    _normalised_table_text(markdown_rows),
-                    _normalised_table_text(structured_rows),
-                    autojunk=False,
-                ).ratio()
                 no_data_loss = all(
                     structured >= markdown
                     for structured, markdown in zip(
@@ -4074,12 +6326,12 @@ class ContentExtractor:
                         markdown_coverage,
                     )
                 )
-                strictly_more_complete = any(
-                    structured > markdown
-                    for structured, markdown in zip(
-                        structured_coverage,
-                        markdown_coverage,
-                    )
+                projection_preserved = self._structured_table_preserves_projection(
+                    segment.content,
+                    str(record.get("pred_html") or ""),
+                    trusted_markdown_row_indices=trusted_rows_by_table.get(
+                        str(segment.source_table_id)
+                    ),
                 )
                 structured_reasons = {
                     str(value).strip()
@@ -4096,15 +6348,42 @@ class ContentExtractor:
                 except (TypeError, ValueError, OverflowError):
                     structure_confidence = 0.0
                 try:
+                    raw_ocr_confidence = record.get("ocr_confidence")
+                    record_ocr_confidence = (
+                        float(raw_ocr_confidence)
+                        if raw_ocr_confidence is not None
+                        else None
+                    )
+                except (TypeError, ValueError, OverflowError):
+                    record_ocr_confidence = None
+                try:
                     structure_threshold = float(
                         os.getenv("REPORT_TABLE_STRUCTURE_CONFIDENCE_THRESHOLD", "0.80")
                         or "0.80"
                     )
                 except (TypeError, ValueError, OverflowError):
                     structure_threshold = 0.80
+                source_table_id = str(segment.source_table_id)
+                source_rows = source_rows_by_table.get(source_table_id, set())
+                trusted_source_rows = trusted_rows_by_table.get(
+                    source_table_id,
+                    set(),
+                )
+                has_untrusted_source_rows = bool(
+                    source_rows - trusted_source_rows
+                )
+                correction_source_is_trusted = (
+                    not has_untrusted_source_rows
+                    or (
+                        record_ocr_confidence is not None
+                        and math.isfinite(record_ocr_confidence)
+                        and record_ocr_confidence >= source_ocr_threshold
+                    )
+                )
                 may_replace_projection = (
                     no_data_loss
-                    and (source_similarity >= 0.82 or strictly_more_complete)
+                    and projection_preserved
+                    and correction_source_is_trusted
                     and not (
                         structured_reasons & _TABLE_SECOND_PASS_CRITICAL_REASONS
                     )
@@ -4167,7 +6446,7 @@ class ContentExtractor:
                         inherited_conflicts.append(dict(conflict))
                 context_by_record[key] = {
                     field: data.get(field)
-                    for field in ("table_title", "section_path")
+                    for field in ("table_title", "table_title_source", "section_path")
                     if data.get(field) not in (None, "", [])
                 }
                 context_by_record[key].update(
@@ -4189,12 +6468,19 @@ class ContentExtractor:
                     int(record.get("page_number") or 1),
                     str(record.get("table_id") or "").strip(),
                 )
-                not in matched_record_keys
-                or (
-                    int(record.get("page_number") or 1),
-                    str(record.get("table_id") or "").strip(),
+                not in ambiguous_record_keys
+                and (
+                    (
+                        int(record.get("page_number") or 1),
+                        str(record.get("table_id") or "").strip(),
+                    )
+                    not in matched_record_keys
+                    or (
+                        int(record.get("page_number") or 1),
+                        str(record.get("table_id") or "").strip(),
+                    )
+                    in replaceable_record_keys
                 )
-                in replaceable_record_keys
             )
         ]
         added = self._materialize_unmatched_table_records(
@@ -4263,13 +6549,14 @@ class ContentExtractor:
             else:
                 review_status = "verified"
 
-            data.update(
-                {
-                    field: value
-                    for field, value in context.items()
-                    if field in {"table_title", "section_path"}
-                }
-            )
+            # A structured Paddle record caption is independent table identity;
+            # never overwrite it with the nearest Markdown section heading.
+            if not str(data.get("table_title") or "").strip():
+                for field in ("table_title", "table_title_source"):
+                    if context.get(field) not in (None, "", []):
+                        data[field] = context[field]
+            if context.get("section_path") not in (None, "", []):
+                data["section_path"] = context["section_path"]
             if context:
                 data["canonicalized_from_markdown"] = True
                 data["previous_source_table_id"] = context.get(
@@ -4394,6 +6681,10 @@ class ContentExtractor:
         if (
             review_status == "needs_review"
             and not (reasons & _TABLE_SECOND_PASS_ACTIONABLE_REASONS)
+            and not (
+                reasons
+                and reasons.issubset(_TABLE_NON_ACTIONABLE_REVIEW_REASONS)
+            )
             and notes != {"missing_ocr_confidence"}
         ):
             reasons.add("unexplained_needs_review")
@@ -4589,6 +6880,180 @@ class ContentExtractor:
             prediction_options=prediction_options,
         )
 
+    @staticmethod
+    def _normalise_table_identity_text(value: object) -> str:
+        text = unicodedata.normalize("NFKC", unescape(str(value or "")))
+        text = text.replace("\u00a0", " ").casefold().strip()
+        text = re.sub(
+            r"\b(fy|cy)\s*['\u2019]?\s*(\d{2})\b",
+            lambda match: f"{match.group(1)}20{match.group(2)}",
+            text,
+            flags=re.IGNORECASE,
+        )
+        text = re.sub(r"[^\w%+./-]+", " ", text, flags=re.UNICODE)
+        return re.sub(r"\s+", " ", text).strip()
+
+    def _table_family_semantic_identity(
+        self,
+        family: Sequence[TextSegment],
+    ) -> Dict[str, Any]:
+        table = next(
+            (segment for segment in family if segment.segment_type == "table"),
+            None,
+        )
+        rows: List[List[str]] = []
+        header_model: Dict[str, Any] = {}
+        if table is not None:
+            rows, _cells, quality = self._parse_table_details(table.content)
+            header_model = dict(quality.get("header_model") or {})
+
+        header_paths: List[str] = []
+        for path in header_model.get("header_paths") or []:
+            normalized = " > ".join(
+                value
+                for raw in path
+                if (value := self._normalise_table_identity_text(raw))
+            )
+            if normalized:
+                header_paths.append(normalized)
+
+        def row_sort_key(segment: TextSegment) -> Tuple[int, float, str]:
+            data = dict(segment.structured_data or {})
+            try:
+                row_index = int(data.get("row_index"))
+            except (TypeError, ValueError, OverflowError):
+                row_index = 1_000_000
+            return row_index, float(segment.position_y or 0.0), str(segment.segment_id)
+
+        row_labels: List[str] = []
+        for segment in sorted(
+            [item for item in family if item.segment_type == "table_row"],
+            key=row_sort_key,
+        ):
+            data = dict(segment.structured_data or {})
+            raw_path = data.get("row_header_path") or []
+            if isinstance(raw_path, str):
+                raw_path = [raw_path]
+            normalized = " > ".join(
+                value
+                for raw in raw_path
+                if (value := self._normalise_table_identity_text(raw))
+            )
+            if not normalized:
+                normalized = self._normalise_table_identity_text(
+                    segment.row_header or data.get("row_header")
+                )
+            if normalized:
+                row_labels.append(normalized)
+
+        if not row_labels and rows:
+            headers = [str(value or "") for value in header_model.get("headers") or []]
+            for row_index in header_model.get("data_row_indices") or []:
+                try:
+                    row = rows[int(row_index)]
+                except (IndexError, TypeError, ValueError, OverflowError):
+                    continue
+                normalized = self._normalise_table_identity_text(
+                    self._infer_row_header(headers, row)
+                )
+                if normalized:
+                    row_labels.append(normalized)
+
+        years: set[int] = set()
+        for value in header_paths:
+            years.update(self._extract_table_years(value))
+        units: set[Tuple[str, float]] = set()
+        for segment in family:
+            data = dict(segment.structured_data or {})
+            for value in (
+                data.get("year"),
+                data.get("source_year_label"),
+                data.get("col_header"),
+                *(data.get("header_path") or []),
+            ):
+                years.update(self._extract_table_years(value))
+
+            base_unit = str(data.get("unit_base") or "").strip()
+            if base_unit:
+                try:
+                    multiplier = float(data.get("unit_multiplier") or 1.0)
+                except (TypeError, ValueError, OverflowError):
+                    multiplier = 1.0
+                units.add((base_unit.casefold(), multiplier))
+                continue
+            for raw_unit in (segment.unit, data.get("unit"), data.get("raw_unit")):
+                for spec in self._extract_table_unit_specs(raw_unit):
+                    if spec.get("base_unit"):
+                        units.add(
+                            (
+                                str(spec.get("base_unit")).casefold(),
+                                float(spec.get("multiplier") or 1.0),
+                            )
+                        )
+
+        return {
+            "header_paths": tuple(header_paths),
+            "row_labels": tuple(row_labels),
+            "years": frozenset(years),
+            "units": frozenset(units),
+        }
+
+    @staticmethod
+    def _table_identity_label_matches(first: str, second: str) -> bool:
+        # Edit-distance similarity is unsafe for categorical table identity:
+        # `direct`/`indirect`, `renewable`/`non-renewable`, and similar opposite
+        # labels have deceptively high string similarity.  The normalizer already
+        # handles Unicode, whitespace, case and FY/CY short years, so identity
+        # axes must otherwise match exactly.
+        return bool(first) and first == second
+
+    def _table_identity_sequence_is_preserved(
+        self,
+        first: Sequence[str],
+        second: Sequence[str],
+    ) -> bool:
+        if not first:
+            return True
+        if not second:
+            return False
+        next_index = 0
+        for expected in first:
+            match_index = next(
+                (
+                    index
+                    for index in range(next_index, len(second))
+                    if self._table_identity_label_matches(expected, second[index])
+                ),
+                None,
+            )
+            if match_index is None:
+                return False
+            next_index = match_index + 1
+        return True
+
+    def _second_pass_table_identity_compatible(
+        self,
+        first_family: Sequence[TextSegment],
+        second_family: Sequence[TextSegment],
+    ) -> bool:
+        first = self._table_family_semantic_identity(first_family)
+        second = self._table_family_semantic_identity(second_family)
+        if not self._table_identity_sequence_is_preserved(
+            first["header_paths"], second["header_paths"]
+        ):
+            return False
+        if not self._table_identity_sequence_is_preserved(
+            first["row_labels"], second["row_labels"]
+        ):
+            return False
+        if first["years"] and not first["years"].issubset(second["years"]):
+            return False
+        if first["units"] and not first["units"].issubset(second["units"]):
+            return False
+        # At least one stable textual axis must identify the table.  Purely
+        # numeric matrices without headers/row labels are never auto-replaced.
+        return bool(first["header_paths"] or first["row_labels"])
+
     def _second_pass_table_match_score(
         self,
         first: TextSegment,
@@ -4618,7 +7083,8 @@ class ContentExtractor:
         if first_bbox is not None and second_bbox is not None:
             score = 0.55 * bbox_score + 0.35 * text_score + 0.10 * order_score
         else:
-            score = 0.85 * text_score + 0.15 * order_score
+            # Reading order is not table identity when geometry is absent.
+            score = text_score
         return score, text_score, bbox_score
 
     def _second_pass_family_is_complete(
@@ -4843,56 +7309,139 @@ class ContentExtractor:
             for candidate in plan.candidates
             if candidate.source_table_id in set(plan.selected_table_ids)
         }
-        match_candidates: List[Tuple[float, float, float, str, TextSegment]] = []
-        for table_id, candidate in candidate_map.items():
-            first = first_tables.get(table_id)
-            page_tables = second_tables_by_page.get(candidate.page_number, [])
-            if first is None:
-                continue
+        # Build the identity graph from every first-pass table on each selected
+        # page, including clean/unselected siblings.  Otherwise a repair target
+        # can steal the second-pass result that uniquely belongs to a clean table.
+        match_edges: List[Tuple[float, float, float, str, TextSegment]] = []
+        selected_pages = {
+            candidate.page_number for candidate in candidate_map.values()
+        }
+        for page_number in sorted(selected_pages):
             first_page_tables = sorted(
-                [table for table in first_tables.values() if table.page_number == candidate.page_number],
+                [
+                    table
+                    for table in first_tables.values()
+                    if int(table.page_number) == int(page_number)
+                ],
                 key=lambda item: (item.position_y, item.position_x or 0.0),
             )
-            first_order = first_page_tables.index(first)
             ordered_second_tables = sorted(
-                page_tables,
+                second_tables_by_page.get(page_number, []),
                 key=lambda item: (item.position_y, item.position_x or 0.0),
             )
-            for second_order, second in enumerate(ordered_second_tables):
-                score, text_score, bbox_score = self._second_pass_table_match_score(
-                    first,
-                    second,
-                    first_order=first_order,
-                    second_order=second_order,
-                    page_span=max(len(page_tables), 1),
-                )
-                first_bbox = _normalized_bbox(
-                    (first.structured_data or {}).get("bbox")
-                )
-                second_bbox = _normalized_bbox(
-                    (second.structured_data or {}).get("bbox")
-                )
-                page_has_multiple_tables = (
-                    len(first_page_tables) > 1 or len(ordered_second_tables) > 1
-                )
-                if page_has_multiple_tables:
-                    if first_bbox is None or second_bbox is None:
-                        # Without geometry, text similarity alone cannot safely
-                        # distinguish repeated templates on one page.  Require
-                        # a complete one-to-one ordinal mapping and never cross
-                        # table order.
-                        if (
-                            len(first_page_tables) != len(ordered_second_tables)
-                            or first_order != second_order
-                        ):
-                            continue
-                    elif bbox_score < 0.10:
-                        # Both passes provide geometry, so require a meaningful
-                        # physical overlap before considering textual affinity.
-                        continue
-                if score < 0.45 or (text_score < 0.35 and bbox_score < 0.20):
+            page_has_multiple_tables = (
+                len(first_page_tables) > 1 or len(ordered_second_tables) > 1
+            )
+            page_span = max(
+                len(first_page_tables),
+                len(ordered_second_tables),
+                1,
+            )
+            for first_order, first in enumerate(first_page_tables):
+                first_id = str(first.source_table_id or "")
+                first_family = first_families.get(first_id, [])
+                if not first_id or not first_family:
                     continue
-                match_candidates.append((score, text_score, bbox_score, table_id, second))
+                for second_order, second in enumerate(ordered_second_tables):
+                    second_id = str(second.source_table_id or "")
+                    second_family = second_families.get(second_id, [])
+                    if not second_id or not second_family:
+                        continue
+                    score, text_score, bbox_score = (
+                        self._second_pass_table_match_score(
+                            first,
+                            second,
+                            first_order=first_order,
+                            second_order=second_order,
+                            page_span=page_span,
+                        )
+                    )
+                    first_bbox = _normalized_bbox(
+                        (first.structured_data or {}).get("bbox")
+                    )
+                    second_bbox = _normalized_bbox(
+                        (second.structured_data or {}).get("bbox")
+                    )
+                    if (
+                        page_has_multiple_tables
+                        and first_bbox is not None
+                        and second_bbox is not None
+                        and bbox_score < 0.10
+                    ):
+                        continue
+                    # If either bbox is absent, ordinal position contributes no
+                    # admission evidence.  Identity must come from table content
+                    # and the semantic axes below.
+                    if score < 0.45 or (
+                        text_score < 0.35 and bbox_score < 0.20
+                    ):
+                        continue
+                    if not self._second_pass_table_identity_compatible(
+                        first_family,
+                        second_family,
+                    ):
+                        continue
+                    match_edges.append(
+                        (score, text_score, bbox_score, first_id, second)
+                    )
+
+        try:
+            match_margin = float(
+                os.getenv("REPORT_TABLE_SECOND_PASS_MATCH_MARGIN", "0.10")
+                or "0.10"
+            )
+        except (TypeError, ValueError, OverflowError):
+            match_margin = 0.10
+        # The safety margin cannot be disabled through configuration.  A zero
+        # margin would let an arbitrary sort winner escape a tied candidate set.
+        match_margin = max(0.10, min(0.50, match_margin))
+
+        edges_by_first: Dict[
+            str, List[Tuple[float, float, float, str, TextSegment]]
+        ] = {}
+        edges_by_second: Dict[
+            str, List[Tuple[float, float, float, str, TextSegment]]
+        ] = {}
+        for edge in match_edges:
+            edges_by_first.setdefault(edge[3], []).append(edge)
+            edges_by_second.setdefault(
+                str(edge[4].source_table_id or ""), []
+            ).append(edge)
+
+        def unique_best(
+            edges: Sequence[Tuple[float, float, float, str, TextSegment]],
+        ) -> Optional[Tuple[str, str]]:
+            ranked = sorted(edges, key=lambda item: item[0], reverse=True)
+            if not ranked:
+                return None
+            if (
+                len(ranked) > 1
+                and float(ranked[0][0]) - float(ranked[1][0])
+                < match_margin
+            ):
+                return None
+            return (
+                ranked[0][3],
+                str(ranked[0][4].source_table_id or ""),
+            )
+
+        best_by_first = {
+            table_id: unique_best(edges)
+            for table_id, edges in edges_by_first.items()
+        }
+        best_by_second = {
+            table_id: unique_best(edges)
+            for table_id, edges in edges_by_second.items()
+        }
+        match_candidates = [
+            edge
+            for edge in match_edges
+            if edge[3] in candidate_map
+            and best_by_first.get(edge[3])
+            == (edge[3], str(edge[4].source_table_id or ""))
+            and best_by_second.get(str(edge[4].source_table_id or ""))
+            == (edge[3], str(edge[4].source_table_id or ""))
+        ]
 
         used_first: set[str] = set()
         used_second: set[str] = set()
@@ -5077,10 +7626,381 @@ class ContentExtractor:
         return summary
 
     def _stitch_continued_tables(self, segments: List[TextSegment]) -> None:
+        """Join physical table fragments only when continuation evidence is complete.
+
+        Repeated generic headers (for example ``Year | Value``) are not table
+        identity.  A cross-page join therefore requires all of the following:
+
+        * the normalized table title and section path agree;
+        * the fragments are at the bottom/top page edges, or one fragment has
+          an explicit continuation marker;
+        * column counts, value types and any discoverable units are compatible.
+
+        Metadata produced by some parsers does not contain titles or geometry.
+        In that case this intentionally fails closed instead of guessing.
+        """
         tables = sorted(
             [segment for segment in segments if segment.segment_type == "table" and segment.source_table_id],
             key=lambda item: (item.page_number, item.position_y),
         )
+
+        continuation_token = (
+            r"(?:continued|continuation|cont\.?|cont[\u2019']?d|"
+            r"\u7eed\u8868|\u63a5\u4e0a\u9875|\u4e0b\u9875\u7eed)"
+        )
+        continuation_re = re.compile(
+            rf"(?ix)(?:"
+            rf"\(\s*{continuation_token}\s*\)|"
+            rf"(?:[-\u2013\u2014,:]\s*|\s+){continuation_token}\s*$|"
+            rf"^{continuation_token}(?:\s*[-\u2013\u2014:]|\s*$)|"
+            rf"\bcontinued\s+(?:from|on)\s+(?:the\s+)?(?:previous|prior|next)?\s*page\b|"
+            rf"\bcontinues?\s+on\s+(?:the\s+)?next\s+page\b)"
+        )
+
+        def table_data(table: TextSegment) -> Dict[str, Any]:
+            return dict(table.structured_data or {})
+
+        def normalize_context(value: Any) -> str:
+            text = unescape(str(value or "")).replace("\u00a0", " ").strip().casefold()
+            if not text:
+                return ""
+            # Strip the full continuation phrases recognized below before
+            # comparing titles. Otherwise "Energy" and
+            # "Energy - continued from previous page" can never match.
+            text = continuation_re.sub(" ", text)
+            text = re.sub(
+                rf"(?ix)\(\s*{continuation_token}\s*\)",
+                " ",
+                text,
+            )
+            text = re.sub(
+                rf"(?ix)(?:[-\u2013\u2014,:]\s*|\s+){continuation_token}\s*$",
+                " ",
+                text,
+            )
+            text = re.sub(
+                rf"(?ix)^{continuation_token}\s*[-\u2013\u2014:]\s*",
+                " ",
+                text,
+            )
+            return re.sub(r"[^\w%]+", " ", text, flags=re.UNICODE).strip()
+
+        def table_title(table: TextSegment) -> str:
+            data = table_data(table)
+            source = str(data.get("table_title_source") or "").strip()
+            section_values = section_path(table)
+
+            # An explicit structured caption remains independent evidence even
+            # when its wording happens to equal the enclosing section heading.
+            if source == "structured_record_caption":
+                for key in ("table_title", "caption"):
+                    if normalized := normalize_context(data.get(key)):
+                        return normalized
+
+            # A Markdown section heading is not a table title, but an attached
+            # parser caption can still supply independent identity.
+            if normalized_caption := normalize_context(data.get("caption")):
+                return normalized_caption
+            if source == "section_heading":
+                return ""
+
+            for key in ("table_title", "title"):
+                normalized = normalize_context(data.get(key))
+                if normalized:
+                    # Legacy Markdown artifacts did not tag their title source;
+                    # the nearest heading was copied into both fields. Treat
+                    # that duplicate as missing independent title evidence.
+                    if section_values and normalized == section_values[-1]:
+                        continue
+                    return normalized
+            return ""
+
+        def section_path(table: TextSegment) -> Tuple[str, ...]:
+            raw_path = table_data(table).get("section_path")
+            if isinstance(raw_path, str):
+                raw_values: Sequence[Any] = [raw_path]
+            elif isinstance(raw_path, (list, tuple)):
+                raw_values = raw_path
+            else:
+                raw_values = []
+            return tuple(
+                normalized
+                for value in raw_values
+                if (normalized := normalize_context(value))
+            )
+
+        def has_continuation_cue(table: TextSegment) -> bool:
+            data = table_data(table)
+            if any(
+                data.get(key) is True
+                for key in (
+                    "is_continuation",
+                    "continued",
+                    "continues_on_next_page",
+                    "continued_from_previous_page",
+                )
+            ):
+                return True
+            cue_fields = [
+                data.get("table_title"),
+                data.get("caption"),
+            ]
+            if any(
+                str(data.get(key) or "").strip()
+                for key in ("continuation_label", "continuation_of")
+            ):
+                return True
+            # A caption/marker normally precedes the first row.  Limit the raw
+            # table scan so a later narrative cell containing "continued" does
+            # not become identity evidence.
+            cue_fields.append(str(table.content or "")[:240])
+            return any(continuation_re.search(str(value or "").strip()) for value in cue_fields)
+
+        def normalized_bbox(table: TextSegment) -> Optional[List[float]]:
+            data = table_data(table)
+            try:
+                page_width = float(data.get("page_width") or 0.0)
+                page_height = float(data.get("page_height") or 0.0)
+            except (TypeError, ValueError, OverflowError):
+                return None
+            return _normalized_bbox(
+                data.get("bbox"),
+                page_width=page_width,
+                page_height=page_height,
+            )
+
+        def has_edge_geometry(previous_table: TextSegment, current_table: TextSegment) -> bool:
+            previous_bbox = normalized_bbox(previous_table)
+            current_bbox = normalized_bbox(current_table)
+            if previous_bbox is None or current_bbox is None:
+                return False
+            try:
+                bottom_threshold = min(
+                    0.95,
+                    max(
+                        0.50,
+                        float(
+                            os.getenv(
+                                "REPORT_TABLE_CONTINUATION_BOTTOM_THRESHOLD",
+                                "0.78",
+                            )
+                            or "0.78"
+                        ),
+                    ),
+                )
+                top_threshold = min(
+                    0.50,
+                    max(
+                        0.05,
+                        float(
+                            os.getenv(
+                                "REPORT_TABLE_CONTINUATION_TOP_THRESHOLD",
+                                "0.22",
+                            )
+                            or "0.22"
+                        ),
+                    ),
+                )
+            except (TypeError, ValueError):
+                bottom_threshold, top_threshold = 0.78, 0.22
+            return previous_bbox[3] >= bottom_threshold and current_bbox[1] <= top_threshold
+
+        def value_type(value: Any) -> Optional[str]:
+            text = re.sub(r"\s+", " ", unescape(str(value or ""))).strip()
+            if not text or text.casefold() in {"-", "--", "n/a", "na", "none", "null"}:
+                return None
+            if "%" in text or re.search(r"(?i)\bpercent(?:age)?\b", text):
+                return "percentage"
+            if re.search(r"[$\u00a3\u20ac\u00a5]", text):
+                return "currency"
+            if re.fullmatch(r"(?:FY|CY)?\s*['\u2019]?\d{2,4}", text, flags=re.IGNORECASE):
+                return "year"
+            numeric = re.sub(r"[(),]", "", text)
+            if re.fullmatch(
+                r"[-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?(?:\s*[A-Za-z0-9\u00b2\u00b3/_-]+)?",
+                numeric,
+            ):
+                return "number"
+            return "text"
+
+        def column_type_signature(rows: List[List[str]]) -> Optional[Tuple[frozenset[str], ...]]:
+            if len(rows) < 2:
+                return None
+            width = len(rows[0])
+            if width < 2 or any(len(row) != width for row in rows):
+                return None
+            signature: List[frozenset[str]] = []
+            evidenced_columns = 0
+            for column in range(width):
+                types = frozenset(
+                    candidate
+                    for row in rows[1:]
+                    if (candidate := value_type(row[column])) is not None
+                )
+                if types:
+                    evidenced_columns += 1
+                signature.append(types)
+            # One populated column is too little evidence to establish a table
+            # schema, even when the repeated headers happen to be identical.
+            return tuple(signature) if evidenced_columns >= 2 else None
+
+        unit_aliases = {
+            "percent": "%",
+            "percentage": "%",
+            "pct": "%",
+            "ton": "t",
+            "tons": "t",
+            "tonne": "t",
+            "tonnes": "t",
+            "litre": "l",
+            "litres": "l",
+            "liter": "l",
+            "liters": "l",
+        }
+        unit_atom = (
+            r"tco2e|kgco2e|ktco2e|mtco2e|co2e|"
+            r"kwh|mwh|gwh|twh|gj|tj|pj|mmbtu|m3|kl|ml|l|"
+            r"kg|tonnes?|tons?|t|usd|eur|gbp|cny|%|"
+            r"employees?|ftes?|revenue|units?"
+        )
+        unit_expression_re = re.compile(
+            rf"(?i)(?<![A-Za-z0-9])"
+            rf"(?:(thousand|million|billion)\s+)?({unit_atom})"
+            rf"(?:\s*(?:/|per)\s*"
+            rf"(?:(thousand|million|billion)\s+)?({unit_atom}))?"
+            rf"(?![A-Za-z0-9])"
+        )
+
+        def canonical_unit(value: Any) -> str:
+            text = re.sub(r"\s+", " ", unescape(str(value or ""))).strip().casefold()
+            if not text:
+                return ""
+            text = text.replace("co\u2082", "co2").replace("m\u00b3", "m3")
+            co2_suffix = r"co2(?:e|\s+equivalents?)"
+            text = re.sub(
+                rf"\bkilograms?\s+(?:of\s+)?{co2_suffix}\b",
+                "kgco2e",
+                text,
+            )
+            text = re.sub(
+                rf"\bkilotonnes?\s+(?:of\s+)?{co2_suffix}\b",
+                "ktco2e",
+                text,
+            )
+            text = re.sub(
+                rf"\b(?:metric\s+)?(?:tonnes?|tons?)\s+(?:of\s+)?{co2_suffix}\b",
+                "tco2e",
+                text,
+            )
+            text = re.sub(
+                rf"\bkg\s+(?:of\s+)?{co2_suffix}\b",
+                "kgco2e",
+                text,
+            )
+            text = re.sub(
+                rf"\bt\s+(?:of\s+)?{co2_suffix}\b",
+                "tco2e",
+                text,
+            )
+            text = re.sub(r"\bmetric\s+tonnes?\b", "t", text)
+            text = re.sub(r"\bmetric\s+tons?\b", "t", text)
+            text = re.sub(r"\bcubic\s+met(?:er|re)s?\b", "m3", text)
+            match = unit_expression_re.search(text)
+            if not match:
+                return ""
+            numerator_scale = str(match.group(1) or "").casefold()
+            numerator = unit_aliases.get(
+                str(match.group(2) or "").casefold(),
+                str(match.group(2) or "").casefold(),
+            )
+            denominator_scale = str(match.group(3) or "").casefold()
+            denominator = unit_aliases.get(
+                str(match.group(4) or "").casefold(),
+                str(match.group(4) or "").casefold(),
+            )
+            rendered = f"{numerator_scale}:{numerator}" if numerator_scale else numerator
+            if denominator:
+                rendered += (
+                    f"/{denominator_scale}:{denominator}"
+                    if denominator_scale
+                    else f"/{denominator}"
+                )
+            return rendered
+
+        def unit_signature(
+            table: TextSegment,
+            rows: List[List[str]],
+        ) -> Tuple[Tuple[str, ...], ...]:
+            headers = [normalize_context(value) for value in rows[0]] if rows else []
+            column_units: List[set[str]] = [set() for _ in headers]
+            unit_columns = {
+                index
+                for index, header in enumerate(headers)
+                if header in {"unit", "units", "uom", "unit of measure", "\u5355\u4f4d"}
+            }
+            for row in rows[1:]:
+                for index, value in enumerate(row):
+                    if index >= len(column_units):
+                        continue
+                    if index in unit_columns or value_type(value) in {
+                        "percentage",
+                        "currency",
+                        "number",
+                    }:
+                        if (unit := canonical_unit(value)):
+                            column_units[index].add(unit)
+            generic_unit_headers = {"unit", "units", "uom", "unit of measure", "\u5355\u4f4d"}
+            for index, header in enumerate(rows[0] if rows else []):
+                # A label saying merely "Unit" describes the column; it is not
+                # evidence that a real measurement unit was extracted.
+                if normalize_context(header) in generic_unit_headers:
+                    continue
+                if (unit := canonical_unit(header)):
+                    column_units[index].add(unit)
+            table_id = table.source_table_id
+            for related in segments:
+                if (
+                    related.source_table_id != table_id
+                    or related.page_number != table.page_number
+                ):
+                    continue
+                for raw_unit in (
+                    related.unit,
+                    (related.structured_data or {}).get("unit"),
+                    (related.structured_data or {}).get("cell_unit"),
+                    (related.structured_data or {}).get("raw_unit"),
+                ):
+                    if (unit := canonical_unit(raw_unit)):
+                        related_data = dict(related.structured_data or {})
+                        raw_column_index = next(
+                            (
+                                related_data.get(key)
+                                for key in (
+                                    "col_index",
+                                    "column_index",
+                                    "column_idx",
+                                    "col_number",
+                                    "source_column_index",
+                                )
+                                if related_data.get(key) is not None
+                            ),
+                            None,
+                        )
+                        try:
+                            column_index = (
+                                int(raw_column_index)
+                                if raw_column_index is not None
+                                else None
+                            )
+                        except (TypeError, ValueError, OverflowError):
+                            column_index = None
+                        if column_index is None or not 0 <= column_index < len(column_units):
+                            # An unbound unit cannot prove per-column
+                            # compatibility, so fail closed by ignoring it.
+                            continue
+                        column_units[column_index].add(unit)
+            return tuple(tuple(sorted(values)) for values in column_units)
+
         previous: Optional[TextSegment] = None
         for current in tables:
             if previous is None or current.page_number != previous.page_number + 1:
@@ -5093,13 +8013,61 @@ class ContentExtractor:
                 continue
             previous_header = self._normalise_table_row(previous_rows[0])
             current_header = self._normalise_table_row(current_rows[0])
-            if len(previous_header) < 2 or previous_header != current_header:
+            if (
+                len(previous_header) < 2
+                or tuple(normalize_context(value) for value in previous_header)
+                != tuple(normalize_context(value) for value in current_header)
+            ):
+                previous = current
+                continue
+
+            previous_title = table_title(previous)
+            current_title = table_title(current)
+            previous_section = section_path(previous)
+            current_section = section_path(current)
+            if (
+                not previous_title
+                or not current_title
+                or previous_title != current_title
+                or not previous_section
+                or not current_section
+                or previous_section != current_section
+            ):
+                previous = current
+                continue
+
+            previous_types = column_type_signature(previous_rows)
+            current_types = column_type_signature(current_rows)
+            if (
+                previous_types is None
+                or current_types is None
+                or previous_types != current_types
+            ):
+                previous = current
+                continue
+
+            previous_units = unit_signature(previous, previous_rows)
+            current_units = unit_signature(current, current_rows)
+            if (
+                not any(previous_units)
+                or not any(current_units)
+                or previous_units != current_units
+            ):
+                previous = current
+                continue
+
+            # Page-edge geometry is mandatory. A continuation marker is useful
+            # corroboration, but cannot replace the missing physical evidence.
+            if not has_edge_geometry(previous, current):
                 previous = current
                 continue
             old_id = current.source_table_id
             continued_id = previous.source_table_id
             for segment in segments:
-                if segment.source_table_id != old_id:
+                if (
+                    segment.source_table_id != old_id
+                    or segment.page_number != current.page_number
+                ):
                     continue
                 segment.source_table_id = continued_id
                 data = dict(segment.structured_data or {})
@@ -5110,12 +8078,22 @@ class ContentExtractor:
                     "repeated_header_suppressed": True,
                 })
                 segment.structured_data = data
-            previous_data = dict(previous.structured_data or {})
-            continuation_pages = list(previous_data.get("continuation_pages") or [previous.page_number])
+            root = min(
+                (
+                    table
+                    for table in tables
+                    if table.source_table_id == continued_id
+                    and table.page_number <= previous.page_number
+                ),
+                key=lambda table: (table.page_number, table.position_y),
+                default=previous,
+            )
+            previous_data = dict(root.structured_data or {})
+            continuation_pages = list(previous_data.get("continuation_pages") or [root.page_number])
             if current.page_number not in continuation_pages:
                 continuation_pages.append(current.page_number)
             previous_data["continuation_pages"] = continuation_pages
-            previous.structured_data = previous_data
+            root.structured_data = previous_data
             # Keep the last physical page as the next adjacency anchor while the
             # logical table id remains the first page's stable id.
             previous = current
@@ -5123,6 +8101,8 @@ class ContentExtractor:
     def _parse_table_details(self, table_text: str) -> tuple[List[List[str]], List[Dict[str, Any]], Dict[str, Any]]:
         is_html = bool(re.search(r"<\s*(table|tr|td|th)\b", table_text or "", flags=re.IGNORECASE))
         cells: List[Dict[str, Any]] = []
+        row_metadata: List[Dict[str, Any]] = []
+        caption = ""
         if is_html:
             parser = _SimpleHTMLTableParser()
             try:
@@ -5130,30 +8110,78 @@ class ContentExtractor:
                 parser.close()
                 rows = [self._normalise_table_row(row) for row in parser.rows if any(str(c).strip() for c in row)]
                 cells = list(parser.cells)
+                row_metadata = list(parser.row_metadata)
+                caption = str(parser.caption or "").strip()
             except Exception:
                 rows = []
         else:
             rows = self._parse_markdown_table_rows(table_text)
+            markdown_has_header = self._markdown_table_has_header_separator(table_text)
             for r_idx, row in enumerate(rows):
                 for c_idx, value in enumerate(row):
-                    cells.append({"row_index": r_idx, "col_index": c_idx, "text": value, "rowspan": 1, "colspan": 1, "is_header": r_idx == 0})
+                    cells.append(
+                        {
+                            "row_index": r_idx,
+                            "col_index": c_idx,
+                            "text": value,
+                            "rowspan": 1,
+                            "colspan": 1,
+                            "is_header": markdown_has_header and r_idx == 0,
+                            "section": "",
+                            "scope": "",
+                            "tag": "",
+                        }
+                    )
+                row_metadata.append(
+                    {
+                        "row_index": r_idx,
+                        "section": "",
+                        "has_header_cells": markdown_has_header and r_idx == 0,
+                        "has_data_cells": not (markdown_has_header and r_idx == 0),
+                    }
+                )
+
+        header_model = self._build_table_header_model(
+            rows,
+            cells,
+            is_html=is_html,
+            table_text=table_text,
+            row_metadata=row_metadata,
+        )
 
         reasons: List[str] = []
+        notes: List[str] = []
         widths = [len(row) for row in rows if row]
         if widths and len(set(widths)) > 1:
             reasons.append("inconsistent_column_count")
-        if not rows or not any(str(value).strip() for value in rows[0]):
+        if not rows or not header_model.get("header_row_indices"):
             reasons.append("missing_header")
+        elif header_model.get("inferred"):
+            notes.append("inferred_header_structure")
         if is_html and table_text.lower().count("<table") != table_text.lower().count("</table"):
             reasons.append("malformed_html")
-        year_pattern = re.compile(r"\b(?:19|20)\d{2}\b")
         if rows:
-            year_columns = sum(1 for value in rows[0] if year_pattern.search(str(value)))
-            numeric_columns = max((sum(1 for value in row if re.search(r"\d", str(value))) for row in rows[1:]), default=0)
+            year_columns = sum(
+                1
+                for path in (header_model.get("header_paths") or [])
+                if any(self._extract_table_years(value) for value in path)
+            )
+            numeric_columns = max(
+                (
+                    sum(1 for value in rows[row_index] if re.search(r"\d", str(value)))
+                    for row_index in (header_model.get("data_row_indices") or [])
+                ),
+                default=0,
+            )
             if year_columns and numeric_columns and numeric_columns < year_columns:
                 reasons.append("year_value_count_mismatch")
 
-        structure_confidence = 0.9 if is_html and not reasons else (0.72 if is_html else 0.80)
+        if is_html and not reasons and not notes:
+            structure_confidence = 0.9
+        elif is_html and not reasons:
+            structure_confidence = 0.82
+        else:
+            structure_confidence = 0.72 if is_html else 0.80
         # Markdown/HTML carries no calibrated per-cell OCR score.  Keep this as
         # unknown instead of manufacturing a perfect 1.0 confidence; a matched
         # Paddle table record may supply the real value later.
@@ -5165,11 +8193,19 @@ class ContentExtractor:
         if ocr_confidence is not None and ocr_confidence < ocr_threshold:
             reasons.append("low_ocr_confidence")
         reasons = list(dict.fromkeys(reasons))
+        notes = list(dict.fromkeys(notes))
         return rows, cells, {
             "structure_confidence": structure_confidence,
             "ocr_confidence": ocr_confidence,
-            "review_status": "needs_review" if reasons else ("verified" if is_html else "unverified"),
+            "review_status": (
+                "needs_review"
+                if reasons
+                else ("verified" if is_html and not notes else "unverified")
+            ),
             "reasons": reasons,
+            "notes": notes,
+            "caption": caption,
+            "header_model": header_model,
         }
 
     def _parse_table_rows(self, table_text: str) -> List[List[str]]:

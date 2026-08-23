@@ -9,15 +9,15 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
+from ..environment import load_backend_environment
 from ..logging_config import configure_logging, env_float
 
-load_dotenv()
+load_backend_environment()
 configure_logging("backend")
 
 from ..exceptions import AccessError, InputError

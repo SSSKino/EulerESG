@@ -11,7 +11,13 @@ import math
 from collections import Counter
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+from ..content_revision import document_content_revision
 from ..models import table_row_scope_key
+from .metric_corpus import (
+    MetricRetrievalCorpus,
+    metric_search_units,
+    resolve_metric_retrieval_corpus,
+)
 from .metric_profile import MetricRetrievalProfile, best_alias_matches, build_metric_retrieval_profile, tokenize_metric_text
 from .scoring import *  # noqa: F401,F403
 
@@ -21,6 +27,121 @@ class KeywordRetriever:
 
     def __init__(self, config: ProcessingConfig):
         self.config = config
+
+    def _search_segments(
+        self,
+        report_content: ReportContent,
+    ) -> Tuple[List[Any], Optional[MetricRetrievalCorpus]]:
+        enabled = bool(getattr(self.config, "use_metric_retrieval_corpus", True))
+        if enabled:
+            try:
+                corpus = resolve_metric_retrieval_corpus(report_content)
+                units = metric_search_units(report_content, corpus)
+                if units:
+                    return units, corpus
+            except Exception as error:
+                logger.warning(
+                    "Metric lexical corpus unavailable; using canonical segments: "
+                    f"{error}"
+                )
+        return list(report_content.document_content.segments), None
+
+    @staticmethod
+    def _result_from_segment(
+        segment: Any,
+        *,
+        score: float,
+        retrieval_type: str,
+        matched_keywords: Sequence[str],
+        metric_id: str,
+        content: Optional[str] = None,
+    ) -> RetrievalResult:
+        canonical_id = str(
+            getattr(segment, "canonical_segment_id", None)
+            or getattr(segment, "segment_id", "")
+        )
+        matched_content = (
+            str(
+                getattr(segment, "matched_content", None)
+                or getattr(segment, "content", "")
+                or ""
+            )
+            if getattr(segment, "retrieval_view_id", None)
+            else None
+        )
+        evidence_content = str(
+            getattr(segment, "evidence_block_content", None)
+            or content
+            or getattr(segment, "content", "")
+            or ""
+        )
+        return RetrievalResult(
+            segment_id=canonical_id,
+            content=evidence_content,
+            page_number=int(getattr(segment, "page_number", 1) or 1),
+            score=float(score),
+            retrieval_type=retrieval_type,
+            matched_keywords=list(matched_keywords or []),
+            metric_id=metric_id,
+            evidence_block_id=getattr(segment, "evidence_block_id", None),
+            retrieval_view_id=getattr(segment, "retrieval_view_id", None),
+            source_segment_ids=list(
+                getattr(segment, "source_segment_ids", None) or [canonical_id]
+            ),
+            matched_content=matched_content,
+            evidence_block_content=(
+                str(getattr(segment, "evidence_block_content", "") or "")
+                or None
+            ),
+            matched_row_index=getattr(segment, "matched_row_index", None),
+            matched_column_indexes=list(
+                getattr(segment, "matched_column_indexes", None) or []
+            ),
+            score_breakdown={retrieval_type.split("+")[0]: float(score)},
+            **visual_result_fields(segment),
+        )
+
+    @staticmethod
+    def _collapse_results(
+        results: Sequence[RetrievalResult],
+    ) -> List[RetrievalResult]:
+        """Keep the best view per canonical parent without score accumulation."""
+        collapsed: Dict[str, RetrievalResult] = {}
+        for result in results:
+            current = collapsed.get(result.segment_id)
+            if current is None or float(result.score or 0.0) > float(
+                current.score or 0.0
+            ):
+                best, other = result, current
+            else:
+                best, other = current, result
+            if other is not None:
+                keywords = list(
+                    dict.fromkeys(
+                        [
+                            *(best.matched_keywords or []),
+                            *(other.matched_keywords or []),
+                        ]
+                    )
+                )[:24]
+                source_ids = list(
+                    dict.fromkeys(
+                        [
+                            *(best.source_segment_ids or []),
+                            *(other.source_segment_ids or []),
+                        ]
+                    )
+                )
+                best = best.model_copy(
+                    update={
+                        "matched_keywords": keywords,
+                        "source_segment_ids": source_ids,
+                    }
+                )
+            collapsed[result.segment_id] = best
+        values = list(collapsed.values())
+        values.sort(key=lambda item: item.score, reverse=True)
+        return values
 
     def search_in_report(
         self,
@@ -64,28 +185,37 @@ class KeywordRetriever:
         if not profile.exact_code_patterns:
             return []
         results: List[RetrievalResult] = []
-        segments = list(report_content.document_content.segments)
-        row_lookup = self._get_table_row_lookup(report_content, segments)
+        segments, metric_corpus = self._search_segments(report_content)
+        row_lookup = (
+            self._get_table_row_lookup(report_content, segments)
+            if metric_corpus is None
+            else {}
+        )
         for segment in segments:
             content = getattr(segment, "content", "") or ""
             if not any(pattern.search(content) for pattern in profile.exact_code_patterns):
                 continue
-            evidence_segment, evidence_content, upgraded = self._upgrade_code_cell_to_table_row(segment, row_lookup)
+            if metric_corpus is None:
+                evidence_segment, evidence_content, upgraded = (
+                    self._upgrade_code_cell_to_table_row(segment, row_lookup)
+                )
+            else:
+                evidence_segment = segment
+                evidence_content = content
+                upgraded = getattr(segment, "view_type", "") == "table_row"
             score = self._score_exact_segment(evidence_segment, metric, profile, base=1.00)
             evidence_seg_type = str(getattr(evidence_segment, "segment_type", "") or "").lower()
             is_row_context = upgraded or evidence_seg_type == "table_row"
             if is_row_context:
                 score = _clamp_score(score + 0.04)
             results.append(
-                RetrievalResult(
-                    segment_id=evidence_segment.segment_id,
-                    content=evidence_content,
-                    page_number=evidence_segment.page_number,
+                self._result_from_segment(
+                    evidence_segment,
                     score=score,
                     retrieval_type="exact_code+table_row_context" if is_row_context else "exact_code",
                     matched_keywords=[profile.metric_code],
                     metric_id=profile.metric_id or getattr(metric, "metric_id", ""),
-                    **visual_result_fields(evidence_segment),
+                    content=evidence_content,
                 )
             )
         deduped: Dict[str, RetrievalResult] = {}
@@ -109,7 +239,8 @@ class KeywordRetriever:
         if not aliases:
             return []
         results: List[RetrievalResult] = []
-        for segment in report_content.document_content.segments:
+        segments, _metric_corpus = self._search_segments(report_content)
+        for segment in segments:
             content = getattr(segment, "content", "") or ""
             matched_aliases = best_alias_matches(content, aliases, limit=16)
             if not matched_aliases:
@@ -117,18 +248,16 @@ class KeywordRetriever:
             base = min(0.94, 0.66 + 0.06 * len(matched_aliases))
             score = self._score_exact_segment(segment, metric, profile, base=base)
             results.append(
-                RetrievalResult(
-                    segment_id=segment.segment_id,
-                    content=content,
-                    page_number=segment.page_number,
+                self._result_from_segment(
+                    segment,
                     score=score,
                     retrieval_type="exact_alias",
                     matched_keywords=matched_aliases,
                     metric_id=profile.metric_id or getattr(metric, "metric_id", ""),
-                    **visual_result_fields(segment),
+                    content=content,
                 )
             )
-        results.sort(key=lambda item: item.score, reverse=True)
+        results = self._collapse_results(results)
         return results[:_internal_pool_size(self.config, metric, observed_matches=len(results), channel="keyword")]
 
     def search_bm25(
@@ -144,7 +273,9 @@ class KeywordRetriever:
             return []
         identity_tokens = self._identity_query_tokens(profile)
 
-        segments, doc_tokens, doc_freq, avg_len = self._get_bm25_corpus(report_content)
+        segments, doc_tokens, doc_freq, avg_len = self._get_metric_bm25_corpus(
+            report_content
+        )
         if not doc_tokens:
             return []
 
@@ -192,17 +323,16 @@ class KeywordRetriever:
             if adjusted < 0.08:
                 continue
             results.append(
-                RetrievalResult(
-                    segment_id=segment.segment_id,
-                    content=getattr(segment, "content", "") or "",
-                    page_number=segment.page_number,
+                self._result_from_segment(
+                    segment,
                     score=adjusted,
                     retrieval_type="bm25",
                     matched_keywords=matched[:18],
                     metric_id=profile.metric_id or getattr(metric, "metric_id", ""),
+                    content=getattr(segment, "content", "") or "",
                 )
             )
-        results.sort(key=lambda item: item.score, reverse=True)
+        results = self._collapse_results(results)
         observed_matches = len(results)
         return results[:_internal_pool_size(self.config, metric, observed_matches=observed_matches, channel="keyword")]
 
@@ -252,8 +382,17 @@ class KeywordRetriever:
         return lookup
 
     @staticmethod
-    def _cache_signature(segments: Sequence[Any]) -> Tuple[int, int]:
-        return id(segments), len(segments)
+    def _cache_signature(
+        report_content: ReportContent,
+        metric_corpus: Optional[MetricRetrievalCorpus] = None,
+    ) -> Tuple[str, int, int, str]:
+        # A table-repair pass can mutate existing segment objects without
+        # replacing the list.  A content revision detects that case whereas
+        # the former (id(list), len(list)) signature remained stale.
+        return (
+            *document_content_revision(report_content),
+            str(getattr(metric_corpus, "corpus_signature", "") or "legacy"),
+        )
 
     def _get_table_row_lookup(
         self,
@@ -261,7 +400,7 @@ class KeywordRetriever:
         segments: Sequence[Any],
     ) -> Dict[Tuple[str, int], Any]:
         source_segments = report_content.document_content.segments
-        signature = self._cache_signature(source_segments)
+        signature = self._cache_signature(report_content)
         cached = getattr(report_content, "_keyword_table_row_cache", None)
         if isinstance(cached, tuple) and len(cached) == 2 and cached[0] == signature:
             return cached[1]
@@ -276,13 +415,13 @@ class KeywordRetriever:
         self,
         report_content: ReportContent,
     ) -> Tuple[List[Any], List[List[str]], Counter[str], float]:
-        source_segments = report_content.document_content.segments
-        signature = self._cache_signature(source_segments)
+        """Historical canonical corpus accessor kept for non-metric callers/tests."""
+        segments = list(report_content.document_content.segments)
+        signature = self._cache_signature(report_content)
         cached = getattr(report_content, "_keyword_bm25_cache", None)
         if isinstance(cached, tuple) and len(cached) == 5 and cached[0] == signature:
             return cached[1], cached[2], cached[3], cached[4]
 
-        segments = list(source_segments)
         doc_tokens = [self._segment_tokens(segment) for segment in segments]
         avg_len = sum(len(tokens) for tokens in doc_tokens) / max(len(doc_tokens), 1)
         doc_freq: Counter[str] = Counter()
@@ -291,6 +430,32 @@ class KeywordRetriever:
         cache_value = (signature, segments, doc_tokens, doc_freq, avg_len)
         try:
             object.__setattr__(report_content, "_keyword_bm25_cache", cache_value)
+        except Exception:
+            pass
+        return segments, doc_tokens, doc_freq, avg_len
+
+    def _get_metric_bm25_corpus(
+        self,
+        report_content: ReportContent,
+    ) -> Tuple[List[Any], List[List[str]], Counter[str], float]:
+        segments, metric_corpus = self._search_segments(report_content)
+        signature = self._cache_signature(report_content, metric_corpus)
+        cached = getattr(report_content, "_metric_keyword_bm25_cache", None)
+        if isinstance(cached, tuple) and len(cached) == 5 and cached[0] == signature:
+            return cached[1], cached[2], cached[3], cached[4]
+
+        doc_tokens = [self._segment_tokens(segment) for segment in segments]
+        avg_len = sum(len(tokens) for tokens in doc_tokens) / max(len(doc_tokens), 1)
+        doc_freq: Counter[str] = Counter()
+        for tokens in doc_tokens:
+            doc_freq.update(set(tokens))
+        cache_value = (signature, segments, doc_tokens, doc_freq, avg_len)
+        try:
+            object.__setattr__(
+                report_content,
+                "_metric_keyword_bm25_cache",
+                cache_value,
+            )
         except Exception:
             pass
         return segments, doc_tokens, doc_freq, avg_len

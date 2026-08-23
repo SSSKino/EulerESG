@@ -252,10 +252,12 @@ async def delete_file(
             shutil.rmtree(asset_dir)
             deleted_items.append(f"Visual assets: {asset_dir.name}")
 
+        for artifact_name in file_manager.delete_report_artifacts(
+            canonical_file_id
+        ):
+            deleted_items.append(f"嵌入文件: {artifact_name}")
+
         embeddings_paths = [
-            Path(file_manager.embeddings_outputs) / f"{canonical_file_id}_segments.json",
-            Path(file_manager.embeddings_outputs) / f"{canonical_file_id}_embeddings.npz",
-            Path(file_manager.embeddings_outputs) / f"{canonical_file_id}_embeddings_meta.json",
             # Legacy variants (best-effort)
             Path(file_manager.embeddings_outputs) / f"{stem}_embeddings.json",
             Path(file_manager.embeddings_outputs) / f"{stem}_embeddings.npy",

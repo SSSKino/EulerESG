@@ -3,7 +3,7 @@
 import os
 import re
 import threading
-from typing import List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -12,6 +12,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from .hipporag.settings import HippoRAGSettings
 from .metric_profile import build_metric_retrieval_profile
+from .metric_corpus import (
+    MetricRetrievalCorpus,
+    attach_metric_embeddings,
+    metric_embeddings,
+    metric_search_units,
+    resolve_metric_retrieval_corpus,
+)
 from .reranker import get_reranker
 from .scoring import *  # noqa: F401,F403
 from ..embedding_settings import get_configured_rerank_model_name
@@ -37,6 +44,7 @@ class SemanticRetriever:
         self._reranker_initialized = False
         self.reranker_top_k = max(1, int(os.getenv("RERANK_TOP_K", os.getenv("LOCAL_RERANKER_TOP_K", "46")) or "46"))
         self._reranker_lock = threading.Lock()
+        self._query_embedding_cache: Dict[str, np.ndarray] = {}
         self._lazy_models = backend_lazy_load_enabled()
         if not self._lazy_models:
             self._init_embedding_model()
@@ -97,6 +105,218 @@ class SemanticRetriever:
         """Build a metric-centric dense query from the canonical profile."""
         profile = build_metric_retrieval_profile(metric, semantic_expansion)
         return profile.dense_query
+
+    def prepare_metric_queries(
+        self,
+        metric_expansion_pairs: Sequence[
+            Tuple[ESGMetric, Optional[SemanticExpansion]]
+        ],
+    ) -> None:
+        """Encode uncached dense queries in one model forward pass.
+
+        A metric collection commonly contains dozens of metrics.  Encoding
+        every metric inside ``search_by_semantic`` creates dozens of tiny GPU
+        batches; this method packs the distinct queries once and retains each
+        row for subsequent whole-report and linked-page retrieval.
+        """
+
+        query_texts: List[str] = []
+        seen = set()
+        cache = getattr(self, "_query_embedding_cache", None)
+        if not isinstance(cache, dict):
+            cache = {}
+            self._query_embedding_cache = cache
+        for metric, expansion in metric_expansion_pairs:
+            query_text = self._build_semantic_query(metric, expansion)
+            if query_text and query_text not in cache and query_text not in seen:
+                seen.add(query_text)
+                query_texts.append(query_text)
+        if not query_texts:
+            return
+
+        self._ensure_models(include_reranker=False)
+        matrix = np.asarray(
+            encode_query_texts(
+                self.embedding_model,
+                query_texts,
+                model_name_or_path=self.config.embedding_model,
+                batch_size=max(1, int(getattr(self.config, "batch_size", 32) or 32)),
+                show_progress_bar=False,
+                normalize_embeddings=True,
+            ),
+            dtype=np.float32,
+        )
+        if matrix.ndim == 1 and len(query_texts) == 1:
+            matrix = matrix.reshape(1, -1)
+        if matrix.ndim != 2 or matrix.shape[0] != len(query_texts):
+            raise ContentEmbeddingError(
+                "Embedding model returned an invalid metric query matrix: "
+                f"expected_rows={len(query_texts)}, shape={matrix.shape}"
+            )
+        for index, query_text in enumerate(query_texts):
+            cache[query_text] = np.ascontiguousarray(matrix[index], dtype=np.float32)
+
+    def _query_embedding(self, query_text: str) -> np.ndarray:
+        cache = getattr(self, "_query_embedding_cache", None)
+        cached = cache.get(query_text) if isinstance(cache, dict) else None
+        if cached is not None:
+            return np.asarray(cached, dtype=np.float32).reshape(1, -1)
+        matrix = np.asarray(
+            encode_query_texts(
+                self.embedding_model,
+                [query_text],
+                model_name_or_path=self.config.embedding_model,
+                batch_size=max(1, int(getattr(self.config, "batch_size", 32) or 32)),
+                show_progress_bar=False,
+                normalize_embeddings=True,
+            ),
+            dtype=np.float32,
+        ).reshape(1, -1)
+        if not isinstance(cache, dict):
+            cache = {}
+            self._query_embedding_cache = cache
+        cache[query_text] = np.ascontiguousarray(matrix[0], dtype=np.float32)
+        return matrix
+
+    def _metric_semantic_corpus(
+        self,
+        report_content: ReportContent,
+    ) -> Optional[Tuple[List[object], np.ndarray, MetricRetrievalCorpus]]:
+        if not bool(getattr(self.config, "use_metric_retrieval_corpus", True)):
+            return None
+        try:
+            corpus = resolve_metric_retrieval_corpus(report_content)
+            signature = corpus.corpus_signature
+            cached = getattr(
+                report_content,
+                "_metric_semantic_retrieval_cache",
+                None,
+            )
+            if (
+                isinstance(cached, tuple)
+                and len(cached) == 3
+                and cached[0] == signature
+            ):
+                cached_units = list(cached[1])
+                cached_matrix = np.asarray(cached[2], dtype=np.float32)
+                if (
+                    cached_matrix.ndim == 2
+                    and cached_matrix.shape[0] == len(cached_units)
+                ):
+                    return cached_units, cached_matrix, corpus
+
+            units = metric_search_units(report_content, corpus)
+            if len(units) != len(corpus.retrieval_views):
+                raise ValueError(
+                    "Metric search units do not match retrieval view count"
+                )
+            embedded = metric_embeddings(corpus)
+            expected_model = str(getattr(self.config, "embedding_model", "") or "")
+            if embedded is not None:
+                matrix, _view_ids, stored_model = embedded
+                if stored_model and expected_model and stored_model != expected_model:
+                    embedded = None
+            if embedded is None:
+                if not units:
+                    return None
+                matrix = np.asarray(
+                    self.embedding_model.encode(
+                        [str(unit.content or "") for unit in units],
+                        batch_size=max(
+                            1,
+                            int(getattr(self.config, "batch_size", 32) or 32),
+                        ),
+                        show_progress_bar=False,
+                        convert_to_numpy=True,
+                        normalize_embeddings=True,
+                    ),
+                    dtype=np.float32,
+                )
+                attach_metric_embeddings(
+                    corpus,
+                    matrix,
+                    embedding_model=expected_model,
+                    normalized=True,
+                )
+            else:
+                matrix = embedded[0]
+            matrix = np.ascontiguousarray(matrix, dtype=np.float32)
+            object.__setattr__(
+                report_content,
+                "_metric_semantic_retrieval_cache",
+                (signature, units, matrix),
+            )
+            return units, matrix, corpus
+        except Exception as error:
+            logger.warning(
+                "Metric semantic corpus unavailable; using canonical embeddings: "
+                f"{error}"
+            )
+            return None
+
+    @staticmethod
+    def _result_from_segment(
+        segment,
+        *,
+        metric_id: str,
+        score: float,
+        retrieval_type: str,
+    ) -> RetrievalResult:
+        canonical_id = str(
+            getattr(segment, "canonical_segment_id", None)
+            or getattr(segment, "segment_id", "")
+        )
+        is_view = bool(getattr(segment, "retrieval_view_id", None))
+        evidence_content = str(
+            getattr(segment, "evidence_block_content", None)
+            or getattr(segment, "content", "")
+            or ""
+        )
+        return RetrievalResult(
+            segment_id=canonical_id,
+            content=evidence_content,
+            page_number=int(getattr(segment, "page_number", 1) or 1),
+            score=float(score),
+            retrieval_type=retrieval_type,
+            matched_keywords=[],
+            metric_id=metric_id,
+            evidence_block_id=getattr(segment, "evidence_block_id", None),
+            retrieval_view_id=getattr(segment, "retrieval_view_id", None),
+            source_segment_ids=list(
+                getattr(segment, "source_segment_ids", None) or [canonical_id]
+            ),
+            matched_content=(
+                str(
+                    getattr(segment, "matched_content", None)
+                    or getattr(segment, "content", "")
+                    or ""
+                )
+                if is_view
+                else None
+            ),
+            evidence_block_content=(evidence_content if is_view else None),
+            matched_row_index=getattr(segment, "matched_row_index", None),
+            matched_column_indexes=list(
+                getattr(segment, "matched_column_indexes", None) or []
+            ),
+            score_breakdown={retrieval_type.split("+")[0]: float(score)},
+            **visual_result_fields(segment),
+        )
+
+    @staticmethod
+    def _collapse_results(
+        results: Sequence[RetrievalResult],
+    ) -> List[RetrievalResult]:
+        collapsed: Dict[str, RetrievalResult] = {}
+        for result in results:
+            current = collapsed.get(result.segment_id)
+            if current is None or float(result.score or 0.0) > float(
+                current.score or 0.0
+            ):
+                collapsed[result.segment_id] = result
+        values = list(collapsed.values())
+        values.sort(key=lambda item: item.score, reverse=True)
+        return values
 
     def _build_rerank_instruction(self, metric: ESGMetric, semantic_expansion: Optional[SemanticExpansion] = None) -> str:
         profile = build_metric_retrieval_profile(metric, semantic_expansion)
@@ -190,7 +410,7 @@ class SemanticRetriever:
                     [
                         source_note,
                         f"Retrieval channels: {retrieval_type}",
-                        candidate.content or "",
+                        candidate.matched_content or candidate.content or "",
                     ]
                 )
             )
@@ -257,9 +477,7 @@ class SemanticRetriever:
             profile = build_metric_retrieval_profile(metric, semantic_expansion)
             anchor_terms = profile.anchor_terms or _extract_metric_anchor_terms(metric, semantic_expansion)
 
-            query_embedding = np.array(
-                encode_query_texts(self.embedding_model, [query_text], model_name_or_path=self.config.embedding_model, normalize_embeddings=True)
-            ).reshape(1, -1)
+            query_embedding = self._query_embedding(query_text)
             target_window = _target_window_size(self.config, metric, observed_matches=0)
             pool_size = _internal_pool_size(self.config, metric, observed_matches=0, channel="semantic")
             preselect_limit = min(pool_size, max(1, int(getattr(self, "reranker_top_k", pool_size) or pool_size))) if apply_reranker and self.reranker is not None else pool_size
@@ -267,7 +485,16 @@ class SemanticRetriever:
             # Get report segments' embeddings once per report object and reuse the
             # same matrix across metrics. This avoids rebuilding a large numpy array
             # for every metric without moving any passage vectors back onto GPU.
-            embedding_cache = getattr(report_content, "_semantic_retrieval_embedding_cache", None)
+            metric_semantic = self._metric_semantic_corpus(report_content)
+            embedding_cache = (
+                (metric_semantic[0], metric_semantic[1])
+                if metric_semantic is not None
+                else getattr(
+                    report_content,
+                    "_semantic_retrieval_embedding_cache",
+                    None,
+                )
+            )
             if embedding_cache is None:
                 segment_lookup = {
                     getattr(seg, "segment_id", None): seg
@@ -322,7 +549,7 @@ class SemanticRetriever:
             segment_embeddings = np.ascontiguousarray(segment_embeddings, dtype=np.float32)
 
             normalized_cache = (segments, segment_embeddings)
-            if (
+            if metric_semantic is None and (
                 embedding_cache is None
                 or embedding_cache[0] is not segments
                 or embedding_cache[1] is not segment_embeddings
@@ -411,15 +638,11 @@ class SemanticRetriever:
                     rerank_score = _clamp_score(float(score))
                     final_score = _clamp_score((base_score * 0.35) + (rerank_score * 0.65))
                     if final_score >= relaxed_threshold or len(results) < target_window:
-                        results.append(RetrievalResult(
-                            segment_id=segment.segment_id,
-                            content=segment.content,
-                            page_number=segment.page_number,
+                        results.append(self._result_from_segment(
+                            segment,
                             score=float(final_score),
                             retrieval_type="semantic+rerank",
-                            matched_keywords=[],
-                            metric_id=metric.metric_id
-                            , **visual_result_fields(segment)
+                            metric_id=metric.metric_id,
                         ))
                 logger.info("Used reranker for semantic retrieval" + (" with cached report embeddings" if can_reuse_embeddings else ""))
             else:
@@ -427,21 +650,17 @@ class SemanticRetriever:
                 for segment, similarity in zip(segments, similarities):
                     boosted = _boost_semantic_score(segment, similarity)
                     if boosted >= relaxed_threshold:
-                        results.append(RetrievalResult(
-                            segment_id=segment.segment_id,
-                            content=segment.content,
-                            page_number=segment.page_number,
+                        results.append(self._result_from_segment(
+                            segment,
                             score=float(boosted),
                             retrieval_type="semantic",
-                            matched_keywords=[],
-                            metric_id=metric.metric_id
-                            , **visual_result_fields(segment)
+                            metric_id=metric.metric_id,
                         ))
                 
                 logger.info(f"Used cosine similarity fallback for semantic retrieval")
             
             # Sort by score
-            results.sort(key=lambda x: x.score, reverse=True)
+            results = self._collapse_results(results)
             
             observed_matches = len(results)
             final_window = _target_window_size(self.config, metric, observed_matches=observed_matches)

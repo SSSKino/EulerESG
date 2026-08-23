@@ -156,6 +156,31 @@ class ReportReanalysisTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(raised.exception.status_code, 409)
         get_executor.assert_not_called()
 
+    async def test_reprocess_rejects_an_active_reanalysis_job(self):
+        active = report_jobs.create_report_job(
+            file_id="report-1",
+            filename="Existing Report.pdf",
+            user_id=7,
+        )
+        file_info = {
+            **self.file_info,
+            "reanalysis_job_id": active["job_id"],
+        }
+
+        with (
+            patch.object(
+                report_service.file_manager,
+                "get_file_info",
+                return_value=file_info,
+            ),
+            patch.object(report_service, "get_report_job_executor") as get_executor,
+        ):
+            with self.assertRaises(HTTPException) as raised:
+                await report_service.reprocess_report("report-1", user_id=7)
+
+        self.assertEqual(raised.exception.status_code, 409)
+        get_executor.assert_not_called()
+
     async def test_accepted_reanalysis_reaches_success_without_ocr_or_embedding(self):
         executor = _InlineExecutor()
         encoder, standalone_embedder = _pipeline_spies()
@@ -251,6 +276,41 @@ class ReportReanalysisTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(job["stage"], "failed")
         self.assertIsNone(job["result"])
         self._assert_no_extraction_or_embedding(encoder, standalone_embedder)
+
+    def test_superseded_reanalysis_cannot_be_marked_successful(self) -> None:
+        job = report_jobs.create_report_job(
+            file_id="report-1",
+            filename="Existing Report.pdf",
+            user_id=7,
+        )
+        result = {
+            "status": "success",
+            "message": "Assessment completed from persisted artifacts.",
+            "file_id": "report-1",
+        }
+
+        with (
+            patch.object(
+                report_service,
+                "_sync_reanalyze_report_body",
+                return_value=result,
+            ),
+            patch.object(
+                report_service,
+                "_patch_file_metadata",
+                side_effect=[True, False, False],
+            ),
+        ):
+            report_service._run_report_reanalysis_job(
+                job["job_id"],
+                dict(self.file_info),
+            )
+
+        snapshot = report_jobs.snapshot_report_job(job["job_id"])
+        self.assertIsNotNone(snapshot)
+        self.assertEqual(snapshot["status"], "failed")
+        self.assertEqual(snapshot["stage"], "failed")
+        self.assertIsNone(snapshot["result"])
 
     @staticmethod
     def _assert_no_extraction_or_embedding(encoder, standalone_embedder) -> None:

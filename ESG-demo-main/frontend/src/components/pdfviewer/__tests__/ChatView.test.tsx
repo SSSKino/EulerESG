@@ -74,7 +74,12 @@ describe("ChatView floating assistant", () => {
     const panel = screen.getByTestId("compliance-ai-assistant");
 
     expect(launcher).toHaveAttribute("aria-expanded", "false");
-    expect(launcher).toHaveClass("dashboard-chat-launcher", "fixed");
+    expect(launcher).toHaveClass(
+      "dashboard-chat-launcher",
+      "draggable-assistant-launcher",
+      "fixed",
+    );
+    expect(launcher).toHaveAttribute("data-draggable-assistant", "true");
     expect(launcher).not.toHaveClass("right-6");
     expect(panel).toHaveAttribute("aria-hidden", "true");
     expect(panel).toHaveClass("dashboard-chat-panel", "fixed");
