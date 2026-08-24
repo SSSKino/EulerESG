@@ -321,4 +321,4 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
   );
 };
 
-export default MainContent;
+export default React.memo(MainContent);

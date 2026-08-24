@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Modal, Popover, Progress, Select, Spin, Table, Tag } from "antd";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Popover, Select, Spin, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/navigation";
 import { useT } from "@/i18n/useT";
@@ -219,12 +219,12 @@ export default function DisclosureCompletenessComparison(props: {
   const { t } = useT();
   const router = useRouter();
   const { fileIds, reports } = props;
+  const fileIdsKey = (fileIds || []).join("\u0000");
+  const reportsRef = useRef(reports);
 
   const [resultPage, setResultPage] = useState(1);
   const [resultPageSize, setResultPageSize] = useState(20);
   const [sortMode, setSortMode] = useState<SortMode>("default");
-  const [openingFile, setOpeningFile] = useState<{ fileId: string; label: string } | null>(null);
-  const [openingProgress, setOpeningProgress] = useState(0);
 
   const [per, setPer] = useState<PerReport[]>(() =>
     (fileIds || []).map((id) => ({
@@ -238,33 +238,43 @@ export default function DisclosureCompletenessComparison(props: {
   );
 
   useEffect(() => {
+    reportsRef.current = reports;
     setPer((prev) => prev.map((p) => ({ ...p, label: reportLabelFromSummaries(p.fileId, reports) })));
-  }, [
-    (reports || [])
-      .map((r) => `${r.file_id}:${safeTrim(r.short_name)}:${safeTrim(r.display_name)}:${safeTrim(r.filename)}`)
-      .join("|"),
-  ]);
+  }, [reports]);
 
   useEffect(() => {
     let cancelled = false;
-    if (!fileIds || fileIds.length < 2) return;
+    const requestedFileIds = fileIdsKey
+      ? fileIdsKey.split("\u0000").filter(Boolean)
+      : [];
+    if (requestedFileIds.length < 2) return;
 
-    setPer(
-      fileIds.map((id) => ({
+    setPer((current) => {
+      const currentLabels = new Map(
+        current.map((item) => [item.fileId, item.label]),
+      );
+      return requestedFileIds.map((id) => ({
         fileId: id,
-        label: reportLabelFromSummaries(id, reports),
+        label:
+          currentLabels.get(id) ||
+          reportLabelFromSummaries(id, reportsRef.current),
         framework: null,
         loading: true,
         error: null,
         metrics: [],
-      }))
-    );
+      }));
+    });
 
     (async () => {
       const results = await Promise.all(
-        fileIds.map(async (id) => {
+        requestedFileIds.map(async (id) => {
           try {
-            const assessment = await apiService.getAssessmentByFile(id, undefined, false);
+            const assessment = await apiService.getAssessmentByFile(
+              id,
+              undefined,
+              false,
+              true,
+            );
 
             const actualFramework = safeTrim(
               (assessment as any)?.framework ??
@@ -343,7 +353,7 @@ export default function DisclosureCompletenessComparison(props: {
 
             return {
               fileId: id,
-              label: reportLabelFromSummaries(id, reports),
+              label: id,
               framework: actualFramework || null,
               loading: false,
               error: null,
@@ -355,41 +365,35 @@ export default function DisclosureCompletenessComparison(props: {
               label: reportLabelFromSummaries(id, reports),
               framework: null,
               loading: false,
-              error: e?.message || t("common.error"),
+              error: e?.message || "Error",
               metrics: [],
             } as PerReport;
           }
         })
       );
 
-      if (!cancelled) setPer(results);
+      if (!cancelled) {
+        setPer((current) => {
+          const labels = new Map(current.map((item) => [item.fileId, item.label]));
+          return results.map((item) => ({
+            ...item,
+            label: labels.get(item.fileId) || item.label,
+          }));
+        });
+      }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [fileIds.join("|"), reports?.map((r) => r.file_id).join("|")]);
+  }, [fileIdsKey]);
 
-  useEffect(() => {
-    if (!openingFile) return;
-    const fileId = openingFile.fileId;
-    let progress = 0;
-    setOpeningProgress(0);
-    void apiService.prefetchAssessmentByFile(fileId, undefined, false);
-    const timer = window.setInterval(() => {
-      progress = Math.min(100, progress + 16);
-      setOpeningProgress(progress);
-      if (progress < 100) return;
-
-      window.clearInterval(timer);
-      // Release the modal mask before starting navigation. If client-side
-      // routing is interrupted or rejected, a stale loading mask must not
-      // leave the comparison page permanently unable to receive clicks.
-      setOpeningFile(null);
-      router.push(`/dashboard/chat?file_id=${encodeURIComponent(fileId)}`);
-    }, 180);
-    return () => window.clearInterval(timer);
-  }, [openingFile, router]);
+  const openReport = useCallback((fileId: string) => {
+    // Warm the exact compact assessment variant consumed by the destination
+    // page, then navigate immediately so it can share the in-flight promise.
+    apiService.prefetchAssessmentByFile(fileId, undefined, false, true);
+    router.push(`/dashboard/chat?file_id=${encodeURIComponent(fileId)}`);
+  }, [router]);
 
   const anyLoading = per.some((p) => p.loading);
 
@@ -441,11 +445,24 @@ export default function DisclosureCompletenessComparison(props: {
   };
 
   const tableData: Row[] = useMemo(() => {
+    const metricsByReport = new Map<string, Map<string, AnalysisDataItem>>();
+    for (const report of per) {
+      const byMetric = new Map<string, AnalysisDataItem>();
+      for (const metric of report.metrics) {
+        // Preserve the previous Array.find behaviour when malformed payloads
+        // contain a duplicate metric id: the first occurrence wins.
+        if (!byMetric.has(metric.metric_id)) {
+          byMetric.set(metric.metric_id, metric);
+        }
+      }
+      metricsByReport.set(report.fileId, byMetric);
+    }
+
     return metricUnion.map((m) => {
       const byReport: Record<string, AnalysisDataItem | null> = {};
       for (const p of per) {
-        const hit = p.metrics.find((x) => x.metric_id === m.metric_id) || null;
-        byReport[p.fileId] = hit;
+        byReport[p.fileId] =
+          metricsByReport.get(p.fileId)?.get(m.metric_id) || null;
       }
       return {
         key: m.metric_id,
@@ -478,7 +495,7 @@ export default function DisclosureCompletenessComparison(props: {
         <button
           type="button"
           className="font-semibold text-slate-800 hover:text-blue-600 text-left"
-          onClick={() => setOpeningFile({ fileId: p.fileId, label: p.label })}
+          onClick={() => openReport(p.fileId)}
         >
           {p.label}
         </button>
@@ -565,7 +582,7 @@ export default function DisclosureCompletenessComparison(props: {
     }));
 
     return [...base, ...perCols];
-  }, [orderedPer, t]);
+  }, [openReport, orderedPer, t]);
 
   if (!fileIds || fileIds.length < 2) {
     return (
@@ -589,13 +606,6 @@ export default function DisclosureCompletenessComparison(props: {
 
   return (
     <div className="space-y-4">
-      <Modal open={!!openingFile} footer={null} closable={false} mask={{ closable: false }} centered>
-        <div className="py-3">
-          <div className="text-base font-semibold text-slate-900 mb-4">{openingFile?.label}</div>
-          <Progress percent={openingProgress} status="active" />
-        </div>
-      </Modal>
-
       {anyError ? (
         <Alert
           title={t("crossAnalysis.disclosure.someReportsFailedTitle")}
@@ -646,7 +656,7 @@ export default function DisclosureCompletenessComparison(props: {
               >
                 <button
                   type="button"
-                  onClick={() => setOpeningFile({ fileId: p.fileId, label: p.label })}
+                  onClick={() => openReport(p.fileId)}
                   className="min-w-0 text-left text-xl font-semibold text-slate-900 truncate pr-1 hover:text-blue-600"
                   title={p.label}
                 >

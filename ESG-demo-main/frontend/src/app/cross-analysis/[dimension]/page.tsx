@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -15,22 +15,52 @@ import { NewHeader } from "@/components/cross-analysis/NewHeader";
 import type { MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
 import { useT } from "@/i18n/useT";
 
+const loadMetricChartsGrid = () =>
+  import("@/components/cross-analysis/MetricChartsGrid");
+const loadNewDataTable = () =>
+  import("@/components/cross-analysis/NewDataTable");
+const loadDisclosureCompleteness = () =>
+  import("@/components/cross-analysis/DisclosureCompletenessComparison");
+
 const MetricChartsGrid = dynamic(
-  () => import("@/components/cross-analysis/MetricChartsGrid").then((mod) => mod.MetricChartsGrid),
+  () => loadMetricChartsGrid().then((mod) => mod.MetricChartsGrid),
   { loading: () => <Skeleton active paragraph={{ rows: 8 }} />, ssr: false },
 );
 const NewDataTable = dynamic(
-  () => import("@/components/cross-analysis/NewDataTable").then((mod) => mod.NewDataTable),
+  () => loadNewDataTable().then((mod) => mod.NewDataTable),
   { loading: () => <Skeleton active paragraph={{ rows: 10 }} />, ssr: false },
 );
 const DisclosureCompletenessComparison = dynamic(
-  () => import("@/components/cross-analysis/DisclosureCompletenessComparison"),
+  loadDisclosureCompleteness,
   { loading: () => <Skeleton active paragraph={{ rows: 10 }} />, ssr: false },
 );
 const FloatingChatAssistant = dynamic(
   () => import("@/components/cross-analysis/FloatingChatAssistant"),
   { ssr: false },
 );
+
+const EMPTY_REPORTS: CrossReportSummary[] = [];
+const EMPTY_RECORDS: CrossExtractedRecord[] = [];
+const ACTIVITY_METRICS_PRIMARY = "Activity Metrics";
+const ACTIVITY_METRICS_SKIP_SECONDARY = new Set([
+  "Quantitative",
+  "Qualitative",
+  "Discussion and Analysis",
+  "General",
+]);
+
+function isActivityMetricsPrimary(primary: string) {
+  return (
+    primary === ACTIVITY_METRICS_PRIMARY ||
+    safeTrim(primary).toLowerCase() === "activity metricss"
+  );
+}
+
+function canonicalPrimary(primary: string) {
+  return isActivityMetricsPrimary(primary)
+    ? ACTIVITY_METRICS_PRIMARY
+    : primary;
+}
 
 function safeTrim(v: any): string {
   if (v === null || v === undefined) return "";
@@ -137,13 +167,27 @@ function CrossAnalysisDimensionPageContent() {
     setViewMode(isDisclosureQuery ? "disclosure" : "issue");
   }, [isDisclosureQuery]);
 
+  // Start downloading the active view's heavy UI at the same time as its data.
+  // Without this, the chart/table chunks only begin after the API bootstrap has
+  // finished, creating an avoidable second loading waterfall.
+  useEffect(() => {
+    if (viewMode === "disclosure") {
+      void loadDisclosureCompleteness().catch(() => undefined);
+      return;
+    }
+    void Promise.all([loadMetricChartsGrid(), loadNewDataTable()]).catch(
+      () => undefined,
+    );
+  }, [viewMode]);
+
   const [reportsRequest, setReportsRequest] = useState<{
     key: string;
     loading: boolean;
     data: CrossReportSummary[];
     error: string | null;
   }>({ key: "", loading: false, data: [], error: null });
-  const reports = reportsRequest.key === idsKey ? reportsRequest.data : [];
+  const reports =
+    reportsRequest.key === idsKey ? reportsRequest.data : EMPTY_REPORTS;
   const reportsLoading =
     ids.length >= 2 && (reportsRequest.key !== idsKey || reportsRequest.loading);
   const reportsError = reportsRequest.key === idsKey ? reportsRequest.error : null;
@@ -164,7 +208,12 @@ function CrossAnalysisDimensionPageContent() {
     data: CrossExtractedRecord[];
     error: string | null;
   }>({ key: "", loading: false, data: [], error: null });
-  const allRecords = recordsRequest.key === idsKey ? recordsRequest.data : [];
+  const recordsRequestRef = useRef(recordsRequest);
+  useEffect(() => {
+    recordsRequestRef.current = recordsRequest;
+  }, [recordsRequest]);
+  const allRecords =
+    recordsRequest.key === idsKey ? recordsRequest.data : EMPTY_RECORDS;
   const recordsLoading =
     viewMode === "issue" && ids.length >= 2 && (recordsRequest.key !== idsKey || recordsRequest.loading);
   const recordsError = recordsRequest.key === idsKey ? recordsRequest.error : null;
@@ -172,17 +221,6 @@ function CrossAnalysisDimensionPageContent() {
   const loadError =
     reportsError ||
     (recordsError === "empty" ? null : recordsError);
-
-  const ACTIVITY_METRICS_PRIMARY = "Activity Metrics";
-  const isActivityMetricsPrimary = (p: string) =>
-    p === ACTIVITY_METRICS_PRIMARY || safeTrim(p).toLowerCase() === "activity metricss";
-  const canonicalPrimary = (p: string) => (isActivityMetricsPrimary(p) ? ACTIVITY_METRICS_PRIMARY : p);
-  const ACTIVITY_METRICS_SKIP_SECONDARY = new Set([
-    "Quantitative",
-    "Qualitative",
-    "Discussion and Analysis",
-    "General",
-  ]);
 
   // Data-driven navigation: Primary Navigation -> Secondary Navigation (canonical: "Activity Metricss" -> "Activity Metrics")
   const primaryOptions = useMemo(() => {
@@ -285,7 +323,7 @@ function CrossAnalysisDimensionPageContent() {
     setSelectedPrimary((prev) => (prev === desiredPrimary ? prev : desiredPrimary));
     setSelectedSecondaries((prev) => (arraysEqual(prev, desiredSecondaries) ? prev : desiredSecondaries));
     setSelectedTertiary((prev) => (prev === desiredTertiary ? prev : desiredTertiary));
-  }, [primaryOptions.join("|"), secondaryByPrimary, tertiaryByPrimaryAndSecondary, dimensionSlug, primaryQ, secondaryQ, metricQ, isSasbFramework]);
+  }, [primaryOptions, secondaryByPrimary, tertiaryByPrimaryAndSecondary, dimensionSlug, primaryQ, secondaryQ, metricQ, isSasbFramework]);
 
   const records = useMemo(() => {
     const p = selectedPrimary;
@@ -405,11 +443,18 @@ function CrossAnalysisDimensionPageContent() {
   // soon as the parallel metadata request resolves.
   useEffect(() => {
     if (viewMode === "disclosure") {
-      setRecordsRequest({ key: idsKey, loading: false, data: [], error: null });
       return;
     }
     if (ids.length < 2) {
       setRecordsRequest({ key: idsKey, loading: false, data: [], error: null });
+      return;
+    }
+    const previous = recordsRequestRef.current;
+    if (
+      previous.key === idsKey &&
+      !previous.loading &&
+      (previous.data.length > 0 || previous.error === "empty")
+    ) {
       return;
     }
     let cancelled = false;

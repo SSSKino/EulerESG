@@ -4,11 +4,11 @@ Disclosure Inference Engine - Use LLM to analyze ESG metric disclosure status
 
 import json
 import math
-from typing import Any, List, Dict, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 import re
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime
 import openai
 from loguru import logger
@@ -455,7 +455,7 @@ class DisclosureInferenceEngine:
     
     def analyze_compliance(
         self,
-        retrieval_results: List[MetricRetrievalResult],
+        retrieval_results: Iterable[MetricRetrievalResult],
         report_content: ReportContent,
         report_file_path: str = "",
         all_metrics: Optional[MetricCollection] = None,
@@ -483,9 +483,6 @@ class DisclosureInferenceEngine:
         if all_metrics:
             logger.info(f"Starting compliance analysis for all {len(all_metrics.metrics)} metrics in collection")
             
-            # Create retrieval results mapping
-            retrieval_map = {result.metric_id: result for result in retrieval_results}
-            
             metrics = list(all_metrics.metrics)
             concurrency = _positive_env_int(
                 "REPORT_DISCLOSURE_LLM_CONCURRENCY",
@@ -500,43 +497,156 @@ class DisclosureInferenceEngine:
             # Build immutable report lookup caches before worker threads begin.
             self._get_report_segment_cache(report_content)
             ordered_analyses: List[Optional[DisclosureAnalysis]] = [None] * len(metrics)
+            metric_indices_by_id: Dict[str, List[int]] = {}
+            for index, metric in enumerate(metrics):
+                metric_indices_by_id.setdefault(
+                    str(getattr(metric, "metric_id", "") or ""),
+                    [],
+                ).append(index)
+            submitted_indices = set()
+            analysis_intervals: List[Tuple[float, float]] = []
 
-            def analyze_indexed(index: int, metric):
+            def analyze_indexed(
+                index: int,
+                metric,
+                retrieval_result: Optional[MetricRetrievalResult],
+            ):
                 started = time.perf_counter()
                 logger.info(f"Analyzing metric {index + 1}/{len(metrics)}: {metric.metric_name}")
                 analysis = self._analyze_collection_metric(
                     metric,
-                    retrieval_map.get(metric.metric_id),
+                    retrieval_result,
                     report_content,
                 )
+                finished = time.perf_counter()
                 logger.info(
                     f"Metric analysis completed {index + 1}/{len(metrics)}: "
-                    f"{metric.metric_name}, elapsed={time.perf_counter() - started:.2f}s"
+                    f"{metric.metric_name}, elapsed={finished - started:.2f}s"
                 )
-                return index, analysis
+                return index, analysis, started, finished
 
-            if concurrency == 1:
-                for index, metric in enumerate(metrics):
-                    result_index, analysis = analyze_indexed(index, metric)
+            pending = {}
+            pending_limit = max(concurrency, concurrency * 2)
+
+            def collect_completed(*, block: bool) -> None:
+                if not pending:
+                    return
+                completed, _ = wait(
+                    tuple(pending),
+                    timeout=None if block else 0,
+                    return_when=FIRST_COMPLETED,
+                )
+                for future in completed:
+                    pending.pop(future, None)
+                    result_index, analysis, started, finished = future.result()
                     ordered_analyses[result_index] = analysis
-            else:
-                with ThreadPoolExecutor(
-                    max_workers=concurrency,
-                    thread_name_prefix="disclosure-llm",
-                ) as executor:
-                    futures = [
-                        executor.submit(analyze_indexed, index, metric)
-                        for index, metric in enumerate(metrics)
-                    ]
-                    for future in as_completed(futures):
-                        result_index, analysis = future.result()
-                        ordered_analyses[result_index] = analysis
+                    analysis_intervals.append((started, finished))
 
-            metric_analyses = [
-                analysis for analysis in ordered_analyses if analysis is not None
+            def submit_analysis(
+                executor: ThreadPoolExecutor,
+                index: int,
+                retrieval_result: Optional[MetricRetrievalResult],
+            ) -> None:
+                if index in submitted_indices:
+                    return
+                submitted_indices.add(index)
+                pending[
+                    executor.submit(
+                        analyze_indexed,
+                        index,
+                        metrics[index],
+                        retrieval_result,
+                    )
+                ] = index
+                # Surface already-failed tasks promptly and keep the executor's
+                # otherwise-unbounded work queue small while retrieval continues.
+                collect_completed(block=False)
+                if len(pending) >= pending_limit:
+                    collect_completed(block=True)
+
+            retrieval_count = 0
+            with ThreadPoolExecutor(
+                max_workers=concurrency,
+                thread_name_prefix="disclosure-llm",
+            ) as executor:
+                try:
+                    for retrieval_result in retrieval_results or []:
+                        retrieval_count += 1
+                        metric_id = str(
+                            getattr(retrieval_result, "metric_id", "") or ""
+                        )
+                        matching_indices = metric_indices_by_id.get(metric_id, [])
+                        if not matching_indices:
+                            logger.warning(
+                                "Ignoring extra retrieval result without an "
+                                "unsubmitted matching "
+                                f"collection metric: metric_id={metric_id!r}"
+                            )
+                            continue
+                        # A collection can contain repeated metric IDs. Consume
+                        # those positions one by one so each streamed retrieval
+                        # result remains paired with exactly one metric entry.
+                        index = matching_indices.pop(0)
+                        submit_analysis(executor, index, retrieval_result)
+                        logger.info(
+                            "Submitted disclosure inference immediately after "
+                            f"retrieval metric_id={metric_id}, "
+                            f"retrieved={retrieval_count}/{len(metrics)}, "
+                            f"in_flight={len(pending)}"
+                        )
+
+                    # Preserve the existing all-metrics behavior when a retrieval
+                    # implementation omits a metric entirely.
+                    for index in range(len(metrics)):
+                        if index not in submitted_indices:
+                            submit_analysis(executor, index, None)
+
+                    while pending:
+                        collect_completed(block=True)
+                except Exception:
+                    for future in pending:
+                        future.cancel()
+                    raise
+
+            analysis_work_seconds = sum(
+                max(0.0, finished - started)
+                for started, finished in analysis_intervals
+            )
+            analysis_active_seconds = 0.0
+            active_end: Optional[float] = None
+            for started, finished in sorted(analysis_intervals):
+                if finished <= started:
+                    continue
+                if active_end is None or started > active_end:
+                    analysis_active_seconds += finished - started
+                    active_end = finished
+                    continue
+                if finished > active_end:
+                    analysis_active_seconds += finished - active_end
+                    active_end = finished
+            for telemetry_name, telemetry_value in (
+                ("disclosure_active_seconds", analysis_active_seconds),
+                ("disclosure_work_seconds", analysis_work_seconds),
+            ):
+                try:
+                    setattr(retrieval_results, telemetry_name, telemetry_value)
+                except Exception:
+                    pass
+
+            missing_analysis_indices = [
+                index
+                for index, analysis in enumerate(ordered_analyses)
+                if analysis is None
             ]
+            if missing_analysis_indices:
+                raise RuntimeError(
+                    "Compliance pipeline completed without results for metric "
+                    f"indices: {missing_analysis_indices}"
+                )
+            metric_analyses = list(ordered_analyses)
                 
         else:
+            retrieval_results = list(retrieval_results or [])
             logger.info(f"Starting compliance analysis for {len(retrieval_results)} retrieved metrics")
             
             # Analyze each retrieved metric

@@ -14,6 +14,7 @@ from .metric_profile import (
 
 __all__ = [
     "retrieve_evidence",
+    "iter_metric_collection_results",
     "retrieve_metric_collection",
     "map_document_metrics",
     "DualChannelRetriever",
@@ -28,7 +29,12 @@ __all__ = [
 
 
 def __getattr__(name: str):
-    if name in {"retrieve_evidence", "retrieve_metric_collection", "map_document_metrics"}:
+    if name in {
+        "retrieve_evidence",
+        "iter_metric_collection_results",
+        "retrieve_metric_collection",
+        "map_document_metrics",
+    }:
         from . import evidence_retriever as _evidence_retriever
         return getattr(_evidence_retriever, name)
     if name == "DualChannelRetriever":

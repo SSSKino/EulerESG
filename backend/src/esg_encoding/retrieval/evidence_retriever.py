@@ -11,12 +11,13 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import time
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple
 
 from ..content_extractor import enrich_document_with_pdf_links
 from ..content_revision import document_content_revision
-from ..models import ProcessingConfig, ReportContent
+from ..models import MetricRetrievalResult, ProcessingConfig, ReportContent
 from .dual_channel import DualChannelRetriever
 from .metric_corpus import metric_embeddings, resolve_metric_retrieval_corpus
 from .metric_profile import (
@@ -114,12 +115,68 @@ def retrieve_evidence(
     return retriever.retrieve_for_metric(report_content, metric)
 
 
-def retrieve_metric_collection(
+class MetricRetrievalResultStream(Iterator[MetricRetrievalResult]):
+    """Single-pass metric retrieval stream with lightweight timing telemetry."""
+
+    def __init__(
+        self,
+        report_content: ReportContent,
+        retriever: DualChannelRetriever,
+        plans: Sequence[Tuple[Any, Any, str, Optional[MetricRetrievalResult]]],
+        cache: Dict[str, MetricRetrievalResult],
+        *,
+        setup_seconds: float = 0.0,
+    ):
+        self._report_content = report_content
+        self._retriever = retriever
+        self._plans = list(plans)
+        self._cache = cache
+        self._index = 0
+        self.results: List[MetricRetrievalResult] = []
+        self.retrieval_seconds = max(0.0, float(setup_seconds or 0.0))
+
+    @property
+    def total_metrics(self) -> int:
+        return len(self._plans)
+
+    def __iter__(self) -> "MetricRetrievalResultStream":
+        return self
+
+    def __next__(self) -> MetricRetrievalResult:
+        if self._index >= len(self._plans):
+            raise StopIteration
+
+        metric, expansion, key, cached_result = self._plans[self._index]
+        self._index += 1
+        started = time.perf_counter()
+        try:
+            result = cached_result
+            if result is None:
+                result = self._retriever.retrieve_for_metric(
+                    self._report_content,
+                    metric,
+                    expansion,
+                )
+                self._cache[key] = result
+            self.results.append(result)
+            return result
+        finally:
+            self.retrieval_seconds += time.perf_counter() - started
+
+
+def iter_metric_collection_results(
     report_content: ReportContent,
     metric_collection: Any,
     config: Optional[ProcessingConfig] = None,
-):
-    """Retrieve evidence for every metric in a MetricCollection."""
+) -> MetricRetrievalResultStream:
+    """Prepare collection retrieval and yield each metric result when ready.
+
+    Dense metric queries are still encoded as one batch up front.  The expensive
+    per-metric retrieval and rerank work remains sequential and occurs on each
+    ``next()`` so disclosure inference can consume it as a producer/consumer
+    pipeline.
+    """
+    setup_started = time.perf_counter()
     enrich_document_with_pdf_links(report_content.document_content)
     config = config or _get_default_config(getattr(ProcessingConfig(), "top_k", 50))
     retriever = DualChannelRetriever(config)
@@ -180,13 +237,28 @@ def retrieve_metric_collection(
     ):
         retriever.semantic_retriever.prepare_metric_queries(uncached_pairs)
 
-    results = []
-    for metric, expansion, key, result in plans:
-        if result is None:
-            result = retriever.retrieve_for_metric(report_content, metric, expansion)
-            cache[key] = result
-        results.append(result)
-    return results
+    return MetricRetrievalResultStream(
+        report_content,
+        retriever,
+        plans,
+        cache,
+        setup_seconds=time.perf_counter() - setup_started,
+    )
+
+
+def retrieve_metric_collection(
+    report_content: ReportContent,
+    metric_collection: Any,
+    config: Optional[ProcessingConfig] = None,
+) -> List[MetricRetrievalResult]:
+    """Retrieve all metric evidence as a list for backward compatibility."""
+    return list(
+        iter_metric_collection_results(
+            report_content,
+            metric_collection,
+            config,
+        )
+    )
 
 
 def _profiles_for_mapping(metric_collection: Optional[Any] = None) -> List[MetricRetrievalProfile]:
@@ -246,6 +318,8 @@ def map_document_metrics(
 
 __all__ = [
     "retrieve_evidence",
+    "MetricRetrievalResultStream",
+    "iter_metric_collection_results",
     "retrieve_metric_collection",
     "map_document_metrics",
     "DualChannelRetriever",

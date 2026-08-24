@@ -33,14 +33,8 @@ vi.mock("antd", async () => {
   return {
     Alert: ({ title }: { title?: React.ReactNode }) =>
       ReactModule.createElement("div", null, title),
-    Modal: ({ children, open }: React.PropsWithChildren<{ open?: boolean }>) =>
-      open
-        ? ReactModule.createElement("div", { "data-testid": "opening-modal" }, children)
-        : null,
     Popover: ({ children }: React.PropsWithChildren) =>
       ReactModule.createElement(ReactModule.Fragment, null, children),
-    Progress: ({ percent }: { percent?: number }) =>
-      ReactModule.createElement("div", { "data-progress": percent }),
     Select: () => ReactModule.createElement("div"),
     Spin: () => ReactModule.createElement("div", { role: "status" }),
     Table: () => ReactModule.createElement("div", { "data-testid": "comparison-table" }),
@@ -78,17 +72,15 @@ const reports = [
 
 describe("DisclosureCompletenessComparison report navigation", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
     mocks.getAssessmentByFile.mockResolvedValue({ metric_analyses: [] });
     mocks.prefetchAssessmentByFile.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
     vi.clearAllMocks();
-    vi.useRealTimers();
   });
 
-  it("releases the blocking progress modal even when client navigation does not unmount the page", async () => {
+  it("prefetches the compact assessment and navigates immediately without a progress delay", async () => {
     render(
       <DisclosureCompletenessComparison
         fileIds={["report-a", "report-b"]}
@@ -102,21 +94,48 @@ describe("DisclosureCompletenessComparison report navigation", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Report A" }));
-    expect(screen.getByTestId("opening-modal")).toBeInTheDocument();
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(1_500);
-    });
 
     expect(mocks.prefetchAssessmentByFile).toHaveBeenCalledWith(
       "report-a",
       undefined,
       false,
+      true,
     );
     expect(mocks.push).toHaveBeenCalledWith(
       "/dashboard/chat?file_id=report-a",
     );
-    expect(screen.queryByTestId("opening-modal")).not.toBeInTheDocument();
+  });
+
+  it("updates report metadata without requesting the same assessments again", async () => {
+    const view = render(
+      <DisclosureCompletenessComparison
+        fileIds={["report-a", "report-b"]}
+        reports={[]}
+      />,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(mocks.getAssessmentByFile).toHaveBeenCalledTimes(2);
+    mocks.getAssessmentByFile.mockClear();
+
+    view.rerender(
+      <DisclosureCompletenessComparison
+        fileIds={["report-a", "report-b"]}
+        reports={reports}
+      />,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mocks.getAssessmentByFile).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Report A" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Report B" })).toBeInTheDocument();
   });
 
   it("reloads only the reports in the current Cross Analysis selection", async () => {
@@ -133,6 +152,18 @@ describe("DisclosureCompletenessComparison report navigation", () => {
     });
 
     expect(mocks.getAssessmentByFile).toHaveBeenCalledTimes(2);
+    expect(mocks.getAssessmentByFile).toHaveBeenCalledWith(
+      "report-a",
+      undefined,
+      false,
+      true,
+    );
+    expect(mocks.getAssessmentByFile).toHaveBeenCalledWith(
+      "report-b",
+      undefined,
+      false,
+      true,
+    );
     expect(
       mocks.getAssessmentByFile.mock.calls.map(([fileId]) => fileId).sort(),
     ).toEqual(["report-a", "report-b"]);

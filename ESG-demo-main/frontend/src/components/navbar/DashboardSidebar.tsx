@@ -29,15 +29,33 @@ import { canCrossAnalyzeFiles, useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import type { DashboardReportSelectorMode } from "./DashboardReportSelector";
 
+function ReportSelectorLoading() {
+  return (
+    <div
+      className="fixed inset-0 z-[1000] grid place-items-center bg-slate-950/20 backdrop-blur-[1px]"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-medium text-slate-700 shadow-xl">
+        Loading reports…
+      </div>
+    </div>
+  );
+}
+
 const DashboardReportSelector = dynamic(
   () => import("./DashboardReportSelector"),
-  { ssr: false },
+  { ssr: false, loading: ReportSelectorLoading },
 );
 
 const preloadDashboardReportSelector = () =>
   import("./DashboardReportSelector");
 
 const SIDEBAR_STORAGE_KEY = "dashboard-sidebar-collapsed";
+
+function reportKey(file: Pick<File, "file_id" | "analysis_scope_key">) {
+  return `${file.file_id}::${file.analysis_scope_key || ""}`;
+}
 
 type DashboardSidebarProps = {
   crossAnalysisNavigationSlotRef?: RefCallback<HTMLDivElement>;
@@ -77,9 +95,14 @@ export default function DashboardSidebar({
     () => files.filter((file) => file.status === "ready" && Boolean(file.file_id)),
     [files]
   );
-  const reportKey = (file: (typeof readyReports)[number]) =>
-    `${file.file_id}::${file.analysis_scope_key || ""}`;
-  const selectedReports = readyReports.filter((file) => selectedReportKeys.includes(reportKey(file)));
+  const selectedReportKeySet = useMemo(
+    () => new Set(selectedReportKeys),
+    [selectedReportKeys],
+  );
+  const selectedReports = useMemo(
+    () => readyReports.filter((file) => selectedReportKeySet.has(reportKey(file))),
+    [readyReports, selectedReportKeySet],
+  );
   useEffect(() => {
     const stored = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
     setCollapsed(stored === null ? window.innerWidth < 768 : stored === "true");
@@ -200,7 +223,9 @@ export default function DashboardSidebar({
     }
     if (selectorMode === "disclosure") {
       void apiService.getCrossAnalysisReports(uniqueFileIds).catch(() => undefined);
-      uniqueFileIds.forEach((fileId) => apiService.prefetchAssessmentByFile(fileId));
+      uniqueFileIds.forEach((fileId) =>
+        apiService.prefetchAssessmentByFile(fileId, undefined, false, true),
+      );
     } else {
       apiService.prefetchCrossAnalysis(uniqueFileIds);
     }
@@ -226,7 +251,7 @@ export default function DashboardSidebar({
     // reports again when switching to Disclosure Completeness.
     void apiService.getCrossAnalysisReports(crossAnalysisSelectedReportIds).catch(() => undefined);
     crossAnalysisSelectedReportIds.forEach((fileId) => {
-      apiService.prefetchAssessmentByFile(fileId);
+      apiService.prefetchAssessmentByFile(fileId, undefined, false, true);
     });
     setSelectorMode(null);
     const next = new URLSearchParams(searchParams.toString());
@@ -313,6 +338,7 @@ export default function DashboardSidebar({
         <button
           type="button"
           onClick={() => openReportSelector("compliance")}
+          onPointerDown={() => prefetchReportFlow("compliance")}
           onFocus={() => prefetchReportFlow("compliance")}
           onMouseEnter={() => prefetchReportFlow("compliance")}
           className={navigationClass(isCompliance)}
@@ -324,6 +350,7 @@ export default function DashboardSidebar({
         <button
           type="button"
           onClick={() => openReportSelector("cross")}
+          onPointerDown={() => prefetchReportFlow("cross")}
           onFocus={() => prefetchReportFlow("cross")}
           onMouseEnter={() => prefetchReportFlow("cross")}
           className={navigationClass(isCrossAnalysis)}
@@ -343,6 +370,7 @@ export default function DashboardSidebar({
             type="button"
             data-testid="disclosure-completeness-nav"
             onClick={handleDisclosureCompletenessClick}
+            onPointerDown={() => prefetchReportFlow("disclosure")}
             onFocus={() => prefetchReportFlow("disclosure")}
             onMouseEnter={() => prefetchReportFlow("disclosure")}
             aria-label={t("crossAnalysis.disclosureCompleteness")}

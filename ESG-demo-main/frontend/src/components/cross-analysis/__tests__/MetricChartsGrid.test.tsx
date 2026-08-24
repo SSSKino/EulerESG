@@ -115,7 +115,68 @@ class ControllableResizeObserver implements ResizeObserver {
   }
 }
 
+class ControllableIntersectionObserver implements IntersectionObserver {
+  static instances: ControllableIntersectionObserver[] = [];
+
+  readonly root = null;
+  readonly rootMargin: string;
+  readonly thresholds: readonly number[];
+  readonly targets = new Set<Element>();
+
+  constructor(
+    private readonly callback: IntersectionObserverCallback,
+    options?: IntersectionObserverInit,
+  ) {
+    this.rootMargin = options?.rootMargin ?? "0px";
+    const threshold = options?.threshold ?? 0;
+    this.thresholds = Array.isArray(threshold) ? threshold : [threshold];
+    ControllableIntersectionObserver.instances.push(this);
+  }
+
+  observe(target: Element): void {
+    this.targets.add(target);
+  }
+
+  unobserve(target: Element): void {
+    this.targets.delete(target);
+  }
+
+  disconnect(): void {
+    this.targets.clear();
+  }
+
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+
+  static reset(): void {
+    ControllableIntersectionObserver.instances = [];
+  }
+
+  static trigger(target: Element, isIntersecting: boolean): boolean {
+    const observer = ControllableIntersectionObserver.instances.find(
+      (candidate) => candidate.targets.has(target),
+    );
+    if (!observer) return false;
+
+    const targetRect = domRect(640, 418);
+    const intersectionRect = isIntersecting ? targetRect : domRect(0, 0);
+    const entry = {
+      boundingClientRect: targetRect,
+      intersectionRatio: isIntersecting ? 1 : 0,
+      intersectionRect,
+      isIntersecting,
+      rootBounds: null,
+      target,
+      time: 0,
+    } satisfies IntersectionObserverEntry;
+    observer.callback([entry], observer);
+    return true;
+  }
+}
+
 const originalResizeObserver = globalThis.ResizeObserver;
+const originalIntersectionObserver = globalThis.IntersectionObserver;
 
 const companyColors = {
   "report-a": "#1677ff",
@@ -158,9 +219,15 @@ describe("MetricChartsGrid responsive rendering", () => {
     mocks.nextMountId = 0;
     setDevicePixelRatio(1);
     ControllableResizeObserver.reset();
+    ControllableIntersectionObserver.reset();
     Object.defineProperty(globalThis, "ResizeObserver", {
       configurable: true,
       value: ControllableResizeObserver,
+      writable: true,
+    });
+    Object.defineProperty(globalThis, "IntersectionObserver", {
+      configurable: true,
+      value: ControllableIntersectionObserver,
       writable: true,
     });
   });
@@ -171,6 +238,11 @@ describe("MetricChartsGrid responsive rendering", () => {
     Object.defineProperty(globalThis, "ResizeObserver", {
       configurable: true,
       value: originalResizeObserver,
+      writable: true,
+    });
+    Object.defineProperty(globalThis, "IntersectionObserver", {
+      configurable: true,
+      value: originalIntersectionObserver,
       writable: true,
     });
   });
@@ -259,5 +331,64 @@ describe("MetricChartsGrid responsive rendering", () => {
         className.startsWith("md:col-span-"),
       ),
     ).toBe(false);
+  });
+
+  it("mounts a small eager batch and reveals deferred plots near the viewport", () => {
+    render(<MetricChartsGrid charts={charts(8)} companyColors={companyColors} />);
+
+    expect(screen.getAllByTestId("column-plot")).toHaveLength(4);
+    expect(screen.getAllByTestId("metric-chart-placeholder")).toHaveLength(4);
+
+    const regions = screen.getAllByTestId("metric-chart-region");
+    expect(regions).toHaveLength(8);
+    regions.slice(0, 4).forEach((region) => {
+      expect(region).toHaveAttribute("aria-busy", "false");
+      expect(region).toHaveAttribute("data-chart-state", "ready");
+      expect(region).toHaveStyle({ minHeight: "418px" });
+    });
+    regions.slice(4).forEach((region, index) => {
+      expect(region).toHaveAttribute("aria-busy", "true");
+      expect(region).toHaveAttribute("data-chart-state", "deferred");
+      expect(region).toHaveAttribute(
+        "aria-label",
+        `crossAnalysis.comparisonChartTitle: Metric ${index + 5}`,
+      );
+    });
+    screen.getAllByTestId("metric-chart-placeholder").forEach((placeholder) => {
+      expect(placeholder).toHaveStyle({ height: "418px" });
+    });
+
+    const firstDeferredRegion = regions[4];
+    const observer = ControllableIntersectionObserver.instances.find(
+      (candidate) => candidate.targets.has(firstDeferredRegion),
+    );
+    expect(observer).toBeDefined();
+    expect(observer?.rootMargin).toBe("600px 0px");
+    expect(observer?.thresholds).toEqual([0.01]);
+
+    act(() => {
+      expect(
+        ControllableIntersectionObserver.trigger(firstDeferredRegion, true),
+      ).toBe(true);
+    });
+
+    expect(screen.getAllByTestId("column-plot")).toHaveLength(5);
+    expect(screen.getAllByTestId("metric-chart-placeholder")).toHaveLength(3);
+    expect(firstDeferredRegion).toHaveAttribute("aria-busy", "false");
+    expect(firstDeferredRegion).toHaveAttribute("data-chart-state", "ready");
+    expect(observer?.targets.has(firstDeferredRegion)).toBe(false);
+  });
+
+  it("falls back to mounting every plot when IntersectionObserver is unavailable", () => {
+    Object.defineProperty(globalThis, "IntersectionObserver", {
+      configurable: true,
+      value: undefined,
+      writable: true,
+    });
+
+    render(<MetricChartsGrid charts={charts(6)} companyColors={companyColors} />);
+
+    expect(screen.getAllByTestId("column-plot")).toHaveLength(6);
+    expect(screen.queryByTestId("metric-chart-placeholder")).not.toBeInTheDocument();
   });
 });

@@ -622,6 +622,35 @@ def _sync_reanalyze_report_body(
     artifacts = _load_validated_report_artifacts(file_id)
     report_content = _report_content_from_artifacts(file_info, artifacts)
     metric_sidecar_persisted = artifacts.get("metric_retrieval_corpus") is not None
+
+    def persist_metric_sidecar_if_ready() -> None:
+        nonlocal metric_sidecar_persisted
+        if metric_sidecar_persisted:
+            return
+        metric_corpus = getattr(
+            report_content,
+            "_metric_retrieval_corpus",
+            None,
+        )
+        if metric_corpus is None or getattr(
+            metric_corpus,
+            "_embedding_matrix",
+            None,
+        ) is None:
+            return
+        try:
+            file_manager.save_metric_retrieval_artifacts(
+                file_id,
+                metric_corpus,
+                list(report_content.document_content.segments),
+            )
+            metric_sidecar_persisted = True
+        except Exception as metric_persist_error:
+            logger.warning(
+                "Failed to persist lazily built metric retrieval "
+                f"corpus for {file_id}: {metric_persist_error}"
+            )
+
     fw, scopes = _reanalysis_scopes(file_info)
     _emit_upload_progress(
         progress_cb,
@@ -683,44 +712,51 @@ def _sync_reanalyze_report_body(
                 processor, fw, scope_key, params
             )
             metrics = _prepare_metrics_for_retrieval(processor, metrics)
-            retrieval_started = time.perf_counter()
-            retrieval_results = retrieve_metric_collection(
+            metric_pipeline_started = time.perf_counter()
+            retrieval_results = iter_metric_collection_results(
                 report_content, metrics, config=config
             )
-            if not metric_sidecar_persisted:
-                metric_corpus = getattr(
+            try:
+                assessment = disclosure_engine.analyze_compliance(
+                    retrieval_results,
                     report_content,
-                    "_metric_retrieval_corpus",
-                    None,
+                    str(file_info.get("file_path") or ""),
+                    metrics,
+                    framework=fw,
+                    industry=file_info.get("industry"),
+                    semi_industry=semi_for_disclosure,
                 )
-                if metric_corpus is not None and getattr(
-                    metric_corpus,
-                    "_embedding_matrix",
-                    None,
-                ) is not None:
-                    try:
-                        file_manager.save_metric_retrieval_artifacts(
-                            file_id,
-                            metric_corpus,
-                            list(report_content.document_content.segments),
-                        )
-                        metric_sidecar_persisted = True
-                    except Exception as metric_persist_error:
-                        logger.warning(
-                            "Failed to persist lazily built metric retrieval "
-                            f"corpus for {file_id}: {metric_persist_error}"
-                        )
-            analysis_started = time.perf_counter()
-            assessment = disclosure_engine.analyze_compliance(
-                retrieval_results,
-                report_content,
-                str(file_info.get("file_path") or ""),
-                metrics,
-                framework=fw,
-                industry=file_info.get("industry"),
-                semi_industry=semi_for_disclosure,
+            finally:
+                metric_pipeline_finished = time.perf_counter()
+                persist_metric_sidecar_if_ready()
+            metric_pipeline_elapsed = (
+                metric_pipeline_finished - metric_pipeline_started
             )
-            analysis_finished = time.perf_counter()
+            retrieval_elapsed = float(
+                getattr(retrieval_results, "retrieval_seconds", 0.0) or 0.0
+            )
+            disclosure_active_elapsed = float(
+                getattr(
+                    retrieval_results,
+                    "disclosure_active_seconds",
+                    max(0.0, metric_pipeline_elapsed - retrieval_elapsed),
+                )
+                or 0.0
+            )
+            disclosure_work_elapsed = float(
+                getattr(
+                    retrieval_results,
+                    "disclosure_work_seconds",
+                    disclosure_active_elapsed,
+                )
+                or 0.0
+            )
+            pipeline_overlap_elapsed = max(
+                0.0,
+                retrieval_elapsed
+                + disclosure_active_elapsed
+                - metric_pipeline_elapsed,
+            )
             manifest_row, scope_staged_files, report_path = (
                 _stage_reanalysis_scope_outputs(
                     assessment=assessment,
@@ -743,9 +779,13 @@ def _sync_reanalyze_report_body(
                 {
                     "scope_key": scope_key,
                     "total_seconds": round(time.perf_counter() - scope_started, 3),
-                    "metrics_seconds": round(retrieval_started - metrics_started, 3),
-                    "retrieval_seconds": round(analysis_started - retrieval_started, 3),
-                    "analysis_seconds": round(analysis_finished - analysis_started, 3),
+                    "metrics_seconds": round(metric_pipeline_started - metrics_started, 3),
+                    "metric_pipeline_seconds": round(metric_pipeline_elapsed, 3),
+                    "retrieval_seconds": round(retrieval_elapsed, 3),
+                    "analysis_seconds": round(disclosure_active_elapsed, 3),
+                    "disclosure_active_seconds": round(disclosure_active_elapsed, 3),
+                    "disclosure_work_seconds": round(disclosure_work_elapsed, 3),
+                    "pipeline_overlap_seconds": round(pipeline_overlap_elapsed, 3),
                     "metric_count": len(metrics.metrics),
                 }
             )
@@ -1077,15 +1117,10 @@ def _sync_upload_report_body(
                     f"count={len(metrics.metrics)}, elapsed={time.perf_counter() - metrics_started:.2f}s"
                 )
 
-                retrieval_started = time.perf_counter()
-                retrieval_results = retrieve_metric_collection(
+                metric_pipeline_started = time.perf_counter()
+                retrieval_results = iter_metric_collection_results(
                     report_content, metrics, config=system_components.get("config")
                 )
-                logger.info(
-                    f"Metric retrieval scope={scope_key} took "
-                    f"{time.perf_counter() - retrieval_started:.2f}s"
-                )
-                t_start = time.perf_counter()
                 assessment = disclosure_engine.analyze_compliance(
                     retrieval_results,
                     report_content,
@@ -1095,10 +1130,40 @@ def _sync_upload_report_body(
                     industry=industry,
                     semi_industry=semi_for_disclosure,
                 )
-                analysis_elapsed = time.perf_counter() - t_start
+                metric_pipeline_elapsed = (
+                    time.perf_counter() - metric_pipeline_started
+                )
+                retrieval_elapsed = float(
+                    getattr(retrieval_results, "retrieval_seconds", 0.0) or 0.0
+                )
+                disclosure_active_elapsed = float(
+                    getattr(
+                        retrieval_results,
+                        "disclosure_active_seconds",
+                        max(0.0, metric_pipeline_elapsed - retrieval_elapsed),
+                    )
+                    or 0.0
+                )
+                disclosure_work_elapsed = float(
+                    getattr(
+                        retrieval_results,
+                        "disclosure_work_seconds",
+                        disclosure_active_elapsed,
+                    )
+                    or 0.0
+                )
+                pipeline_overlap_elapsed = max(
+                    0.0,
+                    retrieval_elapsed
+                    + disclosure_active_elapsed
+                    - metric_pipeline_elapsed,
+                )
                 logger.info(
-                    f"Disclosure inference scope={scope_key} took "
-                    f"{analysis_elapsed:.2f}s"
+                    f"Metric retrieval + disclosure pipeline scope={scope_key} "
+                    f"took {metric_pipeline_elapsed:.2f}s "
+                    f"(active retrieval={retrieval_elapsed:.2f}s, "
+                    f"active disclosure={disclosure_active_elapsed:.2f}s, "
+                    f"overlap={pipeline_overlap_elapsed:.2f}s)"
                 )
                 last_assessment = assessment
 
@@ -1201,9 +1266,13 @@ def _sync_upload_report_body(
                 performance["scopes"].append({
                     "scope_key": scope_key,
                     "total_seconds": round(time.perf_counter() - scope_started, 3),
-                    "metrics_seconds": round(retrieval_started - metrics_started, 3),
-                    "retrieval_seconds": round(t_start - retrieval_started, 3),
-                    "analysis_seconds": round(analysis_elapsed, 3),
+                    "metrics_seconds": round(metric_pipeline_started - metrics_started, 3),
+                    "metric_pipeline_seconds": round(metric_pipeline_elapsed, 3),
+                    "retrieval_seconds": round(retrieval_elapsed, 3),
+                    "analysis_seconds": round(disclosure_active_elapsed, 3),
+                    "disclosure_active_seconds": round(disclosure_active_elapsed, 3),
+                    "disclosure_work_seconds": round(disclosure_work_elapsed, 3),
+                    "pipeline_overlap_seconds": round(pipeline_overlap_elapsed, 3),
                     "metric_count": len(metrics.metrics),
                 })
                 _emit_upload_progress(progress_cb, "assessment_scope_done", f"Completed scope {scope_index}/{len(scopes_list)}: {scope_key}.", 55 + 35 * (scope_index / max(1, len(scopes_list))), file_id=file_info.get("file_id"), scope_key=scope_key, scope_index=scope_index, total_scopes=len(scopes_list))

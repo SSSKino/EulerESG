@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { App, Table, Button, Dropdown, Modal, Space, Tag, Tooltip } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import {
@@ -61,6 +61,22 @@ function sortFilesForDisplay(files: File[]): File[] {
   });
 }
 
+function statusColor(status: string | undefined) {
+  if (status === "ready") return "success";
+  if (status === "failed") return "error";
+  if (status === "partial") return "processing";
+  return "warning";
+}
+
+function frameworkTagColor(framework: string | undefined) {
+  const value = (framework || "").trim();
+  if (value === "SASB") return "blue";
+  if (value === "GRI") return "green";
+  if (value === "TCFD") return "purple";
+  if (value === "CDP") return "gold";
+  return "default";
+}
+
 const FileTable: React.FC<FileTableProps> = ({
   onChatClick,
   selectedRows,
@@ -95,7 +111,7 @@ const FileTable: React.FC<FileTableProps> = ({
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  const toggleFavourite = (file: File) => {
+  const toggleFavourite = useCallback((file: File) => {
     const favouriteKey = favouriteReportKey(file);
     setFavouriteReportKeys((current) => {
       const next = new Set(current);
@@ -104,10 +120,12 @@ const FileTable: React.FC<FileTableProps> = ({
       writeFavouriteReportKeys(next);
       return next;
     });
-  };
+  }, []);
 
-  const isFavourite = (file: File) =>
-    favouriteReportKeys.has(favouriteReportKey(file));
+  const isFavourite = useCallback(
+    (file: File) => favouriteReportKeys.has(favouriteReportKey(file)),
+    [favouriteReportKeys],
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -177,16 +195,16 @@ const FileTable: React.FC<FileTableProps> = ({
     }
   };
 
-  const setReanalyzing = (fileId: string, active: boolean) => {
+  const setReanalyzing = useCallback((fileId: string, active: boolean) => {
     setReanalyzingIds((current) => {
       const next = new Set(current);
       if (active) next.add(fileId);
       else next.delete(fileId);
       return next;
     });
-  };
+  }, []);
 
-  const handleReanalyze = (file: File) => {
+  const handleReanalyze = useCallback((file: File) => {
     const fileId = file.file_id;
     if (!fileId || reanalyzingIds.has(fileId)) return;
 
@@ -248,7 +266,7 @@ const FileTable: React.FC<FileTableProps> = ({
         }
       },
     });
-  };
+  }, [lang, message, modal, reanalyzingIds, setReanalyzing]);
 
   const dataSource = useMemo<FileTableRow[]>(() => {
     const reportFiles = files.filter(
@@ -336,7 +354,7 @@ const FileTable: React.FC<FileTableProps> = ({
     setCurrentPage(1);
   }, [reportCatalogMode]);
 
-  const statusText = (file: File) => {
+  const statusText = useCallback((file: File) => {
     const s = file.status;
     if (s === "ready") return t("files.status.ready");
     if (s === "failed") return t("files.status.failed");
@@ -350,56 +368,67 @@ const FileTable: React.FC<FileTableProps> = ({
       return t("files.status.partial", { done: String(done), total: String(total) });
     }
     return t("files.status.pending");
-  };
+  }, [t]);
 
-  const statusColor = (s: string | undefined) => {
-    if (s === "ready") return "success";
-    if (s === "failed") return "error";
-    if (s === "partial") return "processing";
-    return "warning";
-  };
+  const renderUnknown = useCallback(
+    (value: any) =>
+      value && value !== "Unknown" && value !== "未知"
+        ? value
+        : t("common.unknown"),
+    [t],
+  );
 
-  const frameworkTagColor = (fw: string | undefined) => {
-    const f = (fw || "").trim();
-    if (f === "SASB") return "blue";
-    if (f === "GRI") return "green";
-    if (f === "TCFD") return "purple";
-    if (f === "CDP") return "gold";
-    return "default";
-  };
-
-  const renderUnknown = (v: any) =>
-    v && v !== "Unknown" && v !== "未知" ? v : t("common.unknown");
-
-  const optionFilterValue = (file: File) => {
+  const optionFilterValue = useCallback((file: File) => {
     const framework = (file.framework || "").trim();
     const value = framework === "CDP" || framework === "TCFD" ? file.semiIndustry : file.industry;
     return String(value || t("common.unknown"));
-  };
+  }, [t]);
 
-  const subOptionFilterValue = (file: File) => {
+  const subOptionFilterValue = useCallback((file: File) => {
     const framework = (file.framework || "").trim();
     return framework === "CDP" || framework === "TCFD"
       ? t("common.na")
       : String(file.semiIndustry || t("common.unknown"));
-  };
+  }, [t]);
 
-  const filterRows = dataSource.flatMap((row) => [row, ...(row.children || [])]);
-  const makeFilterOptions = (values: string[]) =>
-    [...new Set(values.map((value) => value.trim()).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b))
-      .map((value) => ({ text: value, value }));
+  const tableFilters = useMemo(() => {
+    const filterRows = dataSource.flatMap((row) => [
+      row,
+      ...(row.children || []),
+    ]);
+    const makeFilterOptions = (values: string[]) =>
+      [...new Set(values.map((value) => value.trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b))
+        .map((value) => ({ text: value, value }));
 
-  const tableFilters = {
-    name: makeFilterOptions(filterRows.map((file) => String(file.name || t("common.unknown")))),
-    date: makeFilterOptions(filterRows.map((file) => String(file.dateUploaded || t("common.unknown")))),
-    framework: makeFilterOptions(filterRows.map((file) => String(file.framework || t("common.unknown")))),
-    option: makeFilterOptions(filterRows.map(optionFilterValue)),
-    subOption: makeFilterOptions(filterRows.map(subOptionFilterValue)),
-    status: [...new Map(filterRows.map((file) => [file.status, { text: statusText(file), value: file.status }])).values()],
-  };
+    return {
+      name: makeFilterOptions(
+        filterRows.map((file) => String(file.name || t("common.unknown"))),
+      ),
+      date: makeFilterOptions(
+        filterRows.map((file) =>
+          String(file.dateUploaded || t("common.unknown")),
+        ),
+      ),
+      framework: makeFilterOptions(
+        filterRows.map((file) =>
+          String(file.framework || t("common.unknown")),
+        ),
+      ),
+      option: makeFilterOptions(filterRows.map(optionFilterValue)),
+      subOption: makeFilterOptions(filterRows.map(subOptionFilterValue)),
+      status: [
+        ...new Map(
+          filterRows.map((file) => [
+            file.status,
+            { text: statusText(file), value: file.status },
+          ]),
+        ).values(),
+      ],
+    };
+  }, [dataSource, optionFilterValue, statusText, subOptionFilterValue, t]);
 
-  const columns: ColumnsType<FileTableRow> = [
+  const columns = useMemo<ColumnsType<FileTableRow>>(() => [
     {
       title: t("files.columns.name"),
       dataIndex: "name",
@@ -575,9 +604,23 @@ const FileTable: React.FC<FileTableProps> = ({
         </Space>
       ),
     },
-  ];
+  ], [
+    handleReanalyze,
+    isFavourite,
+    lang,
+    onChatClick,
+    optionFilterValue,
+    reanalyzingIds,
+    renderUnknown,
+    router,
+    statusText,
+    subOptionFilterValue,
+    tableFilters,
+    t,
+    toggleFavourite,
+  ]);
 
-  const pagination: TablePaginationConfig = {
+  const pagination = useMemo<TablePaginationConfig>(() => ({
     current: currentPage,
     pageSize,
     defaultPageSize: 10,
@@ -597,7 +640,36 @@ const FileTable: React.FC<FileTableProps> = ({
         setCurrentPage(page);
       }
     },
-  };
+  }), [currentPage, pageSize]);
+
+  const selectedRowKeys = useMemo(
+    () => selectedRows.map((row) => row.key),
+    [selectedRows],
+  );
+  const rowSelection = useMemo(
+    () => ({
+      selectedRowKeys,
+      onChange: (_keys: React.Key[], rows: FileTableRow[]) =>
+        onSelectionChange(rows.filter((row) => !row.isCompany)),
+      getCheckboxProps: (record: FileTableRow) => ({
+        disabled: Boolean(record.isCompany),
+      }),
+    }),
+    [onSelectionChange, selectedRowKeys],
+  );
+  const tableRow = useCallback(
+    (record: FileTableRow) => ({
+      onClick: () => {
+        if (record.isCompany && record.company_id && record.status === "ready") {
+          router.push(`/dashboard/company/${encodeURIComponent(record.company_id)}`);
+        }
+      },
+      style: record.isCompany
+        ? { cursor: record.status === "ready" ? "pointer" : "default" }
+        : undefined,
+    }),
+    [router],
+  );
 
   return (
     <>
@@ -637,20 +709,8 @@ const FileTable: React.FC<FileTableProps> = ({
             className="w-full dashboard-file-table"
             rowKey={(record) => record.key}
             loading={loading}
-            rowSelection={{
-              selectedRowKeys: selectedRows.map((r) => r.key),
-              onChange: (_keys, rows) =>
-                onSelectionChange((rows as FileTableRow[]).filter((row) => !row.isCompany)),
-              getCheckboxProps: (record) => ({ disabled: Boolean(record.isCompany) }),
-            }}
-            onRow={(record) => ({
-              onClick: () => {
-                if (record.isCompany && record.company_id && record.status === "ready") {
-                  router.push(`/dashboard/company/${encodeURIComponent(record.company_id)}`);
-                }
-              },
-              style: record.isCompany ? { cursor: record.status === "ready" ? "pointer" : "default" } : undefined,
-            })}
+            rowSelection={rowSelection}
+            onRow={tableRow}
           />
         )}
       </div>

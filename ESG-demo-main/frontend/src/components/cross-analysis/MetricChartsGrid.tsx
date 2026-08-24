@@ -9,6 +9,10 @@ const Column = dynamic(() => import("@ant-design/plots/es/components/column"), {
   ssr: false,
 });
 
+const EAGER_CHART_COUNT = 4;
+const CHART_HEIGHT_PX = 418;
+const DEFERRED_CHART_ROOT_MARGIN = "600px 0px";
+
 function currentDevicePixelRatio(): number {
   if (typeof window === "undefined") return 1;
   const ratio = Number(window.devicePixelRatio || 1);
@@ -99,6 +103,95 @@ function ResponsiveColumn({
           plotRef.current = plot;
         }}
       />
+    </div>
+  );
+}
+
+function ProgressiveColumn({
+  chartKey,
+  chartLabel,
+  config,
+  eager,
+  loadingLabel,
+  pixelRatioRevision,
+  topic,
+}: {
+  chartKey: string;
+  chartLabel: string;
+  config: Record<string, unknown>;
+  eager: boolean;
+  loadingLabel: string;
+  pixelRatioRevision: number;
+  topic: string;
+}) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [shouldRender, setShouldRender] = useState(eager);
+
+  useEffect(() => {
+    if (eager) setShouldRender(true);
+  }, [eager]);
+
+  useEffect(() => {
+    if (shouldRender) return;
+    const host = hostRef.current;
+    if (!host) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      // Progressive mounting is an enhancement. Older browsers still receive
+      // every chart instead of being left with permanent placeholders.
+      setShouldRender(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          !entries.some(
+            (entry) => entry.isIntersecting || entry.intersectionRatio > 0,
+          )
+        ) {
+          return;
+        }
+        setShouldRender(true);
+        observer.disconnect();
+      },
+      {
+        root: null,
+        rootMargin: DEFERRED_CHART_ROOT_MARGIN,
+        threshold: 0.01,
+      },
+    );
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, [shouldRender]);
+
+  return (
+    <div
+      ref={hostRef}
+      className="w-full min-w-0"
+      data-chart-state={shouldRender ? "ready" : "deferred"}
+      data-testid="metric-chart-region"
+      role="group"
+      aria-busy={!shouldRender}
+      aria-label={`${chartLabel}: ${topic}`}
+      style={{ minHeight: CHART_HEIGHT_PX }}
+    >
+      {shouldRender ? (
+        <ResponsiveColumn
+          chartKey={chartKey}
+          config={config}
+          pixelRatioRevision={pixelRatioRevision}
+        />
+      ) : (
+        <div
+          className="flex w-full items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500"
+          data-testid="metric-chart-placeholder"
+          style={{ height: CHART_HEIGHT_PX }}
+        >
+          <span aria-hidden="true">{loadingLabel}</span>
+          <span className="sr-only">{`${topic}: ${loadingLabel}`}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -205,6 +298,8 @@ function MetricChartsGridInner({
 
   const colorDomain = Object.keys(companyColors);
   const colorRange = colorDomain.map((key) => companyColors[key]);
+  const chartLabel = t("crossAnalysis.comparisonChartTitle");
+  const loadingLabel = t("common.loading");
 
   return (
     <div
@@ -215,7 +310,7 @@ function MetricChartsGridInner({
           "repeat(auto-fit, minmax(min(100%, 20rem), 1fr))",
       }}
     >
-      {normalizedCharts.map((chart) => {
+      {normalizedCharts.map((chart, index) => {
         const percentChart = isPercentUnit(chart.unit);
 
         const data = chart.points.map((point) => {
@@ -237,7 +332,7 @@ function MetricChartsGridInner({
         const compactLabels =
           normalizedCharts.length >= 4 ||
           data.some((d) => String(d.company).length > 18);
-        const chartHeight = 418;
+        const chartHeight = CHART_HEIGHT_PX;
         const yValues = data
           .map((d) => Number(d.value))
           .filter((n) => Number.isFinite(n));
@@ -336,11 +431,15 @@ function MetricChartsGridInner({
               </div>
             </div>
 
-            <div className="w-full min-w-0 min-h-[304px] pt-2">
-              <ResponsiveColumn
+            <div className="w-full min-w-0 pt-2">
+              <ProgressiveColumn
                 chartKey={chart.key}
+                chartLabel={chartLabel}
                 config={config}
+                eager={index < EAGER_CHART_COUNT}
+                loadingLabel={loadingLabel}
                 pixelRatioRevision={pixelRatioRevision}
+                topic={chart.topic}
               />
             </div>
           </div>

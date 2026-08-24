@@ -23,7 +23,7 @@ from .common import (
     _sanitize_compliance_filename_part,
     file_manager,
     get_current_user,
-    retrieve_metric_collection,
+    iter_metric_collection_results,
     system_components,
 )
 from .report_jobs import create_report_job, get_executor, update_report_job
@@ -392,7 +392,7 @@ def _run_company_batch_job(
             metrics, semi_for_disclosure, filename_part = _load_scope_metrics(
                 framework, scope_key, params
             )
-            retrieval_results = retrieve_metric_collection(
+            retrieval_results = iter_metric_collection_results(
                 report_content,
                 metrics,
                 config=system_components.get("config"),

@@ -1,28 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import FileTable from "@/components/pdfviewer/FileTable";
 import { useT } from "@/i18n/useT";
 import { apiService } from "@/lib/api";
 import { useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
+import { useEnsureReportFiles } from "@/hooks/useEnsureReportFiles";
 
 export default function FavouriteReportsPage() {
   const router = useRouter();
   const { lang } = useT();
   const [selectedRows, setSelectedRows] = useState<File[]>([]);
-  const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
-
-  useEffect(() => {
-    void loadFilesFromBackend({ showLoading: true });
-  }, [loadFilesFromBackend]);
+  useEnsureReportFiles();
 
   useEffect(() => {
     router.prefetch("/dashboard/chat");
   }, [router]);
 
-  const openAnalysis = (file: File) => {
+  const openAnalysis = useCallback((file: File) => {
     if (!file.file_id) return;
     useFileStore.getState().setSelectedFileId(file.file_id);
     apiService.prefetchAssessmentByFile(
@@ -38,7 +35,7 @@ export default function FavouriteReportsPage() {
     router.push(
       `/dashboard/chat?file_id=${encodeURIComponent(file.file_id)}${scope}`,
     );
-  };
+  }, [router]);
 
   return (
     <main className="min-h-screen w-full bg-gray-50 pt-1">

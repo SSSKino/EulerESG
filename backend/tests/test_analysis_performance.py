@@ -14,6 +14,7 @@ from esg_encoding.content_embedder import ContentEmbedder
 from esg_encoding.content_revision import bump_document_content_revision
 from esg_encoding.models import (
     DocumentContent,
+    MetricRetrievalResult,
     ProcessingConfig,
     ReportContent,
     RetrievalResult,
@@ -23,7 +24,10 @@ from esg_encoding.models import (
 from esg_encoding.retrieval.keyword import KeywordRetriever
 from esg_encoding.retrieval.reranker import _QwenReranker
 from esg_encoding.retrieval.semantic import SemanticRetriever
-from esg_encoding.retrieval.evidence_retriever import retrieve_metric_collection
+from esg_encoding.retrieval.evidence_retriever import (
+    iter_metric_collection_results,
+    retrieve_metric_collection,
+)
 from esg_encoding.services.common import (
     _apply_assessment_year_selection,
     _compact_assessment_payload,
@@ -380,6 +384,63 @@ class RetrievalCacheTests(unittest.TestCase):
         self.assertEqual(calls, 2)
         self.assertIs(third[0], expected)
 
+    def test_metric_result_stream_retrieves_one_metric_per_iteration(self):
+        report = _report(
+            [
+                TextSegment(
+                    segment_id="s1",
+                    content="Energy",
+                    page_number=1,
+                    position_y=0,
+                )
+            ]
+        )
+        metrics = [_metric(1), _metric(2)]
+        collection = SimpleNamespace(metrics=metrics, semantic_expansions=[])
+        retrieved_metric_ids: list[str] = []
+
+        def fake_retrieve(_self, _report, metric, _expansion=None):
+            retrieved_metric_ids.append(metric.metric_id)
+            return MetricRetrievalResult(
+                metric_id=metric.metric_id,
+                metric_name=metric.metric_name,
+                metric_code=metric.metric_code,
+            )
+
+        with patch(
+            "esg_encoding.retrieval.evidence_retriever.enrich_document_with_pdf_links"
+        ), patch.object(
+            __import__(
+                "esg_encoding.retrieval.dual_channel",
+                fromlist=["DualChannelRetriever"],
+            ).DualChannelRetriever,
+            "retrieve_for_metric",
+            fake_retrieve,
+        ):
+            stream = iter_metric_collection_results(
+                report,
+                collection,
+                ProcessingConfig(use_metric_retrieval_corpus=False),
+            )
+            self.assertEqual(retrieved_metric_ids, [])
+            self.assertEqual(stream.results, [])
+
+            first = next(stream)
+            self.assertEqual(retrieved_metric_ids, ["metric-1"])
+            self.assertEqual([item.metric_id for item in stream.results], ["metric-1"])
+
+            second = next(stream)
+            self.assertEqual(retrieved_metric_ids, ["metric-1", "metric-2"])
+            self.assertEqual(
+                [item.metric_id for item in stream.results],
+                ["metric-1", "metric-2"],
+            )
+            with self.assertRaises(StopIteration):
+                next(stream)
+
+        self.assertEqual(first.metric_id, "metric-1")
+        self.assertEqual(second.metric_id, "metric-2")
+
 
 class ContentEmbedderMatrixTests(unittest.TestCase):
     def test_new_document_keeps_only_native_matrix(self):
@@ -452,6 +513,67 @@ class MetricPreparationTests(unittest.TestCase):
 
 
 class DisclosureConcurrencyTests(unittest.TestCase):
+    def test_retrieval_and_disclosure_overlap_with_single_llm_worker(self):
+        engine = object.__new__(DisclosureInferenceEngine)
+        metrics = [_metric(1), _metric(2)]
+        collection = SimpleNamespace(metrics=metrics)
+        report = _report(
+            [
+                TextSegment(
+                    segment_id="report-segment",
+                    content="Report content",
+                    page_number=1,
+                    position_y=1,
+                )
+            ]
+        )
+        first_analysis_started = threading.Event()
+        second_retrieval_requested = threading.Event()
+
+        def fake_analysis(self, metric, retrieval_result, report_content):
+            if metric.metric_id == "metric-1":
+                first_analysis_started.set()
+                if not second_retrieval_requested.wait(2.0):
+                    raise AssertionError(
+                        "Second retrieval did not overlap the first disclosure analysis"
+                    )
+            return self._not_disclosed_analysis_for_metric(metric, "test")
+
+        def retrieval_stream():
+            yield MetricRetrievalResult(
+                metric_id=metrics[0].metric_id,
+                metric_name=metrics[0].metric_name,
+                metric_code=metrics[0].metric_code,
+            )
+            if not first_analysis_started.wait(2.0):
+                raise AssertionError(
+                    "Disclosure analysis did not start before the next retrieval"
+                )
+            second_retrieval_requested.set()
+            yield MetricRetrievalResult(
+                metric_id=metrics[1].metric_id,
+                metric_name=metrics[1].metric_name,
+                metric_code=metrics[1].metric_code,
+            )
+
+        engine._analyze_collection_metric = MethodType(fake_analysis, engine)
+        with patch.dict(
+            os.environ,
+            {"REPORT_DISCLOSURE_LLM_CONCURRENCY": "1"},
+        ):
+            assessment = engine.analyze_compliance(
+                retrieval_stream(),
+                report,
+                all_metrics=collection,
+                framework="SASB",
+            )
+
+        self.assertTrue(second_retrieval_requested.is_set())
+        self.assertEqual(
+            [analysis.metric_id for analysis in assessment.metric_analyses],
+            [metric.metric_id for metric in metrics],
+        )
+
     def test_metric_analysis_is_parallel_and_result_order_is_stable(self):
         engine = object.__new__(DisclosureInferenceEngine)
         metrics = [_metric(index) for index in range(16)]

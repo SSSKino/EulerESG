@@ -26,7 +26,7 @@ async def analyze_compliance():
             processor,
             system_components["current_metrics"],
         )
-        retrieval_results = retrieve_metric_collection(
+        retrieval_results = iter_metric_collection_results(
             system_components["current_report"],
             system_components["current_metrics"],
             config=system_components.get("config"),

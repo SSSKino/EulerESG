@@ -7,6 +7,14 @@ const showDevTools = /^(1|true|yes|on)$/i.test(
 const nextConfig = {
   reactStrictMode: true,
 
+  // Keep recently visited route bundles warm in development. The application
+  // has several large workspaces; letting Next evict them quickly makes a
+  // return navigation look like a frozen click while the route recompiles.
+  onDemandEntries: {
+    maxInactiveAge: 30 * 60 * 1000,
+    pagesBufferLength: 12,
+  },
+
   /**
    * Proxy backend routes through Next.js so the browser always talks to the same origin.
    * This avoids CORS issues and removes the need for hard-coded API base URLs.

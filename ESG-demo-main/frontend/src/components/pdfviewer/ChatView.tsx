@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import AnalysisResults from "./AnalysisResults";
 import type { AnalysisDataItem, EvidencePageTarget } from "./AnalysisResults";
@@ -146,6 +146,25 @@ const ChatView: React.FC<ChatViewProps> = ({
     }));
   }, [documentKey, effectiveFileId]);
 
+  // AnalysisResults is memoized and can contain a large Ant table. Keep this
+  // element stable so chat message updates do not force that table to render.
+  const summaryAction = useMemo(() => (
+    <button
+      type="button"
+      onClick={() => {
+        setAssistantOpen(false);
+        setSummaryOpen(true);
+      }}
+      disabled={analysisMetrics.length === 0}
+      className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2274BC] px-4 text-xs font-semibold text-white shadow-sm transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-px hover:bg-[#1b63a3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
+      title={t("analysis.generateSummaryTooltip")}
+      aria-haspopup="dialog"
+    >
+      <FileText className="h-3.5 w-3.5" />
+      {t("analysis.generateSummary")}
+    </button>
+  ), [analysisMetrics.length, t]);
+
   return (
     <div className="flex flex-col gap-6">
       {/* Analysis: Summary always visible; Results table can be collapsed upward */}
@@ -178,22 +197,7 @@ const ChatView: React.FC<ChatViewProps> = ({
             onPageNavigate={navigateToPage}
             showTable={showAnalysisTable}
             onDataChange={handleAnalysisDataChange}
-            headerAction={(
-              <button
-                type="button"
-                onClick={() => {
-                  setAssistantOpen(false);
-                  setSummaryOpen(true);
-                }}
-                disabled={analysisMetrics.length === 0}
-                className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2274BC] px-4 text-xs font-semibold text-white shadow-sm transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-px hover:bg-[#1b63a3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
-                title={t("analysis.generateSummaryTooltip")}
-                aria-haspopup="dialog"
-              >
-                <FileText className="h-3.5 w-3.5" />
-                {t("analysis.generateSummary")}
-              </button>
-            )}
+            headerAction={summaryAction}
           />
         </div>
       </div>

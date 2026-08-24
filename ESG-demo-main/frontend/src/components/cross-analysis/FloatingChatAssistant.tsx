@@ -3,10 +3,23 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { App as AntdApp } from "antd";
 import { MessageCircle, X } from "lucide-react";
-import ChatInterface from "@/components/pdfviewer/ChatInterface";
+import dynamic from "next/dynamic";
 import { apiService, type ChatResponse } from "@/lib/api";
 import { useT } from "@/i18n/useT";
 import { useDraggableFloating } from "@/hooks/useDraggableFloating";
+
+const loadChatInterface = () => import("@/components/pdfviewer/ChatInterface");
+const ChatInterface = dynamic(loadChatInterface, {
+  ssr: false,
+  loading: () => (
+    <div
+      className="flex h-full items-center justify-center text-sm text-slate-500"
+      role="status"
+    >
+      Loading assistant…
+    </div>
+  ),
+});
 
 interface Message {
   text: string;
@@ -29,6 +42,7 @@ export default function FloatingChatAssistant({
   const { t } = useT();
   const { message } = AntdApp.useApp();
   const [open, setOpen] = useState(false);
+  const [hasOpened, setHasOpened] = useState(false);
   const [sessionId, setSessionId] = useState<string>();
   const [messages, setMessages] = useState<Message[]>(() => [
     { text: t("chat.welcomeMessage"), isUser: false },
@@ -75,20 +89,7 @@ export default function FloatingChatAssistant({
       availableHeight,
     );
     const launcherRect = launcher.getBoundingClientRect();
-    const shell = launcher.closest("[data-dashboard-shell]");
-    const sidebar = shell?.querySelector<HTMLElement>("aside[data-collapsed]");
-    const sidebarRect = sidebar?.getBoundingClientRect();
-    const launcherIsInsideSidebar = Boolean(
-      sidebarRect &&
-        launcherRect.left >= sidebarRect.left - 1 &&
-        launcherRect.right <= sidebarRect.right + 1,
-    );
-    const preferredRight = launcherIsInsideSidebar && sidebarRect
-      ? Math.max(
-          launcherRect.right + FLOATING_PANEL_GAP_PX,
-          sidebarRect.right + FLOATING_PANEL_GAP_PX,
-        )
-      : launcherRect.right + FLOATING_PANEL_GAP_PX;
+    const preferredRight = launcherRect.right + FLOATING_PANEL_GAP_PX;
     const preferredLeft =
       launcherRect.left - FLOATING_PANEL_GAP_PX - panelWidth;
     const minimumLeft = viewportLeft + FLOATING_PANEL_MARGIN_PX;
@@ -159,6 +160,7 @@ export default function FloatingChatAssistant({
       return;
     }
     positionPanelAtLauncher();
+    setHasOpened(true);
     setOpen(true);
   }, [closeAssistant, open, positionPanelAtLauncher]);
 
@@ -240,6 +242,16 @@ export default function FloatingChatAssistant({
         ref={draggableRef}
         type="button"
         {...draggableProps}
+        onPointerDown={(event) => {
+          void loadChatInterface().catch(() => undefined);
+          draggableProps.onPointerDown(event);
+        }}
+        onMouseEnter={() => {
+          void loadChatInterface().catch(() => undefined);
+        }}
+        onFocus={() => {
+          void loadChatInterface().catch(() => undefined);
+        }}
         onPointerMove={(event) => {
           draggableProps.onPointerMove(event);
           if (open) positionPanelAtLauncher();
@@ -291,13 +303,15 @@ export default function FloatingChatAssistant({
         }}
       >
         <div className="flex h-full flex-col min-h-0">
-          <ChatInterface
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            onClearChat={handleClearChat}
-            onClose={closeAssistant}
-            onReferenceClick={() => {}}
-          />
+          {hasOpened ? (
+            <ChatInterface
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              onClearChat={handleClearChat}
+              onClose={closeAssistant}
+              onReferenceClick={() => {}}
+            />
+          ) : null}
         </div>
       </section>
     </>

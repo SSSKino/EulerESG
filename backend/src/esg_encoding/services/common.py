@@ -79,7 +79,10 @@ from ..auth.dependencies import get_current_user, get_current_user_optional
 from ..report_encoder import ReportEncoder
 from ..metric_processor import MetricProcessor
 from ..retrieval.dual_channel import DualChannelRetriever
-from ..retrieval.evidence_retriever import retrieve_metric_collection
+from ..retrieval.evidence_retriever import (
+    iter_metric_collection_results,
+    retrieve_metric_collection,
+)
 from ..retrieval.metric_profile import find_metric_profile
 from ..disclosure_inference import DisclosureInferenceEngine, COMPLIANCE_VALUE_NA
 from ..chat.chatbot import ESGChatbot
