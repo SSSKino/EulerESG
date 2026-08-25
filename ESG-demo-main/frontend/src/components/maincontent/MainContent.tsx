@@ -1,16 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import { App as AntdApp, Form, Progress } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useFileStore } from "@/store/useFileStore";
 import type { ReportCatalogMode } from "@/store/useFileStore";
 import { apiService } from "@/lib/api";
 import UploadArea from "./UploadArea";
-import UploadOptionsModal from "./UploadOptionsModal";
 import type { FileInfoFormValues } from "./FileInfoForm";
 import { isActiveFramework } from "@/data/frameworkOptions";
 import { useT } from "@/i18n/useT";
+
+const UploadOptionsModal = dynamic(
+  () => import("./UploadOptionsModal"),
+  { ssr: false },
+);
 
 type ActiveReportJob = {
   jobId: string;
@@ -306,17 +311,19 @@ const MainContent: React.FC<MainContentProps> = ({ uploadMode }) => {
           </section>
         </div>
       </div>
-      <UploadOptionsModal
-        isOpen={isModalOpen}
-        selectedUploadFiles={selectedUploadFiles}
-        selectedIndustry={selectedIndustry}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
-        onIndustryChange={setSelectedIndustry}
-        form={form}
-        uploadMode={uploadMode}
-        confirmLoading={uploadSubmitting}
-      />
+      {isModalOpen ? (
+        <UploadOptionsModal
+          isOpen
+          selectedUploadFiles={selectedUploadFiles}
+          selectedIndustry={selectedIndustry}
+          onOk={handleModalOk}
+          onCancel={handleModalCancel}
+          onIndustryChange={setSelectedIndustry}
+          form={form}
+          uploadMode={uploadMode}
+          confirmLoading={uploadSubmitting}
+        />
+      ) : null}
     </>
   );
 };

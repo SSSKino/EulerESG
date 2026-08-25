@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiService } from "@/lib/api";
 import { isAuthenticated, saveAuth } from "@/lib/auth";
+import { warmAppRoute } from "@/lib/routeWarmup";
 import { useT } from "@/i18n/useT";
 
 export default function RegisterPage() {
@@ -21,6 +22,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    warmAppRoute(router, "/dashboard");
     if (isAuthenticated()) {
       router.replace("/dashboard");
     }

@@ -27,6 +27,16 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(mocks.search),
 }));
 
+vi.mock("next/link", async () => {
+  const React = await import("react");
+  return {
+    default: ({ children, href, prefetch: _prefetch, ...props }: any) => {
+      void _prefetch;
+      return React.createElement("a", { href, ...props }, children);
+    },
+  };
+});
+
 vi.mock("next/image", async () => {
   const React = await import("react");
   return {
@@ -359,13 +369,13 @@ describe("DashboardSidebar favourites navigation", () => {
     window.localStorage.clear();
   });
 
-  it("opens the favourites report directory", () => {
+  it("exposes the favourites report directory as a prefetchable link", () => {
     render(<DashboardSidebar />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Favourite" }));
-
-    expect(mocks.push).toHaveBeenCalledTimes(1);
-    expect(mocks.push).toHaveBeenCalledWith("/dashboard/favourite");
+    expect(screen.getByRole("link", { name: "Favourite" })).toHaveAttribute(
+      "href",
+      "/dashboard/favourite",
+    );
   });
 
   it("marks Favourite as the current directory on its route", () => {
@@ -373,10 +383,10 @@ describe("DashboardSidebar favourites navigation", () => {
 
     render(<DashboardSidebar />);
 
-    const favourite = screen.getByRole("button", { name: "Favourite" });
+    const favourite = screen.getByRole("link", { name: "Favourite" });
     expect(favourite).toHaveAttribute("aria-current", "page");
     expect(favourite).toHaveClass("bg-[#ececec]");
-    expect(screen.getByRole("button", { name: "Homepage" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Homepage" })).not.toHaveAttribute(
       "aria-current",
     );
   });
@@ -394,17 +404,13 @@ describe("DashboardSidebar Standards Library", () => {
   it("places a single Standards Library navigation button directly after Favourite", () => {
     render(<DashboardSidebar />);
 
-    const favourite = screen.getByRole("button", { name: "Favourite" });
-    const library = screen.getByRole("button", { name: "Standards Library" });
+    const favourite = screen.getByRole("link", { name: "Favourite" });
+    const library = screen.getByRole("link", { name: "Standards Library" });
 
     expect(favourite.nextElementSibling).toBe(library);
     expect(library).toBeVisible();
     expect(screen.queryByRole("heading", { name: "Standards Library" })).not.toBeInTheDocument();
-    expect(screen.queryAllByRole("link")).toHaveLength(0);
-
-    fireEvent.click(library);
-    expect(mocks.push).toHaveBeenCalledTimes(1);
-    expect(mocks.push).toHaveBeenCalledWith("/dashboard/standards-library");
+    expect(library).toHaveAttribute("href", "/dashboard/standards-library");
   });
 
   it("marks Standards Library as current only on its dedicated route", () => {
@@ -412,13 +418,13 @@ describe("DashboardSidebar Standards Library", () => {
 
     render(<DashboardSidebar />);
 
-    const library = screen.getByRole("button", { name: "Standards Library" });
+    const library = screen.getByRole("link", { name: "Standards Library" });
     expect(library).toHaveAttribute("aria-current", "page");
     expect(library).toHaveClass("bg-[#ececec]");
-    expect(screen.getByRole("button", { name: "Homepage" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Homepage" })).not.toHaveAttribute(
       "aria-current",
     );
-    expect(screen.getByRole("button", { name: "Favourite" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Favourite" })).not.toHaveAttribute(
       "aria-current",
     );
   });
@@ -432,20 +438,19 @@ describe("DashboardSidebar Standards Library", () => {
       expect(screen.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
     });
 
-    const library = screen.getByRole("button", { name: "Standards Library" });
+    const library = screen.getByRole("link", { name: "Standards Library" });
     expect(library).toBeVisible();
     expect(library).toHaveAttribute("title", "Standards Library");
     library.focus();
     expect(library).toHaveFocus();
 
-    fireEvent.click(library);
-    expect(mocks.push).toHaveBeenCalledWith("/dashboard/standards-library");
+    expect(library).toHaveAttribute("href", "/dashboard/standards-library");
   });
 
   it("deduplicates route and catalog prefetch across pointer and keyboard intent", async () => {
     render(<DashboardSidebar />);
 
-    const library = screen.getByRole("button", { name: "Standards Library" });
+    const library = screen.getByRole("link", { name: "Standards Library" });
     fireEvent.mouseEnter(library);
     library.focus();
 
@@ -461,7 +466,7 @@ describe("DashboardSidebar Standards Library", () => {
       .mockResolvedValueOnce({ frameworks: [] });
     render(<DashboardSidebar />);
 
-    const library = screen.getByRole("button", { name: "Standards Library" });
+    const library = screen.getByRole("link", { name: "Standards Library" });
     fireEvent.mouseEnter(library);
     await waitFor(() => {
       expect(mocks.getStandardsCatalog).toHaveBeenCalledTimes(1);
@@ -486,19 +491,18 @@ describe("DashboardSidebar Graph Exploration", () => {
   it("opens the interactive graph from a first-level navigation item", () => {
     render(<DashboardSidebar />);
 
-    const library = screen.getByRole("button", { name: "Standards Library" });
-    const graph = screen.getByRole("button", { name: "Graph Exploration" });
+    const library = screen.getByRole("link", { name: "Standards Library" });
+    const graph = screen.getByRole("link", { name: "Graph Exploration" });
     expect(library.nextElementSibling).toBe(graph);
 
-    fireEvent.click(graph);
-    expect(mocks.push).toHaveBeenCalledWith("/dashboard/graph");
+    expect(graph).toHaveAttribute("href", "/dashboard/graph");
   });
 
   it("marks Graph Exploration current on its route and keeps it usable when collapsed", async () => {
     mocks.pathname = "/dashboard/graph";
     render(<DashboardSidebar />);
 
-    const graph = screen.getByRole("button", { name: "Graph Exploration" });
+    const graph = screen.getByRole("link", { name: "Graph Exploration" });
     expect(graph).toHaveAttribute("aria-current", "page");
     expect(graph).toHaveClass("bg-[#ececec]");
 
@@ -528,7 +532,7 @@ describe("DashboardSidebar cross-analysis navigation directory", () => {
     const navigationSlot = within(subnavigation).getByTestId(
       "cross-analysis-navigation-slot",
     );
-    const favourite = screen.getByRole("button", { name: "Favourite" });
+    const favourite = screen.getByRole("link", { name: "Favourite" });
 
     expect(crossAnalysis).toHaveClass("bg-[#ececec]");
     expect(crossAnalysis).toHaveAttribute("aria-current", "page");

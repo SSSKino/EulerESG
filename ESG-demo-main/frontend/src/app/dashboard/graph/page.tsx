@@ -42,6 +42,7 @@ import {
 } from "antd";
 import {
   useCallback,
+  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
@@ -67,6 +68,7 @@ import type {
   DisclosureGraphNode,
   DisclosureGraphResponse,
   GraphDisplayEdge,
+  GraphDisplayData,
   GraphDisplayMode,
   GraphLayoutName,
 } from "@/features/graph/types";
@@ -128,6 +130,16 @@ function selectableReports(files: ReportFile[], companyId: string) {
         (companyId === STANDALONE_OWNER ? true : file.company_id === companyId),
     )
     .sort(newestFirst);
+}
+
+const REPORT_ID_SEPARATOR = "\u0000";
+
+function reportIdsFromKey(key: string): string[] {
+  return key ? key.split(REPORT_ID_SEPARATOR) : [];
+}
+
+function sameOrderedStrings(left: string[], right: string[]): boolean {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
 function statusLabel(status: string) {
@@ -381,6 +393,7 @@ function GraphExplorationContent() {
   const pageRef = useRef<HTMLElement>(null);
   const canvasFrameRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const zoomReadoutRef = useRef<HTMLButtonElement>(null);
   const viewMenuRef = useRef<HTMLDivElement>(null);
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [ownerId, setOwnerId] = useState("");
@@ -392,6 +405,7 @@ function GraphExplorationContent() {
         .filter(Boolean),
     ),
   ]);
+  const [appliedReportIds, setAppliedReportIds] = useState<string[]>(() => selectedReportIds);
   const [graph, setGraph] = useState<DisclosureGraphResponse | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [loadError, setLoadError] = useState("");
@@ -418,7 +432,6 @@ function GraphExplorationContent() {
   const [searchText, setSearchText] = useState("");
   const [searchIndex, setSearchIndex] = useState(-1);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [zoom, setZoom] = useState(1);
   const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([]);
   const [pinnedNodeIds, setPinnedNodeIds] = useState<string[]>([]);
   const [focusDegree, setFocusDegree] = useState<number | null>(null);
@@ -440,6 +453,9 @@ function GraphExplorationContent() {
   const initialNodeIdRef = useRef(searchParams.get("node_id") || "");
   const initialNodeAppliedRef = useRef(false);
   const defaultGroupsRevisionRef = useRef("");
+  const retainedDisplayDataRef = useRef<GraphDisplayData | null>(null);
+  const graphAvailableRef = useRef(false);
+  graphAvailableRef.current = Boolean(graph);
 
   const readyReports = useMemo(
     () => files.filter((file) => file.status === "ready" && Boolean(file.file_id)).sort(newestFirst),
@@ -448,6 +464,24 @@ function GraphExplorationContent() {
   const ownerReports = useMemo(
     () => selectableReports(files, ownerId),
     [files, ownerId],
+  );
+  const ownerReportIdsKey = useMemo(
+    () => [...new Set(ownerReports.map((file) => file.file_id!).filter(Boolean))]
+      .join(REPORT_ID_SEPARATOR),
+    [ownerReports],
+  );
+  const ownerReportSnapshotKey = useMemo(
+    () => JSON.stringify(ownerReports.map((file) => [
+      file.file_id,
+      file.status,
+      file.backend_status,
+      file.analysis_scope_key,
+      file.scope_analysis_completed,
+      file.scope_analysis_total,
+      file.scope_analysis_all_done,
+      file.company_analysis_version,
+    ])),
+    [ownerReports],
   );
 
   useEffect(() => {
@@ -494,9 +528,7 @@ function GraphExplorationContent() {
 
   useEffect(() => {
     if (!ownerId) return;
-    const allOwnerReportIds = [...new Set(selectableReports(files, ownerId)
-      .map((file) => file.file_id!)
-      .filter(Boolean))];
+    const allOwnerReportIds = reportIdsFromKey(ownerReportIdsKey);
     if (files.length === 0) return;
     const allowed = new Set(allOwnerReportIds);
     const available = allOwnerReportIds
@@ -506,8 +538,8 @@ function GraphExplorationContent() {
     previousOwnerRef.current = ownerId;
     setSelectedReportIds((current) => {
       const validCurrent = [...new Set(current)].filter((reportId) => allowed.has(reportId));
-      if (!ownerChanged && validCurrent.length > 0) return validCurrent;
-      return available;
+      const next = !ownerChanged && validCurrent.length > 0 ? validCurrent : available;
+      return sameOrderedStrings(current, next) ? current : next;
     });
     if (ownerChanged) {
       setScope("");
@@ -518,16 +550,42 @@ function GraphExplorationContent() {
       setFocusDegree(null);
       setLayoutPaused(false);
     }
-  }, [files, ownerId]);
+  }, [files.length, ownerId, ownerReportIdsKey]);
+
+  useEffect(() => {
+    if (sameOrderedStrings(appliedReportIds, selectedReportIds)) return;
+    const timer = window.setTimeout(() => {
+      if (graphAvailableRef.current) setLoadState("loading");
+      setAppliedReportIds((current) => (
+        sameOrderedStrings(current, selectedReportIds) ? current : selectedReportIds
+      ));
+    }, graphAvailableRef.current ? 220 : 0);
+    return () => window.clearTimeout(timer);
+  }, [appliedReportIds, selectedReportIds]);
+
+  const installLoadedGraph = useCallback((nextGraph: DisclosureGraphResponse) => {
+    const revisionKey = `${ownerId}:${nextGraph.graph_revision}`;
+    if (defaultGroupsRevisionRef.current !== revisionKey) {
+      defaultGroupsRevisionRef.current = revisionKey;
+      const defaultCodes = graphFilterOptions(nextGraph).metricCodeCounts
+        .filter(({ count }) => count > 1)
+        .map(({ code }) => code);
+      if (defaultCodes.length) {
+        setFilters((current) => current.collapsedMetricCodes.length
+          ? current
+          : { ...current, collapsedMetricCodes: defaultCodes });
+      }
+    }
+    setGraph(nextGraph);
+  }, [ownerId]);
 
   const loadGraph = useCallback(async (signal?: AbortSignal) => {
     if (!ownerId) return;
-    const ownerFileIds = new Set(
-      selectableReports(files, ownerId)
-        .map((file) => file.file_id!)
-        .filter(Boolean),
-    );
-    const validSelection = [...new Set(selectedReportIds)].filter((fileId) => ownerFileIds.has(fileId));
+    // Completion/version changes must invalidate an otherwise identical report
+    // selection so a newly finished assessment replaces the cached graph.
+    void ownerReportSnapshotKey;
+    const ownerFileIds = new Set(reportIdsFromKey(ownerReportIdsKey));
+    const validSelection = [...new Set(appliedReportIds)].filter((fileId) => ownerFileIds.has(fileId));
     const fallbackIds = validSelection.length
       ? validSelection
       : [...ownerFileIds].slice(0, MAX_DEFAULT_REPORTS);
@@ -549,7 +607,7 @@ function GraphExplorationContent() {
           (node) => normalizeNodeType(node.type) === "disclosure",
         ).length;
         if (companyGraph.nodes.length > 0 && disclosureCount > 0) {
-          setGraph(companyGraph);
+          installLoadedGraph(companyGraph);
           setLoadState("success");
           return;
         }
@@ -577,7 +635,7 @@ function GraphExplorationContent() {
         .map((result) => result.value);
       if (successful.length > 0) {
         const fallbackGraph = mergeDisclosureGraphs(successful);
-        setGraph(fallbackGraph);
+        installLoadedGraph(fallbackGraph);
         setUsingReportFallback(ownerId !== STANDALONE_OWNER);
         setLoadState("success");
         return;
@@ -595,7 +653,7 @@ function GraphExplorationContent() {
         : "No completed report assessments are available for graph exploration.",
     );
     setLoadState("error");
-  }, [files, ownerId, scope, selectedReportIds]);
+  }, [appliedReportIds, installLoadedGraph, ownerId, ownerReportIdsKey, ownerReportSnapshotKey, scope]);
 
   useEffect(() => {
     if (!ownerId) return;
@@ -606,7 +664,7 @@ function GraphExplorationContent() {
 
   const availableFilters = useMemo(
     () => graph ? graphFilterOptions(graph) : {
-      frameworks: [], scopes: [], years: [], topics: [], statuses: [], metricCodes: [],
+      frameworks: [], scopes: [], years: [], topics: [], statuses: [], metricCodes: [], metricCodeCounts: [],
     },
     [graph],
   );
@@ -619,6 +677,16 @@ function GraphExplorationContent() {
     ])].sort((left, right) => left.localeCompare(right)),
     [availableFilters.scopes, ownerReports],
   );
+  const filterSelectOptions = useMemo(() => ({
+    frameworks: availableFilters.frameworks.map(option),
+    scopes: availableScopes.map(option),
+    years: availableFilters.years.map(option),
+    topics: availableFilters.topics.map(option),
+    statuses: availableFilters.statuses.map((value) => ({
+      label: statusLabel(value),
+      value,
+    })),
+  }), [availableFilters, availableScopes]);
 
   const reportOptions = useMemo(() => {
     const optionsById = new Map(
@@ -636,61 +704,54 @@ function GraphExplorationContent() {
   }, [graph, ownerReports]);
 
   const duplicateMetricCodes = useMemo(() => {
-    if (!graph) return [];
-    const counts = new Map<string, number>();
-    graph.nodes
-      .filter((node) => normalizeNodeType(node.type) === "metric")
-      .forEach((node) => counts.set(metricCode(node), (counts.get(metricCode(node)) || 0) + 1));
-    return [...counts.entries()]
-      .filter(([, count]) => count > 1)
-      .map(([code, count]) => ({ label: `${code} (${count})`, value: code }));
-  }, [graph]);
+    return availableFilters.metricCodeCounts
+      .filter(({ count }) => count > 1)
+      .map(({ code, count }) => ({ label: `${code} (${count})`, value: code }));
+  }, [availableFilters.metricCodeCounts]);
 
   const effectiveFilters = useMemo(() => {
-    const revisionKey = graph ? `${ownerId}:${graph.graph_revision}` : "";
-    const pendingDefaultCodes = graph
-      && defaultGroupsRevisionRef.current !== revisionKey
-      && filters.collapsedMetricCodes.length === 0
-      ? duplicateMetricCodes.map((item) => item.value)
-      : filters.collapsedMetricCodes;
     return {
       ...filters,
-      // Apply the Kumu code-level projection on the first graph render, not in
-      // a second frame after G6 has already laid out every sub-metric. This
-      // avoids the visible topology jump and the stale expanded Force layout.
-      collapsedMetricCodes: pendingDefaultCodes,
-      reportIds: selectedReportIds,
+      reportIds: appliedReportIds,
       scopes: scope ? [scope] : [],
     };
-  }, [duplicateMetricCodes, filters, graph, ownerId, scope, selectedReportIds]);
+  }, [appliedReportIds, filters, scope]);
+  const deferredGraphFilters = useDeferredValue(effectiveFilters);
+  const deferredDisplayMode = useDeferredValue(displayMode);
   const displayData = useMemo(
-    () => graph ? deriveGraphDisplayData(graph, effectiveFilters, displayMode) : null,
-    [displayMode, effectiveFilters, graph],
+    () => graph
+      ? deriveGraphDisplayData(graph, deferredGraphFilters, deferredDisplayMode)
+      : null,
+    [deferredDisplayMode, deferredGraphFilters, graph],
   );
-
   useEffect(() => {
-    if (!graph) return;
-    const revisionKey = `${ownerId}:${graph.graph_revision}`;
-    if (defaultGroupsRevisionRef.current === revisionKey) return;
-    defaultGroupsRevisionRef.current = revisionKey;
-    const defaultCodes = duplicateMetricCodes.map((item) => item.value);
-    if (!defaultCodes.length) return;
-    setFilters((current) => ({
-      ...current,
-      // The supplied Kumu map opens at metric-code level. Each projected edge
-      // still carries its unique sub-metric disclosure ID, and users can expand
-      // any family from the group control or by clicking its code node.
-      collapsedMetricCodes: current.collapsedMetricCodes.length
-        ? current.collapsedMetricCodes
-        : defaultCodes,
-    }));
-  }, [duplicateMetricCodes, graph, ownerId]);
+    if (displayData?.nodes.length) retainedDisplayDataRef.current = displayData;
+  }, [displayData]);
+  const canvasDisplayData = loadState === "loading"
+    ? retainedDisplayDataRef.current || displayData
+    : displayData;
 
+  const deferredSearchText = useDeferredValue(searchText);
+  const deferredSearchQuery = useMemo(
+    () => deferredSearchText.trim().toLocaleLowerCase(),
+    [deferredSearchText],
+  );
+  const searchActive = Boolean(deferredSearchQuery);
+  const searchableNodes = useMemo(
+    () => searchActive && displayData
+      ? displayData.nodes.map((node) => ({
+          node,
+          searchText: graphNodeSearchText(node),
+        }))
+      : [],
+    [displayData, searchActive],
+  );
   const searchResults = useMemo(() => {
-    if (!displayData || !searchText.trim()) return [];
-    const query = searchText.trim().toLocaleLowerCase();
-    return displayData.nodes.filter((node) => graphNodeSearchText(node).includes(query));
-  }, [displayData, searchText]);
+    if (!deferredSearchQuery) return [];
+    return searchableNodes
+      .filter((entry) => entry.searchText.includes(deferredSearchQuery))
+      .map((entry) => entry.node);
+  }, [deferredSearchQuery, searchableNodes]);
   const searchResultWindow = useMemo(() => {
     const windowSize = 10;
     const activeIndex = searchIndex < 0 ? 0 : searchIndex;
@@ -784,25 +845,34 @@ function GraphExplorationContent() {
         : [...current.collapsedMetricCodes, code],
     }));
   }, []);
-  const handleZoomChange = useCallback((value: number) => setZoom(value), []);
+  const handleZoomChange = useCallback((value: number) => {
+    const readout = zoomReadoutRef.current;
+    if (!readout) return;
+    const nextText = `${Math.round(value * 100)}%`;
+    if (readout.textContent !== nextText) readout.textContent = nextText;
+  }, []);
   const handleSelectionChange = useCallback((nodeIds: string[]) => {
-    setSelectedNodeIds(nodeIds);
+    setSelectedNodeIds((current) => (
+      sameOrderedStrings(current, nodeIds) ? current : nodeIds
+    ));
     if (!nodeIds.length) setFocusDegree(null);
   }, []);
   const handlePinnedChange = useCallback((nodeIds: string[]) => {
-    setPinnedNodeIds(nodeIds);
+    setPinnedNodeIds((current) => (
+      sameOrderedStrings(current, nodeIds) ? current : nodeIds
+    ));
   }, []);
 
   const positionStorageKey = useMemo(() => {
     const userId = getStoredAuth()?.userId || "anonymous";
     const owner = ownerId === STANDALONE_OWNER
-      ? `reports:${selectedReportIds.slice().sort().join(",")}`
+      ? "reports"
       : `company:${ownerId}`;
     // v2 invalidates coordinates saved by the old hub-based topology. Keeping
     // those pins would prevent the corrected Kumu Force layout from ever
     // becoming visible, while new v2 drag positions still persist normally.
     return `esg-disclosure-graph-positions:v2:${userId}:${owner}:${scope || "default"}`;
-  }, [ownerId, scope, selectedReportIds]);
+  }, [ownerId, scope]);
 
   const resetLayout = useCallback(() => {
     try {
@@ -826,15 +896,15 @@ function GraphExplorationContent() {
         expansion = await apiService.getCompanyDisclosureGraphNeighbors(ownerId, {
           nodeId: node.id,
           scope: scope || undefined,
-          reportIds: selectedReportIds,
+          reportIds: appliedReportIds,
           depth: 2,
           evidenceLimit: 8,
         });
       } else {
         const nodeType = normalizeNodeType(node.type);
-        if (nodeType === "metric" && selectedReportIds.length > 1) {
+        if (nodeType === "metric" && appliedReportIds.length > 1) {
           const results = await Promise.allSettled(
-            selectedReportIds.map((fileId) =>
+            appliedReportIds.map((fileId) =>
               apiService.getReportDisclosureGraphNeighbors(fileId, {
                 nodeId: node.id,
                 scope: scope || undefined,
@@ -854,7 +924,7 @@ function GraphExplorationContent() {
           }
           expansion = mergeDisclosureGraphs(successful, "Metric evidence across selected reports");
         } else {
-          const fileId = nodeReportId(node, graph) || selectedReportIds[0];
+          const fileId = nodeReportId(node, graph) || appliedReportIds[0];
           if (!fileId) throw new Error("This node is not connected to a report.");
           expansion = await apiService.getReportDisclosureGraphNeighbors(fileId, {
             nodeId: node.id,
@@ -880,6 +950,15 @@ function GraphExplorationContent() {
     ],
     [companies],
   );
+
+  const handleOwnerChange = useCallback((value: string) => {
+    if (graphAvailableRef.current) setLoadState("loading");
+    setOwnerId(value);
+  }, []);
+  const handleScopeChange = useCallback((value?: string) => {
+    if (graphAvailableRef.current) setLoadState("loading");
+    setScope(value || "");
+  }, []);
 
   const updateArrayFilter = <K extends "frameworks" | "years" | "topics" | "statuses" | "collapsedMetricCodes">(
     key: K,
@@ -1102,7 +1181,7 @@ function GraphExplorationContent() {
             value={ownerId || undefined}
             options={companyOptions}
             placeholder="Company"
-            onChange={setOwnerId}
+            onChange={handleOwnerChange}
             showSearch
             optionFilterProp="label"
           />
@@ -1126,7 +1205,7 @@ function GraphExplorationContent() {
             maxTagPlaceholder={compactFilterSelection}
             className="min-w-[125px]"
             value={filters.frameworks}
-            options={availableFilters.frameworks.map(option)}
+            options={filterSelectOptions.frameworks}
             placeholder="Framework"
             onChange={(values) => updateArrayFilter("frameworks", values)}
           />
@@ -1135,9 +1214,9 @@ function GraphExplorationContent() {
             allowClear
             className="min-w-[135px]"
             value={scope || undefined}
-            options={availableScopes.map(option)}
+            options={filterSelectOptions.scopes}
             placeholder="Scope"
-            onChange={(value) => setScope(value || "")}
+            onChange={handleScopeChange}
           />
           <Select
             aria-label="Year"
@@ -1146,7 +1225,7 @@ function GraphExplorationContent() {
             maxTagPlaceholder={compactFilterSelection}
             className="min-w-[105px]"
             value={filters.years}
-            options={availableFilters.years.map(option)}
+            options={filterSelectOptions.years}
             placeholder="Year"
             onChange={(values) => updateArrayFilter("years", values)}
           />
@@ -1157,7 +1236,7 @@ function GraphExplorationContent() {
             maxTagPlaceholder={compactFilterSelection}
             className="min-w-[130px]"
             value={filters.topics}
-            options={availableFilters.topics.map(option)}
+            options={filterSelectOptions.topics}
             placeholder="Topic"
             onChange={(values) => updateArrayFilter("topics", values)}
           />
@@ -1168,7 +1247,7 @@ function GraphExplorationContent() {
             maxTagPlaceholder={compactFilterSelection}
             className="min-w-[170px]"
             value={filters.statuses}
-            options={availableFilters.statuses.map((value) => ({ label: statusLabel(value), value }))}
+            options={filterSelectOptions.statuses}
             placeholder="Disclosure status"
             onChange={(values) => updateArrayFilter("statuses", values)}
           />
@@ -1360,7 +1439,7 @@ function GraphExplorationContent() {
 
               <div className="row-span-2 flex w-11 flex-col items-center gap-0.5 rounded-xl border border-[#C2CBC8] bg-[#FAFBF9]/95 p-1 shadow-md backdrop-blur">
                 <Tooltip placement="left" title="Zoom in (])"><button type="button" onClick={() => void canvasRef.current?.zoomIn()} aria-label="Zoom in" className="grid h-8 w-8 place-items-center rounded-lg text-slate-600 hover:bg-slate-100"><Plus className="h-4 w-4" /></button></Tooltip>
-                <button type="button" onClick={() => void canvasRef.current?.actualSize()} aria-label="Actual size" className="w-9 rounded py-1 text-center text-[9px] font-semibold tabular-nums text-slate-500 hover:bg-slate-100">{Math.round(zoom * 100)}%</button>
+                <button ref={zoomReadoutRef} type="button" onClick={() => void canvasRef.current?.actualSize()} aria-label="Actual size" className="w-9 rounded py-1 text-center text-[9px] font-semibold tabular-nums text-slate-500 hover:bg-slate-100">100%</button>
                 <Tooltip placement="left" title="Zoom out ([)"><button type="button" onClick={() => void canvasRef.current?.zoomOut()} aria-label="Zoom out" className="grid h-8 w-8 place-items-center rounded-lg text-slate-600 hover:bg-slate-100"><Minus className="h-4 w-4" /></button></Tooltip>
                 <span className="my-0.5 h-px w-6 bg-slate-200" />
                 <Tooltip placement="left" title="Fit graph (F)"><button type="button" onClick={() => void canvasRef.current?.fitView()} aria-label="Fit graph" className="grid h-8 w-8 place-items-center rounded-lg text-slate-600 hover:bg-slate-100"><Maximize2 className="h-4 w-4" /></button></Tooltip>
@@ -1387,7 +1466,8 @@ function GraphExplorationContent() {
             </div>
           </div>
 
-          {loadState === "loading" || catalogLoading ? (
+          {(loadState === "loading" || catalogLoading)
+            && !(canvasDisplayData && canvasDisplayData.nodes.length > 0 && graph) ? (
             <div className="absolute inset-0 z-[5] grid place-items-center bg-white px-8 pt-16" role="status">
               <div className="w-full max-w-xl text-center">
                 <LoaderCircle className="mx-auto mb-3 h-7 w-7 animate-spin text-emerald-700" />
@@ -1404,10 +1484,10 @@ function GraphExplorationContent() {
                 <Button icon={<RefreshCcw className="h-4 w-4" />} onClick={() => void loadGraph()}>Try again</Button>
               </div>
             </div>
-          ) : displayData && displayData.nodes.length > 0 && graph ? (
+          ) : canvasDisplayData && canvasDisplayData.nodes.length > 0 && graph ? (
             <DisclosureGraphCanvas
               ref={canvasRef}
-              data={displayData}
+              data={canvasDisplayData}
               graphRevision={graph.graph_revision}
               layout={layout}
               positionStorageKey={positionStorageKey}
@@ -1439,6 +1519,20 @@ function GraphExplorationContent() {
               </Empty>
             </div>
           )}
+
+          {(loadState === "loading" || catalogLoading)
+            && canvasDisplayData && canvasDisplayData.nodes.length > 0 && graph ? (
+            <div
+              data-testid="graph-refresh-indicator"
+              className="pointer-events-none absolute left-1/2 top-3 z-[19] -translate-x-1/2 rounded-full border border-emerald-200 bg-white/95 px-3 py-1.5 text-xs font-medium text-emerald-800 shadow-md backdrop-blur"
+              role="status"
+            >
+              <span className="flex items-center gap-2">
+                <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                Updating graph...
+              </span>
+            </div>
+          ) : null}
 
           {loadState === "success" && displayData ? (
             <div className="pointer-events-none absolute bottom-3 left-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-col gap-2">

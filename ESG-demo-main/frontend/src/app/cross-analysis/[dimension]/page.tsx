@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { Button, Modal, Skeleton } from "antd";
 
 import { apiService } from "@/lib/api";
+import { warmAppRoute } from "@/lib/routeWarmup";
 import type { CrossExtractedRecord, CrossReportSummary } from "@/features/crossAnalysis/types";
 import { normalizeCrossRecords } from "@/features/crossAnalysis/recordAdapter";
 import { NewSidebar } from "@/components/cross-analysis/NewSidebar";
@@ -809,7 +810,13 @@ const handleSelectTertiary = useCallback(
             closable={false}
             mask={{ closable: false }}
             footer={
-              <Button type="primary" onClick={() => router.push("/dashboard")}>
+              <Button
+                type="primary"
+                onPointerDown={() => warmAppRoute(router, "/dashboard")}
+                onFocus={() => warmAppRoute(router, "/dashboard")}
+                onMouseEnter={() => warmAppRoute(router, "/dashboard")}
+                onClick={() => router.push("/dashboard")}
+              >
                 {t("common.back")}
               </Button>
             }

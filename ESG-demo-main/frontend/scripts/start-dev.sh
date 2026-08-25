@@ -42,4 +42,45 @@ if [ "$stored_signature" != "$cache_signature" ]; then
     printf '%s\n' "$cache_signature" > "$cache_marker"
 fi
 
+warm_frontend_routes() {
+    warmup_origin="http://127.0.0.1:3001"
+    attempts=0
+    until wget -q -O /dev/null "${warmup_origin}/" 2>/dev/null; do
+        attempts=$((attempts + 1))
+        if [ "$attempts" -ge 120 ]; then
+            echo "[frontend-dev] Route warmup skipped: dev server did not become ready." >&2
+            return
+        fi
+        sleep 1
+    done
+
+    # Compile high-frequency destinations sequentially so the first real
+    # navigation never has to wait for a cold page build. Sequential requests
+    # also avoid competing with the dashboard's first browser render.
+    for route in \
+        /dashboard \
+        /dashboard/chat \
+        /dashboard/favourite \
+        /dashboard/standards-library \
+        /dashboard/graph \
+        /dashboard/company/__warmup__ \
+        /cross-analysis \
+        '/cross-analysis/evidence?file_id=__warmup__'
+    do
+        if wget -q -O /dev/null "${warmup_origin}${route}" 2>/dev/null; then
+            echo "[frontend-dev] Warmed ${route}"
+        else
+            echo "[frontend-dev] Could not warm ${route}; it will compile on first visit." >&2
+        fi
+    done
+}
+
+case "${FRONTEND_ROUTE_WARMUP:-1}" in
+    0|false|FALSE|no|NO|off|OFF)
+        ;;
+    *)
+        warm_frontend_routes &
+        ;;
+esac
+
 exec npm run dev -- -H 0.0.0.0

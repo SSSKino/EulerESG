@@ -69,11 +69,12 @@ const mocks = vi.hoisted(() => ({
     },
   ],
   loadFilesFromBackend: vi.fn(),
+  prefetch: vi.fn(),
   push: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mocks.push }),
+  useRouter: () => ({ prefetch: mocks.prefetch, push: mocks.push }),
 }));
 
 vi.mock("@ant-design/icons", async () => {
@@ -100,13 +101,17 @@ vi.mock("antd", async () => {
     icon,
     onClick,
     title,
-  }: PropsWithChildren<Record<string, any>>) =>
-    React.createElement(
+    type: _type,
+    ...props
+  }: PropsWithChildren<Record<string, any>>) => {
+    void _type;
+    return React.createElement(
       "button",
-      { "aria-label": ariaLabel, disabled, onClick, title, type: "button" },
+      { ...props, "aria-label": ariaLabel, disabled, onClick, title, type: "button" },
       icon,
       children,
     );
+  };
   const Modal = Object.assign(
     ({ children, open }: PropsWithChildren<{ open?: boolean }>) =>
       open ? React.createElement("div", null, children) : null,
@@ -174,6 +179,7 @@ vi.mock("@/i18n/useT", () => ({
         "common.noDataAvailable": "No data available",
         "common.unknown": "Unknown",
         "files.actions.analysis": "Analysis",
+        "files.crossAnalysisBeta": "Cross Analysis",
         "files.actions.delete": "Delete",
         "files.columns.actions": "Actions",
         "files.columns.dateUploaded": "Uploaded",
@@ -257,6 +263,38 @@ describe("FileTable compliance actions", () => {
       expect(action.querySelector('[data-testid="compliance-action-icon"]')).not.toBeNull();
       expect(action.querySelector(".lucide-shield-check")).not.toBeNull();
     }
+  });
+
+  it("warms the compliance route once across pointer, hover, and focus intent", () => {
+    renderHomepageTable();
+
+    const action = screen.getAllByRole("button", { name: "Analysis" })[0];
+    fireEvent.pointerDown(action);
+    fireEvent.mouseEnter(action);
+    fireEvent.focus(action);
+
+    expect(mocks.prefetch).toHaveBeenCalledTimes(1);
+    expect(mocks.prefetch).toHaveBeenCalledWith("/dashboard/chat");
+  });
+
+  it("warms the exact company route before opening a company assessment", () => {
+    render(
+      <FileTable
+        onChatClick={vi.fn()}
+        onSelectionChange={vi.fn()}
+        reportCatalogMode="multi"
+        selectedRows={[]}
+      />,
+    );
+
+    const action = screen.getByRole("button", { name: "Analysis" });
+    fireEvent.pointerDown(action);
+    fireEvent.mouseEnter(action);
+
+    expect(mocks.prefetch).toHaveBeenCalledTimes(1);
+    expect(mocks.prefetch).toHaveBeenCalledWith(
+      "/dashboard/company/company-x",
+    );
   });
 });
 

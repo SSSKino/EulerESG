@@ -21,6 +21,10 @@ const createNextConfig = (phase) => ({
     pagesBufferLength: 12,
   },
 
+  // Turbopack substantially reduces cold route compilation time in the
+  // Docker development workspace. Keep this on stable Next.js options only.
+  turbopack: {},
+
   /**
    * Proxy backend routes through Next.js so the browser always talks to the same origin.
    * This avoids CORS issues and removes the need for hard-coded API base URLs.

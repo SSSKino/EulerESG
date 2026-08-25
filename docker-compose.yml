@@ -375,6 +375,9 @@ services:
       # Set NEXT_PUBLIC_SHOW_DEV_TOOLS=true in the repository-root .env to
       # show Backend System Status and the Next.js development indicator.
       NEXT_PUBLIC_SHOW_DEV_TOOLS: ${NEXT_PUBLIC_SHOW_DEV_TOOLS:-false}
+      # Precompile common App Router destinations after the dev server starts.
+      # Set false only when diagnosing frontend compilation itself.
+      FRONTEND_ROUTE_WARMUP: ${FRONTEND_ROUTE_WARMUP:-true}
       BACKEND_URL: http://backend:8000
       CHOKIDAR_USEPOLLING: 'true'
       WATCHPACK_POLLING: 'true'

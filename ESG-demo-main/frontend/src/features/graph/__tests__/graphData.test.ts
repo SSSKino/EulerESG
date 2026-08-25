@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   deriveGraphDisplayData,
+  graphFilterOptions,
   graphNodeSearchText,
   graphNeighborhood,
   mergeDisclosureGraphs,
@@ -130,6 +131,23 @@ describe("graph neighborhood", () => {
 });
 
 describe("disclosure graph projection", () => {
+  it("builds filter options and duplicate-code counts from one graph catalog", () => {
+    const options = graphFilterOptions(dellGraph());
+
+    expect(options.frameworks).toEqual(["SASB"]);
+    expect(options.scopes).toEqual(["hardware"]);
+    expect(options.years).toEqual(["2024", "2023", "2022", "2021", "2020", "2019"]);
+    expect(options.topics).toEqual(["Energy", "Materials"]);
+    expect(options.statuses).toEqual([
+      "fully_disclosed",
+      "not_disclosed",
+      "partially_disclosed",
+    ]);
+    expect(options.metricCodes).toHaveLength(23);
+    expect(options.metricCodeCounts.find(({ code }) => code === "TC-HW-000.A"))
+      .toEqual({ code: "TC-HW-000.A", count: 2 });
+  });
+
   it("keeps six reports x 24 metric items as 144 independent disclosure relationships", () => {
     const view = deriveGraphDisplayData(dellGraph(), noFilters, "overview");
 
@@ -271,6 +289,31 @@ describe("disclosure graph projection", () => {
     const evidenceEdge = view.edges.find((edge) => edge.target === "evidence:candidate");
     expect(evidenceEdge?.type).toBe("candidate_evidence");
     expect(evidenceEdge?.properties.evidence_role).toBe("candidate");
+  });
+
+  it("invalidates the cached topology when an in-place evidence expansion changes array sizes", () => {
+    const graph = dellGraph();
+    const before = deriveGraphDisplayData(graph, noFilters, "expanded");
+    expect(before.nodes.some((node) => node.id === "evidence:late")).toBe(false);
+
+    graph.nodes.push({
+      id: "evidence:late",
+      type: "evidence",
+      label: "Late evidence",
+      properties: {},
+    });
+    graph.edges.push({
+      id: "candidate:late",
+      type: "candidate_evidence",
+      source: "disclosure:dell-2024:metric-2",
+      target: "evidence:late",
+      properties: {},
+    });
+
+    const after = deriveGraphDisplayData(graph, noFilters, "expanded");
+    expect(after.nodes.some((node) => node.id === "evidence:late")).toBe(true);
+    expect(after.edges.some((edge) => edge.id === "candidate_evidence:disclosure:dell-2024:metric-2:evidence:late"))
+      .toBe(true);
   });
 });
 

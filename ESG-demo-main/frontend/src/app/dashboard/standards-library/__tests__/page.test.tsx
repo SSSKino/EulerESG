@@ -12,11 +12,11 @@ vi.mock("@/components/maincontent/FrameworkReferencePanel", () => ({
 }));
 
 describe("StandardsLibraryPage", () => {
-  it("places the interactive Standards Library panel in the page's main content", () => {
+  it("places the lazily loaded Standards Library panel in the page's main content", async () => {
     render(<StandardsLibraryPage />);
 
     const main = screen.getByRole("main");
-    const panel = within(main).getByRole("region", { name: "Standards Library" });
+    const panel = await within(main).findByRole("region", { name: "Standards Library" });
 
     expect(main).toBeVisible();
     expect(panel).toBeVisible();

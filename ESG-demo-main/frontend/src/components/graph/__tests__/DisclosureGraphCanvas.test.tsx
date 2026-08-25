@@ -944,6 +944,42 @@ describe("DisclosureGraphCanvas G6 event and reset contract", () => {
     expect(graph.layout).toHaveBeenCalledTimes(1);
   });
 
+  it("redraws property changes without rerunning a non-force layout", async () => {
+    const ref = createRef<DisclosureGraphCanvasHandle>();
+    const handlers = callbacks();
+    const props = {
+      graphRevision: "revision-1",
+      layout: "hierarchical" as const,
+      positionStorageKey: "property-update-positions",
+      resetNonce: 0,
+      showMinimap: false,
+      ...handlers,
+    };
+    const view = render(
+      <DisclosureGraphCanvas ref={ref} data={graphData} {...props} />,
+    );
+    const graph = await graphReady();
+    graph.draw.mockClear();
+    graph.layout.mockClear();
+    graph.stopLayout.mockClear();
+
+    const updatedData: GraphDisplayData = {
+      ...graphData,
+      nodes: graphData.nodes.map((node) => (
+        node.id === "b" ? { ...node, label: "Updated metric label" } : node
+      )),
+    };
+    view.rerender(
+      <DisclosureGraphCanvas ref={ref} data={updatedData} {...props} />,
+    );
+
+    await waitFor(() => expect(graph.setData).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(graph.draw).toHaveBeenCalledTimes(1));
+    expect(graph.stopLayout).not.toHaveBeenCalled();
+    expect(graph.layout).not.toHaveBeenCalled();
+    expect(graphHarness.instances).toHaveLength(1);
+  });
+
   it("switches layouts in place so the canvas and selection do not blink", async () => {
     const ref = createRef<DisclosureGraphCanvasHandle>();
     const handlers = callbacks();

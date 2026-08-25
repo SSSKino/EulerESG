@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RefCallback } from "react";
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { clearAuth, getStoredAuth } from "@/lib/auth";
 import { apiService } from "@/lib/api";
+import { warmAppRoute } from "@/lib/routeWarmup";
 import { useAppLang } from "@/i18n/useAppLang";
 import { useT } from "@/i18n/useT";
 import { canCrossAnalyzeFiles, useFileStore } from "@/store/useFileStore";
@@ -50,6 +52,19 @@ const DashboardReportSelector = dynamic(
 
 const preloadDashboardReportSelector = () =>
   import("./DashboardReportSelector");
+const preloadDashboardWorkspace = () =>
+  import("@/components/pdfviewer/PDFViewer");
+const preloadComplianceWorkspace = () =>
+  import("@/components/pdfviewer/ChatView");
+const preloadFavouriteWorkspace = () =>
+  import("@/components/pdfviewer/FileTable");
+const preloadStandardsWorkspace = () =>
+  import("@/components/maincontent/FrameworkReferencePanel");
+
+const preloadWorkspace = (loader: () => Promise<unknown>) => {
+  if (process.env.NODE_ENV === "test") return;
+  void loader().catch(() => undefined);
+};
 
 const SIDEBAR_STORAGE_KEY = "dashboard-sidebar-collapsed";
 
@@ -139,7 +154,8 @@ export default function DashboardSidebar({
   const prefetchStandardsLibrary = () => {
     if (standardsPrefetchStarted.current) return;
     standardsPrefetchStarted.current = true;
-    router.prefetch("/dashboard/standards-library");
+    warmAppRoute(router, "/dashboard/standards-library");
+    preloadWorkspace(preloadStandardsWorkspace);
     void apiService.getStandardsCatalog().catch(() => {
       standardsPrefetchStarted.current = false;
     });
@@ -155,12 +171,25 @@ export default function DashboardSidebar({
   const prefetchRoute = (route: string) => {
     if (prefetchedRoutes.current.has(route)) return;
     prefetchedRoutes.current.add(route);
-    router.prefetch(route);
+    warmAppRoute(router, route);
   };
 
   const prefetchReportFlow = (mode: DashboardReportSelectorMode) => {
     void preloadDashboardReportSelector().catch(() => undefined);
+    if (mode === "compliance") {
+      preloadWorkspace(preloadComplianceWorkspace);
+    }
     prefetchRoute(mode === "compliance" ? "/dashboard/chat" : "/cross-analysis");
+  };
+
+  const prefetchHomepage = () => {
+    prefetchRoute("/dashboard");
+    preloadWorkspace(preloadDashboardWorkspace);
+  };
+
+  const prefetchFavourite = () => {
+    prefetchRoute("/dashboard/favourite");
+    preloadWorkspace(preloadFavouriteWorkspace);
   };
 
   const openReportSelector = (mode: DashboardReportSelectorMode) => {
@@ -300,15 +329,18 @@ export default function DashboardSidebar({
           </button>
         ) : (
           <>
-            <button
-              type="button"
-              onClick={() => router.push("/dashboard")}
+            <Link
+              href="/dashboard"
+              prefetch
+              onPointerDown={prefetchHomepage}
+              onFocus={prefetchHomepage}
+              onMouseEnter={prefetchHomepage}
               className="flex h-10 min-w-0 items-center gap-2.5 rounded-xl bg-transparent px-2 text-left hover:bg-[#ececec]"
               aria-label={t("nav.goToAllFiles")}
             >
               <Image src={EulerLogo} alt="Euler ESG" className="h-7 w-7 shrink-0" />
               <span className="truncate text-[18px] font-semibold leading-5 text-[#2274BC]">Euler ESG</span>
-            </button>
+            </Link>
             <button
               type="button"
               onClick={toggleCollapsed}
@@ -327,15 +359,19 @@ export default function DashboardSidebar({
         aria-label="Dashboard navigation"
         className={`flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-y-auto ${collapsed ? "px-2 pt-1" : "px-2.5 pt-1"}`}
       >
-        <button
-          type="button"
-          onClick={() => router.push("/dashboard")}
+        <Link
+          href="/dashboard"
+          prefetch
+          onPointerDown={prefetchHomepage}
+          onFocus={prefetchHomepage}
+          onMouseEnter={prefetchHomepage}
           className={navigationClass(isHomepage)}
           title={collapsed ? "Homepage" : undefined}
+          aria-current={isHomepage ? "page" : undefined}
         >
           <House className={`h-[18px] w-[18px] shrink-0 ${isHomepage ? "text-[#2274BC]" : ""}`} />
           {!collapsed && <span className="truncate text-sm">Homepage</span>}
-        </button>
+        </Link>
         <button
           type="button"
           onClick={() => openReportSelector("compliance")}
@@ -402,21 +438,23 @@ export default function DashboardSidebar({
             />
           ) : null}
         </div>
-        <button
-          type="button"
-          onClick={() => router.push("/dashboard/favourite")}
-          onFocus={() => prefetchRoute("/dashboard/favourite")}
-          onMouseEnter={() => prefetchRoute("/dashboard/favourite")}
+        <Link
+          href="/dashboard/favourite"
+          prefetch
+          onPointerDown={prefetchFavourite}
+          onFocus={prefetchFavourite}
+          onMouseEnter={prefetchFavourite}
           className={navigationClass(isFavourite)}
           title={collapsed ? "Favourite" : undefined}
           aria-current={isFavourite ? "page" : undefined}
         >
           <Star className={`h-[18px] w-[18px] shrink-0 ${isFavourite ? "text-[#2274BC]" : ""}`} />
           {!collapsed && <span className="truncate text-sm">Favourite</span>}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push("/dashboard/standards-library")}
+        </Link>
+        <Link
+          href="/dashboard/standards-library"
+          prefetch
+          onPointerDown={prefetchStandardsLibrary}
           onFocus={prefetchStandardsLibrary}
           onMouseEnter={prefetchStandardsLibrary}
           className={navigationClass(isStandardsLibrary)}
@@ -425,10 +463,11 @@ export default function DashboardSidebar({
         >
           <LibraryBig className={`h-[18px] w-[18px] shrink-0 ${isStandardsLibrary ? "text-[#2274BC]" : ""}`} />
           {!collapsed && <span className="truncate text-sm">Standards Library</span>}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push("/dashboard/graph")}
+        </Link>
+        <Link
+          href="/dashboard/graph"
+          prefetch
+          onPointerDown={() => prefetchRoute("/dashboard/graph")}
           onFocus={() => prefetchRoute("/dashboard/graph")}
           onMouseEnter={() => prefetchRoute("/dashboard/graph")}
           className={navigationClass(isGraphExploration)}
@@ -437,7 +476,7 @@ export default function DashboardSidebar({
         >
           <Network className={`h-[18px] w-[18px] shrink-0 ${isGraphExploration ? "text-[#2274BC]" : ""}`} />
           {!collapsed && <span className="truncate text-sm">Graph Exploration</span>}
-        </button>
+        </Link>
       </nav>
 
       <div className={`${collapsed ? "p-2 pb-2" : "p-2.5 pb-2.5"}`}>

@@ -2,6 +2,7 @@
 
 import {
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -412,6 +413,7 @@ function toG6Data(data: GraphDisplayData): GraphData {
       target: edge.target,
       data: {
         graphEdge: edge,
+        curvature: edgeCurvature(edge),
         status:
           normalizeDisclosureStatus(
             edge.properties.disclosure_status ??
@@ -629,7 +631,7 @@ function createWheelPanClassifier(): (event: unknown) => boolean {
   };
 }
 
-const DisclosureGraphCanvas = forwardRef<
+const DisclosureGraphCanvas = memo(forwardRef<
   DisclosureGraphCanvasHandle,
   DisclosureGraphCanvasProps
 >(function DisclosureGraphCanvas(
@@ -654,6 +656,7 @@ const DisclosureGraphCanvas = forwardRef<
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const minimapRef = useRef<HTMLDivElement>(null);
+  const hoverCardRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<Graph | null>(null);
   const dataRef = useRef(data);
   const layoutRef = useRef(layout);
@@ -1002,11 +1005,15 @@ const DisclosureGraphCanvas = forwardRef<
     let hoverClearTimer: ReturnType<typeof setTimeout> | null = null;
     let zoomFrame: number | null = null;
     let hoverFrame: number | null = null;
+    let resizeFrame: number | null = null;
+    let pendingCanvasSize: [number, number] | null = null;
+    let appliedCanvasSize: [number, number] | null = null;
     let draggingNodeIds: string[] = [];
     let canvasPanActive = false;
     let canvasPanLastTime = 0;
     let canvasPanVelocity = { x: 0, y: 0 };
     const isWheelPanGesture = createWheelPanClassifier();
+    const wrappedLabelCache = new Map<string, string>();
     const validIds = initialData.nodes.map((node) => node.id);
     let rawStoredPositions: string | null = null;
     try {
@@ -1226,10 +1233,13 @@ const DisclosureGraphCanvas = forwardRef<
                 : labelLevel === "compact"
                   ? shortLabel
                   : fullLabel;
-            const wrappedLabel = wrapKumuLabel(
-              visibleLabel,
-              type === "report" ? 13 : 21,
-            );
+            const wrapCharacters = type === "report" ? 13 : 21;
+            const wrappedLabelKey = `${labelLevel}\u0000${wrapCharacters}\u0000${visibleLabel}`;
+            let wrappedLabel = wrappedLabelCache.get(wrappedLabelKey);
+            if (wrappedLabel === undefined) {
+              wrappedLabel = wrapKumuLabel(visibleLabel, wrapCharacters);
+              wrappedLabelCache.set(wrappedLabelKey, wrappedLabel);
+            }
             const common = {
               cursor: "pointer" as const,
               zIndex: 2,
@@ -1335,7 +1345,10 @@ const DisclosureGraphCanvas = forwardRef<
         },
         edge: {
           type: (datum) => {
-            const curvature = edgeCurvature(graphEdgeFromDatum(datum));
+            const precomputedCurvature = datum.data?.curvature;
+            const curvature = typeof precomputedCurvature === "number"
+              ? precomputedCurvature
+              : edgeCurvature(graphEdgeFromDatum(datum));
             if (curvature !== null) return curvature === 0 ? "line" : "quadratic";
             return String(datum.type || "line");
           },
@@ -1346,7 +1359,10 @@ const DisclosureGraphCanvas = forwardRef<
               graphEdge?.properties.disclosure_status ||
               graphEdge?.properties.status;
             const normalized = normalizeDisclosureStatus(status);
-            const curvature = edgeCurvature(graphEdge);
+            const precomputedCurvature = datum.data?.curvature;
+            const curvature = typeof precomputedCurvature === "number"
+              ? precomputedCurvature
+              : edgeCurvature(graphEdge);
             const curveStyle = curvature === null
               ? {}
               : { curveOffset: curvature * KUMU_SPRING_LENGTH };
@@ -1520,9 +1536,12 @@ const DisclosureGraphCanvas = forwardRef<
       hoverFrame = window.requestAnimationFrame(() => {
         hoverFrame = null;
         if (disposed) return;
-        setHoverCard((current) => current
-          ? { ...current, ...hoverPoint(event, container, current.width) }
-          : current);
+        const card = hoverCardRef.current;
+        if (!card) return;
+        const width = Number(card.dataset.cardWidth || 440);
+        const point = hoverPoint(event, container, width);
+        card.style.left = `${point.x}px`;
+        card.style.top = `${point.y}px`;
       });
     };
     const clearHover = (immediate = false) => {
@@ -1669,7 +1688,21 @@ const DisclosureGraphCanvas = forwardRef<
       if (!entry || disposed) return;
       const width = Math.floor(entry.contentRect.width);
       const height = Math.floor(entry.contentRect.height);
-      if (width > 0 && height > 0) graph.setSize(width, height);
+      if (width <= 0 || height <= 0) return;
+      pendingCanvasSize = [width, height];
+      if (resizeFrame !== null) return;
+      resizeFrame = window.requestAnimationFrame(() => {
+        resizeFrame = null;
+        if (disposed || !pendingCanvasSize) return;
+        const [nextWidth, nextHeight] = pendingCanvasSize;
+        pendingCanvasSize = null;
+        if (
+          appliedCanvasSize?.[0] === nextWidth
+          && appliedCanvasSize?.[1] === nextHeight
+        ) return;
+        appliedCanvasSize = [nextWidth, nextHeight];
+        graph.setSize(nextWidth, nextHeight);
+      });
     });
     resizeObserver.observe(container);
 
@@ -1745,6 +1778,7 @@ const DisclosureGraphCanvas = forwardRef<
       if (hoverClearTimer) clearTimeout(hoverClearTimer);
       if (zoomFrame !== null) window.cancelAnimationFrame(zoomFrame);
       if (hoverFrame !== null) window.cancelAnimationFrame(hoverFrame);
+      if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
       resizeObserver.disconnect();
       if (graphRef.current === graph) graphRef.current = null;
       graph.destroy();
@@ -1796,6 +1830,7 @@ const DisclosureGraphCanvas = forwardRef<
         (edge) => previousEdgeTopology.get(edge.id) !== `${edge.source}\u0000${edge.target}`,
       );
     const topologyChanged = nodeTopologyChanged || edgeTopologyChanged;
+    if (topologyChanged) graph.stopLayout();
     const currentPositions = new Map<string, GraphPosition>();
     const previousMetricGroupPositions = new Map<string, GraphPosition>();
     const previousMetricMemberPositions = new Map<string, GraphPosition[]>();
@@ -1939,8 +1974,8 @@ const DisclosureGraphCanvas = forwardRef<
         writePersistedPositions(nextPinned);
       }
       if (
-        layoutRef.current !== "force"
-        || (topologyChanged && !layoutPausedRef.current)
+        topologyChanged
+        && (layoutRef.current !== "force" || !layoutPausedRef.current)
       ) {
         graph.setLayout(layoutOptions(
           layoutRef.current,
@@ -1948,6 +1983,10 @@ const DisclosureGraphCanvas = forwardRef<
           !prefersReducedMotionRef.current,
         ));
         await graph.layout();
+        if (
+          graphRef.current !== graph
+          || updateVersion !== dataUpdateVersionRef.current
+        ) return;
         await restorePinnedAfterLayout(graph);
       }
       onSelectionChange?.(survivingSelection);
@@ -2025,6 +2064,8 @@ const DisclosureGraphCanvas = forwardRef<
       ) : null}
       {hoverCard ? (
         <div
+          ref={hoverCardRef}
+          data-card-width={hoverCard.width}
           className="pointer-events-none absolute z-20 origin-top-left animate-in fade-in-0 zoom-in-95 rounded-xl border border-[#C2CBC8] bg-[#FAFBF9]/98 font-[Arial] shadow-xl backdrop-blur duration-150 motion-reduce:animate-none"
           style={{
             left: hoverCard.x,
@@ -2060,6 +2101,6 @@ const DisclosureGraphCanvas = forwardRef<
       </span>
     </div>
   );
-});
+}));
 
 export default DisclosureGraphCanvas;

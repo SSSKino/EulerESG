@@ -1,13 +1,33 @@
 // app/dashboard/chat/page.tsx
 "use client";
 import React, { Suspense, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { App as AntdApp } from "antd";
 import { useSearchParams } from "next/navigation";
-import ChatView from "@/components/pdfviewer/ChatView";
 import { useFileStore } from "@/store/useFileStore";
 import { apiService, type ChatResponse } from "@/lib/api";
 import { useT } from "@/i18n/useT";
 import { errorSummary } from "@/lib/logger";
+
+function ChatWorkspaceLoading() {
+  return (
+    <div
+      data-testid="chat-workspace-loading"
+      aria-busy="true"
+      className="min-h-screen w-full bg-slate-50 px-6 py-5"
+    >
+      <div className="mx-auto w-[95%] animate-pulse space-y-5">
+        <div className="h-96 rounded-2xl border border-slate-200 bg-white" />
+        <div className="h-[600px] rounded-2xl border border-slate-200 bg-white" />
+      </div>
+    </div>
+  );
+}
+
+const ChatView = dynamic(
+  () => import("@/components/pdfviewer/ChatView"),
+  { ssr: false, loading: ChatWorkspaceLoading },
+);
 
 interface Message {
   text: string;

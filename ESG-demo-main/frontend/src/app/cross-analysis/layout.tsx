@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import { Layout } from "antd";
 import DashboardSidebar from "@/components/navbar/DashboardSidebar";
 import { CrossAnalysisNavigationSlotContext } from "@/components/cross-analysis/CrossAnalysisNavigationPortal";
@@ -14,17 +14,6 @@ export default function CrossAnalysisLayout({ children }: { children: React.Reac
   const [navigationSlot, setNavigationSlot] = useState<HTMLElement | null>(null);
 
   const isEvidenceRoute = useMemo(() => pathname.includes("/cross-analysis/evidence"), [pathname]);
-
-  useEffect(() => {
-    if (isEvidenceRoute) return;
-    const root = document.querySelector(".root-layout");
-    if (!root) return;
-    const timer = setTimeout(() => root.classList.add("loaded"), 100);
-    return () => {
-      clearTimeout(timer);
-      root.classList.remove("loaded");
-    };
-  }, [isEvidenceRoute]);
 
   // Evidence view should behave like a standalone reader page:
   // - no nested flex containers

@@ -1,14 +1,29 @@
 "use client";
 
 import React, { Suspense, useMemo, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { Card, Typography } from "antd";
-import PDFEvidenceViewer from "@/components/pdfviewer/PDFEvidenceViewer";
 import { crossTokens } from "@/features/crossAnalysis/tokens";
 import { getStoredAuth } from "@/lib/auth";
 import { useT } from "@/i18n/useT";
 
 const { Title, Text } = Typography;
+
+const PDFEvidenceViewer = dynamic(
+  () => import("@/components/pdfviewer/PDFEvidenceViewer"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        data-testid="pdf-evidence-loading"
+        aria-busy="true"
+        aria-label="Loading PDF evidence"
+        className="min-h-[70vh] w-full animate-pulse rounded-xl bg-slate-100"
+      />
+    ),
+  },
+);
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 

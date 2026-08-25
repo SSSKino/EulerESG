@@ -1,13 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import FileTable from "@/components/pdfviewer/FileTable";
 import { useT } from "@/i18n/useT";
 import { apiService } from "@/lib/api";
 import { useFileStore } from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import { useEnsureReportFiles } from "@/hooks/useEnsureReportFiles";
+
+const FileTable = dynamic(
+  () => import("@/components/pdfviewer/FileTable"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        data-testid="favourite-table-loading"
+        aria-busy="true"
+        className="mt-4 h-96 animate-pulse rounded-2xl border border-slate-200 bg-white"
+      />
+    ),
+  },
+);
 
 export default function FavouriteReportsPage() {
   const router = useRouter();

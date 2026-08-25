@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { App, Table, Button, Dropdown, Modal, Space, Tag, Tooltip } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import {
@@ -20,6 +20,7 @@ import type { File, ReportCatalogMode } from "@/store/useFileStore";
 import { useT } from "@/i18n/useT";
 import { errorSummary } from "@/lib/logger";
 import { apiService } from "@/lib/api";
+import { warmAppRoute } from "@/lib/routeWarmup";
 import {
   FAVOURITE_REPORTS_STORAGE_KEY,
   favouriteReportKey,
@@ -98,6 +99,13 @@ const FileTable: React.FC<FileTableProps> = ({
   const [deleteTarget, setDeleteTarget] = useState<File | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [reanalyzingIds, setReanalyzingIds] = useState<Set<string>>(new Set());
+  const warmedRoutes = useRef(new Set<string>());
+
+  const warmRoute = useCallback((href: string) => {
+    if (warmedRoutes.current.has(href)) return;
+    warmedRoutes.current.add(href);
+    warmAppRoute(router, href);
+  }, [router]);
 
   useEffect(() => {
     const syncFavourites = () => setFavouriteReportKeys(readFavouriteReportKeys());
@@ -161,6 +169,7 @@ const FileTable: React.FC<FileTableProps> = ({
       void message.info(t("files.selectAtLeastTwoReports"));
       return;
     }
+    warmRoute("/cross-analysis");
     apiService.prefetchCrossAnalysis(ids);
     router.push(`/cross-analysis?ids=${encodeURIComponent(ids.join(","))}`);
   };
@@ -521,6 +530,9 @@ const FileTable: React.FC<FileTableProps> = ({
             size="small"
             icon={<ShieldCheck aria-hidden="true" className="h-4 w-4" data-testid="compliance-action-icon" />}
             disabled={file.status !== "ready"}
+            onPointerDown={() => warmRoute(`/dashboard/company/${encodeURIComponent(file.company_id!)}`)}
+            onFocus={() => warmRoute(`/dashboard/company/${encodeURIComponent(file.company_id!)}`)}
+            onMouseEnter={() => warmRoute(`/dashboard/company/${encodeURIComponent(file.company_id!)}`)}
             onClick={(event) => {
               event.stopPropagation();
               router.push(`/dashboard/company/${encodeURIComponent(file.company_id!)}`);
@@ -537,8 +549,9 @@ const FileTable: React.FC<FileTableProps> = ({
               event.stopPropagation();
               onChatClick(file);
             }}
-            onFocus={() => router.prefetch("/dashboard/chat")}
-            onMouseEnter={() => router.prefetch("/dashboard/chat")}
+            onPointerDown={() => warmRoute("/dashboard/chat")}
+            onFocus={() => warmRoute("/dashboard/chat")}
+            onMouseEnter={() => warmRoute("/dashboard/chat")}
             disabled={file.status !== "ready"}
           >
             {t("files.actions.analysis")}
@@ -618,6 +631,7 @@ const FileTable: React.FC<FileTableProps> = ({
     tableFilters,
     t,
     toggleFavourite,
+    warmRoute,
   ]);
 
   const pagination = useMemo<TablePaginationConfig>(() => ({
@@ -658,17 +672,28 @@ const FileTable: React.FC<FileTableProps> = ({
     [onSelectionChange, selectedRowKeys],
   );
   const tableRow = useCallback(
-    (record: FileTableRow) => ({
-      onClick: () => {
-        if (record.isCompany && record.company_id && record.status === "ready") {
-          router.push(`/dashboard/company/${encodeURIComponent(record.company_id)}`);
-        }
-      },
-      style: record.isCompany
-        ? { cursor: record.status === "ready" ? "pointer" : "default" }
-        : undefined,
-    }),
-    [router],
+    (record: FileTableRow) => {
+      const companyHref = record.company_id
+        ? `/dashboard/company/${encodeURIComponent(record.company_id)}`
+        : "";
+      return {
+        onClick: () => {
+          if (record.isCompany && record.company_id && record.status === "ready") {
+            router.push(companyHref);
+          }
+        },
+        onMouseEnter: () => {
+          if (record.isCompany && companyHref) warmRoute(companyHref);
+        },
+        onPointerDown: () => {
+          if (record.isCompany && companyHref) warmRoute(companyHref);
+        },
+        style: record.isCompany
+          ? { cursor: record.status === "ready" ? "pointer" : "default" }
+          : undefined,
+      };
+    },
+    [router, warmRoute],
   );
 
   return (
@@ -686,6 +711,9 @@ const FileTable: React.FC<FileTableProps> = ({
                 size="small"
                 icon={<BarChartOutlined />}
                 disabled={selectedRows.length < 2 || !crossAnalysisAllowed}
+                onPointerDown={() => warmRoute("/cross-analysis")}
+                onFocus={() => warmRoute("/cross-analysis")}
+                onMouseEnter={() => warmRoute("/cross-analysis")}
                 onClick={handleCrossAnalyze}
               >
                 {t("files.crossAnalysisBeta")}

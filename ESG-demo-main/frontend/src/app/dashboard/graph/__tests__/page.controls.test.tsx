@@ -1,14 +1,17 @@
-import type { PropsWithChildren } from "react";
+import type { ForwardedRef, PropsWithChildren } from "react";
 
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   dynamicIndex: 0,
   getCompanies: vi.fn(),
   getReportDisclosureGraph: vi.fn(),
+  graphCanvasProps: null as Record<string, unknown> | null,
   loadFilesFromBackend: vi.fn(),
   replace: vi.fn(),
+  selectChanges: {} as Record<string, ((value: unknown) => void) | undefined>,
+  selectRenderCount: 0,
 }));
 
 vi.mock("next/dynamic", async () => {
@@ -17,7 +20,12 @@ vi.mock("next/dynamic", async () => {
     default: () => {
       const index = mocks.dynamicIndex++;
       if (index === 0) {
-        return React.forwardRef(function MockGraphCanvas() {
+        return React.forwardRef(function MockGraphCanvas(
+          props: Record<string, unknown>,
+          _ref: ForwardedRef<unknown>,
+        ) {
+          void _ref;
+          mocks.graphCanvasProps = props;
           return React.createElement("div", { "data-testid": "mock-graph-canvas" });
         });
       }
@@ -53,14 +61,18 @@ vi.mock("antd", async () => {
       maxTagCount,
       maxTagPlaceholder,
       mode,
+      onChange,
       value,
     }: {
       "aria-label"?: string;
       maxTagCount?: number | string;
       maxTagPlaceholder?: (omittedValues: unknown[]) => React.ReactNode;
       mode?: string;
+      onChange?: (value: unknown) => void;
       value?: unknown;
     }) => {
+      mocks.selectRenderCount += 1;
+      if (ariaLabel) mocks.selectChanges[ariaLabel] = onChange;
       const selectedValues = Array.isArray(value) ? value : [];
       const summary = mode === "multiple" && maxTagCount === 0 && selectedValues.length
         ? maxTagPlaceholder?.(selectedValues.map((selectedValue) => ({ value: selectedValue })))
@@ -124,6 +136,9 @@ vi.mock("@/store/useFileStore", () => ({
 describe("Graph Exploration Kumu control placement", () => {
   beforeEach(() => {
     mocks.dynamicIndex = 0;
+    mocks.graphCanvasProps = null;
+    mocks.selectChanges = {};
+    mocks.selectRenderCount = 0;
     mocks.getCompanies.mockResolvedValue({ companies: [] });
     mocks.getReportDisclosureGraph.mockResolvedValue({
       schema_version: "1.0",
@@ -182,5 +197,79 @@ describe("Graph Exploration Kumu control placement", () => {
       expect(screen.getByRole("combobox", { name: "Reports" })).toHaveTextContent("1 item filtered");
       expect(screen.getByRole("combobox", { name: "Reports" })).not.toHaveTextContent("Example ESG Report.pdf");
     });
+  });
+
+  it("does not refetch graph data when result state rerenders with unchanged report ids", async () => {
+    const { default: GraphExplorationPage } = await import("../page");
+    render(<GraphExplorationPage />);
+
+    expect(await screen.findByText("The selected reports do not have completed assessments."))
+      .toBeVisible();
+    expect(mocks.getReportDisclosureGraph).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the existing canvas mounted while refreshing and isolates zoom readout updates", async () => {
+    const graph = {
+      schema_version: "1.0",
+      graph_revision: "revision-with-data",
+      nodes: [
+        {
+          id: "report:file-1",
+          type: "Report",
+          label: "Example ESG Report",
+          properties: { file_id: "file-1", report_year: 2024, scope_key: "hardware" },
+        },
+        {
+          id: "metric:one",
+          type: "MetricItem",
+          label: "Energy metric",
+          properties: { metric_code: "TC-TEST-000.A", scope_key: "hardware" },
+        },
+        {
+          id: "disclosure:one",
+          type: "Disclosure",
+          label: "Energy disclosure",
+          properties: { disclosure_status: "fully_disclosed", scope_key: "hardware" },
+        },
+      ],
+      edges: [
+        {
+          id: "has:one",
+          type: "has_disclosure",
+          source: "report:file-1",
+          target: "disclosure:one",
+          properties: {},
+        },
+        {
+          id: "assesses:one",
+          type: "assesses",
+          source: "disclosure:one",
+          target: "metric:one",
+          properties: {},
+        },
+      ],
+      stats: { node_count: 3, edge_count: 2 },
+      truncated: false,
+    };
+    mocks.getReportDisclosureGraph.mockResolvedValueOnce(graph);
+
+    const { default: GraphExplorationPage } = await import("../page");
+    render(<GraphExplorationPage />);
+    expect(await screen.findByTestId("mock-graph-canvas")).toBeVisible();
+
+    const selectRendersBeforeZoom = mocks.selectRenderCount;
+    act(() => {
+      (mocks.graphCanvasProps?.onZoomChange as ((zoom: number) => void) | undefined)?.(1.25);
+    });
+    expect(screen.getByRole("button", { name: "Actual size" })).toHaveTextContent("125%");
+    expect(mocks.selectRenderCount).toBe(selectRendersBeforeZoom);
+
+    mocks.getReportDisclosureGraph.mockImplementationOnce(() => new Promise(() => undefined));
+    act(() => mocks.selectChanges.Scope?.("different-scope"));
+    await waitFor(() => expect(mocks.getReportDisclosureGraph).toHaveBeenCalledTimes(2));
+
+    expect(screen.getByTestId("mock-graph-canvas")).toBeVisible();
+    expect(screen.getByTestId("graph-refresh-indicator")).toHaveTextContent("Updating graph");
+    expect(screen.queryByText("Building the disclosure graph...")).not.toBeInTheDocument();
   });
 });

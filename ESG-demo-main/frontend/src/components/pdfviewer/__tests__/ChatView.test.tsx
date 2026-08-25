@@ -5,26 +5,53 @@ import { describe, expect, it, vi } from "vitest";
 
 import ChatView from "../ChatView";
 
+const mocks = vi.hoisted(() => ({ dynamicIndex: 0 }));
+
 vi.mock("next/dynamic", () => ({
-  default: () =>
-    function MockPdfViewer({
-      fileUrl,
-      targetPage,
-      targetPageNonce,
-    }: {
-      fileUrl: string;
-      targetPage: number;
-      targetPageNonce: number;
-    }) {
-      return (
-        <div
-          data-file-url={fileUrl}
-          data-target-page={targetPage}
-          data-target-page-nonce={targetPageNonce}
-          data-testid="pdf-viewer"
-        />
-      );
-    },
+  default: () => {
+    const index = mocks.dynamicIndex++;
+    if (index === 0) {
+      return function MockPdfViewer({
+        fileUrl,
+        targetPage,
+        targetPageNonce,
+      }: {
+        fileUrl: string;
+        targetPage: number;
+        targetPageNonce: number;
+      }) {
+        return (
+          <div
+            data-file-url={fileUrl}
+            data-target-page={targetPage}
+            data-target-page-nonce={targetPageNonce}
+            data-testid="pdf-viewer"
+          />
+        );
+      };
+    }
+    if (index === 1) {
+      return function MockDynamicChatInterface({ onClose }: { onClose?: () => void }) {
+        const [draft, setDraft] = useState("");
+        return (
+          <div>
+            <label htmlFor="chat-draft">Draft</label>
+            <input
+              id="chat-draft"
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+            />
+            <button type="button" onClick={onClose}>
+              assistant-close
+            </button>
+          </div>
+        );
+      };
+    }
+    return function MockDynamicSummaryDrawer() {
+      return null;
+    };
+  },
 }));
 
 vi.mock("../AnalysisResults", () => ({

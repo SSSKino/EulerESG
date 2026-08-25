@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  dynamicIndex: 0,
   dynamicOptions: [] as Array<Record<string, unknown> | undefined>,
 }));
 
@@ -10,7 +11,18 @@ vi.mock("next/dynamic", () => ({
     _loader: () => Promise<unknown>,
     options?: Record<string, unknown>,
   ) => {
+    const index = mocks.dynamicIndex++;
     mocks.dynamicOptions.push(options);
+    if (index === 0) {
+      return function MockDashboardWorkspace() {
+        return <main data-testid="dashboard-files" />;
+      };
+    }
+    if (index === 2) {
+      return function MockStatusButton() {
+        return null;
+      };
+    }
     return function MockFloatingChatAssistant({
       includeContext,
     }: {
@@ -52,5 +64,9 @@ describe("DashboardPage", () => {
       "false",
     );
     expect(mocks.dynamicOptions).toContainEqual({ ssr: false });
+    expect(mocks.dynamicOptions[0]).toMatchObject({
+      ssr: false,
+      loading: expect.any(Function),
+    });
   });
 });

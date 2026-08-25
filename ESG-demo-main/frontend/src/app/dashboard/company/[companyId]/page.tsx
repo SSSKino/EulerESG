@@ -1,13 +1,26 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { App as AntdApp, Button, Select, Space, Spin, Table, Tag, Typography } from "antd";
+import dynamic from "next/dynamic";
+import { App as AntdApp, Button, Select, Space, Spin, Tag, Typography } from "antd";
 import { ArrowLeftOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useParams, useRouter } from "next/navigation";
 import { apiService } from "@/lib/api";
+import { warmAppRoute } from "@/lib/routeWarmup";
 import { useT } from "@/i18n/useT";
 
 const { Title, Text } = Typography;
+
+const AssessmentTable = dynamic(() => import("antd/es/table"), {
+  ssr: false,
+  loading: () => (
+    <div
+      aria-busy="true"
+      aria-label="Loading assessment table"
+      className="h-96 animate-pulse bg-slate-50"
+    />
+  ),
+});
 
 function statusColor(status: string) {
   if (status === "fully_disclosed") return "green";
@@ -121,7 +134,13 @@ export default function CompanyAssessmentPage() {
       <div className="mx-auto max-w-[1600px]">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <Space>
-            <Button icon={<ArrowLeftOutlined />} onClick={() => router.push("/dashboard")} />
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onPointerDown={() => warmAppRoute(router, "/dashboard")}
+              onFocus={() => warmAppRoute(router, "/dashboard")}
+              onMouseEnter={() => warmAppRoute(router, "/dashboard")}
+              onClick={() => router.push("/dashboard")}
+            />
             <div>
               <Title level={3} style={{ margin: 0 }}>
                 {company?.company_name || (zh ? "公司综合结果" : "Company assessment")}
@@ -155,7 +174,7 @@ export default function CompanyAssessmentPage() {
           {loading ? (
             <div className="flex min-h-72 items-center justify-center"><Spin /></div>
           ) : (
-            <Table
+            <AssessmentTable
               rowKey={(row: any, index) => row.metric_id || `${row.Code || row.metric_code}-${index}`}
               columns={columns}
               dataSource={rows}

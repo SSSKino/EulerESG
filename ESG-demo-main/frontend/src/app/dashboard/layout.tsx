@@ -24,19 +24,6 @@ export default function DashboardLayout({
     }
   }, [router]);
 
-  useEffect(() => {
-    const rootLayout = document.getElementById("root-layout");
-    if (rootLayout) {
-      const timer = setTimeout(() => {
-        rootLayout.classList.add("loaded");
-      }, 100);
-      return () => {
-        clearTimeout(timer);
-        rootLayout.classList.remove("loaded");
-      };
-    }
-  }, []);
-
   return (
     <AntdRegistry>
       <Layout

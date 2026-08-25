@@ -131,6 +131,40 @@ function buildEdgeIndex<T extends GraphEdgeLike>(
   return index;
 }
 
+interface DisplayGraphIndex {
+  nodeSource: GraphDisplayData["nodes"];
+  edgeSource: GraphDisplayData["edges"];
+  nodeCount: number;
+  edgeCount: number;
+  validNodeIds: Set<string>;
+  edgeIndex: Map<string, IndexedGraphEdge<GraphDisplayData["edges"][number]>[]>;
+}
+
+const displayGraphIndexCache = new WeakMap<GraphDisplayData, DisplayGraphIndex>();
+
+function displayGraphIndex(data: GraphDisplayData): DisplayGraphIndex {
+  const cached = displayGraphIndexCache.get(data);
+  if (
+    cached
+    && cached.nodeSource === data.nodes
+    && cached.edgeSource === data.edges
+    && cached.nodeCount === data.nodes.length
+    && cached.edgeCount === data.edges.length
+  ) {
+    return cached;
+  }
+  const index: DisplayGraphIndex = {
+    nodeSource: data.nodes,
+    edgeSource: data.edges,
+    nodeCount: data.nodes.length,
+    edgeCount: data.edges.length,
+    validNodeIds: new Set(data.nodes.map((node) => node.id)),
+    edgeIndex: buildEdgeIndex(data.edges),
+  };
+  displayGraphIndexCache.set(data, index);
+  return index;
+}
+
 /**
  * Return a deterministic n-degree neighborhood for Kumu-style focus. The edge
  * index keeps this linear in the visible graph instead of rescanning every edge
@@ -141,12 +175,11 @@ export function graphNeighborhood(
   seedIds: string[],
   degree: number,
 ): { nodeIds: string[]; edgeIds: string[] } {
-  const validNodeIds = new Set(data.nodes.map((node) => node.id));
+  const { validNodeIds, edgeIndex } = displayGraphIndex(data);
   const includedNodes = new Set(
     seedIds.filter((nodeId) => validNodeIds.has(nodeId)),
   );
   const includedEdges = new Set<string>();
-  const edgeIndex = buildEdgeIndex(data.edges);
   let frontier = [...includedNodes];
   const maxDegree = Math.max(0, Math.floor(Number.isFinite(degree) ? degree : 0));
 
@@ -174,23 +207,36 @@ export function graphNeighborhood(
   };
 }
 
-function firstNodeOfType(
-  ids: string[],
-  nodesById: Map<string, DisclosureGraphNode>,
-  type: "report" | "metric" | "evidence",
-): DisclosureGraphNode | undefined {
-  return ids.map((id) => nodesById.get(id)).find((node) => node && normalizeNodeType(node.type) === type);
+interface CompiledDisclosureFilters {
+  reportIds?: Set<string>;
+  frameworks?: Set<string>;
+  scopes?: Set<string>;
+  years?: Set<string>;
+  topics?: Set<string>;
+  statuses?: Set<string>;
 }
 
-function matchesOne(value: string, selected: string[]): boolean {
-  return selected.length === 0 || selected.includes(value);
+function compileDisclosureFilters(filters: DisclosureGraphFilters): CompiledDisclosureFilters {
+  const selected = (values: string[]) => values.length ? new Set(values) : undefined;
+  return {
+    reportIds: selected(filters.reportIds),
+    frameworks: selected(filters.frameworks),
+    scopes: selected(filters.scopes),
+    years: selected(filters.years),
+    topics: selected(filters.topics),
+    statuses: selected(filters.statuses),
+  };
+}
+
+function matchesOne(value: string, selected?: Set<string>): boolean {
+  return !selected || selected.has(value);
 }
 
 function matchesDisclosureFilters(
   disclosure: DisclosureGraphNode,
   report: DisclosureGraphNode | undefined,
   metric: DisclosureGraphNode | undefined,
-  filters: DisclosureGraphFilters,
+  filters: CompiledDisclosureFilters,
 ): boolean {
   if (!report || !metric) return false;
   const reportProperties = report.properties;
@@ -359,6 +405,101 @@ function metricDisplayLabel(
   return `${code} — ${label}`;
 }
 
+interface IndexedDisclosureRelation {
+  disclosure: DisclosureGraphNode;
+  report?: DisclosureGraphNode;
+  metric?: DisclosureGraphNode;
+  evidence: Array<{ node: DisclosureGraphNode; relationType: string }>;
+}
+
+interface GraphProjectionIndex {
+  nodeSource: DisclosureGraphNode[];
+  edgeSource: DisclosureGraphEdge[];
+  nodeCount: number;
+  edgeCount: number;
+  disclosureRelations: IndexedDisclosureRelation[];
+  canonicalMetricFamilies: Map<string, DisclosureGraphNode[]>;
+  metricCurveTags: Map<string, string>;
+}
+
+// Graph responses are treated as immutable throughout the page (`setGraph`
+// replaces them after loading/expansion). Cache only topology-derived data so
+// filter, search and display-mode changes do not rebuild the O(N + E) index.
+const projectionIndexCache = new WeakMap<DisclosureGraphResponse, GraphProjectionIndex>();
+
+function graphProjectionIndex(graph: DisclosureGraphResponse): GraphProjectionIndex {
+  const cached = projectionIndexCache.get(graph);
+  if (
+    cached
+    && cached.nodeSource === graph.nodes
+    && cached.edgeSource === graph.edges
+    && cached.nodeCount === graph.nodes.length
+    && cached.edgeCount === graph.edges.length
+  ) {
+    return cached;
+  }
+
+  const nodesById = new Map<string, DisclosureGraphNode>();
+  const nodeTypesById = new Map<string, ReturnType<typeof normalizeNodeType>>();
+  const disclosures: DisclosureGraphNode[] = [];
+  for (const node of graph.nodes) {
+    const nodeType = normalizeNodeType(node.type);
+    nodesById.set(node.id, node);
+    nodeTypesById.set(node.id, nodeType);
+    if (nodeType === "disclosure") disclosures.push(node);
+  }
+
+  const edgeIndex = buildEdgeIndex(graph.edges);
+  const canonicalFamilyMembers = new Map<string, Map<string, DisclosureGraphNode>>();
+  const disclosureRelations: IndexedDisclosureRelation[] = [];
+
+  for (const disclosure of disclosures) {
+    let report: DisclosureGraphNode | undefined;
+    let metric: DisclosureGraphNode | undefined;
+    const evidence: IndexedDisclosureRelation["evidence"] = [];
+    for (const { edge, otherId } of edgeIndex.get(disclosure.id) || []) {
+      const node = nodesById.get(otherId);
+      if (!node) continue;
+      const nodeType = nodeTypesById.get(otherId);
+      if (nodeType === "report" && !report) report = node;
+      else if (nodeType === "metric" && !metric) metric = node;
+      else if (nodeType === "evidence") evidence.push({ node, relationType: edge.type });
+    }
+    disclosureRelations.push({ disclosure, report, metric, evidence });
+    if (report && metric) {
+      const code = metricCode(metric);
+      const family = canonicalFamilyMembers.get(code) ?? new Map<string, DisclosureGraphNode>();
+      family.set(metric.id, metric);
+      canonicalFamilyMembers.set(code, family);
+    }
+  }
+
+  const canonicalMetricFamilies = new Map<string, DisclosureGraphNode[]>();
+  const metricCurveTags = new Map<string, string>();
+  for (const [code, family] of canonicalFamilyMembers) {
+    const metrics = [...family.values()].sort(metricSort);
+    canonicalMetricFamilies.set(code, metrics);
+    metrics.forEach((metric, index) => {
+      metricCurveTags.set(
+        metric.id,
+        curvatureTag(curvatureForMetric(index, metrics.length)),
+      );
+    });
+  }
+
+  const index: GraphProjectionIndex = {
+    nodeSource: graph.nodes,
+    edgeSource: graph.edges,
+    nodeCount: graph.nodes.length,
+    edgeCount: graph.edges.length,
+    disclosureRelations,
+    canonicalMetricFamilies,
+    metricCurveTags,
+  };
+  projectionIndexCache.set(graph, index);
+  return index;
+}
+
 /**
  * Produces the visual graph without mutating the canonical response. In overview
  * mode each Disclosure is projected to one report-to-metric edge, while the
@@ -369,83 +510,47 @@ export function deriveGraphDisplayData(
   filters: DisclosureGraphFilters,
   mode: GraphDisplayMode,
 ): GraphDisplayData {
-  const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
-  const edgeIndex = buildEdgeIndex(graph.edges);
-  const disclosures = graph.nodes.filter((node) => normalizeNodeType(node.type) === "disclosure");
-  const includedDisclosures = new Set<string>();
-  const canonicalMetricFamilies = new Map<string, DisclosureGraphNode[]>();
-  const disclosureRelations = new Map<
-    string,
-    {
-      report?: DisclosureGraphNode;
-      metric?: DisclosureGraphNode;
-      evidence: Array<{ node: DisclosureGraphNode; relationType: string }>;
-    }
-  >();
-
-  for (const disclosure of disclosures) {
-    const relations = edgeIndex.get(disclosure.id) || [];
-    const neighborIds = relations.map((relation) => relation.otherId);
-    const report = firstNodeOfType(neighborIds, nodesById, "report");
-    const metric = firstNodeOfType(neighborIds, nodesById, "metric");
-    const evidence = relations.flatMap(({ edge, otherId }) => {
-      const node = nodesById.get(otherId);
-      if (!node || normalizeNodeType(node.type) !== "evidence") return [];
-      return [{ node, relationType: edge.type }];
-    });
-    disclosureRelations.set(disclosure.id, { report, metric, evidence });
-    if (report && metric) {
-      const code = metricCode(metric);
-      const family = canonicalMetricFamilies.get(code) ?? [];
-      if (!family.some((item) => item.id === metric.id)) family.push(metric);
-      canonicalMetricFamilies.set(code, family);
-    }
-    if (matchesDisclosureFilters(disclosure, report, metric, filters)) {
-      includedDisclosures.add(disclosure.id);
-    }
-  }
+  const {
+    disclosureRelations,
+    canonicalMetricFamilies,
+    metricCurveTags,
+  } = graphProjectionIndex(graph);
+  const compiledFilters = compileDisclosureFilters(filters);
+  const includedRelations = disclosureRelations.filter(({ disclosure, report, metric }) =>
+    matchesDisclosureFilters(disclosure, report, metric, compiledFilters));
 
   const visibleNodeIds = new Set<string>();
   const displayEdges: GraphDisplayData["edges"] = [];
   const collapsedMetricCodes = new Set(filters.collapsedMetricCodes);
   const metricGroups = new Map<
     string,
-    { id: string; metrics: DisclosureGraphNode[]; disclosures: DisclosureGraphNode[] }
+    {
+      id: string;
+      metrics: DisclosureGraphNode[];
+      metricIds: Set<string>;
+      disclosures: DisclosureGraphNode[];
+    }
   >();
 
-  // Build the visible code family before projecting edges. It controls which
-  // nodes are rendered, while canonicalMetricFamilies above controls stable
-  // curve assignment independently of report/status/topic filters.
-  for (const disclosureId of includedDisclosures) {
-    const disclosure = nodesById.get(disclosureId)!;
-    const relation = disclosureRelations.get(disclosureId)!;
-    const metric = relation.metric!;
+  // Visible groups control rendering, while the cached canonical families
+  // control stable curve assignment independently of active filters.
+  for (const relation of includedRelations) {
+    const { disclosure, report: relationReport, metric: relationMetric } = relation;
+    const report = relationReport!;
+    const metric = relationMetric!;
     const code = metricCode(metric);
-    const groupId = `metric-group:${encodeURIComponent(code)}`;
-    const group = metricGroups.get(code) ?? { id: groupId, metrics: [], disclosures: [] };
-    if (!group.metrics.some((item) => item.id === metric.id)) group.metrics.push(metric);
+    const group = metricGroups.get(code) ?? {
+      id: `metric-group:${encodeURIComponent(code)}`,
+      metrics: [],
+      metricIds: new Set<string>(),
+      disclosures: [],
+    };
+    if (!group.metricIds.has(metric.id)) {
+      group.metricIds.add(metric.id);
+      group.metrics.push(metric);
+    }
     group.disclosures.push(disclosure);
     metricGroups.set(code, group);
-  }
-
-  const metricCurveTags = new Map<string, string>();
-  for (const metrics of canonicalMetricFamilies.values()) {
-    metrics.sort(metricSort);
-    metrics.forEach((metric, index) => {
-      metricCurveTags.set(
-        metric.id,
-        curvatureTag(curvatureForMetric(index, metrics.length)),
-      );
-    });
-  }
-
-  for (const disclosureId of includedDisclosures) {
-    const disclosure = nodesById.get(disclosureId)!;
-    const relation = disclosureRelations.get(disclosureId)!;
-    const report = relation.report!;
-    const metric = relation.metric!;
-    const code = metricCode(metric);
-    const group = metricGroups.get(code)!;
     const curveTag = metricCurveTags.get(metric.id) || "curve-0";
     let metricTargetId = metric.id;
 
@@ -519,16 +624,19 @@ export function deriveGraphDisplayData(
 
   const displayNodes: GraphDisplayData["nodes"] = graph.nodes
     .filter((node) => visibleNodeIds.has(node.id))
-    .map((node) => ({
-      ...node,
-      short_label: normalizeNodeType(node.type) === "metric" ? metricCode(node) : node.label,
-      display_label: normalizeNodeType(node.type) === "metric"
-        ? metricDisplayLabel(
-            node,
-            (canonicalMetricFamilies.get(metricCode(node))?.length || 1) === 1,
-          )
-        : node.label,
-    }));
+    .map((node) => {
+      const isMetric = normalizeNodeType(node.type) === "metric";
+      return {
+        ...node,
+        short_label: isMetric ? metricCode(node) : node.label,
+        display_label: isMetric
+          ? metricDisplayLabel(
+              node,
+              (canonicalMetricFamilies.get(metricCode(node))?.length || 1) === 1,
+            )
+          : node.label,
+      };
+    });
 
   for (const [code, group] of metricGroups) {
     const collapsed = collapsedMetricCodes.has(code);
@@ -576,7 +684,7 @@ export function deriveGraphDisplayData(
     edges: displayEdges.filter(
       (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target),
     ),
-    underlyingDisclosureCount: includedDisclosures.size,
+    underlyingDisclosureCount: includedRelations.length,
   };
 }
 
@@ -688,24 +796,47 @@ export function parseStoredGraphPositions(
 }
 
 export function graphFilterOptions(graph: DisclosureGraphResponse) {
-  const reports = graph.nodes.filter((node) => normalizeNodeType(node.type) === "report");
-  const metrics = graph.nodes.filter((node) => normalizeNodeType(node.type) === "metric");
-  const disclosures = graph.nodes.filter((node) => normalizeNodeType(node.type) === "disclosure");
-  const unique = (values: string[]) => [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const frameworks = new Set<string>();
+  const scopes = new Set<string>();
+  const years = new Set<string>();
+  const topics = new Set<string>();
+  const statuses = new Set<string>();
+  const metricCodeCounts = new Map<string, number>();
+  const add = (values: Set<string>, value: string) => {
+    if (value) values.add(value);
+  };
+
+  add(frameworks, graph.framework || "");
+  add(scopes, graph.scope_key || "");
+  for (const node of graph.nodes) {
+    add(frameworks, propertyString(node.properties, "framework"));
+    add(scopes, propertyString(node.properties, "scope_key", "scope"));
+    const nodeType = normalizeNodeType(node.type);
+    if (nodeType === "report") {
+      add(years, propertyString(node.properties, "report_year", "year"));
+    } else if (nodeType === "metric") {
+      add(topics, propertyString(node.properties, "topic", "category", "dimension"));
+      const code = metricCode(node);
+      if (code) metricCodeCounts.set(code, (metricCodeCounts.get(code) || 0) + 1);
+    } else if (nodeType === "disclosure") {
+      add(statuses, disclosureStatus(node));
+    }
+  }
+
+  const alphabetical = (values: Set<string>) =>
+    [...values].sort((left, right) => left.localeCompare(right));
+  const orderedMetricCounts = [...metricCodeCounts.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([code, count]) => ({ code, count }));
   return {
-    frameworks: unique([
-      ...graph.nodes.map((node) => propertyString(node.properties, "framework")),
-      graph.framework || "",
-    ]),
-    scopes: unique([
-      ...graph.nodes.map((node) => propertyString(node.properties, "scope_key", "scope")),
-      graph.scope_key || "",
-    ]),
-    years: unique(reports.map((node) => propertyString(node.properties, "report_year", "year"))).sort(
+    frameworks: alphabetical(frameworks),
+    scopes: alphabetical(scopes),
+    years: [...years].sort(
       (a, b) => Number(b) - Number(a),
     ),
-    topics: unique(metrics.map((node) => propertyString(node.properties, "topic", "category", "dimension"))),
-    statuses: unique(disclosures.map(disclosureStatus)),
-    metricCodes: unique(metrics.map(metricCode)),
+    topics: alphabetical(topics),
+    statuses: alphabetical(statuses),
+    metricCodes: orderedMetricCounts.map(({ code }) => code),
+    metricCodeCounts: orderedMetricCounts,
   };
 }

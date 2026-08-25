@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import AnalysisResults from "./AnalysisResults";
 import type { AnalysisDataItem, EvidencePageTarget } from "./AnalysisResults";
-import ChatInterface from "./ChatInterface";
-import ComplianceSummaryDrawer from "./ComplianceSummaryDrawer";
 import { ChevronDown, ChevronUp, FileText, MessageCircle, X } from "lucide-react";
 import { useT } from "@/i18n/useT";
 import type { File as FileData } from "@/store/useFileStore";
@@ -51,6 +49,20 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 
 const PDFReportViewer = dynamic(() => import("./PDFChatViewer"), { ssr: false });
 const MemoizedPDFReportViewer = React.memo(PDFReportViewer);
+const ChatInterface = dynamic(() => import("./ChatInterface"), {
+  ssr: false,
+  loading: () => (
+    <div
+      aria-busy="true"
+      aria-label="Loading AI Assistant"
+      className="h-full min-h-64 animate-pulse bg-slate-50"
+    />
+  ),
+});
+const ComplianceSummaryDrawer = dynamic(
+  () => import("./ComplianceSummaryDrawer"),
+  { ssr: false },
+);
 // Use same-origin proxy via Next.js rewrites by default.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -84,6 +96,7 @@ const ChatView: React.FC<ChatViewProps> = ({
 }) => {
   const { t } = useT();
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [assistantLoaded, setAssistantLoaded] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [analysisMetrics, setAnalysisMetrics] = useState<AnalysisDataItem[]>([]);
   const [showAnalysisTable, setShowAnalysisTable] = useState<boolean>(true);
@@ -242,16 +255,18 @@ const ChatView: React.FC<ChatViewProps> = ({
         }`}
       >
         <div className="flex h-full min-h-0 flex-col">
-          <ChatInterface
-            messages={messages}
-            onSendMessage={onSendMessage}
-            onClearChat={onClearChat}
-            onClose={closeAssistant}
-            onReferenceClick={(page) => {
-              navigateToPage({ page });
-              closeAssistant();
-            }}
-          />
+          {assistantLoaded ? (
+            <ChatInterface
+              messages={messages}
+              onSendMessage={onSendMessage}
+              onClearChat={onClearChat}
+              onClose={closeAssistant}
+              onReferenceClick={(page) => {
+                navigateToPage({ page });
+                closeAssistant();
+              }}
+            />
+          ) : null}
         </div>
       </section>
 
@@ -261,6 +276,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         {...assistantDragProps}
         onClick={() => {
           setSummaryOpen(false);
+          setAssistantLoaded(true);
           setAssistantOpen((open) => !open);
         }}
         className={`dashboard-chat-launcher draggable-assistant-launcher fixed z-[51] flex h-12 items-center gap-2 rounded-full px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 ${
@@ -277,12 +293,14 @@ const ChatView: React.FC<ChatViewProps> = ({
         </span>
       </button>
 
-      <ComplianceSummaryDrawer
-        metrics={analysisMetrics}
-        open={summaryOpen}
-        onClose={() => setSummaryOpen(false)}
-        reportName={activeFile?.name}
-      />
+      {summaryOpen ? (
+        <ComplianceSummaryDrawer
+          metrics={analysisMetrics}
+          open
+          onClose={() => setSummaryOpen(false)}
+          reportName={activeFile?.name}
+        />
+      ) : null}
     </div>
   );
 };
