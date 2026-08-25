@@ -3,6 +3,31 @@
  */
 
 import { errorSummary } from "@/lib/logger";
+import type {
+  DisclosureGraphEdge,
+  DisclosureGraphNode,
+  DisclosureGraphNeighborsQuery,
+  DisclosureGraphQuery,
+  DisclosureGraphResponse,
+} from "@/features/graph/types";
+
+function normalizeDisclosureGraphResponse(
+  payload: DisclosureGraphResponse,
+): DisclosureGraphResponse {
+  return {
+    ...payload,
+    nodes: (payload.nodes || []).map((node) => {
+      const raw = node as DisclosureGraphNode & { kind?: string; type?: string };
+      const type = String(raw.type || raw.kind || "other");
+      return { ...node, kind: raw.kind || type, type };
+    }),
+    edges: (payload.edges || []).map((edge) => {
+      const raw = edge as DisclosureGraphEdge & { kind?: string; type?: string };
+      const type = String(raw.type || raw.kind || "relationship");
+      return { ...edge, kind: raw.kind || type, type };
+    }),
+  };
+}
 
 // Prefer same-origin proxy via Next.js rewrites. If you need to bypass Next,
 // set NEXT_PUBLIC_API_BASE_URL to a full backend URL.
@@ -10,7 +35,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const STANDARDS_METRICS_CACHE_TTL_MS = 10 * 60 * 1000;
 const STANDARDS_METRICS_CACHE_MAX_ENTRIES = 32;
 
-class ApiRequestError extends Error {
+export class ApiRequestError extends Error {
   readonly status: number;
 
   constructor(message: string, status: number) {
@@ -648,6 +673,82 @@ class APIService {
     return this.fetchWithError(
       `${API_BASE_URL}/api/companies/${encodeURIComponent(companyId)}/assessment${query}`
     );
+  }
+
+  private disclosureGraphQuery(query: DisclosureGraphQuery = {}): string {
+    const params = new URLSearchParams();
+    if (query.scope) params.set("scope", query.scope);
+    params.set("include_evidence", String(query.includeEvidence === true));
+    if (query.evidenceLimit !== undefined) {
+      params.set("evidence_limit", String(query.evidenceLimit));
+    }
+    const reportIds = [...new Set((query.reportIds || []).map(String).map((id) => id.trim()).filter(Boolean))];
+    if (reportIds.length) {
+      params.set("report_ids", reportIds.join(","));
+      reportIds.forEach((reportId) => params.append("report_id", reportId));
+    }
+    return params.toString();
+  }
+
+  async getCompanyDisclosureGraph(
+    companyId: string,
+    query: DisclosureGraphQuery = {},
+  ): Promise<DisclosureGraphResponse> {
+    const search = this.disclosureGraphQuery(query);
+    const payload = await this.fetchWithError(
+      `${API_BASE_URL}/api/companies/${encodeURIComponent(companyId)}/disclosure-graph${search ? `?${search}` : ""}`,
+      { signal: query.signal },
+    );
+    return normalizeDisclosureGraphResponse(payload as DisclosureGraphResponse);
+  }
+
+  async getReportDisclosureGraph(
+    fileId: string,
+    query: DisclosureGraphQuery = {},
+  ): Promise<DisclosureGraphResponse> {
+    const search = this.disclosureGraphQuery(query);
+    const payload = await this.fetchWithError(
+      `${API_BASE_URL}/api/reports/${encodeURIComponent(fileId)}/disclosure-graph${search ? `?${search}` : ""}`,
+      { signal: query.signal },
+    );
+    return normalizeDisclosureGraphResponse(payload as DisclosureGraphResponse);
+  }
+
+  private disclosureGraphNeighborsQuery(query: DisclosureGraphNeighborsQuery): string {
+    const params = new URLSearchParams({ node_id: query.nodeId });
+    if (query.scope) params.set("scope", query.scope);
+    if (query.depth !== undefined) params.set("depth", String(query.depth));
+    if (query.evidenceLimit !== undefined) {
+      params.set("evidence_limit", String(query.evidenceLimit));
+    }
+    const reportIds = [...new Set((query.reportIds || []).map(String).map((id) => id.trim()).filter(Boolean))];
+    if (reportIds.length) {
+      params.set("report_ids", reportIds.join(","));
+      reportIds.forEach((reportId) => params.append("report_id", reportId));
+    }
+    return params.toString();
+  }
+
+  async getCompanyDisclosureGraphNeighbors(
+    companyId: string,
+    query: DisclosureGraphNeighborsQuery,
+  ): Promise<DisclosureGraphResponse> {
+    const payload = await this.fetchWithError(
+      `${API_BASE_URL}/api/companies/${encodeURIComponent(companyId)}/disclosure-graph/neighbors?${this.disclosureGraphNeighborsQuery(query)}`,
+      { signal: query.signal },
+    );
+    return normalizeDisclosureGraphResponse(payload as DisclosureGraphResponse);
+  }
+
+  async getReportDisclosureGraphNeighbors(
+    fileId: string,
+    query: DisclosureGraphNeighborsQuery,
+  ): Promise<DisclosureGraphResponse> {
+    const payload = await this.fetchWithError(
+      `${API_BASE_URL}/api/reports/${encodeURIComponent(fileId)}/disclosure-graph/neighbors?${this.disclosureGraphNeighborsQuery(query)}`,
+      { signal: query.signal },
+    );
+    return normalizeDisclosureGraphResponse(payload as DisclosureGraphResponse);
   }
 
   async retryReportBatch(batchId: string): Promise<ReportBatchUploadResponse> {

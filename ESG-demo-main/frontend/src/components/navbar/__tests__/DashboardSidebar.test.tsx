@@ -475,6 +475,39 @@ describe("DashboardSidebar Standards Library", () => {
   });
 });
 
+describe("DashboardSidebar Graph Exploration", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.pathname = "/dashboard";
+    mocks.search = "";
+    window.localStorage.clear();
+  });
+
+  it("opens the interactive graph from a first-level navigation item", () => {
+    render(<DashboardSidebar />);
+
+    const library = screen.getByRole("button", { name: "Standards Library" });
+    const graph = screen.getByRole("button", { name: "Graph Exploration" });
+    expect(library.nextElementSibling).toBe(graph);
+
+    fireEvent.click(graph);
+    expect(mocks.push).toHaveBeenCalledWith("/dashboard/graph");
+  });
+
+  it("marks Graph Exploration current on its route and keeps it usable when collapsed", async () => {
+    mocks.pathname = "/dashboard/graph";
+    render(<DashboardSidebar />);
+
+    const graph = screen.getByRole("button", { name: "Graph Exploration" });
+    expect(graph).toHaveAttribute("aria-current", "page");
+    expect(graph).toHaveClass("bg-[#ececec]");
+
+    fireEvent.click(screen.getByRole("button", { name: "Collapse sidebar" }));
+    await waitFor(() => expect(graph).toHaveAttribute("title", "Graph Exploration"));
+    expect(graph).toBeVisible();
+  });
+});
+
 describe("DashboardSidebar cross-analysis navigation directory", () => {
   beforeEach(() => {
     vi.clearAllMocks();

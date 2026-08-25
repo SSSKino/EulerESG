@@ -1,11 +1,17 @@
 /** @type {import('next').NextConfig} */
 
+const { PHASE_DEVELOPMENT_SERVER } = require("next/constants");
+
 const showDevTools = /^(1|true|yes|on)$/i.test(
   (process.env.NEXT_PUBLIC_SHOW_DEV_TOOLS || "").trim(),
 );
 
-const nextConfig = {
+/** @param {string} phase */
+const createNextConfig = (phase) => ({
   reactStrictMode: true,
+  // Development and production builds must never share webpack chunks or an
+  // RSC client manifest. `next build` always keeps the standard `.next` path.
+  distDir: phase === PHASE_DEVELOPMENT_SERVER ? ".next-dev" : ".next",
 
   // Keep recently visited route bundles warm in development. The application
   // has several large workspaces; letting Next evict them quickly makes a
@@ -49,6 +55,6 @@ const nextConfig = {
   },
 
   devIndicators: showDevTools ? { position: "bottom-right" } : false,
-};
+});
 
-module.exports = nextConfig;
+module.exports = createNextConfig;

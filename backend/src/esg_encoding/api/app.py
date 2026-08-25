@@ -30,6 +30,7 @@ from .routers import (
     chat,
     compliance,
     cross_analysis,
+    disclosure_graph,
     excel_metrics,
     files,
     reports,
@@ -149,3 +150,4 @@ app.include_router(files.router)
 app.include_router(cross_analysis.router)
 app.include_router(excel_metrics.router)
 app.include_router(standards_library.router)
+app.include_router(disclosure_graph.router)

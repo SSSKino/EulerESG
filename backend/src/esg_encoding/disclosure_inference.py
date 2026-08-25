@@ -486,8 +486,8 @@ class DisclosureInferenceEngine:
             metrics = list(all_metrics.metrics)
             concurrency = _positive_env_int(
                 "REPORT_DISCLOSURE_LLM_CONCURRENCY",
-                4,
-                maximum=8,
+                200,
+                maximum=200,
             )
             concurrency = min(concurrency, max(1, len(metrics)))
             logger.info(

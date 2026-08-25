@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RefCallback } from "react";
-import { BarChart3, Check, HelpCircle, House, Languages, LibraryBig, ListChecks, LogOut, PanelLeftClose, PanelLeftOpen, Repeat2, Settings, ShieldCheck, Star } from "lucide-react";
+import { BarChart3, Check, HelpCircle, House, Languages, LibraryBig, ListChecks, LogOut, Network, PanelLeftClose, PanelLeftOpen, Repeat2, Settings, ShieldCheck, Star } from "lucide-react";
 import { App as AntdApp } from "antd";
 import EulerLogo from "@/assets/Euler-Img.svg";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -261,6 +261,7 @@ export default function DashboardSidebar({
   };
   const isFavourite = pathname.startsWith("/dashboard/favourite");
   const isStandardsLibrary = pathname.startsWith("/dashboard/standards-library");
+  const isGraphExploration = pathname.startsWith("/dashboard/graph");
   const navigationClass = (active: boolean) =>
     `flex h-10 w-full shrink-0 items-center rounded-xl transition-colors ${
       active
@@ -424,6 +425,18 @@ export default function DashboardSidebar({
         >
           <LibraryBig className={`h-[18px] w-[18px] shrink-0 ${isStandardsLibrary ? "text-[#2274BC]" : ""}`} />
           {!collapsed && <span className="truncate text-sm">Standards Library</span>}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push("/dashboard/graph")}
+          onFocus={() => prefetchRoute("/dashboard/graph")}
+          onMouseEnter={() => prefetchRoute("/dashboard/graph")}
+          className={navigationClass(isGraphExploration)}
+          title={collapsed ? "Graph Exploration" : undefined}
+          aria-current={isGraphExploration ? "page" : undefined}
+        >
+          <Network className={`h-[18px] w-[18px] shrink-0 ${isGraphExploration ? "text-[#2274BC]" : ""}`} />
+          {!collapsed && <span className="truncate text-sm">Graph Exploration</span>}
         </button>
       </nav>
 

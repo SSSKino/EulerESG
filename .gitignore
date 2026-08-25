@@ -40,6 +40,7 @@ node_modules/
 **/node_modules/
 .next/
 **/.next/
+**/.next-dev/
 .turbo/
 .vercel/
 npm-debug.log*
