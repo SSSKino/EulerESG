@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   convertAssessmentData,
   getEmptyQuantitativeValueTranslationKey,
+  getMetricDefinitionText,
 } from "../AnalysisResults";
 
 const metric = (page: unknown, evidenceSources: unknown[] = []) => ({
@@ -36,6 +37,40 @@ describe("AnalysisResults evidence navigation", () => {
   it("keeps the generic placeholder for other empty values", () => {
     expect(getEmptyQuantitativeValueTranslationKey("none")).toBe(
       "analysis.summary.notSpecified",
+    );
+  });
+
+  it("uses the complete simple definition before the technical definition", () => {
+    const simpleDefinition = [
+      "Report the current-period energy consumed.",
+      "Include the required scope, calculation basis, and breakdowns.",
+    ].join("\n\n");
+    const [item] = convertAssessmentData({
+      metric_analyses: [
+        {
+          ...metric(12),
+          simple_definition: simpleDefinition,
+          definition: "Long technical definition that should not be displayed.",
+        },
+      ],
+    });
+
+    expect(item.simple_definition).toBe(simpleDefinition);
+    expect(getMetricDefinitionText(item)).toBe(simpleDefinition);
+  });
+
+  it("falls back to the technical definition for legacy assessments", () => {
+    const [item] = convertAssessmentData({
+      metric_analyses: [
+        {
+          ...metric(12),
+          definition: "Legacy definition, including its final sentence.",
+        },
+      ],
+    });
+
+    expect(getMetricDefinitionText(item)).toBe(
+      "Legacy definition, including its final sentence.",
     );
   });
 

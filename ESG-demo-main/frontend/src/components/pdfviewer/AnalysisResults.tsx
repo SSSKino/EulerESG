@@ -21,6 +21,7 @@ export type AnalysisDataItem = {
   page?: string | number | null;
   evidenceTarget?: EvidencePageTarget | null;
   context?: string | null;
+  simple_definition?: string | null;
   definition?: string | null;
   visualEvidence?: {
     asset_id: string;
@@ -246,6 +247,19 @@ const pickValue = (...vals: any[]) => {
   return null;
 };
 
+const cleanDefinitionText = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const text = value.replace(/\r\n?/g, "\n").trim();
+  return text || null;
+};
+
+export const getMetricDefinitionText = (
+  metric: Pick<AnalysisDataItem, "simple_definition" | "definition">,
+): string =>
+  cleanDefinitionText(metric.simple_definition)
+  || cleanDefinitionText(metric.definition)
+  || "";
+
 export const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
   (assessment?.metric_analyses || [])
     .filter((item: any) => {
@@ -330,10 +344,12 @@ export const convertAssessmentData = (assessment: any): AnalysisDataItem[] =>
         page: page ?? null,
         evidenceTarget,
         context: extractContextText(contextRaw) || null,
-        definition:
-          typeof (item?.definition ?? item?.Definition) === "string"
-            ? String(item?.definition ?? item?.Definition).trim() || null
-            : null,
+        simple_definition: cleanDefinitionText(
+          item?.simple_definition
+          ?? item?.simpleDefinition
+          ?? item?.["Simple Definition"],
+        ),
+        definition: cleanDefinitionText(item?.definition ?? item?.Definition),
         visualEvidence,
         tableEvidence,
       };
@@ -481,9 +497,26 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
         key: "metric_name",
         width: 200,
         render: (_value: string, record: AnalysisDataItem) => {
-          const definitionText = (record.definition || "").trim();
+          const definitionText = getMetricDefinitionText(record);
           const definitionContent = definitionText ? (
-            <div className="max-w-md p-2 text-sm whitespace-pre-wrap">{definitionText}</div>
+            <div
+              className="w-[min(34rem,calc(100vw-3rem))] max-h-[min(60vh,32rem)] overflow-y-auto px-1 py-1"
+              data-testid="metric-simple-definition"
+            >
+              <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-slate-100 pb-2">
+                {record.metric_code ? (
+                  <span className="rounded bg-emerald-50 px-2 py-0.5 font-mono text-xs font-semibold text-emerald-800">
+                    {record.metric_code}
+                  </span>
+                ) : null}
+                <span className="text-xs font-medium text-slate-500">
+                  {record.metric_name}
+                </span>
+              </div>
+              <p className="m-0 whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">
+                {definitionText}
+              </p>
+            </div>
           ) : null;
 
           return (
@@ -491,14 +524,22 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
               <div className="min-w-0 flex-1 whitespace-normal break-words">{record.metric_name}</div>
               {definitionText && (
                 <div className="shrink-0 self-center">
-                  <Popover content={definitionContent} title={null} trigger="hover" mouseEnterDelay={0.2}>
-                    <span
-                      className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-700 text-[11px] font-semibold leading-none cursor-pointer select-none"
-                      aria-label={t("analysis.columns.metric")}
+                  <Popover
+                    content={definitionContent}
+                    title={<span className="text-sm font-semibold text-slate-800">Simple Definition</span>}
+                    trigger={["hover", "focus"]}
+                    mouseEnterDelay={0.15}
+                    placement="rightTop"
+                    destroyOnHidden
+                  >
+                    <button
+                      type="button"
+                      className="inline-flex h-5 w-5 cursor-help select-none items-center justify-center rounded-full border border-emerald-300 bg-emerald-50 text-xs font-bold leading-none text-emerald-800 transition-colors hover:border-emerald-500 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1"
+                      aria-label={`Simple definition: ${record.metric_name}`}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      !
-                    </span>
+                      i
+                    </button>
                   </Popover>
                 </div>
               )}

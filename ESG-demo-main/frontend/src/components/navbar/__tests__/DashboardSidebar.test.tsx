@@ -216,6 +216,7 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     mocks.search = "";
     mocks.getCrossAnalysisReports.mockResolvedValue({ reports: [] });
     window.localStorage.clear();
+    window.sessionStorage.clear();
   });
 
   it("configures vertical boundary chaining for the sidebar", () => {
@@ -228,6 +229,29 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     expect(
       screen.getByRole("navigation", { name: "Dashboard navigation" }),
     ).not.toHaveClass("overscroll-contain");
+  });
+
+  it("keeps every unclicked navigation icon neutral", () => {
+    mocks.pathname = "/dashboard/graph";
+    render(<DashboardSidebar />);
+
+    const navigation = screen.getByRole("navigation", {
+      name: "Dashboard navigation",
+    });
+    const icons = [...navigation.querySelectorAll("svg")];
+    expect(icons.length).toBeGreaterThan(0);
+    icons.forEach((icon) => {
+      expect(icon).toHaveClass("text-slate-600");
+      expect(icon).not.toHaveClass("text-[#2274BC]");
+    });
+
+    fireEvent.click(screen.getByRole("link", { name: "Graph Exploration" }));
+
+    expect(
+      screen.getByRole("link", { name: "Graph Exploration" }).querySelector("svg"),
+    ).toHaveClass("text-[#2274BC]");
+    expect(screen.getByRole("link", { name: "Homepage" }).querySelector("svg"))
+      .not.toHaveClass("text-[#2274BC]");
   });
 
   it("prefetches heavy report routes only after navigation intent", () => {
@@ -354,6 +378,7 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     expect(disclosure).toHaveAttribute("aria-current", "page");
     expect(crossAnalysis).not.toHaveClass("bg-[#ececec]");
     expect(crossAnalysis).not.toHaveAttribute("aria-current");
+    expect(crossAnalysis.querySelector("svg")).not.toHaveClass("text-[#2274BC]");
     expect(crossAnalysis.nextElementSibling).toBe(subnavigation);
     expect(
       within(subnavigation).queryByTestId("cross-analysis-navigation-slot"),

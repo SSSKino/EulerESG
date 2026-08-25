@@ -1755,6 +1755,7 @@ def _compact_assessment_payload(payload: dict) -> dict:
         "value",
         "page",
         "context",
+        "simple_definition",
         "definition",
         "selected_year",
         "value_status",

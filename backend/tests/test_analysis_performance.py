@@ -674,6 +674,7 @@ class CompactAssessmentPayloadTests(unittest.TestCase):
                     "value": 87,
                     "page": 108,
                     "context": "Employee engagement: 87%",
+                    "simple_definition": "Report the percentage of employees who are engaged.",
                     "definition": "Percentage of employees who are engaged.",
                     "evidence_segments": ["large-segment" * 100],
                     "year_values": [{"year": 2024, "value": 87}],
@@ -712,6 +713,10 @@ class CompactAssessmentPayloadTests(unittest.TestCase):
         self.assertEqual(metric["value"], 87)
         self.assertEqual(metric["page"], 108)
         self.assertEqual(metric["context"], "Employee engagement: 87%")
+        self.assertEqual(
+            metric["simple_definition"],
+            "Report the percentage of employees who are engaged.",
+        )
         self.assertNotIn("evidence_segments", metric)
         self.assertNotIn("year_values", metric)
         self.assertNotIn("Value", metric)

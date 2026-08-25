@@ -256,7 +256,7 @@ function DetailDrawer({
       }
       open={open}
       onClose={onClose}
-      width={430}
+      size={430}
       styles={{ body: { padding: 20 }, header: { borderBottomColor: "#e2e8f0" } }}
     >
       {node ? (

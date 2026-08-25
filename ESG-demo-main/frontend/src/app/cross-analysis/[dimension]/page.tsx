@@ -286,6 +286,11 @@ function CrossAnalysisDimensionPageContent() {
   const [selectedSecondaries, setSelectedSecondaries] = useState<string[]>([]);
   const [selectedTertiary, setSelectedTertiary] = useState<string | null>(null);
   const [expandedPrimaries, setExpandedPrimaries] = useState<Record<string, boolean>>({});
+  const [navigationSelectionTouched, setNavigationSelectionTouched] = useState(false);
+
+  useEffect(() => {
+    setNavigationSelectionTouched(false);
+  }, [idsKey]);
 
   // Resolve selectedPrimary / Secondaries / Tertiary (metric) from URL after data arrives.
   useEffect(() => {
@@ -508,6 +513,7 @@ const buildNavUrl = useCallback(
 const handleTogglePrimary = useCallback(
   (primary: string) => {
     setViewMode("issue");
+    setNavigationSelectionTouched(true);
     setExpandedPrimaries((prev) => ({ ...prev, [primary]: safeTrim(selectedPrimary) === primary ? !prev?.[primary] : true }));
 
     if (safeTrim(selectedPrimary) !== primary) {
@@ -524,6 +530,7 @@ const handleTogglePrimary = useCallback(
 const handleSelectSecondary = useCallback(
   (primary: string, secondary: string) => {
     setViewMode("issue");
+    setNavigationSelectionTouched(true);
     setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
 
     const currentOrder = secondaryByPrimary.get(primary) || [];
@@ -544,6 +551,7 @@ const handleSelectSecondary = useCallback(
 const handleSelectTertiary = useCallback(
   (primary: string, secondary: string, metricName: string) => {
     setViewMode("issue");
+    setNavigationSelectionTouched(true);
     setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
 
     const isSameMetric =
@@ -839,6 +847,9 @@ const handleSelectTertiary = useCallback(
                   secondaryByPrimary={secondaryByPrimary}
                   tertiaryByPrimaryAndSecondary={tertiaryByPrimaryAndSecondary}
                   selectedPrimary={selectedPrimary}
+                  highlightedPrimary={
+                    navigationSelectionTouched ? selectedPrimary : ""
+                  }
                   selectedSecondaries={selectedSecondaries}
                   selectedTertiary={selectedTertiary}
                   expandedPrimaries={expandedPrimaries}

@@ -67,6 +67,17 @@ const preloadWorkspace = (loader: () => Promise<unknown>) => {
 };
 
 const SIDEBAR_STORAGE_KEY = "dashboard-sidebar-collapsed";
+const SIDEBAR_NAV_SELECTION_KEY = "dashboard-sidebar-navigation-selection";
+const SIDEBAR_NAV_KEYS = [
+  "homepage",
+  "compliance",
+  "cross-analysis",
+  "disclosure-completeness",
+  "favourite",
+  "standards-library",
+  "graph-exploration",
+] as const;
+type SidebarNavigationKey = (typeof SIDEBAR_NAV_KEYS)[number];
 
 function reportKey(file: Pick<File, "file_id" | "analysis_scope_key">) {
   return `${file.file_id}::${file.analysis_scope_key || ""}`;
@@ -100,6 +111,7 @@ export default function DashboardSidebar({
   const { lang, setLang } = useAppLang();
   const { t } = useT();
   const [collapsed, setCollapsed] = useState(false);
+  const [clickedNavigationKey, setClickedNavigationKey] = useState<SidebarNavigationKey | null>(null);
   const [displayName, setDisplayName] = useState("User");
   const [selectorMode, setSelectorMode] = useState<DashboardReportSelectorMode | null>(null);
   const [selectedReportKeys, setSelectedReportKeys] = useState<string[]>([]);
@@ -122,6 +134,11 @@ export default function DashboardSidebar({
     const stored = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
     setCollapsed(stored === null ? window.innerWidth < 768 : stored === "true");
 
+    const storedNavigationKey = window.sessionStorage.getItem(SIDEBAR_NAV_SELECTION_KEY);
+    if (SIDEBAR_NAV_KEYS.includes(storedNavigationKey as SidebarNavigationKey)) {
+      setClickedNavigationKey(storedNavigationKey as SidebarNavigationKey);
+    }
+
     const auth = getStoredAuth();
     if (auth?.name || auth?.email) setDisplayName(auth.name || auth.email || "User");
   }, []);
@@ -137,6 +154,11 @@ export default function DashboardSidebar({
       window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next));
       return next;
     });
+  };
+
+  const markNavigationSelection = (key: SidebarNavigationKey) => {
+    setClickedNavigationKey(key);
+    window.sessionStorage.setItem(SIDEBAR_NAV_SELECTION_KEY, key);
   };
 
   const handleLogout = () => {
@@ -291,6 +313,23 @@ export default function DashboardSidebar({
   const isFavourite = pathname.startsWith("/dashboard/favourite");
   const isStandardsLibrary = pathname.startsWith("/dashboard/standards-library");
   const isGraphExploration = pathname.startsWith("/dashboard/graph");
+  const blueIconClass = (selected: boolean) =>
+    selected ? "text-[#2274BC]" : "text-slate-600";
+  const homepageClicked = clickedNavigationKey === "homepage" && isHomepage;
+  const complianceClicked =
+    clickedNavigationKey === "compliance" &&
+    (isCompliance || selectorMode === "compliance");
+  const crossAnalysisClicked =
+    clickedNavigationKey === "cross-analysis" &&
+    (isCrossAnalysis || selectorMode === "cross");
+  const disclosureCompletenessClicked =
+    clickedNavigationKey === "disclosure-completeness" &&
+    (isDisclosureCompleteness || selectorMode === "disclosure");
+  const favouriteClicked = clickedNavigationKey === "favourite" && isFavourite;
+  const standardsLibraryClicked =
+    clickedNavigationKey === "standards-library" && isStandardsLibrary;
+  const graphExplorationClicked =
+    clickedNavigationKey === "graph-exploration" && isGraphExploration;
   const navigationClass = (active: boolean) =>
     `flex h-10 w-full shrink-0 items-center rounded-xl transition-colors ${
       active
@@ -335,6 +374,7 @@ export default function DashboardSidebar({
               onPointerDown={prefetchHomepage}
               onFocus={prefetchHomepage}
               onMouseEnter={prefetchHomepage}
+              onClick={() => markNavigationSelection("homepage")}
               className="flex h-10 min-w-0 items-center gap-2.5 rounded-xl bg-transparent px-2 text-left hover:bg-[#ececec]"
               aria-label={t("nav.goToAllFiles")}
             >
@@ -365,28 +405,35 @@ export default function DashboardSidebar({
           onPointerDown={prefetchHomepage}
           onFocus={prefetchHomepage}
           onMouseEnter={prefetchHomepage}
+          onClick={() => markNavigationSelection("homepage")}
           className={navigationClass(isHomepage)}
           title={collapsed ? "Homepage" : undefined}
           aria-current={isHomepage ? "page" : undefined}
         >
-          <House className={`h-[18px] w-[18px] shrink-0 ${isHomepage ? "text-[#2274BC]" : ""}`} />
+          <House className={`h-[18px] w-[18px] shrink-0 ${blueIconClass(homepageClicked)}`} />
           {!collapsed && <span className="truncate text-sm">Homepage</span>}
         </Link>
         <button
           type="button"
-          onClick={() => openReportSelector("compliance")}
+          onClick={() => {
+            markNavigationSelection("compliance");
+            openReportSelector("compliance");
+          }}
           onPointerDown={() => prefetchReportFlow("compliance")}
           onFocus={() => prefetchReportFlow("compliance")}
           onMouseEnter={() => prefetchReportFlow("compliance")}
           className={navigationClass(isCompliance)}
           title={collapsed ? "Compliance" : undefined}
         >
-          <ShieldCheck className={`h-[18px] w-[18px] shrink-0 ${isCompliance ? "text-[#2274BC]" : ""}`} />
+          <ShieldCheck className={`h-[18px] w-[18px] shrink-0 ${blueIconClass(complianceClicked)}`} />
           {!collapsed && <span className="truncate text-sm">Compliance</span>}
         </button>
         <button
           type="button"
-          onClick={() => openReportSelector("cross")}
+          onClick={() => {
+            markNavigationSelection("cross-analysis");
+            openReportSelector("cross");
+          }}
           onPointerDown={() => prefetchReportFlow("cross")}
           onFocus={() => prefetchReportFlow("cross")}
           onMouseEnter={() => prefetchReportFlow("cross")}
@@ -394,7 +441,7 @@ export default function DashboardSidebar({
           title={collapsed ? "Cross Analysis" : undefined}
           aria-current={isCrossAnalysis ? "page" : undefined}
         >
-          <BarChart3 className={`h-[18px] w-[18px] shrink-0 ${isCrossAnalysisRoute ? "text-[#2274BC]" : ""}`} />
+          <BarChart3 className={`h-[18px] w-[18px] shrink-0 ${blueIconClass(crossAnalysisClicked)}`} />
           {!collapsed && <span className="truncate text-sm">Cross Analysis</span>}
         </button>
         <div
@@ -406,7 +453,10 @@ export default function DashboardSidebar({
           <button
             type="button"
             data-testid="disclosure-completeness-nav"
-            onClick={handleDisclosureCompletenessClick}
+            onClick={() => {
+              markNavigationSelection("disclosure-completeness");
+              handleDisclosureCompletenessClick();
+            }}
             onPointerDown={() => prefetchReportFlow("disclosure")}
             onFocus={() => prefetchReportFlow("disclosure")}
             onMouseEnter={() => prefetchReportFlow("disclosure")}
@@ -424,7 +474,7 @@ export default function DashboardSidebar({
             title={collapsed ? t("crossAnalysis.disclosureCompleteness") : undefined}
           >
             {collapsed ? (
-              <ListChecks className={`h-4 w-4 shrink-0 ${isDisclosureCompleteness ? "text-[#2274BC]" : ""}`} />
+              <ListChecks className={`h-4 w-4 shrink-0 ${blueIconClass(disclosureCompletenessClicked)}`} />
             ) : (
               <span className="truncate text-sm font-medium">{t("crossAnalysis.disclosureCompleteness")}</span>
             )}
@@ -444,11 +494,12 @@ export default function DashboardSidebar({
           onPointerDown={prefetchFavourite}
           onFocus={prefetchFavourite}
           onMouseEnter={prefetchFavourite}
+          onClick={() => markNavigationSelection("favourite")}
           className={navigationClass(isFavourite)}
           title={collapsed ? "Favourite" : undefined}
           aria-current={isFavourite ? "page" : undefined}
         >
-          <Star className={`h-[18px] w-[18px] shrink-0 ${isFavourite ? "text-[#2274BC]" : ""}`} />
+          <Star className={`h-[18px] w-[18px] shrink-0 ${blueIconClass(favouriteClicked)}`} />
           {!collapsed && <span className="truncate text-sm">Favourite</span>}
         </Link>
         <Link
@@ -457,11 +508,12 @@ export default function DashboardSidebar({
           onPointerDown={prefetchStandardsLibrary}
           onFocus={prefetchStandardsLibrary}
           onMouseEnter={prefetchStandardsLibrary}
+          onClick={() => markNavigationSelection("standards-library")}
           className={navigationClass(isStandardsLibrary)}
           title={collapsed ? "Standards Library" : undefined}
           aria-current={isStandardsLibrary ? "page" : undefined}
         >
-          <LibraryBig className={`h-[18px] w-[18px] shrink-0 ${isStandardsLibrary ? "text-[#2274BC]" : ""}`} />
+          <LibraryBig className={`h-[18px] w-[18px] shrink-0 ${blueIconClass(standardsLibraryClicked)}`} />
           {!collapsed && <span className="truncate text-sm">Standards Library</span>}
         </Link>
         <Link
@@ -470,11 +522,12 @@ export default function DashboardSidebar({
           onPointerDown={() => prefetchRoute("/dashboard/graph")}
           onFocus={() => prefetchRoute("/dashboard/graph")}
           onMouseEnter={() => prefetchRoute("/dashboard/graph")}
+          onClick={() => markNavigationSelection("graph-exploration")}
           className={navigationClass(isGraphExploration)}
           title={collapsed ? "Graph Exploration" : undefined}
           aria-current={isGraphExploration ? "page" : undefined}
         >
-          <Network className={`h-[18px] w-[18px] shrink-0 ${isGraphExploration ? "text-[#2274BC]" : ""}`} />
+          <Network className={`h-[18px] w-[18px] shrink-0 ${blueIconClass(graphExplorationClicked)}`} />
           {!collapsed && <span className="truncate text-sm">Graph Exploration</span>}
         </Link>
       </nav>

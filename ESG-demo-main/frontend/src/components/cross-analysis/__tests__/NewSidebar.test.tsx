@@ -66,4 +66,32 @@ describe("NewSidebar", () => {
     expect(directory).not.toHaveClass("rounded-2xl");
     expect(directory).not.toHaveClass("shadow-sm");
   });
+
+  it("does not paint a default data category blue before the user selects navigation", () => {
+    render(
+      <NewSidebar
+        embedded
+        expandedPrimaries={{ Environment: true }}
+        highlightedPrimary=""
+        onSelectSecondary={vi.fn()}
+        onSelectTertiary={vi.fn()}
+        onTogglePrimary={vi.fn()}
+        primaryOptions={["Environment"]}
+        secondaryByPrimary={new Map([["Environment", ["Energy"]]])}
+        selectedPrimary="Environment"
+        selectedSecondaries={["Energy"]}
+        selectedTertiary={null}
+        tertiaryByPrimaryAndSecondary={new Map()}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Environment" })).not.toHaveClass(
+      "bg-[#EFF6FF]",
+      "border-[#BFDBFE]",
+    );
+    expect(screen.getByRole("button", { name: "Energy" })).not.toHaveClass(
+      "bg-[#EFF6FF]",
+      "border-[#BFDBFE]",
+    );
+  });
 });

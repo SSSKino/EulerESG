@@ -23,7 +23,9 @@ const createNextConfig = (phase) => ({
 
   // Turbopack substantially reduces cold route compilation time in the
   // Docker development workspace. Keep this on stable Next.js options only.
-  turbopack: {},
+  // A concrete root also tells Next that Turbopack is intentionally configured,
+  // avoiding the misleading "Webpack is configured" development warning.
+  turbopack: { root: __dirname },
 
   /**
    * Proxy backend routes through Next.js so the browser always talks to the same origin.
