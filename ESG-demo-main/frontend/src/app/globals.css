@@ -98,6 +98,25 @@
   --dashboard-user-entry-height: 4rem;
 }
 
+/* Ant Design injects an unlayered global `a` color, which otherwise wins over
+   Tailwind's layered text utilities and turns sidebar links blue. Keep all
+   unclicked/current link labels neutral; click feedback is handled separately
+   by the icon state in DashboardSidebar. */
+aside[data-collapsed] nav[aria-label="Dashboard navigation"] a,
+aside[data-collapsed] nav[aria-label="Dashboard navigation"] a:visited {
+  color: #334155 !important;
+}
+
+aside[data-collapsed]
+  nav[aria-label="Dashboard navigation"]
+  a[aria-current="page"] {
+  color: #0f172a !important;
+}
+
+aside[data-collapsed] nav[aria-label="Dashboard navigation"] a:hover {
+  color: #020617 !important;
+}
+
 .dashboard-chat-launcher {
   right: auto;
   bottom: calc(

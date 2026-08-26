@@ -1066,30 +1066,41 @@ describe("DisclosureGraphCanvas G6 behavior routing contract", () => {
     expect(brush.enable({ targetType: "edge" })).toBe(false);
   });
 
-  it("keeps a wheel burst in pan mode while routing Ctrl pinch to zoom", async () => {
+  it("supports touchpad, modified wheel, and pinch zoom without wheel panning", async () => {
     renderCanvas();
     const graph = await graphReady();
-    const scroll = g6Behavior(graph, "scroll-canvas");
-    const zoom = g6Behavior(graph, "zoom-canvas");
-    const pinchZoom = g6Behavior(graph, "zoom-canvas", 1);
-    const trackpadStart = {
-      nativeEvent: { deltaMode: 0, deltaX: 2, deltaY: 18, timeStamp: 100 },
-    };
-    const sameBurstLargeDelta = {
-      nativeEvent: { deltaMode: 0, deltaX: 0, deltaY: 120, timeStamp: 180 },
-    };
-    const ctrlPinch = {
-      nativeEvent: { ctrlKey: true, deltaMode: 0, deltaY: 160, timeStamp: 220 },
-    };
+    const wheelZoom = g6Behavior(graph, "zoom-canvas");
+    const controlWheelZoom = g6Behavior(graph, "zoom-canvas", 1);
+    const metaWheelZoom = g6Behavior(graph, "zoom-canvas", 2);
+    const pinchZoom = g6Behavior(graph, "zoom-canvas", 3);
 
-    expect(scroll.enable(trackpadStart)).toBe(true);
-    expect(zoom.enable(trackpadStart)).toBe(false);
-    expect(scroll.enable(sameBurstLargeDelta)).toBe(true);
-    expect(zoom.enable(sameBurstLargeDelta)).toBe(false);
-    expect(scroll.enable(ctrlPinch)).toBe(false);
-    expect(zoom.enable(ctrlPinch)).toBe(true);
-    expect(zoom.sensitivity).toBe(0.28);
-    expect(pinchZoom).toMatchObject({ trigger: ["pinch"], sensitivity: 0.65 });
+    expect(wheelZoom).toMatchObject({
+      key: "wheel-zoom",
+      trigger: [],
+      sensitivity: 0.28,
+      preventDefault: true,
+    });
+    expect(controlWheelZoom).toMatchObject({
+      key: "control-wheel-zoom",
+      trigger: ["Control"],
+      sensitivity: 0.28,
+      preventDefault: true,
+    });
+    expect(metaWheelZoom).toMatchObject({
+      key: "meta-wheel-zoom",
+      trigger: ["Meta"],
+      sensitivity: 0.28,
+      preventDefault: true,
+    });
+    expect(pinchZoom).toMatchObject({
+      key: "pinch-zoom",
+      trigger: ["pinch"],
+      sensitivity: 0.65,
+      preventDefault: true,
+    });
+    expect(graph.options.behaviors).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: "scroll-canvas" })]),
+    );
   });
 
   it("continues a quick canvas pan with one bounded release glide", async () => {

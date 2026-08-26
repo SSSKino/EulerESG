@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { NewSidebar } from "../NewSidebar";
@@ -71,8 +71,8 @@ describe("NewSidebar", () => {
     render(
       <NewSidebar
         embedded
+        directSelection={null}
         expandedPrimaries={{ Environment: true }}
-        highlightedPrimary=""
         onSelectSecondary={vi.fn()}
         onSelectTertiary={vi.fn()}
         onTogglePrimary={vi.fn()}
@@ -87,11 +87,106 @@ describe("NewSidebar", () => {
 
     expect(screen.getByRole("button", { name: "Environment" })).not.toHaveClass(
       "bg-[#EFF6FF]",
+    );
+    expect(screen.getByRole("button", { name: "Environment" })).not.toHaveClass(
       "border-[#BFDBFE]",
     );
     expect(screen.getByRole("button", { name: "Energy" })).not.toHaveClass(
       "bg-[#EFF6FF]",
+    );
+    expect(screen.getByRole("button", { name: "Energy" })).not.toHaveClass(
       "border-[#BFDBFE]",
     );
+  });
+
+  it("highlights only the navigation level directly selected by the user", () => {
+    const commonProps = {
+      embedded: true,
+      expandedPrimaries: { Environment: true },
+      onSelectSecondary: vi.fn(),
+      onSelectTertiary: vi.fn(),
+      onTogglePrimary: vi.fn(),
+      primaryOptions: ["Environment"],
+      secondaryByPrimary: new Map([["Environment", ["Energy"]]]),
+      selectedPrimary: "Environment",
+      selectedSecondaries: ["Energy"],
+      selectedTertiary: null,
+      tertiaryByPrimaryAndSecondary: new Map(),
+    };
+    const view = render(
+      <NewSidebar
+        {...commonProps}
+        directSelection={{ level: "primary", primary: "Environment" }}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Environment" })).toHaveClass(
+      "bg-[#EFF6FF]",
+    );
+    expect(screen.getByRole("button", { name: "Energy" })).not.toHaveClass(
+      "bg-[#EFF6FF]",
+    );
+
+    view.rerender(
+      <NewSidebar
+        {...commonProps}
+        directSelection={{
+          level: "secondary",
+          primary: "Environment",
+          secondary: "Energy",
+        }}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Environment" })).not.toHaveClass(
+      "bg-[#EFF6FF]",
+    );
+    expect(screen.getByRole("button", { name: "Energy" })).toHaveClass(
+      "bg-[#EFF6FF]",
+    );
+  });
+
+  it("highlights a tertiary item only inside its selected secondary branch", () => {
+    render(
+      <NewSidebar
+        embedded
+        directSelection={{
+          level: "tertiary",
+          metricName: "Shared Metric",
+          primary: "Environment",
+          secondary: "Energy",
+        }}
+        expandedPrimaries={{ Environment: true }}
+        onSelectSecondary={vi.fn()}
+        onSelectTertiary={vi.fn()}
+        onTogglePrimary={vi.fn()}
+        primaryOptions={["Environment"]}
+        secondaryByPrimary={new Map([
+          ["Environment", ["Energy", "Water"]],
+        ])}
+        selectedPrimary="Environment"
+        selectedSecondaries={["Energy"]}
+        selectedTertiary="Shared Metric"
+        tertiaryByPrimaryAndSecondary={new Map([
+          [
+            "Environment",
+            new Map([
+              ["Energy", ["Shared Metric"]],
+              ["Water", ["Shared Metric"]],
+            ]),
+          ],
+        ])}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Energy" })[1]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Water" })[1]);
+
+    const sharedMetrics = screen.getAllByRole("button", {
+      name: "Shared Metric",
+    });
+    expect(sharedMetrics).toHaveLength(2);
+    expect(sharedMetrics[0]).toHaveClass("bg-[#DBEAFE]");
+    expect(sharedMetrics[1]).not.toHaveClass("bg-[#DBEAFE]");
   });
 });

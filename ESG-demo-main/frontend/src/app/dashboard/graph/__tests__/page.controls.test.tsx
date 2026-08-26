@@ -1,9 +1,10 @@
 import type { ForwardedRef, PropsWithChildren } from "react";
 
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  actualSize: vi.fn(),
   dynamicIndex: 0,
   getCompanies: vi.fn(),
   getReportDisclosureGraph: vi.fn(),
@@ -12,6 +13,8 @@ const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
   selectChanges: {} as Record<string, ((value: unknown) => void) | undefined>,
   selectRenderCount: 0,
+  zoomIn: vi.fn(),
+  zoomOut: vi.fn(),
 }));
 
 vi.mock("next/dynamic", async () => {
@@ -22,9 +25,13 @@ vi.mock("next/dynamic", async () => {
       if (index === 0) {
         return React.forwardRef(function MockGraphCanvas(
           props: Record<string, unknown>,
-          _ref: ForwardedRef<unknown>,
+          ref: ForwardedRef<unknown>,
         ) {
-          void _ref;
+          React.useImperativeHandle(ref, () => ({
+            actualSize: mocks.actualSize,
+            zoomIn: mocks.zoomIn,
+            zoomOut: mocks.zoomOut,
+          }));
           mocks.graphCanvasProps = props;
           return React.createElement("div", { "data-testid": "mock-graph-canvas" });
         });
@@ -135,10 +142,13 @@ vi.mock("@/store/useFileStore", () => ({
 
 describe("Graph Exploration Kumu control placement", () => {
   beforeEach(() => {
+    mocks.actualSize.mockReset();
     mocks.dynamicIndex = 0;
     mocks.graphCanvasProps = null;
     mocks.selectChanges = {};
     mocks.selectRenderCount = 0;
+    mocks.zoomIn.mockReset();
+    mocks.zoomOut.mockReset();
     mocks.getCompanies.mockResolvedValue({ companies: [] });
     mocks.getReportDisclosureGraph.mockResolvedValue({
       schema_version: "1.0",
@@ -174,6 +184,64 @@ describe("Graph Exploration Kumu control placement", () => {
       expect(legend).toHaveTextContent("Partially disclosed");
       expect(legend).toHaveTextContent("Not disclosed");
     });
+  });
+
+  it("routes Control and Command zoom shortcuts to the graph canvas", async () => {
+    mocks.getReportDisclosureGraph.mockResolvedValueOnce({
+      schema_version: "1.0",
+      graph_revision: "revision-with-keyboard-zoom",
+      nodes: [
+        {
+          id: "report:file-1",
+          type: "Report",
+          label: "Example ESG Report",
+          properties: { file_id: "file-1", report_year: 2024 },
+        },
+        {
+          id: "metric:one",
+          type: "MetricItem",
+          label: "Energy metric",
+          properties: { metric_code: "TC-TEST-000.A" },
+        },
+        {
+          id: "disclosure:one",
+          type: "Disclosure",
+          label: "Energy disclosure",
+          properties: { disclosure_status: "fully_disclosed" },
+        },
+      ],
+      edges: [
+        {
+          id: "has:one",
+          type: "has_disclosure",
+          source: "report:file-1",
+          target: "disclosure:one",
+          properties: {},
+        },
+        {
+          id: "assesses:one",
+          type: "assesses",
+          source: "disclosure:one",
+          target: "metric:one",
+          properties: {},
+        },
+      ],
+      stats: { node_count: 3, edge_count: 2 },
+      truncated: false,
+    });
+
+    const { default: GraphExplorationPage } = await import("../page");
+    render(<GraphExplorationPage />);
+    expect(await screen.findByTestId("mock-graph-canvas")).toBeVisible();
+
+    fireEvent.keyDown(window, { key: "=", ctrlKey: true });
+    fireEvent.keyDown(window, { key: "-", ctrlKey: true });
+    fireEvent.keyDown(window, { key: "0", ctrlKey: true });
+    fireEvent.keyDown(window, { key: "+", metaKey: true });
+
+    expect(mocks.zoomIn).toHaveBeenCalledTimes(2);
+    expect(mocks.zoomOut).toHaveBeenCalledTimes(1);
+    expect(mocks.actualSize).toHaveBeenCalledTimes(1);
   });
 
   it("summarizes multi-select filters by count instead of selected labels", async () => {

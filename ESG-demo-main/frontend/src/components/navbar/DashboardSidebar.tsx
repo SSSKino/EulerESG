@@ -67,17 +67,14 @@ const preloadWorkspace = (loader: () => Promise<unknown>) => {
 };
 
 const SIDEBAR_STORAGE_KEY = "dashboard-sidebar-collapsed";
-const SIDEBAR_NAV_SELECTION_KEY = "dashboard-sidebar-navigation-selection";
-const SIDEBAR_NAV_KEYS = [
-  "homepage",
-  "compliance",
-  "cross-analysis",
-  "disclosure-completeness",
-  "favourite",
-  "standards-library",
-  "graph-exploration",
-] as const;
-type SidebarNavigationKey = (typeof SIDEBAR_NAV_KEYS)[number];
+type SidebarNavigationKey =
+  | "homepage"
+  | "compliance"
+  | "cross-analysis"
+  | "disclosure-completeness"
+  | "favourite"
+  | "standards-library"
+  | "graph-exploration";
 
 function reportKey(file: Pick<File, "file_id" | "analysis_scope_key">) {
   return `${file.file_id}::${file.analysis_scope_key || ""}`;
@@ -134,11 +131,6 @@ export default function DashboardSidebar({
     const stored = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
     setCollapsed(stored === null ? window.innerWidth < 768 : stored === "true");
 
-    const storedNavigationKey = window.sessionStorage.getItem(SIDEBAR_NAV_SELECTION_KEY);
-    if (SIDEBAR_NAV_KEYS.includes(storedNavigationKey as SidebarNavigationKey)) {
-      setClickedNavigationKey(storedNavigationKey as SidebarNavigationKey);
-    }
-
     const auth = getStoredAuth();
     if (auth?.name || auth?.email) setDisplayName(auth.name || auth.email || "User");
   }, []);
@@ -158,7 +150,6 @@ export default function DashboardSidebar({
 
   const markNavigationSelection = (key: SidebarNavigationKey) => {
     setClickedNavigationKey(key);
-    window.sessionStorage.setItem(SIDEBAR_NAV_SELECTION_KEY, key);
   };
 
   const handleLogout = () => {
@@ -333,8 +324,8 @@ export default function DashboardSidebar({
   const navigationClass = (active: boolean) =>
     `flex h-10 w-full shrink-0 items-center rounded-xl transition-colors ${
       active
-        ? "bg-[#ececec] text-slate-900 hover:bg-[#e5e5e5]"
-        : "text-slate-700 hover:bg-[#ececec] hover:text-slate-950"
+        ? "bg-[#ececec] text-slate-900 visited:text-slate-900 hover:bg-[#e5e5e5]"
+        : "text-slate-700 visited:text-slate-700 hover:bg-[#ececec] hover:text-slate-950"
     } ${collapsed ? "justify-center px-2" : "gap-3 px-2.5"}`;
 
   return (

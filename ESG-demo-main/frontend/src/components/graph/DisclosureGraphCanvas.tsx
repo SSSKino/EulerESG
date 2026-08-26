@@ -591,46 +591,6 @@ function isShiftModifiedGesture(event: unknown): boolean {
   return Boolean(raw?.shiftKey);
 }
 
-function createWheelPanClassifier(): (event: unknown) => boolean {
-  let burstMode: "pan" | "zoom" | null = null;
-  let burstExpiresAt = 0;
-  return (event: unknown) => {
-    const raw = ((event as { nativeEvent?: unknown })?.nativeEvent || event) as {
-      ctrlKey?: boolean;
-      deltaMode?: number;
-      deltaX?: number;
-      deltaY?: number;
-      timeStamp?: number;
-      wheelDeltaY?: number;
-    };
-    if (!raw) return false;
-
-    const eventTimestamp = Number(raw.timeStamp);
-    const timestamp = Number.isFinite(eventTimestamp) && eventTimestamp > 0
-      ? eventTimestamp
-      : performance.now();
-    if (raw.ctrlKey) {
-      burstMode = "zoom";
-      burstExpiresAt = timestamp + 180;
-      return false;
-    }
-
-    if (burstMode === null || timestamp > burstExpiresAt) {
-      const deltaX = Math.abs(Number(raw.deltaX || 0));
-      const deltaY = Math.abs(Number(raw.deltaY || 0));
-      const wheelDeltaY = Math.abs(Number(raw.wheelDeltaY || 0));
-      const quantizedMouseWheel = wheelDeltaY >= 100 && Math.abs(wheelDeltaY % 120) < 1;
-      burstMode = deltaX > 0 || (
-        raw.deltaMode === 0 && !quantizedMouseWheel && deltaY > 0 && deltaY < 80
-      )
-        ? "pan"
-        : "zoom";
-    }
-    burstExpiresAt = timestamp + 180;
-    return burstMode === "pan";
-  };
-}
-
 const DisclosureGraphCanvas = memo(forwardRef<
   DisclosureGraphCanvasHandle,
   DisclosureGraphCanvasProps
@@ -1012,7 +972,6 @@ const DisclosureGraphCanvas = memo(forwardRef<
     let canvasPanActive = false;
     let canvasPanLastTime = 0;
     let canvasPanVelocity = { x: 0, y: 0 };
-    const isWheelPanGesture = createWheelPanClassifier();
     const wrappedLabelCache = new Map<string, string>();
     const validIds = initialData.nodes.map((node) => node.id);
     let rawStoredPositions: string | null = null;
@@ -1427,8 +1386,24 @@ const DisclosureGraphCanvas = memo(forwardRef<
           {
             type: "zoom-canvas",
             key: "wheel-zoom",
+            // G6 treats an empty shortcut as an unmodified wheel gesture.
             trigger: [],
-            enable: (event: unknown) => !isWheelPanGesture(event),
+            sensitivity: 0.28,
+            preventDefault: true,
+            onFinish: refreshZoomLabels,
+          },
+          {
+            type: "zoom-canvas",
+            key: "control-wheel-zoom",
+            trigger: ["Control"],
+            sensitivity: 0.28,
+            preventDefault: true,
+            onFinish: refreshZoomLabels,
+          },
+          {
+            type: "zoom-canvas",
+            key: "meta-wheel-zoom",
+            trigger: ["Meta"],
             sensitivity: 0.28,
             preventDefault: true,
             onFinish: refreshZoomLabels,
@@ -1440,13 +1415,6 @@ const DisclosureGraphCanvas = memo(forwardRef<
             sensitivity: 0.65,
             preventDefault: true,
             onFinish: refreshZoomLabels,
-          },
-          {
-            type: "scroll-canvas",
-            enable: isWheelPanGesture,
-            sensitivity: 0.9,
-            range: 2,
-            preventDefault: true,
           },
           {
             type: "drag-element-force",
@@ -2047,7 +2015,7 @@ const DisclosureGraphCanvas = memo(forwardRef<
         tabIndex={0}
         aria-label="Interactive disclosure graph"
         aria-describedby="graph-canvas-instructions"
-        aria-keyshortcuts="S / [ ] A P Alt+P Escape ArrowUp ArrowDown ArrowLeft ArrowRight"
+        aria-keyshortcuts="Control+= Control+- Control+0 Meta+= Meta+- Meta+0 S / [ ] A P Alt+P Escape ArrowUp ArrowDown ArrowLeft ArrowRight"
       />
       {showMinimap ? (
         <div className="pointer-events-auto absolute bottom-3 right-3 z-[3] overflow-hidden rounded-xl border border-[#C2CBC8] bg-[#FAFBF9]/95 p-1.5 shadow-lg backdrop-blur">
@@ -2097,7 +2065,7 @@ const DisclosureGraphCanvas = memo(forwardRef<
         </div>
       ) : null}
       <span id="graph-canvas-instructions" className="sr-only">
-        Drag to pan, wheel or pinch to zoom, Shift-drag to select, and press question mark for shortcuts.
+        Drag to pan; use a mouse wheel, touchpad, Control or Command plus wheel, or pinch to zoom. Shift-drag selects nodes, and question mark opens shortcuts.
       </span>
     </div>
   );

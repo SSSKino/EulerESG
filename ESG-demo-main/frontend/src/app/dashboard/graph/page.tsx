@@ -320,7 +320,8 @@ function GraphShortcutHelp({ open, onClose }: { open: boolean; onClose: () => vo
       title: "Navigate",
       items: [
         ["S or /", "Search the current map"],
-        ["[ / ]", "Zoom out / in"],
+        ["[ / ] or Ctrl/Cmd + - / =", "Zoom out / in"],
+        ["Ctrl/Cmd + 0", "Reset zoom to 100%"],
         ["Arrow keys", "Pan the canvas"],
         ["F", "Fit the full graph"],
         ["Alt + F", "Fullscreen graph page"],
@@ -1051,6 +1052,21 @@ function GraphExplorationContent() {
       if (event.altKey && key === "f") {
         event.preventDefault();
         void toggleFullscreen(event.shiftKey ? "canvas" : "page");
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && (event.key === "+" || event.key === "=")) {
+        event.preventDefault();
+        void canvasRef.current?.zoomIn();
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && (event.key === "-" || event.key === "_")) {
+        event.preventDefault();
+        void canvasRef.current?.zoomOut();
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === "0") {
+        event.preventDefault();
+        void canvasRef.current?.actualSize();
         return;
       }
       if (key === "s" || event.key === "/") {

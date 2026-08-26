@@ -18,6 +18,10 @@ const mocks = vi.hoisted(() => ({
   search: "",
 }));
 
+beforeEach(() => {
+  window.sessionStorage.clear();
+});
+
 vi.mock("next/navigation", () => ({
   usePathname: () => mocks.pathname,
   useRouter: () => ({
@@ -216,7 +220,6 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     mocks.search = "";
     mocks.getCrossAnalysisReports.mockResolvedValue({ reports: [] });
     window.localStorage.clear();
-    window.sessionStorage.clear();
   });
 
   it("configures vertical boundary chaining for the sidebar", () => {
@@ -233,6 +236,12 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
 
   it("keeps every unclicked navigation icon neutral", () => {
     mocks.pathname = "/dashboard/graph";
+    // A selection left by an older build must not make a freshly mounted
+    // sidebar blue before the user clicks anything in the current view.
+    window.sessionStorage.setItem(
+      "dashboard-sidebar-navigation-selection",
+      "graph-exploration",
+    );
     render(<DashboardSidebar />);
 
     const navigation = screen.getByRole("navigation", {
@@ -245,10 +254,18 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
       expect(icon).not.toHaveClass("text-[#2274BC]");
     });
 
-    fireEvent.click(screen.getByRole("link", { name: "Graph Exploration" }));
+    ["Favourite", "Standards Library", "Graph Exploration"].forEach((name) => {
+      expect(screen.getByRole("link", { name })).not.toHaveClass("text-[#2274BC]");
+    });
+
+    const graphLink = screen.getByRole("link", { name: "Graph Exploration" });
+    graphLink.addEventListener("click", (event) => event.preventDefault(), {
+      once: true,
+    });
+    fireEvent.click(graphLink);
 
     expect(
-      screen.getByRole("link", { name: "Graph Exploration" }).querySelector("svg"),
+      graphLink.querySelector("svg"),
     ).toHaveClass("text-[#2274BC]");
     expect(screen.getByRole("link", { name: "Homepage" }).querySelector("svg"))
       .not.toHaveClass("text-[#2274BC]");

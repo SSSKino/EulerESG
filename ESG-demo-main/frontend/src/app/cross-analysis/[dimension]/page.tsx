@@ -10,7 +10,10 @@ import { apiService } from "@/lib/api";
 import { warmAppRoute } from "@/lib/routeWarmup";
 import type { CrossExtractedRecord, CrossReportSummary } from "@/features/crossAnalysis/types";
 import { normalizeCrossRecords } from "@/features/crossAnalysis/recordAdapter";
-import { NewSidebar } from "@/components/cross-analysis/NewSidebar";
+import {
+  NewSidebar,
+  type DirectNavigationSelection,
+} from "@/components/cross-analysis/NewSidebar";
 import { useCrossAnalysisNavigationSlot } from "@/components/cross-analysis/CrossAnalysisNavigationPortal";
 import { NewHeader } from "@/components/cross-analysis/NewHeader";
 import type { MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
@@ -286,10 +289,11 @@ function CrossAnalysisDimensionPageContent() {
   const [selectedSecondaries, setSelectedSecondaries] = useState<string[]>([]);
   const [selectedTertiary, setSelectedTertiary] = useState<string | null>(null);
   const [expandedPrimaries, setExpandedPrimaries] = useState<Record<string, boolean>>({});
-  const [navigationSelectionTouched, setNavigationSelectionTouched] = useState(false);
+  const [directNavigationSelection, setDirectNavigationSelection] =
+    useState<DirectNavigationSelection | null>(null);
 
   useEffect(() => {
-    setNavigationSelectionTouched(false);
+    setDirectNavigationSelection(null);
   }, [idsKey]);
 
   // Resolve selectedPrimary / Secondaries / Tertiary (metric) from URL after data arrives.
@@ -513,7 +517,7 @@ const buildNavUrl = useCallback(
 const handleTogglePrimary = useCallback(
   (primary: string) => {
     setViewMode("issue");
-    setNavigationSelectionTouched(true);
+    setDirectNavigationSelection({ level: "primary", primary });
     setExpandedPrimaries((prev) => ({ ...prev, [primary]: safeTrim(selectedPrimary) === primary ? !prev?.[primary] : true }));
 
     if (safeTrim(selectedPrimary) !== primary) {
@@ -530,7 +534,6 @@ const handleTogglePrimary = useCallback(
 const handleSelectSecondary = useCallback(
   (primary: string, secondary: string) => {
     setViewMode("issue");
-    setNavigationSelectionTouched(true);
     setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
 
     const currentOrder = secondaryByPrimary.get(primary) || [];
@@ -543,6 +546,9 @@ const handleSelectSecondary = useCallback(
     setSelectedPrimary(primary);
     setSelectedSecondaries(nextSecondaries);
     setSelectedTertiary(null);
+    setDirectNavigationSelection(
+      hasSecondary ? null : { level: "secondary", primary, secondary },
+    );
     updateCrossAnalysisHistory(buildNavUrl(primary, nextSecondaries, null), "replace");
   },
   [buildNavUrl, selectedPrimary, selectedSecondaries, secondaryByPrimary]
@@ -551,7 +557,6 @@ const handleSelectSecondary = useCallback(
 const handleSelectTertiary = useCallback(
   (primary: string, secondary: string, metricName: string) => {
     setViewMode("issue");
-    setNavigationSelectionTouched(true);
     setExpandedPrimaries((prev) => ({ ...prev, [primary]: true }));
 
     const isSameMetric =
@@ -566,6 +571,13 @@ const handleSelectTertiary = useCallback(
     setSelectedPrimary(primary);
     setSelectedSecondaries(nextSecondaries);
     setSelectedTertiary(nextMetric);
+    setDirectNavigationSelection(
+      isSameMetric
+        ? null
+        : primary === ACTIVITY_METRICS_PRIMARY
+          ? { level: "secondary", primary, secondary }
+          : { level: "tertiary", primary, secondary, metricName },
+    );
     updateCrossAnalysisHistory(buildNavUrl(primary, nextSecondaries, nextMetric), "replace");
   },
   [buildNavUrl, selectedPrimary, selectedSecondaries, selectedTertiary]
@@ -847,9 +859,7 @@ const handleSelectTertiary = useCallback(
                   secondaryByPrimary={secondaryByPrimary}
                   tertiaryByPrimaryAndSecondary={tertiaryByPrimaryAndSecondary}
                   selectedPrimary={selectedPrimary}
-                  highlightedPrimary={
-                    navigationSelectionTouched ? selectedPrimary : ""
-                  }
+                  directSelection={directNavigationSelection}
                   selectedSecondaries={selectedSecondaries}
                   selectedTertiary={selectedTertiary}
                   expandedPrimaries={expandedPrimaries}

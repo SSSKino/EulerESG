@@ -16,18 +16,23 @@ const CATEGORY_LABELS_NO_SECONDARY = new Set([
 ]);
 
 export type TertiaryMap = Map<string, Map<string, string[]>>;
+export type DirectNavigationSelection =
+  | { level: "primary"; primary: string }
+  | { level: "secondary"; primary: string; secondary: string }
+  | {
+      level: "tertiary";
+      primary: string;
+      secondary: string;
+      metricName: string;
+    };
 
 export interface NewSidebarProps {
   primaryOptions: string[];
   secondaryByPrimary: Map<string, string[]>;
   tertiaryByPrimaryAndSecondary: TertiaryMap;
   selectedPrimary: string;
-  /**
-   * Optional visual-selection override. The comparison page can use a default
-   * data category without painting it as user-selected before any navigation
-   * choice has been made.
-   */
-  highlightedPrimary?: string;
+  /** Only the option directly selected by the user receives blue styling. */
+  directSelection?: DirectNavigationSelection | null;
   selectedSecondaries: string[];
   selectedTertiary: string | null;
   expandedPrimaries: Record<string, boolean>;
@@ -54,7 +59,7 @@ export function NewSidebar({
   secondaryByPrimary,
   tertiaryByPrimaryAndSecondary,
   selectedPrimary,
-  highlightedPrimary,
+  directSelection = null,
   selectedSecondaries,
   selectedTertiary,
   expandedPrimaries,
@@ -66,9 +71,6 @@ export function NewSidebar({
   onSelectTertiary,
 }: NewSidebarProps) {
   const { t } = useT();
-  const visualPrimary = highlightedPrimary === undefined
-    ? selectedPrimary
-    : highlightedPrimary;
   const selectedSecondarySet = useMemo(() => new Set(selectedSecondaries || []), [selectedSecondaries]);
   const [expandedSecondaries, setExpandedSecondaries] = useState<Record<string, boolean>>({});
   const isActivityMetrics = primaryIsActivityMetrics && safeTrim(selectedPrimary) === "Activity Metrics";
@@ -90,7 +92,10 @@ export function NewSidebar({
       <div className="space-y-1">
         {primaryOptions.map((primary) => {
           const isExpanded = !!expandedPrimaries?.[primary];
-          const isActivePrimary = safeTrim(visualPrimary) === primary;
+          const isActivePrimary =
+            directSelection?.level === "primary" &&
+            directSelection.primary === primary &&
+            safeTrim(selectedPrimary) === primary;
           const rawSecondaries = secondaryByPrimary.get(primary) || [];
           const isActivityMetricsPrimary = primary === "Activity Metrics";
           const secondaries =
@@ -121,7 +126,12 @@ export function NewSidebar({
                 <div className="mt-1 ml-3 space-y-1">
                   {secondaries.length ? (
                     secondaries.map((secondary) => {
-                      const isSelectedSecondary = isActivePrimary && selectedSecondarySet.has(secondary);
+                      const isSelectedSecondary =
+                        directSelection?.level === "secondary" &&
+                        directSelection.primary === primary &&
+                        directSelection.secondary === secondary &&
+                        safeTrim(selectedPrimary) === primary &&
+                        selectedSecondarySet.has(secondary);
                       const tertiaries = secondaryActsAsLeaf ? [] : (innerTertiary?.get(secondary) || []);
                       const isExpandedSec = !!expandedSecondaries[secondaryKey(primary, secondary)];
                       const hasTertiaries = !secondaryActsAsLeaf && tertiaries.length > 0;
@@ -168,7 +178,13 @@ export function NewSidebar({
                             <div className="ml-3 mt-0.5 space-y-0.5">
                               {tertiaries.map((metricName) => {
                                 const isSelectedMetric =
-                                  isActivePrimary && selectedTertiary === metricName;
+                                  directSelection?.level === "tertiary" &&
+                                  directSelection.primary === primary &&
+                                  directSelection.secondary === secondary &&
+                                  directSelection.metricName === metricName &&
+                                  safeTrim(selectedPrimary) === primary &&
+                                  selectedSecondarySet.has(secondary) &&
+                                  selectedTertiary === metricName;
                                 return (
                                   <button
                                     key={metricName}
