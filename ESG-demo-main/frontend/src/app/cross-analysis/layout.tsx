@@ -1,6 +1,7 @@
 "use client";
 
 import React, { Suspense, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { Layout } from "antd";
 import DashboardSidebar from "@/components/navbar/DashboardSidebar";
 import { CrossAnalysisNavigationSlotContext } from "@/components/cross-analysis/CrossAnalysisNavigationPortal";
@@ -8,6 +9,11 @@ import { usePathname } from "next/navigation";
 import { AntdRegistry } from "@/lib/antd";
 
 const { Content } = Layout;
+
+const FloatingChatAssistant = dynamic(
+  () => import("@/components/cross-analysis/FloatingChatAssistant"),
+  { ssr: false },
+);
 
 export default function CrossAnalysisLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
@@ -20,7 +26,15 @@ export default function CrossAnalysisLayout({ children }: { children: React.Reac
   // - browser handles scrolling (no extra scroll frame)
   // - allows wide content when user zooms in
   if (isEvidenceRoute) {
-    return <AntdRegistry>{children}</AntdRegistry>;
+    return (
+      <AntdRegistry>
+        {children}
+        <FloatingChatAssistant
+          conversationKey="general"
+          includeContext={false}
+        />
+      </AntdRegistry>
+    );
   }
 
   // Cross Analysis now uses per-report assessment outputs directly;
@@ -41,6 +55,10 @@ export default function CrossAnalysisLayout({ children }: { children: React.Reac
           <Content style={{ display: "flex", minWidth: 0 }}>
             {children}
           </Content>
+          <FloatingChatAssistant
+            conversationKey="general"
+            includeContext={false}
+          />
         </Layout>
       </CrossAnalysisNavigationSlotContext.Provider>
     </AntdRegistry>

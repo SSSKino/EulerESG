@@ -32,16 +32,155 @@ const successfulResponse = (overrides: Record<string, unknown> = {}) => ({
   files: [backendFile(overrides)],
 });
 
-describe("useFileStore.loadFilesFromBackend", () => {
+describe("useFileStore", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    apiMocks.deleteFile.mockReset();
     apiMocks.getFiles.mockReset();
+    apiMocks.invalidateAssessmentByFileCache.mockReset();
+    apiMocks.invalidateVisualAssetCache.mockReset();
     useFileStore.setState({
       files: [],
       selectedFileId: null,
+      selectedFileScopeKey: null,
+      crossAnalysisSelection: null,
       loading: false,
       lastRefresh: 0,
     });
+  });
+
+  it("sets the compliance file and scope atomically", () => {
+    const observedSelections: Array<[string | null, string | null]> = [];
+    const unsubscribe = useFileStore.subscribe((state) => {
+      observedSelections.push([
+        state.selectedFileId,
+        state.selectedFileScopeKey,
+      ]);
+    });
+
+    useFileStore
+      .getState()
+      .setComplianceSelection(" report-a ", " scope-a ");
+    unsubscribe();
+
+    expect(observedSelections).toEqual([["report-a", "scope-a"]]);
+    expect(useFileStore.getState()).toMatchObject({
+      selectedFileId: "report-a",
+      selectedFileScopeKey: "scope-a",
+    });
+  });
+
+  it("persists compliance and cross-analysis selections", () => {
+    const crossAnalysisSelection = {
+      href: "/cross-analysis/environment?ids=report-a%2Creport-b",
+      reports: [
+        { fileId: "report-a", scopeKey: "scope-a" },
+        { fileId: "report-b", scopeKey: "scope-b" },
+      ],
+    };
+
+    useFileStore
+      .getState()
+      .setComplianceSelection("report-a", "scope-a");
+    useFileStore
+      .getState()
+      .setCrossAnalysisSelection(crossAnalysisSelection);
+
+    const persisted = JSON.parse(
+      window.localStorage.getItem("file-storage") || "{}",
+    );
+    expect(persisted.state).toEqual({
+      selectedFileId: "report-a",
+      selectedFileScopeKey: "scope-a",
+      crossAnalysisSelection,
+    });
+  });
+
+  it("clears compliance and cross-analysis selections with account state", () => {
+    useFileStore.setState({
+      selectedFileId: "report-a",
+      selectedFileScopeKey: "scope-a",
+      crossAnalysisSelection: {
+        href: "/cross-analysis/environment?ids=report-a%2Creport-b",
+        reports: [
+          { fileId: "report-a", scopeKey: "scope-a" },
+          { fileId: "report-b", scopeKey: "scope-b" },
+        ],
+      },
+    });
+
+    useFileStore.getState().clearFiles();
+
+    expect(useFileStore.getState()).toMatchObject({
+      files: [],
+      selectedFileId: null,
+      selectedFileScopeKey: null,
+      crossAnalysisSelection: null,
+    });
+    expect(apiMocks.invalidateAssessmentByFileCache).toHaveBeenCalledTimes(1);
+    expect(apiMocks.invalidateVisualAssetCache).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears selections when their selected report scope is deleted", async () => {
+    apiMocks.deleteFile.mockResolvedValue({ status: "success" });
+    apiMocks.getFiles.mockResolvedValue({ status: "success", files: [] });
+    useFileStore.setState({
+      selectedFileId: "report-a",
+      selectedFileScopeKey: "scope-a",
+      crossAnalysisSelection: {
+        href: "/cross-analysis/environment?ids=report-a%2Creport-b",
+        reports: [
+          { fileId: "report-a", scopeKey: "scope-a" },
+          { fileId: "report-b", scopeKey: "scope-b" },
+        ],
+      },
+    });
+
+    await useFileStore.getState().deleteFile("report-a", "scope-a");
+
+    expect(apiMocks.deleteFile).toHaveBeenCalledWith("report-a", "scope-a");
+    expect(useFileStore.getState()).toMatchObject({
+      selectedFileId: null,
+      selectedFileScopeKey: null,
+      crossAnalysisSelection: null,
+    });
+  });
+
+  it.each([
+    {
+      href: "/dashboard/chat?file_id=report-c",
+      reports: [
+        { fileId: "report-c", scopeKey: "scope-c" },
+        { fileId: "report-d", scopeKey: "scope-d" },
+      ],
+    },
+    {
+      href: "/cross-analysis/environment?ids=report-c",
+      reports: [{ fileId: "report-c", scopeKey: "scope-c" }],
+    },
+    {
+      href: "/cross-analysis/environment?ids=report-c",
+      reports: [
+        { fileId: "report-c", scopeKey: "scope-c" },
+        { fileId: " report-c ", scopeKey: "scope-c" },
+      ],
+    },
+  ])("does not overwrite a valid cross-analysis selection with an invalid one", (invalidSelection) => {
+    const validSelection = {
+      href: "/cross-analysis/environment?ids=report-a%2Creport-b",
+      reports: [
+        { fileId: "report-a", scopeKey: "scope-a" },
+        { fileId: "report-b", scopeKey: "scope-b" },
+      ],
+    };
+    useFileStore.getState().setCrossAnalysisSelection(validSelection);
+    const previousSelection = useFileStore.getState().crossAnalysisSelection;
+
+    useFileStore.getState().setCrossAnalysisSelection(invalidSelection);
+
+    expect(useFileStore.getState().crossAnalysisSelection).toBe(
+      previousSelection,
+    );
   });
 
   it("preserves the files array reference when the mapped backend rows are unchanged", async () => {

@@ -169,9 +169,20 @@ const FileTable: React.FC<FileTableProps> = ({
       void message.info(t("files.selectAtLeastTwoReports"));
       return;
     }
+    const href = `/cross-analysis?ids=${encodeURIComponent(ids.join(","))}`;
+    useFileStore.getState().setCrossAnalysisSelection({
+      href,
+      reports: ids.map((fileId) => {
+        const report = selectedRows.find((file) => file.file_id === fileId);
+        return {
+          fileId,
+          scopeKey: report?.analysis_scope_key,
+        };
+      }),
+    });
     warmRoute("/cross-analysis");
     apiService.prefetchCrossAnalysis(ids);
-    router.push(`/cross-analysis?ids=${encodeURIComponent(ids.join(","))}`);
+    router.push(href);
   };
 
   const handleDeleteConfirm = async () => {

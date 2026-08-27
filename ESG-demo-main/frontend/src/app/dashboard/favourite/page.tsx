@@ -5,7 +5,10 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useT } from "@/i18n/useT";
 import { apiService } from "@/lib/api";
-import { useFileStore } from "@/store/useFileStore";
+import {
+  buildComplianceAnalysisHref,
+  useFileStore,
+} from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import { useEnsureReportFiles } from "@/hooks/useEnsureReportFiles";
 
@@ -35,7 +38,10 @@ export default function FavouriteReportsPage() {
 
   const openAnalysis = useCallback((file: File) => {
     if (!file.file_id) return;
-    useFileStore.getState().setSelectedFileId(file.file_id);
+    useFileStore.getState().setComplianceSelection(
+      file.file_id,
+      file.analysis_scope_key,
+    );
     apiService.prefetchAssessmentByFile(
       file.file_id,
       file.analysis_scope_key,
@@ -43,11 +49,8 @@ export default function FavouriteReportsPage() {
       true,
     );
 
-    const scope = file.analysis_scope_key
-      ? `&scope=${encodeURIComponent(file.analysis_scope_key)}`
-      : "";
     router.push(
-      `/dashboard/chat?file_id=${encodeURIComponent(file.file_id)}${scope}`,
+      buildComplianceAnalysisHref(file.file_id, file.analysis_scope_key),
     );
   }, [router]);
 

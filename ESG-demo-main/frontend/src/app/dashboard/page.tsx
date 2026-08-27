@@ -23,11 +23,6 @@ const PDFViewer = dynamic(
   { ssr: false, loading: DashboardWorkspaceLoading },
 );
 
-const FloatingChatAssistant = dynamic(
-  () => import("@/components/cross-analysis/FloatingChatAssistant"),
-  { ssr: false },
-);
-
 const FloatingStatusButton = dynamic(
   () => import("@/components/status/FloatingStatusButton"),
   { ssr: false },
@@ -41,7 +36,6 @@ export default function DashboardPage() {
   return (
     <>
       <PDFViewer />
-      <FloatingChatAssistant includeContext={false} />
       {SHOW_DEV_TOOLS && <FloatingStatusButton />}
     </>
   );

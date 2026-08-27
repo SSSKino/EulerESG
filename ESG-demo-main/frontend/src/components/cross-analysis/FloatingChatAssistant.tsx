@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { App as AntdApp } from "antd";
 import { MessageCircle, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { apiService, type ChatResponse } from "@/lib/api";
 import { useT } from "@/i18n/useT";
 import { useDraggableFloating } from "@/hooks/useDraggableFloating";
+import {
+  createAssistantMessageId,
+  useAssistantStore,
+} from "@/store/useAssistantStore";
 
 const loadChatInterface = () => import("@/components/pdfviewer/ChatInterface");
 const ChatInterface = dynamic(loadChatInterface, {
@@ -16,17 +20,14 @@ const ChatInterface = dynamic(loadChatInterface, {
       className="flex h-full items-center justify-center text-sm text-slate-500"
       role="status"
     >
-      Loading assistant…
+      Loading assistant...
     </div>
   ),
 });
 
-interface Message {
-  text: string;
-  isUser: boolean;
-}
-
 interface FloatingChatAssistantProps {
+  conversationKey?: string;
+  fileId?: string;
   includeContext?: boolean;
 }
 
@@ -37,19 +38,57 @@ const FLOATING_PANEL_MAX_HEIGHT_PX = 620;
 const FLOATING_PANEL_MOBILE_MAX_HEIGHT_PX = 520;
 
 export default function FloatingChatAssistant({
-  includeContext = true,
+  conversationKey = "general",
+  fileId,
+  includeContext = false,
 }: FloatingChatAssistantProps) {
   const { t } = useT();
   const { message } = AntdApp.useApp();
-  const [open, setOpen] = useState(false);
-  const [hasOpened, setHasOpened] = useState(false);
-  const [sessionId, setSessionId] = useState<string>();
-  const [messages, setMessages] = useState<Message[]>(() => [
-    { text: t("chat.welcomeMessage"), isUser: false },
-  ]);
+  const conversation = useAssistantStore(
+    (state) => state.conversations[conversationKey],
+  );
+  const open = useAssistantStore((state) => state.open);
+  const hasOpened = useAssistantStore((state) => state.hasOpened);
+  const launcherPosition = useAssistantStore((state) => state.position);
+  const appendMessages = useAssistantStore((state) => state.appendMessages);
+  const clearConversation = useAssistantStore(
+    (state) => state.clearConversation,
+  );
+  const ensureConversation = useAssistantStore(
+    (state) => state.ensureConversation,
+  );
+  const markOpened = useAssistantStore((state) => state.markOpened);
+  const replaceMessage = useAssistantStore((state) => state.replaceMessage);
+  const setMessages = useAssistantStore((state) => state.setMessages);
+  const setOpen = useAssistantStore((state) => state.setOpen);
+  const setPosition = useAssistantStore((state) => state.setPosition);
+  const setSessionId = useAssistantStore((state) => state.setSessionId);
+  const sessionId = conversation?.sessionId;
+  const welcomeText = t("chat.welcomeMessage");
+  const messages = conversation?.messages.length
+    ? conversation.messages
+    : [{ text: welcomeText, isUser: false }];
   const panelRef = useRef<HTMLElement>(null);
   const { draggableProps, draggableRef } =
-    useDraggableFloating<HTMLButtonElement>();
+    useDraggableFloating<HTMLButtonElement>({
+      position: launcherPosition,
+      onPositionChange: setPosition,
+    });
+
+  useEffect(() => {
+    const welcomeMessage = { text: welcomeText, isUser: false };
+    ensureConversation(conversationKey, welcomeMessage);
+    setMessages(conversationKey, (currentMessages) => {
+      if (
+        currentMessages.length === 1
+        && !currentMessages[0]?.isUser
+        && !currentMessages[0]?.pending
+      ) {
+        return [{ ...currentMessages[0], text: welcomeText }];
+      }
+      return currentMessages;
+    });
+  }, [conversationKey, ensureConversation, setMessages, welcomeText]);
 
   const positionPanelAtLauncher = useCallback(() => {
     const launcher = draggableRef.current;
@@ -152,7 +191,7 @@ export default function FloatingChatAssistant({
   const closeAssistant = useCallback(() => {
     setOpen(false);
     window.requestAnimationFrame(() => draggableRef.current?.focus());
-  }, [draggableRef]);
+  }, [draggableRef, setOpen]);
 
   const toggleAssistant = useCallback(() => {
     if (open) {
@@ -160,9 +199,9 @@ export default function FloatingChatAssistant({
       return;
     }
     positionPanelAtLauncher();
-    setHasOpened(true);
+    markOpened();
     setOpen(true);
-  }, [closeAssistant, open, positionPanelAtLauncher]);
+  }, [closeAssistant, markOpened, open, positionPanelAtLauncher, setOpen]);
 
   useEffect(() => {
     if (!open) return;
@@ -199,42 +238,59 @@ export default function FloatingChatAssistant({
 
   const handleSendMessage = useCallback(
     async (userMessage: string) => {
-      setMessages((prev) => [...prev, { text: userMessage, isUser: true }]);
-      setMessages((prev) => [...prev, { text: t("chat.thinking"), isUser: false }]);
+      const pendingMessageId = createAssistantMessageId();
+      appendMessages(conversationKey, [
+        { text: userMessage, isUser: true },
+        {
+          id: pendingMessageId,
+          pending: true,
+          text: t("chat.thinking"),
+          isUser: false,
+        },
+      ]);
 
       try {
-        const response: ChatResponse = await apiService.sendMessage({
+        const request = {
           message: userMessage,
-          include_context: includeContext,
+          include_context: fileId ? true : includeContext,
           session_id: sessionId,
-        });
-        setSessionId(response.session_id);
-        setMessages((prev) => {
-          const withoutLoading = prev.slice(0, -1);
-          return [...withoutLoading, { text: response.response, isUser: false }];
+        };
+        const response: ChatResponse = fileId
+          ? await apiService.sendMessageForFile(fileId, request)
+          : await apiService.sendMessage(request);
+        setSessionId(conversationKey, response.session_id);
+        replaceMessage(conversationKey, pendingMessageId, {
+          text: response.response,
+          isUser: false,
         });
       } catch (error) {
         console.error("Chat error:", error);
         message.error(t("chat.failedToSend", { error: String(error) }));
-        setMessages((prev) => {
-          const withoutLoading = prev.slice(0, -1);
-          return [
-            ...withoutLoading,
-            {
-              text: t("chat.genericError"),
-              isUser: false,
-            },
-          ];
+        replaceMessage(conversationKey, pendingMessageId, {
+          text: t("chat.genericError"),
+          isUser: false,
         });
       }
     },
-    [includeContext, message, sessionId, t]
+    [
+      appendMessages,
+      conversationKey,
+      fileId,
+      includeContext,
+      message,
+      replaceMessage,
+      sessionId,
+      setSessionId,
+      t,
+    ],
   );
 
   const handleClearChat = useCallback(() => {
-    setSessionId(undefined);
-    setMessages([{ text: t("chat.welcomeMessage"), isUser: false }]);
-  }, [t]);
+    clearConversation(conversationKey, {
+      text: welcomeText,
+      isUser: false,
+    });
+  }, [clearConversation, conversationKey, welcomeText]);
 
   return (
     <>

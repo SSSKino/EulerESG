@@ -6,11 +6,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   actualSize: vi.fn(),
   dynamicIndex: 0,
+  files: [] as Array<Record<string, unknown>>,
   getCompanies: vi.fn(),
   getReportDisclosureGraph: vi.fn(),
   graphCanvasProps: null as Record<string, unknown> | null,
   loadFilesFromBackend: vi.fn(),
   replace: vi.fn(),
+  searchParams: "owner=reports&file_id=file-1",
   selectChanges: {} as Record<string, ((value: unknown) => void) | undefined>,
   selectRenderCount: 0,
   zoomIn: vi.fn(),
@@ -45,7 +47,7 @@ vi.mock("next/dynamic", async () => {
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mocks.replace }),
-  useSearchParams: () => new URLSearchParams("owner=reports&file_id=file-1"),
+  useSearchParams: () => new URLSearchParams(mocks.searchParams),
 }));
 
 vi.mock("antd", async () => {
@@ -124,18 +126,7 @@ vi.mock("@/lib/logger", () => ({
 vi.mock("@/store/useFileStore", () => ({
   useFileStore: (selector: (state: Record<string, unknown>) => unknown) =>
     selector({
-      files: [
-        {
-          key: "file-1",
-          name: "Example ESG Report.pdf",
-          size: "1 MB",
-          dateUploaded: "2026-08-24",
-          type: "pdf",
-          status: "ready",
-          file_id: "file-1",
-          report_year: 2024,
-        },
-      ],
+      files: mocks.files,
       loadFilesFromBackend: mocks.loadFilesFromBackend,
     }),
 }));
@@ -145,8 +136,21 @@ describe("Graph Exploration Kumu control placement", () => {
     mocks.actualSize.mockReset();
     mocks.dynamicIndex = 0;
     mocks.graphCanvasProps = null;
+    mocks.files = [
+      {
+        key: "file-1",
+        name: "Example ESG Report.pdf",
+        size: "1 MB",
+        dateUploaded: "2026-08-24",
+        type: "pdf",
+        status: "ready",
+        file_id: "file-1",
+        report_year: 2024,
+      },
+    ];
     mocks.selectChanges = {};
     mocks.selectRenderCount = 0;
+    mocks.searchParams = "owner=reports&file_id=file-1";
     mocks.zoomIn.mockReset();
     mocks.zoomOut.mockReset();
     mocks.getCompanies.mockResolvedValue({ companies: [] });
@@ -265,6 +269,39 @@ describe("Graph Exploration Kumu control placement", () => {
       expect(screen.getByRole("combobox", { name: "Reports" })).toHaveTextContent("1 item filtered");
       expect(screen.getByRole("combobox", { name: "Reports" })).not.toHaveTextContent("Example ESG Report.pdf");
     });
+  });
+
+  it("selects only the newest report when no reports are requested", async () => {
+    mocks.searchParams = "owner=reports";
+    mocks.files = [
+      {
+        key: "file-old",
+        name: "Example ESG Report 2024.pdf",
+        type: "pdf",
+        status: "ready",
+        file_id: "file-old",
+        report_year: 2024,
+      },
+      {
+        key: "file-new",
+        name: "Example ESG Report 2025.pdf",
+        type: "pdf",
+        status: "ready",
+        file_id: "file-new",
+        report_year: 2025,
+      },
+    ];
+
+    const { default: GraphExplorationPage } = await import("../page");
+    render(<GraphExplorationPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("combobox", { name: "Reports" })).toHaveTextContent("1 item filtered");
+      expect(mocks.getReportDisclosureGraph).toHaveBeenCalled();
+    });
+    const requestedReportIds = mocks.getReportDisclosureGraph.mock.calls.map(([fileId]) => fileId);
+    expect(requestedReportIds).toContain("file-new");
+    expect(requestedReportIds).not.toContain("file-old");
   });
 
   it("does not refetch graph data when result state rerenders with unchanged report ids", async () => {

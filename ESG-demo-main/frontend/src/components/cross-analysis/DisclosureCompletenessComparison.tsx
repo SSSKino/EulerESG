@@ -9,6 +9,10 @@ import { useT } from "@/i18n/useT";
 import { apiService } from "@/lib/api";
 import { normalizeDisclosureStatus, type DisclosureStatus } from "@/lib/complianceSummary";
 import type { CrossReportSummary } from "@/features/crossAnalysis/types";
+import {
+  buildComplianceAnalysisHref,
+  useFileStore,
+} from "@/store/useFileStore";
 
 export type AnalysisDataItem = {
   metric_id: string;
@@ -218,8 +222,36 @@ export default function DisclosureCompletenessComparison(props: {
 }) {
   const { t } = useT();
   const router = useRouter();
+  const files = useFileStore((state) => state.files);
+  const crossAnalysisSelection = useFileStore(
+    (state) => state.crossAnalysisSelection,
+  );
+  const setComplianceSelection = useFileStore(
+    (state) => state.setComplianceSelection,
+  );
   const { fileIds, reports } = props;
   const fileIdsKey = (fileIds || []).join("\u0000");
+  const scopedAssessmentSelections = useMemo(() => {
+    const selectedFileIds = fileIdsKey
+      ? fileIdsKey.split("\u0000").filter(Boolean)
+      : [];
+    const committedReports = crossAnalysisSelection?.reports || [];
+    const committedIds = committedReports.map((report) => report.fileId);
+    const exactCommittedSelection =
+      committedIds.length === selectedFileIds.length
+      && committedIds.every(
+        (fileId, index) => fileId === selectedFileIds[index],
+      );
+    return selectedFileIds.map((fileId) => ({
+      fileId,
+      scopeKey: exactCommittedSelection
+        ? committedReports.find((report) => report.fileId === fileId)?.scopeKey
+        : undefined,
+    }));
+  }, [crossAnalysisSelection, fileIdsKey]);
+  const scopedAssessmentSelectionKey = scopedAssessmentSelections
+    .map(({ fileId, scopeKey }) => `${fileId}\u0001${scopeKey || ""}`)
+    .join("\u0000");
   const reportsRef = useRef(reports);
 
   const [resultPage, setResultPage] = useState(1);
@@ -244,10 +276,17 @@ export default function DisclosureCompletenessComparison(props: {
 
   useEffect(() => {
     let cancelled = false;
-    const requestedFileIds = fileIdsKey
-      ? fileIdsKey.split("\u0000").filter(Boolean)
+    const requestedSelections = scopedAssessmentSelectionKey
+      ? scopedAssessmentSelectionKey
+          .split("\u0000")
+          .filter(Boolean)
+          .map((entry) => {
+            const [fileId, scopeKey] = entry.split("\u0001", 2);
+            return { fileId, scopeKey: scopeKey || undefined };
+          })
       : [];
-    if (requestedFileIds.length < 2) return;
+    if (requestedSelections.length < 2) return;
+    const requestedFileIds = requestedSelections.map(({ fileId }) => fileId);
 
     setPer((current) => {
       const currentLabels = new Map(
@@ -267,11 +306,11 @@ export default function DisclosureCompletenessComparison(props: {
 
     (async () => {
       const results = await Promise.all(
-        requestedFileIds.map(async (id) => {
+        requestedSelections.map(async ({ fileId: id, scopeKey }) => {
           try {
             const assessment = await apiService.getAssessmentByFile(
               id,
-              undefined,
+              scopeKey,
               false,
               true,
             );
@@ -362,7 +401,7 @@ export default function DisclosureCompletenessComparison(props: {
           } catch (e: any) {
             return {
               fileId: id,
-              label: reportLabelFromSummaries(id, reports),
+              label: reportLabelFromSummaries(id, reportsRef.current),
               framework: null,
               loading: false,
               error: e?.message || "Error",
@@ -386,14 +425,23 @@ export default function DisclosureCompletenessComparison(props: {
     return () => {
       cancelled = true;
     };
-  }, [fileIdsKey]);
+  }, [scopedAssessmentSelectionKey]);
 
   const openReport = useCallback((fileId: string) => {
+    const scopedSelection = scopedAssessmentSelections.find(
+      (report) => report.fileId === fileId,
+    );
+    const reportCandidates = files.filter((file) => file.file_id === fileId);
+    const scopeKey = scopedSelection?.scopeKey
+      || (reportCandidates.length === 1
+        ? reportCandidates[0].analysis_scope_key
+        : undefined);
     // Warm the exact compact assessment variant consumed by the destination
     // page, then navigate immediately so it can share the in-flight promise.
-    apiService.prefetchAssessmentByFile(fileId, undefined, false, true);
-    router.push(`/dashboard/chat?file_id=${encodeURIComponent(fileId)}`);
-  }, [router]);
+    apiService.prefetchAssessmentByFile(fileId, scopeKey, false, true);
+    setComplianceSelection(fileId, scopeKey);
+    router.push(buildComplianceAnalysisHref(fileId, scopeKey));
+  }, [files, router, scopedAssessmentSelections, setComplianceSelection]);
 
   const anyLoading = per.some((p) => p.loading);
 

@@ -1,10 +1,12 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import FloatingChatAssistant from "@/components/cross-analysis/FloatingChatAssistant";
+import { useAssistantStore } from "@/store/useAssistantStore";
 
 const apiMocks = vi.hoisted(() => ({
   sendMessage: vi.fn(),
+  sendMessageForFile: vi.fn(),
 }));
 
 const chatInterfaceMocks = vi.hoisted(() => ({
@@ -22,9 +24,13 @@ vi.mock("@/components/pdfviewer/ChatInterface", async () => {
   const { useState } = await vi.importActual<typeof import("react")>("react");
 
   function MockChatInterface({
+    messages,
+    onClearChat,
     onClose,
     onSendMessage,
   }: {
+    messages: Array<{ isUser: boolean; text: string }>;
+    onClearChat?: () => void;
     onClose?: () => void;
     onSendMessage: (message: string) => Promise<void>;
   }) {
@@ -32,6 +38,13 @@ vi.mock("@/components/pdfviewer/ChatInterface", async () => {
 
     return (
       <div data-testid="mock-chat-interface">
+        <div data-testid="assistant-messages">
+          {messages.map((message, index) => (
+            <span data-is-user={String(message.isUser)} key={`${message.text}-${index}`}>
+              {message.text}
+            </span>
+          ))}
+        </div>
         <label>
           Assistant draft
           <input
@@ -46,6 +59,9 @@ vi.mock("@/components/pdfviewer/ChatInterface", async () => {
         <button type="button" onClick={onClose}>
           Close test assistant
         </button>
+        <button type="button" onClick={onClearChat}>
+          Clear test assistant
+        </button>
       </div>
     );
   }
@@ -54,7 +70,10 @@ vi.mock("@/components/pdfviewer/ChatInterface", async () => {
 });
 
 vi.mock("@/lib/api", () => ({
-  apiService: { sendMessage: apiMocks.sendMessage },
+  apiService: {
+    sendMessage: apiMocks.sendMessage,
+    sendMessageForFile: apiMocks.sendMessageForFile,
+  },
 }));
 
 vi.mock("@/i18n/useT", () => ({
@@ -87,10 +106,17 @@ const dispatchPointerEvent = (
 
 describe("FloatingChatAssistant", () => {
   beforeEach(() => {
+    useAssistantStore.getState().resetAll();
+    window.sessionStorage.clear();
     apiMocks.sendMessage.mockReset();
     apiMocks.sendMessage.mockResolvedValue({
       session_id: "assistant-session",
       response: "answer",
+    });
+    apiMocks.sendMessageForFile.mockReset();
+    apiMocks.sendMessageForFile.mockResolvedValue({
+      session_id: "report-assistant-session",
+      response: "report answer",
     });
   });
 
@@ -291,7 +317,7 @@ describe("FloatingChatAssistant", () => {
   });
 
   it("drags within the viewport without treating the release as an open click", () => {
-    render(<FloatingChatAssistant />);
+    const view = render(<FloatingChatAssistant />);
 
     vi.spyOn(window, "innerWidth", "get").mockReturnValue(800);
     vi.spyOn(window, "innerHeight", "get").mockReturnValue(600);
@@ -356,6 +382,30 @@ describe("FloatingChatAssistant", () => {
     fireEvent.click(launcher);
     expect(panel).toHaveAttribute("aria-hidden", "true");
     expect(launcher).toHaveStyle({ left: "632px", top: "8px" });
+
+    view.unmount();
+    const remountRect = vi
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockReturnValue({
+        bottom: 56,
+        height: 48,
+        left: 632,
+        right: 792,
+        top: 8,
+        width: 160,
+        x: 632,
+        y: 8,
+        toJSON: () => ({}),
+      });
+    render(<FloatingChatAssistant />);
+
+    expect(screen.getByRole("button", { name: "AI Assistant" })).toHaveStyle({
+      bottom: "auto",
+      left: "632px",
+      right: "auto",
+      top: "8px",
+    });
+    remountRect.mockRestore();
   });
 
   it("uses generic mode on the homepage and preserves the server chat session", async () => {
@@ -379,6 +429,152 @@ describe("FloatingChatAssistant", () => {
       message: "test question",
       include_context: false,
       session_id: "assistant-session",
+    });
+  });
+
+  it("keeps the open general conversation and pending response across a route remount", async () => {
+    let resolveFirstResponse: ((response: {
+      response: string;
+      session_id: string;
+    }) => void) | undefined;
+    apiMocks.sendMessage.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveFirstResponse = resolve;
+      }),
+    );
+
+    const firstPage = render(
+      <FloatingChatAssistant
+        conversationKey="general"
+        includeContext={false}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "AI Assistant" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Send test question" }),
+    );
+
+    await waitFor(() => expect(apiMocks.sendMessage).toHaveBeenCalledTimes(1));
+    expect(apiMocks.sendMessage).toHaveBeenNthCalledWith(1, {
+      message: "test question",
+      include_context: false,
+      session_id: undefined,
+    });
+    expect(screen.getByTestId("assistant-messages")).toHaveTextContent(
+      "test question",
+    );
+
+    firstPage.unmount();
+    render(
+      <FloatingChatAssistant
+        conversationKey="general"
+        includeContext={false}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "common.close" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    expect(screen.getByTestId("floating-ai-assistant")).toHaveAttribute(
+      "aria-hidden",
+      "false",
+    );
+    expect(await screen.findByTestId("assistant-messages")).toHaveTextContent(
+      "test question",
+    );
+
+    await act(async () => {
+      resolveFirstResponse?.({
+        response: "answer after navigation",
+        session_id: "general-session-after-navigation",
+      });
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("assistant-messages")).toHaveTextContent(
+        "answer after navigation",
+      );
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Send test question" }));
+    await waitFor(() => expect(apiMocks.sendMessage).toHaveBeenCalledTimes(2));
+    expect(apiMocks.sendMessage).toHaveBeenNthCalledWith(2, {
+      message: "test question",
+      include_context: false,
+      session_id: "general-session-after-navigation",
+    });
+  });
+
+  it("isolates report conversations and uses the report-scoped chat endpoint", async () => {
+    const reportA = render(
+      <FloatingChatAssistant
+        conversationKey="file:report-a"
+        fileId="report-a"
+        includeContext
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "AI Assistant" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Send test question" }),
+    );
+
+    await waitFor(() => {
+      expect(apiMocks.sendMessageForFile).toHaveBeenCalledWith("report-a", {
+        message: "test question",
+        include_context: true,
+        session_id: undefined,
+      });
+      expect(screen.getByTestId("assistant-messages")).toHaveTextContent(
+        "report answer",
+      );
+    });
+    expect(apiMocks.sendMessage).not.toHaveBeenCalled();
+
+    reportA.unmount();
+    const reportB = render(
+      <FloatingChatAssistant
+        conversationKey="file:report-b"
+        fileId="report-b"
+        includeContext
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "common.close" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    expect(await screen.findByTestId("assistant-messages")).not.toHaveTextContent(
+      "report answer",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Send test question" }));
+    await waitFor(() => {
+      expect(apiMocks.sendMessageForFile).toHaveBeenNthCalledWith(2, "report-b", {
+        message: "test question",
+        include_context: true,
+        session_id: undefined,
+      });
+    });
+
+    reportB.unmount();
+    render(
+      <FloatingChatAssistant
+        conversationKey="file:report-a"
+        fileId="report-a"
+        includeContext
+      />,
+    );
+    expect(await screen.findByTestId("assistant-messages")).toHaveTextContent(
+      "report answer",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Send test question" }));
+    await waitFor(() => {
+      expect(apiMocks.sendMessageForFile).toHaveBeenNthCalledWith(3, "report-a", {
+        message: "test question",
+        include_context: true,
+        session_id: "report-assistant-session",
+      });
     });
   });
 });

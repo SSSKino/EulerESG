@@ -4,7 +4,7 @@ import type { UploadFile } from "antd/es/upload/interface";
 import type { FormInstance } from "antd/es/form";
 import { industries, SASB_OTHER_INDUSTRY_KEY } from "@/data/industries";
 import { CDP_TOPIC_OPTIONS } from "@/data/cdpTopics";
-import { ACTIVE_FRAMEWORK_OPTIONS, isActiveFramework } from "@/data/frameworkOptions";
+import { isActiveFramework, UPLOAD_FRAMEWORK_OPTIONS } from "@/data/frameworkOptions";
 import { useT } from "@/i18n/useT";
 import { apiService } from "@/lib/api";
 import type { CompanySummary } from "@/lib/api";
@@ -269,7 +269,7 @@ const FileInfoForm: React.FC<FileInfoFormProps> = ({
       >
         <Select
           placeholder={t("upload.selectFramework")}
-          options={ACTIVE_FRAMEWORK_OPTIONS}
+          options={UPLOAD_FRAMEWORK_OPTIONS}
           onChange={handleFrameworkChange}
           disabled={scopeLocked}
           style={{ width: "100%" }}

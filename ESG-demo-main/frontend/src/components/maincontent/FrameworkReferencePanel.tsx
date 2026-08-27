@@ -239,7 +239,7 @@ export default function FrameworkReferencePanel() {
       className="w-full"
       data-testid="standards-library"
     >
-      <header className="mb-9 max-w-3xl">
+      <header className="mb-6 max-w-3xl">
         <h1 id="standards-library-title" className="m-0 text-3xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-[2.15rem]">
           {copy.title}
         </h1>
@@ -259,7 +259,7 @@ export default function FrameworkReferencePanel() {
         </div>
       ) : (
         <>
-          <div aria-label="Frameworks" className="-mx-1 flex gap-6 overflow-x-auto px-1 pb-1" role="group">
+          <div aria-label="Frameworks" className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-1 sm:gap-5" role="group">
             {catalog?.frameworks.map((framework) => {
               const active = framework.id === selectedFrameworkId;
               return (
@@ -290,7 +290,7 @@ export default function FrameworkReferencePanel() {
             })}
           </div>
 
-          <div className="mt-9" id="standards-browser">
+          <div className="mt-6" id="standards-browser">
             {selectedFramework && !selectedFramework.available ? (
               <div className="bg-[#f6f6f3] px-6 py-12 text-center sm:px-10">
                 <h2 className="m-0 text-xl font-semibold tracking-[-0.025em] text-slate-950">{selectedFramework.name}</h2>
@@ -302,7 +302,7 @@ export default function FrameworkReferencePanel() {
                 </a>
               </div>
             ) : selectedFramework ? (
-              <div className="grid gap-9 lg:grid-cols-[248px_minmax(0,1fr)] xl:gap-14">
+              <div className="grid gap-6 lg:grid-cols-[248px_minmax(0,1fr)] xl:gap-8">
                 <aside aria-label={`${selectedFramework.name} taxonomy`} className="min-w-0">
                   {selectedFramework.groups.length > 1 && (
                     <label className="mb-5 block">

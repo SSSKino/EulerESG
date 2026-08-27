@@ -43,6 +43,78 @@ export interface File {
   company_analysis_version?: number;
 }
 
+export interface AnalysisReportSelection {
+  fileId: string;
+  scopeKey?: string;
+}
+
+export interface CrossAnalysisSelection {
+  href: string;
+  reports: AnalysisReportSelection[];
+}
+
+export function buildComplianceAnalysisHref(
+  fileId: string,
+  scopeKey?: string | null,
+): string {
+  const query = new URLSearchParams({ file_id: String(fileId || "").trim() });
+  const normalizedScopeKey = String(scopeKey || "").trim();
+  if (normalizedScopeKey) query.set("scope", normalizedScopeKey);
+  return `/dashboard/chat?${query.toString()}`;
+}
+
+function normalizeCrossAnalysisSelection(
+  selection: unknown,
+): CrossAnalysisSelection | null {
+  if (!selection || typeof selection !== "object") return null;
+  const rawSelection = selection as Partial<CrossAnalysisSelection>;
+  const href = String(rawSelection.href || "").trim();
+  const rawReports = Array.isArray(rawSelection.reports)
+    ? rawSelection.reports
+    : [];
+  const reports = rawReports
+    .map((report) => ({
+      fileId: String(report?.fileId || "").trim(),
+      scopeKey: String(report?.scopeKey || "").trim() || undefined,
+    }))
+    .filter((report) => report.fileId)
+    .filter(
+      (report, index, values) =>
+        values.findIndex(
+          (candidate) => candidate.fileId === report.fileId,
+        ) === index,
+    );
+  if (reports.length < 2) return null;
+
+  try {
+    const url = new URL(href, "http://localhost");
+    if (
+      url.pathname !== "/cross-analysis"
+      && !url.pathname.startsWith("/cross-analysis/")
+    ) {
+      return null;
+    }
+    const hrefIds = [
+      ...new Set(
+        String(url.searchParams.get("ids") || "")
+          .split(",")
+          .map((fileId) => fileId.trim())
+          .filter(Boolean),
+      ),
+    ];
+    if (
+      hrefIds.length !== reports.length
+      || hrefIds.some((fileId, index) => fileId !== reports[index].fileId)
+    ) {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+
+  return { href, reports };
+}
+
 export type ReportCatalogMode = "single" | "multi";
 
 /**
@@ -196,6 +268,8 @@ function expandMultiScopeBackendRows(file: any, mapped: File): File[] {
 interface FileStore {
   files: File[];
   selectedFileId: string | null;
+  selectedFileScopeKey: string | null;
+  crossAnalysisSelection: CrossAnalysisSelection | null;
   loading: boolean;
   lastRefresh: number;
   addFile: (file: File) => void;
@@ -207,6 +281,13 @@ interface FileStore {
   ) => void;
   updateFilePages: (fileIdOrKey: string, pages: number) => void;
   setSelectedFileId: (fileId: string | null) => void;
+  setComplianceSelection: (
+    fileId: string | null,
+    scopeKey?: string | null,
+  ) => void;
+  setCrossAnalysisSelection: (
+    selection: CrossAnalysisSelection | null,
+  ) => void;
   loadFilesFromBackend: (options?: {
     showLoading?: boolean;
     /** Queue one trailing request when a mutation must observe the newest backend state. */
@@ -228,6 +309,8 @@ export const useFileStore = create<FileStore>()(
       return {
       files: [],
       selectedFileId: null,
+      selectedFileScopeKey: null,
+      crossAnalysisSelection: null,
       loading: false,
       lastRefresh: 0,
       setLoading: (loading) => set({ loading }),
@@ -242,6 +325,8 @@ export const useFileStore = create<FileStore>()(
         set(() => ({
           files: [],
           selectedFileId: null,
+          selectedFileScopeKey: null,
+          crossAnalysisSelection: null,
           loading: false,
           lastRefresh: 0,
         }));
@@ -273,14 +358,37 @@ export const useFileStore = create<FileStore>()(
           await apiService.deleteFile(fileId, scopeKey);
 
           const sk = scopeKey && String(scopeKey).trim() ? String(scopeKey).trim() : "";
-          set((state) => ({
-            files: state.files.filter((file) => {
-              if (file.file_id !== fileId) return true;
-              if (sk) return file.analysis_scope_key !== sk;
-              return false;
-            }),
-            selectedFileId: !sk && state.selectedFileId === fileId ? null : state.selectedFileId,
-          }));
+          set((state) => {
+            const deletingSelectedCompliance =
+              state.selectedFileId === fileId
+              && (
+                !sk
+                || !state.selectedFileScopeKey
+                || state.selectedFileScopeKey === sk
+              );
+            const deletingSelectedCrossReport =
+              state.crossAnalysisSelection?.reports.some(
+                (report) =>
+                  report.fileId === fileId
+                  && (!sk || !report.scopeKey || report.scopeKey === sk),
+              ) === true;
+            return {
+              files: state.files.filter((file) => {
+                if (file.file_id !== fileId) return true;
+                if (sk) return file.analysis_scope_key !== sk;
+                return false;
+              }),
+              selectedFileId: deletingSelectedCompliance
+                ? null
+                : state.selectedFileId,
+              selectedFileScopeKey: deletingSelectedCompliance
+                ? null
+                : state.selectedFileScopeKey,
+              crossAnalysisSelection: deletingSelectedCrossReport
+                ? null
+                : state.crossAnalysisSelection,
+            };
+          });
         } catch (error) {
           console.error(`Failed to delete file from backend: ${errorSummary(error)}`);
           throw error;
@@ -291,9 +399,48 @@ export const useFileStore = create<FileStore>()(
         await get().loadFilesFromBackend({ showLoading: false, forceFresh: true });
       },
       setSelectedFileId: (fileId) =>
-        set(() => ({
+        set((state) => ({
           selectedFileId: fileId,
+          selectedFileScopeKey:
+            fileId && fileId === state.selectedFileId
+              ? state.selectedFileScopeKey
+              : null,
         })),
+      setComplianceSelection: (fileId, scopeKey) =>
+        set((state) => {
+          const normalizedFileId = String(fileId || "").trim() || null;
+          const normalizedScopeKey = normalizedFileId
+            ? String(scopeKey || "").trim() || null
+            : null;
+          if (
+            state.selectedFileId === normalizedFileId
+            && state.selectedFileScopeKey === normalizedScopeKey
+          ) {
+            return state;
+          }
+          return {
+            selectedFileId: normalizedFileId,
+            selectedFileScopeKey: normalizedScopeKey,
+          };
+        }),
+      setCrossAnalysisSelection: (selection) =>
+        set((state) => {
+          if (selection === null) {
+            return state.crossAnalysisSelection === null
+              ? state
+              : { crossAnalysisSelection: null };
+          }
+          const nextSelection = normalizeCrossAnalysisSelection(selection);
+          if (!nextSelection) return state;
+          if (
+            state.crossAnalysisSelection?.href === nextSelection.href
+            && JSON.stringify(state.crossAnalysisSelection.reports)
+              === JSON.stringify(nextSelection.reports)
+          ) {
+            return state;
+          }
+          return { crossAnalysisSelection: nextSelection };
+        }),
       loadFilesFromBackend: (options) => {
         const showLoading = options?.showLoading === true;
         const forceFresh = options?.forceFresh === true;
@@ -417,7 +564,25 @@ export const useFileStore = create<FileStore>()(
       name: "file-storage",
       partialize: (state) => ({
         selectedFileId: state.selectedFileId,
+        selectedFileScopeKey: state.selectedFileScopeKey,
+        crossAnalysisSelection: state.crossAnalysisSelection,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = (persistedState || {}) as Partial<FileStore>;
+        const selectedFileId = String(
+          persisted.selectedFileId || "",
+        ).trim() || null;
+        return {
+          ...currentState,
+          selectedFileId,
+          selectedFileScopeKey: selectedFileId
+            ? String(persisted.selectedFileScopeKey || "").trim() || null
+            : null,
+          crossAnalysisSelection: normalizeCrossAnalysisSelection(
+            persisted.crossAnalysisSelection,
+          ),
+        };
+      },
     }
   )
 );

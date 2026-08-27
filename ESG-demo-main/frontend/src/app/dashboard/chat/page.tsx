@@ -1,13 +1,13 @@
-// app/dashboard/chat/page.tsx
 "use client";
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+
+import React, { Suspense, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { App as AntdApp } from "antd";
-import { useSearchParams } from "next/navigation";
-import { useFileStore } from "@/store/useFileStore";
-import { apiService, type ChatResponse } from "@/lib/api";
-import { useT } from "@/i18n/useT";
-import { errorSummary } from "@/lib/logger";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  buildComplianceAnalysisHref,
+  useFileStore,
+} from "@/store/useFileStore";
+import { useEnsureReportFiles } from "@/hooks/useEnsureReportFiles";
 
 function ChatWorkspaceLoading() {
   return (
@@ -29,129 +29,78 @@ const ChatView = dynamic(
   { ssr: false, loading: ChatWorkspaceLoading },
 );
 
-interface Message {
-  text: string;
-  isUser: boolean;
-}
-
 function ChatPageContent() {
-  const { t } = useT();
-  const { message } = AntdApp.useApp();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [messages, setMessages] = useState<Message[]>(() => [
-    { text: t("chat.welcomeMessage"), isUser: false },
-  ]);
-
   const files = useFileStore((state) => state.files);
   const selectedFileId = useFileStore((state) => state.selectedFileId);
-  const setSelectedFileId = useFileStore((state) => state.setSelectedFileId);
-  const loadFilesFromBackend = useFileStore((state) => state.loadFilesFromBackend);
+  const selectedFileScopeKey = useFileStore(
+    (state) => state.selectedFileScopeKey,
+  );
+  const setComplianceSelection = useFileStore(
+    (state) => state.setComplianceSelection,
+  );
+  useEnsureReportFiles();
 
   const queryFileId = searchParams.get("file_id");
   const queryScope = searchParams.get("scope");
   const requestedFileId = queryFileId || selectedFileId || undefined;
-
-  useEffect(() => {
-    // Update the default greeting when switching language (only if the chat is still fresh)
-    setMessages((prev) => {
-      if (prev.length !== 1) return prev;
-      if (prev[0]?.isUser) return prev;
-      return [{ text: t("chat.welcomeMessage"), isUser: false }];
-    });
-  }, [t]);
-
-  // Ensure report context exists even after refresh or direct navigation.
-  useEffect(() => {
-    if (queryFileId && queryFileId !== selectedFileId) {
-      setSelectedFileId(queryFileId);
-    }
-  }, [queryFileId, selectedFileId, setSelectedFileId]);
-
-  useEffect(() => {
-    // If store does not have files yet (e.g., hard refresh), fetch from backend.
-    if (!files || files.length === 0) {
-      loadFilesFromBackend();
-    }
-  }, [files, loadFilesFromBackend]);
+  const requestedScopeKey = queryFileId
+    ? (searchParams.has("scope") ? queryScope?.trim() || undefined : undefined)
+    : selectedFileScopeKey || undefined;
 
   const currentFile = useMemo(() => {
-    const id = requestedFileId;
-    if (!id) return null;
-    const cands = files.filter((f) => f.file_id === id);
-    if (cands.length === 0) return null;
-    if (queryScope) {
-      const hit = cands.find((f) => f.analysis_scope_key === queryScope);
-      if (hit) return hit;
+    if (!requestedFileId) return null;
+    const candidates = files.filter((file) => file.file_id === requestedFileId);
+    if (candidates.length === 0) return null;
+    if (requestedScopeKey) {
+      const scopedFile = candidates.find(
+        (file) => file.analysis_scope_key === requestedScopeKey,
+      );
+      return scopedFile || null;
     }
-    return cands[0];
-  }, [files, requestedFileId, queryScope]);
+    if (candidates.length === 1) return candidates[0];
+    const unscopedCandidates = candidates.filter(
+      (file) => !file.analysis_scope_key,
+    );
+    return unscopedCandidates.length === 1 ? unscopedCandidates[0] : null;
+  }, [files, requestedFileId, requestedScopeKey]);
 
-  const handleSendMessage = async (userMessage: string) => {
-    const effectiveFileId = queryFileId || selectedFileId;
-    // 添加用户消息
-    setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
+  useEffect(() => {
+    if (!queryFileId || !currentFile?.file_id) return;
+    setComplianceSelection(
+      currentFile.file_id,
+      currentFile.analysis_scope_key,
+    );
+  }, [currentFile, queryFileId, setComplianceSelection]);
 
-    // 添加加载状态
-    setMessages(prev => [...prev, { text: t("chat.thinking"), isUser: false }]);
-
-    try {
-      // 调用后端API：如果选中了文件，则使用 /api/chat/{file_id}（带报告/评估上下文）；
-      // 否则回落到全局 /api/chat。
-      const response: ChatResponse = effectiveFileId
-        ? await apiService.sendMessageForFile(effectiveFileId, {
-            message: userMessage,
-            include_context: true,
-            session_id: `file:${effectiveFileId}`
-          })
-        : await apiService.sendMessage({
-            message: userMessage,
-            include_context: true
-          });
-
-      // 移除加载消息，添加真实响应
-      setMessages(prev => {
-        const newMessages = prev.slice(0, -1); // 移除加载消息
-        return [...newMessages, { text: response.response, isUser: false }];
-      });
-
-      // 如果有相关段落，可以在这里处理
-      if (response.relevant_segments && response.relevant_segments.length > 0) {
-      }
-
-    } catch (error) {
-      console.error(`Chat request failed: ${errorSummary(error)}`);
-      message.error(t("chat.failedToSend", { error: String(error) }));
-      
-      // 移除加载消息，添加错误消息
-      setMessages(prev => {
-        const newMessages = prev.slice(0, -1);
-        return [...newMessages, { 
-          text: "Sorry, I can't answer your question at the moment. Please try again later.", 
-          isUser: false 
-        }];
-      });
+  useEffect(() => {
+    if (!currentFile?.file_id) return;
+    const currentScopeKey = String(queryScope || "").trim();
+    const resolvedScopeKey = String(
+      currentFile.analysis_scope_key || "",
+    ).trim();
+    if (
+      queryFileId === currentFile.file_id
+      && currentScopeKey === resolvedScopeKey
+    ) {
+      return;
     }
-  };
-
-  const handleClearChat = () => {
-    setMessages([
-      {
-        text: t("chat.welcomeMessage"),
-        isUser: false,
-      },
-    ]);
-  };
+    router.replace(
+      buildComplianceAnalysisHref(
+        currentFile.file_id,
+        currentFile.analysis_scope_key,
+      ),
+    );
+  }, [currentFile, queryFileId, queryScope, router]);
 
   return (
-    <div className="w-full flex flex-col justify-start items-center mx-auto pt-1 min-h-screen">
+    <div className="mx-auto flex min-h-screen w-full flex-col items-center justify-start pt-1">
       <div className="w-[95%]">
         <ChatView
           activeFile={currentFile}
-          fileId={requestedFileId}
-          scopeKey={queryScope || undefined}
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          onClearChat={handleClearChat}
+          fileId={currentFile?.file_id}
+          scopeKey={currentFile?.analysis_scope_key}
         />
       </div>
     </div>

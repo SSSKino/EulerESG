@@ -27,7 +27,11 @@ import { apiService } from "@/lib/api";
 import { warmAppRoute } from "@/lib/routeWarmup";
 import { useAppLang } from "@/i18n/useAppLang";
 import { useT } from "@/i18n/useT";
-import { canCrossAnalyzeFiles, useFileStore } from "@/store/useFileStore";
+import {
+  buildComplianceAnalysisHref,
+  canCrossAnalyzeFiles,
+  useFileStore,
+} from "@/store/useFileStore";
 import type { File } from "@/store/useFileStore";
 import type { DashboardReportSelectorMode } from "./DashboardReportSelector";
 
@@ -105,6 +109,19 @@ export default function DashboardSidebar({
   );
   const clearFiles = useFileStore((state) => state.clearFiles);
   const files = useFileStore((state) => state.files);
+  const selectedFileId = useFileStore((state) => state.selectedFileId);
+  const selectedFileScopeKey = useFileStore(
+    (state) => state.selectedFileScopeKey,
+  );
+  const crossAnalysisSelection = useFileStore(
+    (state) => state.crossAnalysisSelection,
+  );
+  const setComplianceSelection = useFileStore(
+    (state) => state.setComplianceSelection,
+  );
+  const setCrossAnalysisSelection = useFileStore(
+    (state) => state.setCrossAnalysisSelection,
+  );
   const { lang, setLang } = useAppLang();
   const { t } = useT();
   const [collapsed, setCollapsed] = useState(false);
@@ -241,16 +258,20 @@ export default function DashboardSidebar({
         void message.info(lang === "zh" ? "请选择一份已处理完成的报告" : "Select one processed report");
         return;
       }
-      let target = `/dashboard/chat?file_id=${encodeURIComponent(report.file_id)}`;
-      if (report.analysis_scope_key) target += `&scope=${encodeURIComponent(report.analysis_scope_key)}`;
       apiService.prefetchAssessmentByFile(
         report.file_id,
         report.analysis_scope_key,
         false,
         true,
       );
+      setComplianceSelection(report.file_id, report.analysis_scope_key);
       setSelectorMode(null);
-      router.push(target);
+      router.push(
+        buildComplianceAnalysisHref(
+          report.file_id,
+          report.analysis_scope_key,
+        ),
+      );
       return;
     }
 
@@ -265,15 +286,31 @@ export default function DashboardSidebar({
     }
     if (selectorMode === "disclosure") {
       void apiService.getCrossAnalysisReports(uniqueFileIds).catch(() => undefined);
-      uniqueFileIds.forEach((fileId) =>
-        apiService.prefetchAssessmentByFile(fileId, undefined, false, true),
-      );
+      uniqueFileIds.forEach((fileId) => {
+        const report = selectedReports.find(
+          (candidate) => candidate.file_id === fileId,
+        );
+        apiService.prefetchAssessmentByFile(
+          fileId,
+          report?.analysis_scope_key,
+          false,
+          true,
+        );
+      });
     } else {
       apiService.prefetchCrossAnalysis(uniqueFileIds);
     }
     setSelectorMode(null);
     const viewParam = selectorMode === "disclosure" ? "&view=disclosure" : "";
-    router.push(`/cross-analysis?ids=${encodeURIComponent(uniqueFileIds.join(","))}${viewParam}`);
+    const href = `/cross-analysis?ids=${encodeURIComponent(uniqueFileIds.join(","))}${viewParam}`;
+    setCrossAnalysisSelection({
+      href,
+      reports: uniqueFileIds.map((fileId) => {
+        const report = selectedReports.find((file) => file.file_id === fileId);
+        return { fileId, scopeKey: report?.analysis_scope_key };
+      }),
+    });
+    router.push(href);
   };
 
   const isHomepage = pathname === "/dashboard";
@@ -282,8 +319,93 @@ export default function DashboardSidebar({
   const isDisclosureCompleteness =
     isCrossAnalysisRoute && (searchParams.get("view") || "").trim().toLowerCase() === "disclosure";
   const isCrossAnalysis = isCrossAnalysisRoute && !isDisclosureCompleteness;
+  const restoreComplianceAnalysis = () => {
+    if (!selectedFileId) return false;
+    const candidates = readyReports.filter(
+      (report) => report.file_id === selectedFileId,
+    );
+    const matchingReport = selectedFileScopeKey
+      ? candidates.find(
+          (report) => report.analysis_scope_key === selectedFileScopeKey,
+        )
+      : candidates.length === 1
+        ? candidates[0]
+        : (() => {
+            const unscoped = candidates.filter(
+              (report) => !report.analysis_scope_key,
+            );
+            return unscoped.length === 1 ? unscoped[0] : undefined;
+          })();
+    if (files.length > 0 && !matchingReport) return false;
+
+    const scopeKey = matchingReport?.analysis_scope_key
+      || selectedFileScopeKey
+      || undefined;
+    if (matchingReport && selectedFileScopeKey !== (scopeKey || null)) {
+      setComplianceSelection(selectedFileId, scopeKey);
+    }
+
+    apiService.prefetchAssessmentByFile(
+      selectedFileId,
+      scopeKey,
+      false,
+      true,
+    );
+    router.push(
+      buildComplianceAnalysisHref(selectedFileId, scopeKey),
+    );
+    return true;
+  };
+  const restoreCrossAnalysis = (view: "issue" | "disclosure") => {
+    const saved = crossAnalysisSelection;
+    if (!saved || saved.reports.length < 2) return false;
+    const reportIds = [
+      ...new Set(saved.reports.map((report) => report.fileId).filter(Boolean)),
+    ];
+    if (reportIds.length < 2) return false;
+    if (files.length > 0) {
+      const allReportsAvailable = saved.reports.every((savedReport) =>
+        readyReports.some(
+          (report) =>
+            report.file_id === savedReport.fileId
+            && (!savedReport.scopeKey
+              || report.analysis_scope_key === savedReport.scopeKey),
+        ),
+      );
+      if (!allReportsAvailable) return false;
+    }
+
+    const savedUrl = new URL(saved.href, "http://localhost");
+    savedUrl.searchParams.set("ids", reportIds.join(","));
+    if (view === "disclosure") {
+      savedUrl.searchParams.set("view", "disclosure");
+    } else {
+      savedUrl.searchParams.delete("view");
+    }
+    const href = `${savedUrl.pathname}${savedUrl.search}`;
+    if (view === "disclosure") {
+      void apiService.getCrossAnalysisReports(reportIds).catch(() => undefined);
+      reportIds.forEach((fileId) => {
+        const selectedReport = saved.reports.find(
+          (report) => report.fileId === fileId,
+        );
+        apiService.prefetchAssessmentByFile(
+          fileId,
+          selectedReport?.scopeKey,
+          false,
+          true,
+        );
+      });
+    } else {
+      apiService.prefetchCrossAnalysis(reportIds);
+    }
+    setCrossAnalysisSelection({ ...saved, href });
+    router.push(href);
+    return true;
+  };
   const handleDisclosureCompletenessClick = () => {
     if (!isCrossAnalysisRoute || crossAnalysisSelectedReportIds.length < 2) {
+      if (restoreCrossAnalysis("disclosure")) return;
       openReportSelector("disclosure");
       return;
     }
@@ -292,14 +414,33 @@ export default function DashboardSidebar({
     // reports. Reuse it directly instead of asking the user to select the same
     // reports again when switching to Disclosure Completeness.
     void apiService.getCrossAnalysisReports(crossAnalysisSelectedReportIds).catch(() => undefined);
+    const savedReports = crossAnalysisSelection?.reports || [];
     crossAnalysisSelectedReportIds.forEach((fileId) => {
-      apiService.prefetchAssessmentByFile(fileId, undefined, false, true);
+      const selectedReport = savedReports.find(
+        (report) => report.fileId === fileId,
+      );
+      apiService.prefetchAssessmentByFile(
+        fileId,
+        selectedReport?.scopeKey,
+        false,
+        true,
+      );
     });
     setSelectorMode(null);
     const next = new URLSearchParams(searchParams.toString());
     next.set("ids", crossAnalysisSelectedReportIds.join(","));
     next.set("view", "disclosure");
-    router.push(`${pathname}?${next.toString()}`);
+    const href = `${pathname}?${next.toString()}`;
+    const savedReportIds = savedReports.map((report) => report.fileId);
+    const isCommittedSelection =
+      savedReportIds.length === crossAnalysisSelectedReportIds.length
+      && savedReportIds.every(
+        (fileId, index) => fileId === crossAnalysisSelectedReportIds[index],
+      );
+    if (isCommittedSelection) {
+      setCrossAnalysisSelection({ href, reports: savedReports });
+    }
+    router.push(href);
   };
   const isFavourite = pathname.startsWith("/dashboard/favourite");
   const isStandardsLibrary = pathname.startsWith("/dashboard/standards-library");
@@ -408,6 +549,7 @@ export default function DashboardSidebar({
           type="button"
           onClick={() => {
             markNavigationSelection("compliance");
+            if (!isCompliance && restoreComplianceAnalysis()) return;
             openReportSelector("compliance");
           }}
           onPointerDown={() => prefetchReportFlow("compliance")}
@@ -423,6 +565,29 @@ export default function DashboardSidebar({
           type="button"
           onClick={() => {
             markNavigationSelection("cross-analysis");
+            if (isDisclosureCompleteness && crossAnalysisSelectedReportIds.length >= 2) {
+              const next = new URLSearchParams(searchParams.toString());
+              next.set("ids", crossAnalysisSelectedReportIds.join(","));
+              next.delete("view");
+              const href = `${pathname}?${next.toString()}`;
+              const savedReports = crossAnalysisSelection?.reports || [];
+              const savedReportIds = savedReports.map(
+                (report) => report.fileId,
+              );
+              const isCommittedSelection =
+                savedReportIds.length === crossAnalysisSelectedReportIds.length
+                && savedReportIds.every(
+                  (fileId, index) =>
+                    fileId === crossAnalysisSelectedReportIds[index],
+                );
+              if (isCommittedSelection) {
+                setCrossAnalysisSelection({ href, reports: savedReports });
+              }
+              apiService.prefetchCrossAnalysis(crossAnalysisSelectedReportIds);
+              router.push(href);
+              return;
+            }
+            if (!isCrossAnalysisRoute && restoreCrossAnalysis("issue")) return;
             openReportSelector("cross");
           }}
           onPointerDown={() => prefetchReportFlow("cross")}

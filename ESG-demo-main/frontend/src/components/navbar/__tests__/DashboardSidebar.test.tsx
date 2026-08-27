@@ -7,6 +7,34 @@ import DashboardSidebar from "../DashboardSidebar";
 
 const mocks = vi.hoisted(() => ({
   clearFiles: vi.fn(),
+  crossAnalysisSelection: null as null | {
+    href: string;
+    reports: Array<{ fileId: string; scopeKey?: string }>;
+  },
+  files: [
+    {
+      analysis_scope_key: "scope-a",
+      dateUploaded: "2026-08-17",
+      file_id: "report-a",
+      framework: "SASB",
+      key: "report-a::scope-a",
+      name: "Report A",
+      size: "1 MB",
+      status: "ready",
+      type: "PDF",
+    },
+    {
+      analysis_scope_key: "scope-b",
+      dateUploaded: "2026-08-17",
+      file_id: "report-b",
+      framework: "SASB",
+      key: "report-b::scope-b",
+      name: "Report B",
+      size: "1 MB",
+      status: "ready",
+      type: "PDF",
+    },
+  ] as Array<Record<string, unknown>>,
   getCrossAnalysisReports: vi.fn().mockResolvedValue({ reports: [] }),
   getStandardsCatalog: vi.fn().mockResolvedValue({ frameworks: [] }),
   loadFilesFromBackend: vi.fn(),
@@ -16,10 +44,27 @@ const mocks = vi.hoisted(() => ({
   prefetchCrossAnalysis: vi.fn(),
   push: vi.fn(),
   search: "",
+  selectedFileId: null as string | null,
+  selectedFileScopeKey: null as string | null,
+  setComplianceSelection: vi.fn(),
+  setCrossAnalysisSelection: vi.fn(),
 }));
 
 beforeEach(() => {
   window.sessionStorage.clear();
+  mocks.files.splice(2);
+  mocks.selectedFileId = null;
+  mocks.selectedFileScopeKey = null;
+  mocks.crossAnalysisSelection = null;
+  mocks.setComplianceSelection.mockImplementation(
+    (fileId: string | null, scopeKey?: string | null) => {
+      mocks.selectedFileId = fileId;
+      mocks.selectedFileScopeKey = fileId ? scopeKey || null : null;
+    },
+  );
+  mocks.setCrossAnalysisSelection.mockImplementation((selection) => {
+    mocks.crossAnalysisSelection = selection;
+  });
 });
 
 vi.mock("next/navigation", () => ({
@@ -96,7 +141,7 @@ vi.mock("antd", async () => {
         },
       }),
     },
-    Modal: ({ children, onOk, open, title }: any) =>
+    Modal: ({ children, onCancel, onOk, open, title }: any) =>
       open
         ? React.createElement(
             "div",
@@ -106,6 +151,11 @@ vi.mock("antd", async () => {
               "button",
               { onClick: onOk, type: "button" },
               "Confirm selection",
+            ),
+            React.createElement(
+              "button",
+              { onClick: onCancel, type: "button" },
+              "Cancel selection",
             ),
           )
         : null,
@@ -129,6 +179,26 @@ vi.mock("antd", async () => {
           },
           "Select all reports",
         ),
+        ...dataSource.map((row: any) => {
+          const key = typeof rowKey === "function" ? rowKey(row) : row[rowKey];
+          return React.createElement(
+            "button",
+            {
+              key: `select-${key}`,
+              onClick: () => {
+                const selectedKeys = (rowSelection.selectedRowKeys || []).map(String);
+                const nextKeys = rowSelection.type === "radio"
+                  ? [String(key)]
+                  : selectedKeys.includes(String(key))
+                    ? selectedKeys.filter((value: string) => value !== String(key))
+                    : [...selectedKeys, String(key)];
+                rowSelection.onChange(nextKeys);
+              },
+              type: "button",
+            },
+            `Select ${row.name}`,
+          );
+        }),
       ),
     Tag: ({ children }: PropsWithChildren) => React.createElement("span", null, children),
   };
@@ -176,38 +246,34 @@ vi.mock("@/i18n/useT", () => ({
 }));
 
 vi.mock("@/store/useFileStore", () => {
-  const reports = [
-    {
-      dateUploaded: "2026-08-17",
-      file_id: "report-a",
-      framework: "SASB",
-      key: "report-a",
-      name: "Report A",
-      size: "1 MB",
-      status: "ready",
-      type: "PDF",
-    },
-    {
-      dateUploaded: "2026-08-17",
-      file_id: "report-b",
-      framework: "SASB",
-      key: "report-b",
-      name: "Report B",
-      size: "1 MB",
-      status: "ready",
-      type: "PDF",
-    },
-  ];
   const state = {
     clearFiles: mocks.clearFiles,
-    files: reports,
+    get crossAnalysisSelection() {
+      return mocks.crossAnalysisSelection;
+    },
+    get files() {
+      return mocks.files;
+    },
     loadFilesFromBackend: mocks.loadFilesFromBackend,
+    get selectedFileId() {
+      return mocks.selectedFileId;
+    },
+    get selectedFileScopeKey() {
+      return mocks.selectedFileScopeKey;
+    },
+    setComplianceSelection: mocks.setComplianceSelection,
+    setCrossAnalysisSelection: mocks.setCrossAnalysisSelection,
   };
   const useFileStore = Object.assign(
     (selector: (value: typeof state) => unknown) => selector(state),
     { getState: () => state },
   );
   return {
+    buildComplianceAnalysisHref: (fileId: string, scopeKey?: string | null) => {
+      const query = new URLSearchParams({ file_id: fileId });
+      if (scopeKey) query.set("scope", scopeKey);
+      return `/dashboard/chat?${query.toString()}`;
+    },
     canCrossAnalyzeFiles: () => true,
     useFileStore,
   };
@@ -400,6 +466,279 @@ describe("DashboardSidebar disclosure-completeness navigation", () => {
     expect(
       within(subnavigation).queryByTestId("cross-analysis-navigation-slot"),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("DashboardSidebar analysis workspace history", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.pathname = "/dashboard";
+    mocks.search = "";
+    window.localStorage.clear();
+  });
+
+  it("restores Compliance from other pages and replaces it only after a confirmed selection", () => {
+    mocks.selectedFileId = "report-a";
+    mocks.selectedFileScopeKey = "scope-a";
+
+    const restoredA = render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Compliance" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(mocks.push).toHaveBeenLastCalledWith(
+      "/dashboard/chat?file_id=report-a&scope=scope-a",
+    );
+    expect(mocks.prefetchAssessmentByFile).toHaveBeenCalledWith(
+      "report-a",
+      "scope-a",
+      false,
+      true,
+    );
+
+    restoredA.unmount();
+    mocks.push.mockClear();
+    mocks.setComplianceSelection.mockClear();
+    mocks.pathname = "/dashboard/chat";
+    mocks.search = "file_id=report-a&scope=scope-a";
+    const cancelledDraft = render(<DashboardSidebar />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Compliance" }));
+    expect(screen.getByRole("dialog")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Select Report B" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel selection" }));
+
+    expect(mocks.setComplianceSelection).not.toHaveBeenCalled();
+    expect(mocks.selectedFileId).toBe("report-a");
+    expect(mocks.selectedFileScopeKey).toBe("scope-a");
+
+    cancelledDraft.unmount();
+    mocks.pathname = "/dashboard";
+    mocks.search = "";
+    const afterCancel = render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Compliance" }));
+    expect(mocks.push).toHaveBeenLastCalledWith(
+      "/dashboard/chat?file_id=report-a&scope=scope-a",
+    );
+
+    afterCancel.unmount();
+    mocks.push.mockClear();
+    mocks.setComplianceSelection.mockClear();
+    mocks.pathname = "/dashboard/chat";
+    mocks.search = "file_id=report-a&scope=scope-a";
+    const confirmedReplacement = render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Compliance" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select Report B" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm selection" }));
+
+    expect(mocks.setComplianceSelection).toHaveBeenCalledWith(
+      "report-b",
+      "scope-b",
+    );
+    expect(mocks.push).toHaveBeenLastCalledWith(
+      "/dashboard/chat?file_id=report-b&scope=scope-b",
+    );
+
+    confirmedReplacement.unmount();
+    mocks.push.mockClear();
+    mocks.pathname = "/dashboard";
+    mocks.search = "";
+    render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Compliance" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(mocks.push).toHaveBeenLastCalledWith(
+      "/dashboard/chat?file_id=report-b&scope=scope-b",
+    );
+  });
+
+  it("opens the selector when a legacy Compliance selection is ambiguous across scopes", () => {
+    mocks.files.push({
+      ...mocks.files[0],
+      analysis_scope_key: "scope-a-2",
+      key: "report-a::scope-a-2",
+      name: "Report A (alternate scope)",
+    });
+    mocks.selectedFileId = "report-a";
+    mocks.selectedFileScopeKey = null;
+
+    render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Compliance" }));
+
+    expect(screen.getByRole("dialog")).toBeVisible();
+    expect(mocks.push).not.toHaveBeenCalled();
+    expect(mocks.prefetchAssessmentByFile).not.toHaveBeenCalled();
+  });
+
+  it("restores the full Cross Analysis URL and commits a new report set only on confirm", () => {
+    mocks.files.push(
+      {
+        analysis_scope_key: "scope-c",
+        dateUploaded: "2026-08-18",
+        file_id: "report-c",
+        framework: "SASB",
+        key: "report-c::scope-c",
+        name: "Report C",
+        size: "1 MB",
+        status: "ready",
+        type: "PDF",
+      },
+      {
+        analysis_scope_key: "scope-d",
+        dateUploaded: "2026-08-18",
+        file_id: "report-d",
+        framework: "SASB",
+        key: "report-d::scope-d",
+        name: "Report D",
+        size: "1 MB",
+        status: "ready",
+        type: "PDF",
+      },
+    );
+    mocks.crossAnalysisSelection = {
+      href:
+        "/cross-analysis?ids=report-a%2Creport-b&primary=Environment&secondary=Energy&metric=Energy%20Use",
+      reports: [
+        { fileId: "report-a", scopeKey: "scope-a" },
+        { fileId: "report-b", scopeKey: "scope-b" },
+      ],
+    };
+
+    const restoredAB = render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Cross Analysis" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    let target = new URL(
+      String(mocks.push.mock.calls.at(-1)?.[0]),
+      "http://localhost",
+    );
+    expect(target.pathname).toBe("/cross-analysis");
+    expect(target.searchParams.get("ids")).toBe("report-a,report-b");
+    expect(target.searchParams.get("primary")).toBe("Environment");
+    expect(target.searchParams.get("secondary")).toBe("Energy");
+    expect(target.searchParams.get("metric")).toBe("Energy Use");
+    expect(mocks.prefetchCrossAnalysis).toHaveBeenCalledWith([
+      "report-a",
+      "report-b",
+    ]);
+
+    restoredAB.unmount();
+    mocks.push.mockClear();
+    mocks.setCrossAnalysisSelection.mockClear();
+    mocks.pathname = "/cross-analysis";
+    mocks.search = "ids=report-a%2Creport-b&primary=Environment";
+    const cancelledDraft = render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Cross Analysis" }));
+    expect(screen.getByRole("dialog")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Select Report C" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select Report D" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel selection" }));
+
+    expect(mocks.setCrossAnalysisSelection).not.toHaveBeenCalled();
+    expect(mocks.crossAnalysisSelection?.reports.map((report) => report.fileId)).toEqual([
+      "report-a",
+      "report-b",
+    ]);
+
+    cancelledDraft.unmount();
+    mocks.pathname = "/dashboard";
+    mocks.search = "";
+    const afterCancel = render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Cross Analysis" }));
+    target = new URL(
+      String(mocks.push.mock.calls.at(-1)?.[0]),
+      "http://localhost",
+    );
+    expect(target.searchParams.get("ids")).toBe("report-a,report-b");
+
+    afterCancel.unmount();
+    mocks.push.mockClear();
+    mocks.setCrossAnalysisSelection.mockClear();
+    mocks.pathname = "/cross-analysis";
+    mocks.search = "ids=report-a%2Creport-b&primary=Environment";
+    const confirmedReplacement = render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Cross Analysis" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select Report C" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select Report D" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm selection" }));
+
+    expect(mocks.setCrossAnalysisSelection).toHaveBeenCalledWith({
+      href: "/cross-analysis?ids=report-c%2Creport-d",
+      reports: [
+        { fileId: "report-c", scopeKey: "scope-c" },
+        { fileId: "report-d", scopeKey: "scope-d" },
+      ],
+    });
+    target = new URL(
+      String(mocks.push.mock.calls.at(-1)?.[0]),
+      "http://localhost",
+    );
+    expect(target.searchParams.get("ids")).toBe("report-c,report-d");
+
+    confirmedReplacement.unmount();
+    mocks.push.mockClear();
+    mocks.pathname = "/dashboard";
+    mocks.search = "";
+    render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Cross Analysis" }));
+    target = new URL(
+      String(mocks.push.mock.calls.at(-1)?.[0]),
+      "http://localhost",
+    );
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(target.searchParams.get("ids")).toBe("report-c,report-d");
+  });
+
+  it("restores the Cross workspace with the saved reports but not the Disclosure subview", () => {
+    mocks.crossAnalysisSelection = {
+      href:
+        "/cross-analysis?ids=report-a%2Creport-b&primary=Environment&view=disclosure",
+      reports: [
+        { fileId: "report-a", scopeKey: "scope-a" },
+        { fileId: "report-b", scopeKey: "scope-b" },
+      ],
+    };
+
+    render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Cross Analysis" }));
+
+    const target = new URL(
+      String(mocks.push.mock.calls.at(-1)?.[0]),
+      "http://localhost",
+    );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(target.searchParams.get("ids")).toBe("report-a,report-b");
+    expect(target.searchParams.get("primary")).toBe("Environment");
+    expect(target.searchParams.has("view")).toBe(false);
+  });
+
+  it("switches from Disclosure to Cross without asking for the same reports again", () => {
+    mocks.pathname = "/cross-analysis";
+    mocks.search =
+      "ids=report-a%2Creport-b&primary=Environment&view=disclosure";
+    mocks.crossAnalysisSelection = {
+      href: `/cross-analysis?${mocks.search}`,
+      reports: [
+        { fileId: "report-a", scopeKey: "scope-a" },
+        { fileId: "report-b", scopeKey: "scope-b" },
+      ],
+    };
+
+    render(<DashboardSidebar />);
+    fireEvent.click(screen.getByRole("button", { name: "Cross Analysis" }));
+
+    const target = new URL(
+      String(mocks.push.mock.calls.at(-1)?.[0]),
+      "http://localhost",
+    );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(target.searchParams.get("ids")).toBe("report-a,report-b");
+    expect(target.searchParams.get("primary")).toBe("Environment");
+    expect(target.searchParams.has("view")).toBe(false);
+    expect(mocks.prefetchCrossAnalysis).toHaveBeenCalledWith([
+      "report-a",
+      "report-b",
+    ]);
   });
 });
 

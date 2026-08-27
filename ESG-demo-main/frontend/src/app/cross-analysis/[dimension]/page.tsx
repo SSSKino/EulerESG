@@ -2,7 +2,12 @@
 
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import dynamic from "next/dynamic";
 import { Button, Modal, Skeleton } from "antd";
 
@@ -18,6 +23,7 @@ import { useCrossAnalysisNavigationSlot } from "@/components/cross-analysis/Cros
 import { NewHeader } from "@/components/cross-analysis/NewHeader";
 import type { MetricChartSpec } from "@/components/cross-analysis/MetricChartsGrid";
 import { useT } from "@/i18n/useT";
+import { useFileStore } from "@/store/useFileStore";
 
 const loadMetricChartsGrid = () =>
   import("@/components/cross-analysis/MetricChartsGrid");
@@ -38,11 +44,6 @@ const DisclosureCompletenessComparison = dynamic(
   loadDisclosureCompleteness,
   { loading: () => <Skeleton active paragraph={{ rows: 10 }} />, ssr: false },
 );
-const FloatingChatAssistant = dynamic(
-  () => import("@/components/cross-analysis/FloatingChatAssistant"),
-  { ssr: false },
-);
-
 const EMPTY_REPORTS: CrossReportSummary[] = [];
 const EMPTY_RECORDS: CrossExtractedRecord[] = [];
 const ACTIVITY_METRICS_PRIMARY = "Activity Metrics";
@@ -143,7 +144,14 @@ function CrossAnalysisDimensionPageContent() {
   const { t } = useT();
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname() || "/cross-analysis";
   const searchParams = useSearchParams();
+  const crossAnalysisSelection = useFileStore(
+    (state) => state.crossAnalysisSelection,
+  );
+  const setCrossAnalysisSelection = useFileStore(
+    (state) => state.setCrossAnalysisSelection,
+  );
 
   const dimensionSlug = safeTrim((params as any)?.dimension || "");
 
@@ -170,6 +178,56 @@ function CrossAnalysisDimensionPageContent() {
   useEffect(() => {
     setViewMode(isDisclosureQuery ? "disclosure" : "issue");
   }, [isDisclosureQuery]);
+
+  useEffect(() => {
+    if (!crossAnalysisSelection || ids.length < 2) return;
+    const committedIds = crossAnalysisSelection.reports.map(
+      (report) => report.fileId,
+    );
+    if (!arraysEqual(ids, committedIds)) return;
+
+    // Navigation inside an already confirmed comparison may update the saved
+    // dimension/view URL, but it must never replace the committed report set.
+    // This avoids an old page effect racing with a newly confirmed selection.
+    const href = `${pathname}${searchParamsStr ? `?${searchParamsStr}` : ""}`;
+    if (href === crossAnalysisSelection.href) return;
+    setCrossAnalysisSelection({
+      href,
+      reports: crossAnalysisSelection.reports,
+    });
+  }, [
+    crossAnalysisSelection,
+    ids,
+    pathname,
+    searchParamsStr,
+    setCrossAnalysisSelection,
+  ]);
+
+  useEffect(() => {
+    if (idsParam || !crossAnalysisSelection) return;
+    const committedIds = crossAnalysisSelection.reports.map(
+      (report) => report.fileId,
+    );
+    if (parseIds(committedIds.join(",")).length < 2) return;
+    try {
+      const savedUrl = new URL(
+        crossAnalysisSelection.href,
+        "http://localhost",
+      );
+      if (!savedUrl.pathname.startsWith("/cross-analysis")) return;
+      if (
+        !arraysEqual(
+          parseIds(savedUrl.searchParams.get("ids")),
+          committedIds,
+        )
+      ) {
+        return;
+      }
+      router.replace(`${savedUrl.pathname}${savedUrl.search}`);
+    } catch {
+      // Ignore malformed persisted state and keep the neutral selector view.
+    }
+  }, [crossAnalysisSelection, idsParam, router]);
 
   // Start downloading the active view's heavy UI at the same time as its data.
   // Without this, the chart/table chunks only begin after the API bootstrap has
@@ -935,9 +993,6 @@ const handleSelectTertiary = useCallback(
         </div>
       </div>
       )}
-
-      {/* 悬浮 AI 助手：仅在对比分析主内容展示时显示 */}
-      {canCompare && <FloatingChatAssistant />}
     </div>
   );
 }

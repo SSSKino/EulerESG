@@ -92,13 +92,9 @@ const DisclosureGraphCanvas = dynamic(
   },
 );
 
-const FloatingChatAssistant = dynamic(
-  () => import("@/components/cross-analysis/FloatingChatAssistant"),
-  { ssr: false },
-);
-
 const STANDALONE_OWNER = "__ready_reports__";
-const MAX_DEFAULT_REPORTS = 12;
+const DEFAULT_SELECTED_REPORT_COUNT = 1;
+const SHOW_NON_BLOCKING_ERROR_BANNER = false;
 
 type LoadState = "idle" | "loading" | "success" | "error";
 type SelectedDetail =
@@ -533,7 +529,7 @@ function GraphExplorationContent() {
     if (files.length === 0) return;
     const allowed = new Set(allOwnerReportIds);
     const available = allOwnerReportIds
-      .slice(0, MAX_DEFAULT_REPORTS)
+      .slice(0, DEFAULT_SELECTED_REPORT_COUNT)
       .filter(Boolean);
     const ownerChanged = Boolean(previousOwnerRef.current && previousOwnerRef.current !== ownerId);
     previousOwnerRef.current = ownerId;
@@ -589,7 +585,7 @@ function GraphExplorationContent() {
     const validSelection = [...new Set(appliedReportIds)].filter((fileId) => ownerFileIds.has(fileId));
     const fallbackIds = validSelection.length
       ? validSelection
-      : [...ownerFileIds].slice(0, MAX_DEFAULT_REPORTS);
+      : [...ownerFileIds].slice(0, DEFAULT_SELECTED_REPORT_COUNT);
     setLoadState("loading");
     setLoadError("");
     setUsingReportFallback(false);
@@ -956,6 +952,14 @@ function GraphExplorationContent() {
     if (graphAvailableRef.current) setLoadState("loading");
     setOwnerId(value);
   }, []);
+  const handleReportSelectionChange = useCallback((values: string[]) => {
+    const uniqueValues = [...new Set(values)].filter(Boolean);
+    setSelectedReportIds(
+      uniqueValues.length
+        ? uniqueValues
+        : reportIdsFromKey(ownerReportIdsKey).slice(0, DEFAULT_SELECTED_REPORT_COUNT),
+    );
+  }, [ownerReportIdsKey]);
   const handleScopeChange = useCallback((value?: string) => {
     if (graphAvailableRef.current) setLoadState("loading");
     setScope(value || "");
@@ -1209,8 +1213,8 @@ function GraphExplorationContent() {
             className="min-w-[220px] max-w-[360px]"
             value={selectedReportIds}
             options={reportOptions}
-            placeholder="Reports (latest 12)"
-            onChange={setSelectedReportIds}
+            placeholder="Select reports"
+            onChange={handleReportSelectionChange}
             showSearch
             optionFilterProp="label"
           />
@@ -1562,7 +1566,7 @@ function GraphExplorationContent() {
                   Showing merged per-report assessments because a company-level per-report graph was unavailable.
                 </div>
               ) : null}
-              {loadError ? (
+              {SHOW_NON_BLOCKING_ERROR_BANNER && loadError ? (
                 <button type="button" onClick={() => setLoadError("")} className="pointer-events-auto flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50/95 px-3 py-2 text-left text-xs text-amber-800 shadow-sm">
                   <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {loadError}
                 </button>
@@ -1601,7 +1605,6 @@ function GraphExplorationContent() {
         })()}
       />
       <GraphShortcutHelp open={shortcutHelpOpen} onClose={() => setShortcutHelpOpen(false)} />
-      <FloatingChatAssistant includeContext={false} />
     </main>
   );
 }

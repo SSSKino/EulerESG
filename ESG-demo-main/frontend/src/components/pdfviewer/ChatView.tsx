@@ -2,10 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import AnalysisResults from "./AnalysisResults";
 import type { AnalysisDataItem, EvidencePageTarget } from "./AnalysisResults";
-import { ChevronDown, ChevronUp, FileText, MessageCircle, X } from "lucide-react";
+import { ChevronDown, ChevronUp, FileText } from "lucide-react";
 import { useT } from "@/i18n/useT";
 import type { File as FileData } from "@/store/useFileStore";
-import { useDraggableFloating } from "@/hooks/useDraggableFloating";
 
 interface CollapsibleSectionProps {
   title: string;
@@ -49,27 +48,12 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 
 const PDFReportViewer = dynamic(() => import("./PDFChatViewer"), { ssr: false });
 const MemoizedPDFReportViewer = React.memo(PDFReportViewer);
-const ChatInterface = dynamic(() => import("./ChatInterface"), {
-  ssr: false,
-  loading: () => (
-    <div
-      aria-busy="true"
-      aria-label="Loading AI Assistant"
-      className="h-full min-h-64 animate-pulse bg-slate-50"
-    />
-  ),
-});
 const ComplianceSummaryDrawer = dynamic(
   () => import("./ComplianceSummaryDrawer"),
   { ssr: false },
 );
 // Use same-origin proxy via Next.js rewrites by default.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-
-interface Message {
-  text: string;
-  isUser: boolean;
-}
 
 type PageNavigation = {
   documentKey: string;
@@ -81,29 +65,17 @@ interface ChatViewProps {
   activeFile: FileData | null;
   fileId?: string;
   scopeKey?: string;
-  messages: Message[];
-  onSendMessage: (message: string) => void;
-  onClearChat: () => void;
 }
 
 const ChatView: React.FC<ChatViewProps> = ({
   activeFile,
   fileId,
   scopeKey,
-  messages,
-  onSendMessage,
-  onClearChat,
 }) => {
   const { t } = useT();
-  const [assistantOpen, setAssistantOpen] = useState(false);
-  const [assistantLoaded, setAssistantLoaded] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [analysisMetrics, setAnalysisMetrics] = useState<AnalysisDataItem[]>([]);
   const [showAnalysisTable, setShowAnalysisTable] = useState<boolean>(true);
-  const {
-    draggableProps: assistantDragProps,
-    draggableRef: assistantButtonRef,
-  } = useDraggableFloating<HTMLButtonElement>();
 
   const effectiveFileId = fileId || activeFile?.file_id;
   const effectiveScopeKey = scopeKey || activeFile?.analysis_scope_key;
@@ -116,27 +88,11 @@ const ChatView: React.FC<ChatViewProps> = ({
   useEffect(() => {
     setAnalysisMetrics([]);
     setSummaryOpen(false);
-    setAssistantOpen(false);
   }, [effectiveFileId, effectiveScopeKey]);
 
   const handleAnalysisDataChange = useCallback((items: AnalysisDataItem[]) => {
     setAnalysisMetrics(items);
   }, []);
-
-  const closeAssistant = useCallback(() => {
-    setAssistantOpen(false);
-    window.requestAnimationFrame(() => assistantButtonRef.current?.focus());
-  }, [assistantButtonRef]);
-
-  useEffect(() => {
-    if (!assistantOpen) return;
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeAssistant();
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [assistantOpen, closeAssistant]);
 
   const navigateToPage = useCallback((target: EvidencePageTarget) => {
     if (target.fileId && target.fileId !== effectiveFileId) {
@@ -164,10 +120,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   const summaryAction = useMemo(() => (
     <button
       type="button"
-      onClick={() => {
-        setAssistantOpen(false);
-        setSummaryOpen(true);
-      }}
+      onClick={() => setSummaryOpen(true)}
       disabled={analysisMetrics.length === 0}
       className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2274BC] px-4 text-xs font-semibold text-white shadow-sm transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-px hover:bg-[#1b63a3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
       title={t("analysis.generateSummaryTooltip")}
@@ -240,58 +193,6 @@ const ChatView: React.FC<ChatViewProps> = ({
           )}
         </CollapsibleSection>
       </div>
-
-      <section
-        id="compliance-ai-assistant"
-        role="dialog"
-        aria-modal="false"
-        aria-label={t("chat.aiAssistant")}
-        aria-hidden={!assistantOpen}
-        data-testid="compliance-ai-assistant"
-        className={`dashboard-chat-panel fixed z-50 flex h-[min(620px,calc(100dvh-7rem))] min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.22)] transition-[opacity,transform,visibility] duration-300 ease-[var(--motion-fluid)] ${
-          assistantOpen
-            ? "visible translate-y-0 scale-100 opacity-100"
-            : "invisible pointer-events-none translate-y-3 scale-[0.98] opacity-0"
-        }`}
-      >
-        <div className="flex h-full min-h-0 flex-col">
-          {assistantLoaded ? (
-            <ChatInterface
-              messages={messages}
-              onSendMessage={onSendMessage}
-              onClearChat={onClearChat}
-              onClose={closeAssistant}
-              onReferenceClick={(page) => {
-                navigateToPage({ page });
-                closeAssistant();
-              }}
-            />
-          ) : null}
-        </div>
-      </section>
-
-      <button
-        ref={assistantButtonRef}
-        type="button"
-        {...assistantDragProps}
-        onClick={() => {
-          setSummaryOpen(false);
-          setAssistantLoaded(true);
-          setAssistantOpen((open) => !open);
-        }}
-        className={`dashboard-chat-launcher draggable-assistant-launcher fixed z-[51] flex h-12 items-center gap-2 rounded-full px-4 text-white shadow-lg transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 ${
-          assistantOpen ? "bg-slate-800 hover:bg-slate-700" : "bg-[#2274BC] hover:bg-[#1b63a3]"
-        }`}
-        aria-label={assistantOpen ? t("common.close") : "AI Assistant"}
-        aria-controls="compliance-ai-assistant"
-        aria-expanded={assistantOpen}
-        title={t("chat.dragAssistantHint")}
-      >
-        {assistantOpen ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
-        <span className="dashboard-chat-launcher-label text-sm font-medium">
-          {assistantOpen ? t("common.close") : "AI Assistant"}
-        </span>
-      </button>
 
       {summaryOpen ? (
         <ComplianceSummaryDrawer

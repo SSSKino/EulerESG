@@ -1,7 +1,10 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useFileStore } from "@/store/useFileStore";
+import {
+  buildComplianceAnalysisHref,
+  useFileStore,
+} from "@/store/useFileStore";
 import type { File, ReportCatalogMode } from "@/store/useFileStore";
 import MainContent from "../maincontent/MainContent";
 import FileTable from "./FileTable";
@@ -28,7 +31,10 @@ export default function PDFViewer() {
 
   const handleChatClick = useCallback((file: File) => {
     if (!file.file_id) return;
-    useFileStore.getState().setSelectedFileId(file.file_id || null);
+    useFileStore.getState().setComplianceSelection(
+      file.file_id,
+      file.analysis_scope_key,
+    );
     apiService.prefetchAssessmentByFile(
       file.file_id,
       file.analysis_scope_key,
@@ -36,11 +42,9 @@ export default function PDFViewer() {
       true,
     );
 
-    let url = `/dashboard/chat?file_id=${encodeURIComponent(file.file_id)}`;
-    if (file.analysis_scope_key) {
-      url += `&scope=${encodeURIComponent(file.analysis_scope_key)}`;
-    }
-    router.push(url);
+    router.push(
+      buildComplianceAnalysisHref(file.file_id, file.analysis_scope_key),
+    );
   }, [router]);
 
   return (

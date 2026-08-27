@@ -11,16 +11,21 @@ import {
 const DRAG_THRESHOLD_PX = 6;
 const VIEWPORT_MARGIN_PX = 8;
 
-interface Point {
+export interface FloatingPosition {
   x: number;
   y: number;
+}
+
+interface DraggableFloatingOptions {
+  position?: FloatingPosition | null;
+  onPositionChange?: (position: FloatingPosition) => void;
 }
 
 interface DragSession<T extends HTMLElement> {
   activated: boolean;
   element: T;
   height: number;
-  lastPosition: Point | null;
+  lastPosition: FloatingPosition | null;
   pointerId: number;
   startClientX: number;
   startClientY: number;
@@ -45,10 +50,10 @@ function getViewportBounds() {
 }
 
 function clampToViewport(
-  point: Point,
+  point: FloatingPosition,
   width: number,
   height: number,
-): Point {
+): FloatingPosition {
   const viewport = getViewportBounds();
   const minX = viewport.left + VIEWPORT_MARGIN_PX;
   const minY = viewport.top + VIEWPORT_MARGIN_PX;
@@ -67,7 +72,7 @@ function clampToViewport(
   };
 }
 
-function samePoint(left: Point, right: Point): boolean {
+function samePoint(left: FloatingPosition, right: FloatingPosition): boolean {
   return left.x === right.x && left.y === right.y;
 }
 
@@ -76,10 +81,13 @@ function samePoint(left: Point, right: Point): boolean {
  * tap/click into a drag. Position updates are applied directly while moving so
  * a large page does not re-render for every pointer event.
  */
-export function useDraggableFloating<T extends HTMLElement>() {
+export function useDraggableFloating<T extends HTMLElement>({
+  position = null,
+  onPositionChange,
+}: DraggableFloatingOptions = {}) {
   const draggableRef = useRef<T>(null);
   const dragSessionRef = useRef<DragSession<T> | null>(null);
-  const positionRef = useRef<Point | null>(null);
+  const positionRef = useRef<FloatingPosition | null>(position);
   const suppressClickRef = useRef(false);
   const suppressClickTimerRef = useRef<number | null>(null);
 
@@ -90,7 +98,7 @@ export function useDraggableFloating<T extends HTMLElement>() {
     }
   }, []);
 
-  const applyPosition = useCallback((element: T, nextPosition: Point) => {
+  const applyPosition = useCallback((element: T, nextPosition: FloatingPosition) => {
     element.style.left = `${nextPosition.x}px`;
     element.style.top = `${nextPosition.y}px`;
     element.style.right = "auto";
@@ -114,6 +122,7 @@ export function useDraggableFloating<T extends HTMLElement>() {
 
       if (session.lastPosition) {
         positionRef.current = session.lastPosition;
+        onPositionChange?.(session.lastPosition);
       }
 
       clearClickSuppressionTimer();
@@ -127,8 +136,30 @@ export function useDraggableFloating<T extends HTMLElement>() {
         }, 0);
       }
     },
-    [clearClickSuppressionTimer],
+    [clearClickSuppressionTimer, onPositionChange],
   );
+
+  useEffect(() => {
+    const element = draggableRef.current;
+    if (!element) return;
+
+    if (!position) {
+      positionRef.current = null;
+      element.style.removeProperty("left");
+      element.style.removeProperty("top");
+      element.style.removeProperty("right");
+      element.style.removeProperty("bottom");
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const nextPosition = clampToViewport(position, rect.width, rect.height);
+    positionRef.current = nextPosition;
+    applyPosition(element, nextPosition);
+    if (!samePoint(position, nextPosition)) {
+      onPositionChange?.(nextPosition);
+    }
+  }, [applyPosition, onPositionChange, position]);
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<T>) => {
@@ -254,6 +285,7 @@ export function useDraggableFloating<T extends HTMLElement>() {
 
       positionRef.current = nextPosition;
       applyPosition(element, nextPosition);
+      onPositionChange?.(nextPosition);
     };
 
     const viewport = window.visualViewport;
@@ -268,7 +300,7 @@ export function useDraggableFloating<T extends HTMLElement>() {
       viewport?.removeEventListener("resize", keepInsideViewport);
       viewport?.removeEventListener("scroll", keepInsideViewport);
     };
-  }, [applyPosition]);
+  }, [applyPosition, onPositionChange]);
 
   useEffect(() => {
     const stopOnWindowBlur = () => {

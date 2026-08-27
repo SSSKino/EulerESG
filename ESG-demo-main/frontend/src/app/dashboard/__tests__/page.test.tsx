@@ -18,24 +18,8 @@ vi.mock("next/dynamic", () => ({
         return <main data-testid="dashboard-files" />;
       };
     }
-    if (index === 2) {
-      return function MockStatusButton() {
-        return null;
-      };
-    }
-    return function MockFloatingChatAssistant({
-      includeContext,
-    }: {
-      includeContext?: boolean;
-    }) {
-      return (
-        <button
-          type="button"
-          data-include-context={String(includeContext)}
-        >
-          AI Assistant
-        </button>
-      );
+    return function MockStatusButton() {
+      return null;
     };
   },
 }));
@@ -53,16 +37,13 @@ describe("DashboardPage", () => {
     vi.unstubAllEnvs();
   });
 
-  it("keeps a generic AI Assistant available on the homepage via a client-only chunk", async () => {
+  it("keeps the homepage workspace client-only while the shared layout owns its assistant", async () => {
     vi.stubEnv("NEXT_PUBLIC_SHOW_DEV_TOOLS", "false");
     const { default: DashboardPage } = await import("../page");
     render(<DashboardPage />);
 
     expect(screen.getByTestId("dashboard-files")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "AI Assistant" })).toHaveAttribute(
-      "data-include-context",
-      "false",
-    );
+    expect(screen.queryByRole("button", { name: "AI Assistant" })).not.toBeInTheDocument();
     expect(mocks.dynamicOptions).toContainEqual({ ssr: false });
     expect(mocks.dynamicOptions[0]).toMatchObject({
       ssr: false,

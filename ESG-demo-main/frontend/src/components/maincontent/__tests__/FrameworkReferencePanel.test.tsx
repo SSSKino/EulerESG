@@ -214,6 +214,8 @@ describe("FrameworkReferencePanel", () => {
     const heading = screen.getByRole("heading", { level: 1, name: "Standards Library" });
     expect(library).toHaveAttribute("data-testid", "standards-library");
     expect(library).toHaveAttribute("aria-labelledby", heading.id);
+    expect(heading.parentElement).toHaveClass("mb-6");
+    expect(heading.parentElement).not.toHaveClass("mb-9");
 
     const staticLibraryClasses = library.className
       .split(/\s+/)
@@ -223,6 +225,20 @@ describe("FrameworkReferencePanel", () => {
     ).toBe(false);
 
     const frameworks = screen.getByRole("group", { name: "Frameworks" });
+    expect(frameworks).toHaveClass("gap-4", "sm:gap-5", "overflow-x-auto");
+    expect(frameworks).not.toHaveClass("gap-6");
+    const browser = document.getElementById("standards-browser");
+    expect(browser).not.toBeNull();
+    expect(browser as HTMLElement).toHaveClass("mt-6");
+    expect(browser as HTMLElement).not.toHaveClass("mt-9");
+    const browserGrid = screen.getByLabelText("SASB taxonomy").parentElement;
+    expect(browserGrid).toHaveClass(
+      "grid",
+      "gap-6",
+      "lg:grid-cols-[248px_minmax(0,1fr)]",
+      "xl:gap-8",
+    );
+    expect(browserGrid).not.toHaveClass("gap-9", "xl:gap-14");
     const frameworkArticles = Array.from(frameworks.children).filter(
       (child): child is HTMLElement => child instanceof HTMLElement && child.tagName === "ARTICLE",
     );
