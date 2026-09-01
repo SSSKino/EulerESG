@@ -648,6 +648,10 @@ class RetrievalNoiseControlTests(unittest.TestCase):
                     position_y=1,
                     segment_type="paragraph_cluster",
                     review_status="needs_review",
+                    structured_data={
+                        "quality_reasons": ["missing_header"],
+                        "quality_notes": ["inferred_header_structure"],
+                    },
                 ),
                 TextSegment(
                     segment_id="verified",
@@ -667,6 +671,12 @@ class RetrievalNoiseControlTests(unittest.TestCase):
             {"verified", "needs-review"},
         )
         self.assertTrue(all(isinstance(result.score, float) for result in results))
+        by_id = {result.segment_id: result for result in results}
+        self.assertEqual(by_id["needs-review"].quality_reasons, ["missing_header"])
+        self.assertEqual(
+            by_id["needs-review"].quality_notes,
+            ["inferred_header_structure"],
+        )
 
     def test_topic_unit_and_percentage_tokens_are_not_exact_aliases(self):
         metric = self._metric_with_topic()
@@ -1491,6 +1501,59 @@ class RetrievalNoiseControlTests(unittest.TestCase):
 class DirectDisclosureTests(unittest.TestCase):
     def setUp(self):
         self.engine = object.__new__(DisclosureInferenceEngine)
+
+    def test_evidence_sources_keep_table_quality_metadata_from_segment(self):
+        code = "TEST-1"
+        metric_name = "Test metric value"
+        segment = TextSegment(
+            segment_id="quality-row",
+            content=f"{metric_name} | FY2024: 87% | {code}",
+            page_number=12,
+            position_y=1,
+            segment_type="table_row",
+            source_table_id="quality-table",
+            row_header=metric_name,
+            review_status="needs_review",
+            structured_data={
+                "table_id": "quality-table",
+                "row_index": 1,
+                "review_status": "needs_review",
+                "quality_reasons": ["missing_header"],
+                "quality_notes": ["inferred_header_structure"],
+            },
+        )
+        metric = _metric("test-metric", code, metric_name, "%")
+        retrieval = MetricRetrievalResult(
+            metric_id=metric.metric_id,
+            metric_name=metric.metric_name,
+            metric_code=code,
+            combined_results=[
+                RetrievalResult(
+                    segment_id=segment.segment_id,
+                    content=segment.content,
+                    page_number=segment.page_number,
+                    score=1.0,
+                    retrieval_type="exact_code",
+                    metric_id=metric.metric_id,
+                )
+            ],
+            total_matches=1,
+            target_k=1,
+        )
+        self.engine.config = ProcessingConfig()
+
+        analysis = self.engine._analyze_single_metric(
+            retrieval,
+            _report([segment]),
+            metric,
+        )
+
+        source = analysis.evidence_sources[0]
+        self.assertEqual(source["quality_reasons"], ["missing_header"])
+        self.assertEqual(
+            source["quality_notes"],
+            ["inferred_header_structure"],
+        )
 
     def _analyze_all_other_employee_category(
         self,

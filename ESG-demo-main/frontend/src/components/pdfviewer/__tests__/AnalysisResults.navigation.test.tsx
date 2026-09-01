@@ -4,7 +4,12 @@ import {
   convertAssessmentData,
   getEmptyQuantitativeValueTranslationKey,
   getMetricDefinitionText,
+  getTableQualityTranslationKey,
+  getTableReviewStatusColor,
+  getTableReviewStatusTranslationKey,
+  normalizeTableQualityCodes,
 } from "../AnalysisResults";
+import { tWithLang } from "@/i18n/useT";
 
 const metric = (page: unknown, evidenceSources: unknown[] = []) => ({
   metric_id: "metric-1",
@@ -38,6 +43,77 @@ describe("AnalysisResults evidence navigation", () => {
     expect(getEmptyQuantitativeValueTranslationKey("none")).toBe(
       "analysis.summary.notSpecified",
     );
+  });
+
+  it.each([
+    ["needs_review", "表格结构待复核", "Table structure needs review", "warning"],
+    ["verified", "表格结构已校验", "Table structure verified", "success"],
+    ["unverified", "表格结构尚未校验", "Table structure not yet verified", "processing"],
+    ["unknown", "表格结构状态未知", "Table structure status unknown", "default"],
+  ])(
+    "localizes the table review status %s",
+    (reviewStatus, expectedZh, expectedEn, expectedColor) => {
+      const key = getTableReviewStatusTranslationKey(reviewStatus);
+      expect(tWithLang("zh", key)).toBe(expectedZh);
+      expect(tWithLang("en", key)).toBe(expectedEn);
+      expect(getTableReviewStatusColor(reviewStatus)).toBe(expectedColor);
+    },
+  );
+
+  it("treats a missing table review status as unknown", () => {
+    expect(getTableReviewStatusTranslationKey(undefined)).toBe(
+      "analysis.tableReviewStatus.unknown",
+    );
+    expect(getTableReviewStatusColor(undefined)).toBe("default");
+  });
+
+  it.each([
+    [
+      "missing_header",
+      "reason" as const,
+      "无法可靠识别表头",
+      "The table header could not be identified reliably",
+    ],
+    [
+      "missing_ocr_confidence",
+      "note" as const,
+      "OCR 结果未提供可用的置信度",
+      "No usable OCR confidence was provided",
+    ],
+    [
+      "future_reason",
+      "reason" as const,
+      "其他表格质量问题（future reason）",
+      "Other table quality issue (future reason)",
+    ],
+  ])(
+    "localizes the table quality %s",
+    (code, kind, expectedZh, expectedEn) => {
+      const key = getTableQualityTranslationKey(code, kind);
+      const vars = { detail: code.replace(/[_-]+/g, " ") };
+      expect(tWithLang("zh", key, vars)).toBe(expectedZh);
+      expect(tWithLang("en", key, vars)).toBe(expectedEn);
+    },
+  );
+
+  it("preserves and de-duplicates table quality details from evidence sources", () => {
+    const [item] = convertAssessmentData({
+      metric_analyses: [
+        metric(12, [
+          {
+            review_status: "needs_review",
+            quality_reasons: ["missing_header", "missing_header"],
+            quality_notes: ["missing_ocr_confidence"],
+          },
+        ]),
+      ],
+    });
+
+    expect(item.tableEvidence?.quality_reasons).toEqual(["missing_header", "missing_header"]);
+    expect(item.tableEvidence?.quality_notes).toEqual(["missing_ocr_confidence"]);
+    expect(normalizeTableQualityCodes(item.tableEvidence?.quality_reasons)).toEqual([
+      "missing_header",
+    ]);
   });
 
   it("uses the complete simple definition before the technical definition", () => {

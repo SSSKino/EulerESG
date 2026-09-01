@@ -14,6 +14,17 @@ import { warmAppRoute } from "@/lib/routeWarmup";
 
 const REPORT_CATALOG_MODE: ReportCatalogMode = "single";
 
+const warmPDFPreviewAssets = () => {
+  void import("./PDFChatViewer").catch(() => undefined);
+  if (document.querySelector('link[data-pdf-worker-prefetch="true"]')) return;
+  const workerPrefetch = document.createElement("link");
+  workerPrefetch.rel = "prefetch";
+  workerPrefetch.as = "script";
+  workerPrefetch.href = "/pdfjs/pdf.worker.min.js";
+  workerPrefetch.dataset.pdfWorkerPrefetch = "true";
+  document.head.appendChild(workerPrefetch);
+};
+
 export default function PDFViewer() {
   const router = useRouter();
   const [selectedRows, setSelectedRows] = useState<File[]>([]);
@@ -24,6 +35,9 @@ export default function PDFViewer() {
       warmAppRoute(router, "/dashboard/chat");
       if (process.env.NODE_ENV !== "test") {
         void import("./ChatView").catch(() => undefined);
+        // The PDF.js worker is a separate asset and otherwise starts loading
+        // only after both dynamic component chunks have executed.
+        warmPDFPreviewAssets();
       }
     }, 400);
     return () => window.clearTimeout(timer);
@@ -41,6 +55,9 @@ export default function PDFViewer() {
       false,
       true,
     );
+    if (process.env.NODE_ENV !== "test") {
+      warmPDFPreviewAssets();
+    }
 
     router.push(
       buildComplianceAnalysisHref(file.file_id, file.analysis_scope_key),

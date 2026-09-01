@@ -46,7 +46,16 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   );
 };
 
-const PDFReportViewer = dynamic(() => import("./PDFChatViewer"), { ssr: false });
+const PDFReportViewer = dynamic(() => import("./PDFChatViewer"), {
+  ssr: false,
+  loading: () => (
+    <div
+      aria-label="Loading PDF viewer"
+      aria-busy="true"
+      className="h-full min-h-[600px] w-full animate-pulse rounded-lg bg-slate-100"
+    />
+  ),
+});
 const MemoizedPDFReportViewer = React.memo(PDFReportViewer);
 const ComplianceSummaryDrawer = dynamic(
   () => import("./ComplianceSummaryDrawer"),
@@ -122,11 +131,11 @@ const ChatView: React.FC<ChatViewProps> = ({
       type="button"
       onClick={() => setSummaryOpen(true)}
       disabled={analysisMetrics.length === 0}
-      className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#2274BC] px-4 text-xs font-semibold text-white shadow-sm transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-px hover:bg-[#1b63a3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
+      className="inline-flex h-10 items-center gap-2 rounded-full bg-[#2274BC] px-5 text-sm font-semibold text-white shadow-sm transition-[transform,background-color,box-shadow] duration-200 ease-[var(--motion-fluid)] hover:-translate-y-px hover:bg-[#1b63a3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2274BC] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
       title={t("analysis.generateSummaryTooltip")}
       aria-haspopup="dialog"
     >
-      <FileText className="h-3.5 w-3.5" />
+      <FileText className="h-4 w-4" />
       {t("analysis.generateSummary")}
     </button>
   ), [analysisMetrics.length, t]);

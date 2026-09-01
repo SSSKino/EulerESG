@@ -12,6 +12,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import PDFChatViewer from "../PDFChatViewer";
 import { MockIntersectionObserver } from "@/test/setup";
 
+const pdfMocks = vi.hoisted(() => ({
+  getPage: vi.fn(),
+}));
+
 vi.mock("@/lib/auth", () => ({
   getStoredAuth: () => null,
 }));
@@ -93,6 +97,7 @@ vi.mock("react-pdf", async () => {
         const numPages = source.includes("ten-pages") ? 10 : 116;
         const pdfDocument = {
           getPage: vi.fn(async (pageNumber: number) => {
+            pdfMocks.getPage(source, pageNumber);
             if (source.includes("navigation-race") && pageNumber === 20) {
               await new Promise((resolve) => window.setTimeout(resolve, 40));
             }
@@ -292,16 +297,14 @@ describe("PDFChatViewer continuous rendering", () => {
     vi.clearAllMocks();
   });
 
-  it("keeps a 116-page document continuous while mounting no more than nine heavy pages", async () => {
+  it("keeps a 116-page document continuous while mounting only the first render window", async () => {
     render(<PDFChatViewer fileUrl="report-116.pdf" />);
 
     await expectDocumentReady(116);
 
     expect(screen.getByRole("region")).toBeInTheDocument();
     expect(screen.getByTestId("pdf-scroll-container")).toBeInTheDocument();
-    expect(renderedPages().length).toBeGreaterThan(0);
-    expect(renderedPages().length).toBeLessThanOrEqual(9);
-    expect(renderedPageNumbers()).toContain(1);
+    expect(renderedPageNumbers()).toEqual([1, 2]);
 
     for (const renderedPage of renderedPages()) {
       const renderedBoundary = renderedPage.closest<HTMLElement>(
@@ -309,6 +312,18 @@ describe("PDFChatViewer continuous rendering", () => {
       );
       expect(renderedBoundary).not.toBeNull();
     }
+  });
+
+  it("does not scan every PDF page before showing the preview", async () => {
+    render(<PDFChatViewer fileUrl="report-116.pdf" />);
+
+    await expectDocumentReady(116);
+    await waitFor(() => {
+      expect(pdfMocks.getPage).toHaveBeenCalled();
+    });
+
+    expect(pdfMocks.getPage.mock.calls.length).toBeLessThanOrEqual(2);
+    expect(renderedPageNumbers()).toEqual([1, 2]);
   });
 
   it("lazily swaps rendered pages when a later page enters the viewport", async () => {
@@ -338,7 +353,7 @@ describe("PDFChatViewer continuous rendering", () => {
     await waitFor(() => {
       expect(renderedPageNumbers()).toContain(30);
     });
-    expect(renderedPages().length).toBeLessThanOrEqual(9);
+    expect(renderedPages().length).toBeLessThanOrEqual(3);
   });
 
   it("clamps target pages and repeats a same-page jump when the nonce changes", async () => {
@@ -506,7 +521,7 @@ describe("PDFChatViewer continuous rendering", () => {
     }
     expect(screen.getByText("60%")).toBeInTheDocument();
     expect(zoomOut).toBeDisabled();
-    expect(renderedPages().length).toBeLessThanOrEqual(9);
+    expect(renderedPages().length).toBeLessThanOrEqual(3);
   });
 
   it("uses one Ctrl-wheel zoom step inside the scroll container", async () => {
@@ -777,7 +792,7 @@ describe("PDFChatViewer continuous rendering", () => {
     await expectCurrentPage(1, 10);
     expect(renderedPageNumbers()).not.toContain(77);
     expect(renderedPageNumbers()).toContain(1);
-    expect(renderedPages().length).toBeLessThanOrEqual(9);
+    expect(renderedPages().length).toBeLessThanOrEqual(3);
   });
 
   it("shows loading and error fallbacks and can recover with another file", async () => {

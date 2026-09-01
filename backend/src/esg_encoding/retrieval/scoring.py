@@ -42,6 +42,8 @@ def visual_result_fields(segment) -> Dict[str, object]:
         "colspan": getattr(segment, "colspan", 1),
         "parse_pass": getattr(segment, "parse_pass", 1),
         "review_status": getattr(segment, "review_status", None) or data.get("review_status"),
+        "quality_reasons": getattr(segment, "quality_reasons", None) or data.get("quality_reasons") or [],
+        "quality_notes": getattr(segment, "quality_notes", None) or data.get("quality_notes") or [],
         "conflicts": getattr(segment, "conflicts", None) or data.get("conflicts") or [],
     }
     if not data.get("asset_id"):

@@ -90,6 +90,7 @@ describe("ChatView report workspace", () => {
     const generate = screen.getByRole("button", { name: "analysis.generateSummary" });
     expect(screen.getByTestId("analysis-report-heading")).toContainElement(generate);
     expect(screen.getByText("chat.analysis").parentElement?.parentElement).not.toContainElement(generate);
+    expect(generate).toHaveClass("h-10", "px-5", "text-sm");
   });
 
   it("does not render a second assistant owned by the report workspace", () => {

@@ -696,6 +696,8 @@ class CompactAssessmentPayloadTests(unittest.TestCase):
                         {
                             "review_status": "needs_review",
                             "structure_confidence": 0.8,
+                            "quality_reasons": ["missing_header"],
+                            "quality_notes": ["inferred_header_structure"],
                             "conflicts": [{"large": "secret"}, {"large": "secret-2"}],
                         },
                     ],
@@ -727,6 +729,14 @@ class CompactAssessmentPayloadTests(unittest.TestCase):
         self.assertEqual(metric["evidence_sources"][0]["segment_id"], "segment-108")
         self.assertEqual(metric["evidence_sources"][0]["source_report_id"], "source-report-1")
         self.assertEqual(len(metric["evidence_sources"][1]["conflicts"]), 2)
+        self.assertEqual(
+            metric["evidence_sources"][1]["quality_reasons"],
+            ["missing_header"],
+        )
+        self.assertEqual(
+            metric["evidence_sources"][1]["quality_notes"],
+            ["inferred_header_structure"],
+        )
 
 
 if __name__ == "__main__":

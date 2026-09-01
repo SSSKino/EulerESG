@@ -25,8 +25,8 @@ const { Text } = Typography;
 const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 2.6;
 const ZOOM_STEP = 0.1;
-const OVERSCAN_PAGES = 3;
-const MAX_RENDERED_PAGES = 9;
+const OVERSCAN_PAGES = 1;
+const MAX_RENDERED_PAGES = 3;
 const PAGE_GAP = 16;
 const POINTER_DRAG_THRESHOLD = 3;
 
@@ -458,39 +458,10 @@ export default function PDFChatViewer({
     if (container) container.scrollTop = 0;
   }, [cancelPointerDrag, defaultZoom, fileUrl]);
 
-  const preloadPageSizes = useCallback(
-    async (pdfDocument: any, totalPages: number, generation: number) => {
-      const sizes: Record<number, PageSize> = {};
-      let cursor = 1;
-
-      const worker = async () => {
-        while (cursor <= totalPages) {
-          const pageNumber = cursor;
-          cursor += 1;
-          try {
-            const pdfPage = await pdfDocument.getPage(pageNumber);
-            const viewport = pdfPage.getViewport({ scale: 1 });
-            sizes[pageNumber] = { width: viewport.width, height: viewport.height };
-          } catch {
-            sizes[pageNumber] = DEFAULT_PAGE_SIZE;
-          }
-        }
-      };
-
-      await Promise.all(Array.from({ length: Math.min(4, totalPages) }, worker));
-      if (generation !== documentGenerationRef.current) return;
-      pendingAnchorRef.current = captureScrollAnchor();
-      pageSizesRef.current = sizes;
-      setPageSizes(sizes);
-    },
-    [captureScrollAnchor],
-  );
-
   const onDocumentLoadSuccess = useCallback(
     (pdfDocument: any) => {
       const totalPages = Math.max(0, Number(pdfDocument?.numPages) || 0);
       documentRef.current = pdfDocument;
-      const generation = documentGenerationRef.current;
       const requestedPage = normalisePage(targetPage, totalPages) || 1;
 
       currentPageRef.current = requestedPage;
@@ -498,9 +469,8 @@ export default function PDFChatViewer({
       setCurrentPage(requestedPage);
       setPageDraft(requestedPage);
       setRenderedPages(pageWindow(requestedPage, totalPages));
-      void preloadPageSizes(pdfDocument, totalPages, generation);
     },
-    [preloadPageSizes, targetPage],
+    [targetPage],
   );
 
   const commitPageDraft = useCallback((requestedPage: unknown = pageDraft) => {

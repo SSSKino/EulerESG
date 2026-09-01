@@ -196,6 +196,8 @@ class RetrievalResult(BaseModel):
     colspan: int = 1
     parse_pass: int = 1
     review_status: Optional[str] = None
+    quality_reasons: List[str] = Field(default_factory=list)
+    quality_notes: List[str] = Field(default_factory=list)
     conflicts: List[Dict[str, Any]] = Field(default_factory=list)
 
 

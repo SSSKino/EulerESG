@@ -66,6 +66,15 @@ function ChatPageContent() {
     return unscopedCandidates.length === 1 ? unscopedCandidates[0] : null;
   }, [files, requestedFileId, requestedScopeKey]);
 
+  // On a hard refresh the URL already identifies the report, while the file
+  // catalogue is still loading. Start the authenticated PDF and assessment
+  // requests immediately instead of serialising them behind `/api/files`.
+  // Once the catalogue is available, keep its exact scope validation rules.
+  const previewFileId = currentFile?.file_id
+    || (files.length === 0 ? requestedFileId : undefined);
+  const previewScopeKey = currentFile?.analysis_scope_key
+    || (files.length === 0 ? requestedScopeKey : undefined);
+
   useEffect(() => {
     if (!queryFileId || !currentFile?.file_id) return;
     setComplianceSelection(
@@ -99,8 +108,8 @@ function ChatPageContent() {
       <div className="w-[95%]">
         <ChatView
           activeFile={currentFile}
-          fileId={currentFile?.file_id}
-          scopeKey={currentFile?.analysis_scope_key}
+          fileId={previewFileId}
+          scopeKey={previewScopeKey}
         />
       </div>
     </div>

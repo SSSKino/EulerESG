@@ -1799,6 +1799,18 @@ class DisclosureInferenceEngine:
                     "colspan": getattr(result, "colspan", 1),
                     "parse_pass": getattr(result, "parse_pass", 1),
                     "review_status": getattr(result, "review_status", None) or structured.get("review_status"),
+                    "quality_reasons": (
+                        getattr(segment, "quality_reasons", None)
+                        or structured.get("quality_reasons")
+                        or getattr(result, "quality_reasons", None)
+                        or []
+                    ),
+                    "quality_notes": (
+                        getattr(segment, "quality_notes", None)
+                        or structured.get("quality_notes")
+                        or getattr(result, "quality_notes", None)
+                        or []
+                    ),
                     "conflicts": getattr(result, "conflicts", None) or structured.get("conflicts") or [],
                 }
                 segment_metadata.append(metadata)
@@ -2608,7 +2620,18 @@ Assessment principles:
             for field in ("evidence_type", "asset_id", "bbox", "caption", "confidence", "chart_data"):
                 if item.get(field) is not None:
                     source[field] = item[field]
-            for field in ("structure_confidence", "ocr_confidence", "header_path", "rowspan", "colspan", "parse_pass", "review_status", "conflicts"):
+            for field in (
+                "structure_confidence",
+                "ocr_confidence",
+                "header_path",
+                "rowspan",
+                "colspan",
+                "parse_pass",
+                "review_status",
+                "quality_reasons",
+                "quality_notes",
+                "conflicts",
+            ):
                 if item.get(field) not in (None, [], ""):
                     source[field] = item[field]
             if source_report_id:

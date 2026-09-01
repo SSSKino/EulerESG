@@ -1232,6 +1232,7 @@ class DualChannelRetriever:
                         + [str(term) for term in anchor_terms if str(term).lower() in lowered]
                     )[:12],
                     metric_id=getattr(metric, "metric_id", ""),
+                    **visual_result_fields(segment),
                 )
             )
 

@@ -1785,6 +1785,8 @@ def _compact_assessment_payload(payload: dict) -> dict:
         "rowspan",
         "colspan",
         "parse_pass",
+        "quality_reasons",
+        "quality_notes",
     )
 
     compact = {

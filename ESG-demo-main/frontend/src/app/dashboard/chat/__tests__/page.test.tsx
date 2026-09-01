@@ -37,6 +37,8 @@ const mocks = vi.hoisted(() => ({
   setComplianceSelection: vi.fn(),
 }));
 
+const initialFiles = mocks.files.map((file) => ({ ...file }));
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mocks.replace }),
   useSearchParams: () => new URLSearchParams(mocks.search),
@@ -96,6 +98,7 @@ vi.mock("@/store/useFileStore", () => {
 describe("Compliance report restoration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.files.splice(0, mocks.files.length, ...initialFiles.map((file) => ({ ...file })));
     mocks.search = "";
     mocks.selectedFileId = null;
     mocks.selectedFileScopeKey = null;
@@ -105,6 +108,18 @@ describe("Compliance report restoration", () => {
         mocks.selectedFileScopeKey = fileId ? scopeKey || null : null;
       },
     );
+  });
+
+  it("starts the URL-selected preview before the file catalogue finishes loading", async () => {
+    mocks.files.splice(0, mocks.files.length);
+    mocks.search = "file_id=report-a&scope=scope-b";
+
+    render(<ChatPage />);
+
+    const view = await screen.findByTestId("chat-view");
+    expect(view).toHaveAttribute("data-file-id", "report-a");
+    expect(view).toHaveAttribute("data-scope-key", "scope-b");
+    expect(view).toHaveAttribute("data-active-file-key", "");
   });
 
   it("prefers the query scope and restores that exact scope after leaving", async () => {

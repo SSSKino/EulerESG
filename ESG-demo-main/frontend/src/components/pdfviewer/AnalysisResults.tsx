@@ -40,6 +40,8 @@ export type AnalysisDataItem = {
     colspan?: number;
     parse_pass?: number;
     conflicts?: Array<Record<string, unknown>>;
+    quality_reasons?: string[];
+    quality_notes?: string[];
   } | null;
 };
 
@@ -174,6 +176,97 @@ export const getEmptyQuantitativeValueTranslationKey = (
     ? "analysis.summary.multipleValues"
     : "analysis.summary.notSpecified";
 };
+
+export type TableReviewStatus = "verified" | "unverified" | "needs_review" | "unknown";
+
+export const normalizeTableReviewStatus = (reviewStatus: unknown): TableReviewStatus => {
+  const normalized = String(reviewStatus ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+  if (normalized === "verified" || normalized === "unverified" || normalized === "needs_review") {
+    return normalized;
+  }
+  return "unknown";
+};
+
+export const getTableReviewStatusTranslationKey = (
+  reviewStatus: unknown,
+):
+  | "analysis.tableReviewStatus.needsReview"
+  | "analysis.tableReviewStatus.unverified"
+  | "analysis.tableReviewStatus.verified"
+  | "analysis.tableReviewStatus.unknown" => {
+  switch (normalizeTableReviewStatus(reviewStatus)) {
+    case "verified":
+      return "analysis.tableReviewStatus.verified";
+    case "unverified":
+      return "analysis.tableReviewStatus.unverified";
+    case "needs_review":
+      return "analysis.tableReviewStatus.needsReview";
+    default:
+      return "analysis.tableReviewStatus.unknown";
+  }
+};
+
+export const getTableReviewStatusColor = (
+  reviewStatus: unknown,
+): "success" | "processing" | "warning" | "default" => {
+  switch (normalizeTableReviewStatus(reviewStatus)) {
+    case "verified":
+      return "success";
+    case "unverified":
+      return "processing";
+    case "needs_review":
+      return "warning";
+    default:
+      return "default";
+  }
+};
+
+const TABLE_QUALITY_REASON_KEYS: Record<string, string> = {
+  malformed_html: "analysis.tableQuality.reasons.malformedHtml",
+  inconsistent_column_count: "analysis.tableQuality.reasons.inconsistentColumnCount",
+  missing_header: "analysis.tableQuality.reasons.missingHeader",
+  year_value_count_mismatch: "analysis.tableQuality.reasons.yearValueCountMismatch",
+  structure_source_conflict: "analysis.tableQuality.reasons.structureSourceConflict",
+  cell_geometry_alignment_mismatch: "analysis.tableQuality.reasons.cellGeometryAlignmentMismatch",
+  cell_bbox_count_mismatch: "analysis.tableQuality.reasons.cellBboxCountMismatch",
+  low_structure_confidence: "analysis.tableQuality.reasons.lowStructureConfidence",
+  low_ocr_confidence: "analysis.tableQuality.reasons.lowOcrConfidence",
+  weak_table_record_match: "analysis.tableQuality.reasons.weakTableRecordMatch",
+  missing_table_record: "analysis.tableQuality.reasons.missingTableRecord",
+  ambiguous_unit_scope: "analysis.tableQuality.reasons.ambiguousUnitScope",
+  conflicting_year_scope: "analysis.tableQuality.reasons.conflictingYearScope",
+  ambiguous_year_scope: "analysis.tableQuality.reasons.ambiguousYearScope",
+  unexplained_needs_review: "analysis.tableQuality.reasons.unexplainedNeedsReview",
+};
+
+const TABLE_QUALITY_NOTE_KEYS: Record<string, string> = {
+  inferred_header_structure: "analysis.tableQuality.notes.inferredHeaderStructure",
+  missing_ocr_confidence: "analysis.tableQuality.notes.missingOcrConfidence",
+};
+
+export const getTableQualityTranslationKey = (
+  code: unknown,
+  kind: "reason" | "note" = "reason",
+): string => {
+  const normalized = String(code ?? "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+  if (kind === "note") {
+    return TABLE_QUALITY_NOTE_KEYS[normalized] || "analysis.tableQuality.notes.unknown";
+  }
+  return TABLE_QUALITY_REASON_KEYS[normalized] || "analysis.tableQuality.reasons.unknown";
+};
+
+export const normalizeTableQualityCodes = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+  return Array.from(
+    new Set(value.map((item) => String(item ?? "").trim()).filter(Boolean)),
+  );
+};
+
+const formatTableQualityCode = (code: string): string =>
+  code.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
 
 // Extract readable context text from various backend schemas.
 // The backend may return:
@@ -618,6 +711,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           const hasContext = !!contextText;
           const formattedValue = formatDisplayValue(record.value);
           const isDiscussionAndAnalysis = category === "Discussion and Analysis";
+          const tableQualityReasons = normalizeTableQualityCodes(
+            record.tableEvidence?.quality_reasons,
+          );
+          const tableQualityNotes = normalizeTableQualityCodes(
+            record.tableEvidence?.quality_notes,
+          );
 
           let displayValue = "";
           if (status === "fully_disclosed") {
@@ -654,10 +753,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
               )}
               {record.tableEvidence && (
                 <div className="mt-2 rounded border border-gray-200 bg-gray-50 p-2 text-xs">
-                  <Tag color={record.tableEvidence.review_status === "needs_review" ? "warning" : "success"}>
-                    {record.tableEvidence.review_status === "needs_review"
-                      ? ("表格结构待复核")
-                      : ("表格结构已校验")}
+                  <Tag color={getTableReviewStatusColor(record.tableEvidence.review_status)}>
+                    {t(getTableReviewStatusTranslationKey(record.tableEvidence.review_status))}
                   </Tag>
                   <div className="mt-1 text-gray-600">
                     {typeof record.tableEvidence.structure_confidence === "number"
@@ -667,9 +764,39 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
                       ? `OCR ${Math.round(record.tableEvidence.ocr_confidence * 100)}%`
                       : ""}
                   </div>
+                  {tableQualityReasons.length > 0 && (
+                    <div className="mt-2 text-amber-800">
+                      <div className="font-semibold">{t("analysis.tableQuality.issuesLabel")}</div>
+                      <ul className="mt-1 list-disc space-y-0.5 pl-4">
+                        {tableQualityReasons.map((reason) => (
+                          <li key={`reason-${reason}`}>
+                            {t(getTableQualityTranslationKey(reason), {
+                              detail: formatTableQualityCode(reason),
+                            })}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {tableQualityNotes.length > 0 && (
+                    <div className="mt-2 text-slate-600">
+                      <div className="font-semibold">{t("analysis.tableQuality.notesLabel")}</div>
+                      <ul className="mt-1 list-disc space-y-0.5 pl-4">
+                        {tableQualityNotes.map((note) => (
+                          <li key={`note-${note}`}>
+                            {t(getTableQualityTranslationKey(note, "note"), {
+                              detail: formatTableQualityCode(note),
+                            })}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   {!!record.tableEvidence.conflicts?.length && (
                     <div className="mt-1 text-amber-700">
-                      {record.tableEvidence.conflicts.length} conflict(s); value not treated as confirmed.
+                      {t("analysis.tableQuality.conflictSummary", {
+                        count: record.tableEvidence.conflicts.length,
+                      })}
                     </div>
                   )}
                 </div>
